@@ -35,7 +35,7 @@ Once the application is running, you'll be able to:
 * Continuously monitor service availability and response times.
 * View the health status of all registered services from a centralized dashboard.
 * Track incidents and service outages with historical timelines.
-* Monitor workflow execution for scheduled health checks.
+* Continuously monitor registered services through automated health checks.
 * Analyze service health metrics and recent activity.
 * Simulate failures using mock services to test monitoring capabilities.
 
