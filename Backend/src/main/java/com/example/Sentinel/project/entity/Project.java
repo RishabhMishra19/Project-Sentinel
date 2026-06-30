@@ -36,6 +36,7 @@ public class Project {
     private String name;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ProjectStatus status;
 
     @Column(name = "created_by_id", nullable = false)

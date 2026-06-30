@@ -36,6 +36,7 @@ public class Org {
     private String name;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrgStatus status;
 
     @CreationTimestamp

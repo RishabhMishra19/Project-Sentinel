@@ -1,1 +1,25 @@
-/.idea/
+# Maven
+target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# Local Spring Boot configuration
+application-local.properties
+
+# Maven wrapper logs
+.maven/timing.properties

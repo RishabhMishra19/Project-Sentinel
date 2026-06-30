@@ -38,19 +38,23 @@ public class ApiKey {
     private String hashedApiKey;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ApiKeyStatus status;
 
     @Column(name = "env_id", nullable = false)
     private UUID envId;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    @Column(name = "created_by_id")
+    private UUID createdById;
+
+    @Column(name = "revoked_by_id")
+    private UUID revokedById;
 
     @Column(name = "revoked_at")
     private Instant revokedAt;
 
-    @Column(name = "revoked_by_id")
-    private UUID revokedById;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
 
 }

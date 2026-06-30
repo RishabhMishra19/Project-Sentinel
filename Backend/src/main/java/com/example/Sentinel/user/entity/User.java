@@ -21,7 +21,7 @@ import java.util.UUID;
 
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @Setter
 @Builder
@@ -46,9 +46,11 @@ public class User {
     private UUID orgId;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private UserStatus status;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private UserRole role;
 
     @CreationTimestamp

@@ -1,6 +1,6 @@
-package com.example.Sentinel.environment.entity;
+package com.example.Sentinel.invitation.entity;
 
-
+import com.example.Sentinel.user.entity.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,47 +15,48 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "environment")
+@Table(name = "invitation")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Environment {
+public class Invitation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
-    private String name;
+    private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EnvCategory category;
+    private UserRole role;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EnvStatus status;
+    private InvitationStatus status;
 
-    @Column(name = "project_id", nullable = false)
-    private UUID projectId;
+    @Column(name = "org_id", nullable = false)
+    private UUID orgId;
 
-    @Column(name = "created_by_id", nullable = false)
-    private UUID createdById;
+    @Column(name = "invited_by_id", nullable = false)
+    private UUID invitedById;
+
+    @Column(name = "hashed_token", nullable = false)
+    private String hashedToken;
+
+    @Column(name = "expires_at", nullable = false)
+    private Instant expiresAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+    private Instant created_at;
 
 }
