@@ -39,6 +39,9 @@ public class Org {
     @Column(nullable = false)
     private OrgStatus status;
 
+    @Column(name = "owner_id")
+    private UUID ownerId;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
