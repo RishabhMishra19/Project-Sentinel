@@ -7,8 +7,6 @@ public interface RefreshTokenService {
 
     String generate(User user);
 
-    String hash(String refreshToken);
-
     RefreshToken validate(String refreshToken);
 
     void revoke(RefreshToken refreshToken);

@@ -2,6 +2,7 @@ package com.example.Sentinel.resources.refreshTokens.service.impl;
 
 import com.example.Sentinel.common.exceptions.BadRequestException;
 import com.example.Sentinel.common.exceptions.ResourceNotFoundException;
+import com.example.Sentinel.common.security.TokenService;
 import com.example.Sentinel.resources.refreshTokens.constants.RefreshTokenErrorCodes;
 import com.example.Sentinel.resources.refreshTokens.entity.RefreshToken;
 import com.example.Sentinel.resources.refreshTokens.repository.RefreshTokenRepository;
@@ -14,12 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
@@ -33,14 +30,15 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final SecurityUtils securityUtils;
     private final UserRepository userRepository;
+    private final TokenService tokenService;
 
     @Override
     public String generate(User user) {
         Instant now = Instant.now();
-        String refreshToken = generateToken();
+        String refreshToken = tokenService.generateToken();
         RefreshToken entity = RefreshToken.builder()
                                           .user(user)
-                                          .tokenHash(hash(refreshToken))
+                                          .tokenHash(tokenService.hash(refreshToken))
                                           .createdAt(now)
                                           .expiresAt(now.plusMillis(refreshTokenExpiration))
                                           .build();
@@ -48,21 +46,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshToken;
     }
 
-    public String hash(String token) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
-            return Base64.getUrlEncoder()
-                         .withoutPadding()
-                         .encodeToString(hash);
-        } catch (NoSuchAlgorithmException ex) {
-            throw new IllegalStateException("SHA-256 algorithm not available.", ex);
-        }
-    }
-
     @Override
     public RefreshToken validate(String refreshToken) {
-        String tokenHash = hash(refreshToken);
+        String tokenHash = tokenService.hash(refreshToken);
 
         RefreshToken token = refreshTokenRepository
                 .findByTokenHash(tokenHash)
@@ -97,11 +83,4 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         refreshTokenRepository.save(refreshToken);
     }
 
-    private String generateToken() {
-        byte[] bytes = new byte[32]; // 256 bits
-        SECURE_RANDOM.nextBytes(bytes);
-        return Base64.getUrlEncoder()
-                     .withoutPadding()
-                     .encodeToString(bytes);
-    }
 }

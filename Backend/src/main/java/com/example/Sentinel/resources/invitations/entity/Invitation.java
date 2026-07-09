@@ -37,4 +37,5 @@ public class Invitation extends UpdatableBaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private InvitationStatus status;
+
 }
