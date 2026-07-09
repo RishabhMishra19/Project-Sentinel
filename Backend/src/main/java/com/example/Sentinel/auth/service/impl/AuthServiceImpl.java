@@ -7,20 +7,30 @@ import com.example.Sentinel.auth.dto.request.SetPasswordRequest;
 import com.example.Sentinel.auth.dto.response.AuthResponse;
 import com.example.Sentinel.auth.dto.response.CurrentUserResponse;
 import com.example.Sentinel.auth.service.AuthService;
+import com.example.Sentinel.common.exceptions.BadRequestException;
 import com.example.Sentinel.common.exceptions.ResourceNotFoundException;
-import com.example.Sentinel.resources.permissions.entity.repository.PermissionRepository;
+import com.example.Sentinel.resources.invitations.entity.Invitation;
+import com.example.Sentinel.resources.invitations.entity.InvitationStatus;
+import com.example.Sentinel.resources.invitations.service.InvitationService;
 import com.example.Sentinel.resources.permissions.entity.service.PermissionService;
 import com.example.Sentinel.resources.refreshTokens.entity.RefreshToken;
 import com.example.Sentinel.resources.refreshTokens.service.RefreshTokenService;
+import com.example.Sentinel.resources.userOrgs.entity.UserOrg;
+import com.example.Sentinel.resources.userOrgs.entity.repository.UserOrgRepository;
+import com.example.Sentinel.resources.userRoles.entity.UserRole;
+import com.example.Sentinel.resources.userRoles.entity.repository.UserRoleRepository;
 import com.example.Sentinel.resources.users.constants.UserErrorCodes;
 import com.example.Sentinel.resources.users.entity.User;
+import com.example.Sentinel.resources.users.entity.UserStatus;
 import com.example.Sentinel.resources.users.entity.repository.UserRepository;
 import com.example.Sentinel.security.jwt.JwtClaims;
 import com.example.Sentinel.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,8 +42,12 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
-    private final PermissionRepository permissionRepository;
     private final PermissionService permissionService;
+    private final InvitationService invitationService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserOrgRepository userOrgRepository;
+    private final UserRoleRepository userRoleRepository;
+
 
     @Override
     public AuthResponse login(LoginRequest request) {
@@ -50,30 +64,7 @@ public class AuthServiceImpl implements AuthService {
                                           "User not found."
                                   ));
 
-        JwtClaims jwtClaims = JwtClaims.builder()
-                                       .userId(user.getId())
-                                       .email(user.getEmail())
-                                       .build();
-
-        String accessToken = jwtService.generateAccessToken(jwtClaims);
-
-        String refreshToken = refreshTokenService.generate(user);
-
-        List<String> permissions = permissionService.getPermissionsByUserId(user.getId());
-
-        CurrentUserResponse currentUser = CurrentUserResponse.builder()
-                                                             .id(user.getId())
-                                                             .name(user.getName())
-                                                             .email(user.getEmail())
-                                                             .status(user.getStatus())
-                                                             .permissions(permissions)
-                                                             .build();
-
-        return AuthResponse.builder()
-                           .accessToken(accessToken)
-                           .refreshToken(refreshToken)
-                           .user(currentUser)
-                           .build();
+        return this.buildAuthResponse(user);
     }
 
     @Override
@@ -83,29 +74,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = refreshToken.getUser();
 
-        JwtClaims jwtClaims = JwtClaims.builder()
-                                       .userId(user.getId())
-                                       .email(user.getEmail())
-                                       .build();
-
-        String accessToken = jwtService.generateAccessToken(jwtClaims);
-
-        List<String> permissions =
-                permissionService.getPermissionsByUserId(user.getId());
-
-        CurrentUserResponse currentUser = CurrentUserResponse.builder()
-                                                             .id(user.getId())
-                                                             .name(user.getName())
-                                                             .email(user.getEmail())
-                                                             .status(user.getStatus())
-                                                             .permissions(permissions)
-                                                             .build();
-
-        return AuthResponse.builder()
-                           .accessToken(accessToken)
-                           .refreshToken(request.getRefreshToken())
-                           .user(currentUser)
-                           .build();
+        return this.buildAuthResponse(user);
     }
 
     @Override
@@ -117,8 +86,76 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public AuthResponse setPassword(SetPasswordRequest request) {
-        return null;
+
+        Invitation invitation = invitationService.validateInvitation(
+                request.getInvitationToken()
+        );
+
+        if (userRepository.existsByEmail(invitation.getEmail())) {
+            throw new BadRequestException(
+                    UserErrorCodes.USER_ALREADY_EXISTS,
+                    "User already exists."
+            );
+        }
+
+        User user = User.builder()
+                        .name(invitation.getName())
+                        .email(invitation.getEmail())
+                        .passwordHash(passwordEncoder.encode(request.getPassword()))
+                        .status(UserStatus.ACTIVE)
+                        .build();
+
+        user = userRepository.save(user);
+
+        UserOrg userOrg = UserOrg.builder()
+                                 .user(user)
+                                 .org(invitation.getOrg())
+                                 .build();
+
+        userOrgRepository.save(userOrg);
+
+        UserRole userRole = UserRole.builder()
+                                    .user(user)
+                                    .role(invitation.getRole())
+                                    .build();
+
+        userRoleRepository.save(userRole);
+
+        invitation.setStatus(InvitationStatus.ACCEPTED);
+
+        return this.buildAuthResponse(user);
+    }
+
+    private AuthResponse buildAuthResponse(User user) {
+
+        JwtClaims jwtClaims = JwtClaims.builder()
+                                       .userId(user.getId())
+                                       .email(user.getEmail())
+                                       .build();
+
+        String accessToken = jwtService.generateAccessToken(jwtClaims);
+
+        String refreshToken = refreshTokenService.generate(user);
+
+        List<String> permissions =
+                permissionService.getPermissionsByUserId(user.getId());
+
+        CurrentUserResponse currentUser =
+                CurrentUserResponse.builder()
+                                   .id(user.getId())
+                                   .name(user.getName())
+                                   .email(user.getEmail())
+                                   .status(user.getStatus())
+                                   .permissions(permissions)
+                                   .build();
+
+        return AuthResponse.builder()
+                           .accessToken(accessToken)
+                           .refreshToken(refreshToken)
+                           .user(currentUser)
+                           .build();
     }
 
 }

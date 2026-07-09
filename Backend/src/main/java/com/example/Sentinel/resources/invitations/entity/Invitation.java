@@ -18,6 +18,9 @@ import java.time.Instant;
 public class Invitation extends UpdatableBaseEntity {
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
