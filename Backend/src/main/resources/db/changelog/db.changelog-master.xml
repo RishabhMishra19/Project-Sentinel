@@ -7,11 +7,12 @@
         http://www.liquibase.org/xml/ns/dbchangelog
         https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="db/migration/V001__create_org_and_user.sql"/>
-    <include file="db/migration/V002__create_project.sql"/>
-    <include file="db/migration/V003__create_environment.sql"/>
-    <include file="db/migration/V004__create_api_key.sql"/>
-    <include file="db/migration/V005__create_invitation.sql"/>
-    <include file="db/migration/V006__create_refresh_token.sql"/>
+    <include file="db/migration/V001__create_base_tables.sql"/>
+    <include file="db/migration/V002__create_relation_tables.sql"/>
+    <include file="db/migration/V003__create_resource_tables.sql"/>
+    <include file="db/migration/V004__create_security_tables.sql"/>
+    <include file="db/migration/V005__seed_data.sql"/>
+    <include file="db/migration/V006__create_audit_tables.sql"/>
+    <include file="db/migration/V007__create_indexes.sql"/>
 
 </databaseChangeLog>
