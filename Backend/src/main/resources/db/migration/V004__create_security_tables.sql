@@ -5,27 +5,29 @@
 -- INVITATIONS
 CREATE TABLE invitations
 (
-    id           UUID PRIMARY KEY,
+    id         UUID PRIMARY KEY,
 
-    email        VARCHAR(255) NOT NULL,
+    name       VARCHAR(255) NOT NULL,
 
-    role_id      UUID         NOT NULL,
-    org_id       UUID         NOT NULL,
+    email      VARCHAR(255) NOT NULL,
 
-    hashed_token VARCHAR(255) NOT NULL,
+    role_id    UUID         NOT NULL,
+    org_id     UUID         NOT NULL,
 
-    expires_at   TIMESTAMPTZ  NOT NULL,
+    token_hash VARCHAR(255) NOT NULL,
 
-    status       VARCHAR(30)  NOT NULL,
+    expires_at TIMESTAMPTZ  NOT NULL,
 
-    created_at   TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by   UUID         NOT NULL,
+    status     VARCHAR(30)  NOT NULL,
 
-    updated_at   TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_by   UUID         NOT NULL,
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID         NOT NULL,
+
+    updated_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by UUID         NOT NULL,
 
     CONSTRAINT uq_invitations_hashed_token
-        UNIQUE (hashed_token),
+        UNIQUE (token_hash),
 
     CONSTRAINT fk_invitations_role
         FOREIGN KEY (role_id) REFERENCES roles (id),

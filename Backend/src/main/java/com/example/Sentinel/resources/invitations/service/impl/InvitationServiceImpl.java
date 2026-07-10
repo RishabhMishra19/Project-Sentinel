@@ -55,7 +55,7 @@ public class InvitationServiceImpl implements InvitationService {
                 .email(email)
                 .org(org)
                 .role(role)
-                .hashedToken(tokenService.hash(invitationToken))
+                .tokenHash(tokenService.hash(invitationToken))
                 .expiresAt(now.plusMillis(invitationExpiration))
                 .status(InvitationStatus.PENDING)
                 .build();
@@ -155,7 +155,7 @@ public class InvitationServiceImpl implements InvitationService {
 
         String invitationToken = tokenService.generateToken();
 
-        invitation.setHashedToken(tokenService.hash(invitationToken));
+        invitation.setTokenHash(tokenService.hash(invitationToken));
 
         invitation.setExpiresAt(Instant.now().plusMillis(invitationExpiration));
 
