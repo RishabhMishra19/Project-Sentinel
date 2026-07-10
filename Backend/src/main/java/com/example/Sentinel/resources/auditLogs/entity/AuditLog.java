@@ -1,7 +1,11 @@
 package com.example.Sentinel.resources.auditLogs.entity;
 
 import com.example.Sentinel.common.baseEntities.CreatedBaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;

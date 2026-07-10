@@ -19,9 +19,7 @@ public class TokenServiceImpl implements TokenService {
         byte[] bytes = new byte[32];
         SECURE_RANDOM.nextBytes(bytes);
 
-        return Base64.getUrlEncoder()
-                     .withoutPadding()
-                     .encodeToString(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     @Override
@@ -30,9 +28,7 @@ public class TokenServiceImpl implements TokenService {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
 
-            return Base64.getUrlEncoder()
-                         .withoutPadding()
-                         .encodeToString(hash);
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
 
         } catch (NoSuchAlgorithmException ex) {
             throw new IllegalStateException("SHA-256 algorithm not available.", ex);

@@ -1,4 +1,5 @@
 package com.example.Sentinel.common.baseEntities;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;

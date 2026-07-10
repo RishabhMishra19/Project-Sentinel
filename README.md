@@ -2,11 +2,16 @@
 
 > **A distributed service monitoring & incident management platform for modern engineering teams.**
 
-Sentinel is a full-stack platform that helps engineering teams monitor the health of their services, detect failures, and track incidents from a single dashboard.
+Sentinel is a full-stack platform that helps engineering teams monitor the health of their services, detect failures,
+and track incidents from a single dashboard.
 
-Modern applications are often built using multiple services, making it difficult to identify failures, understand dependencies, and monitor overall system health. Sentinel aims to simplify this by continuously monitoring registered services, collecting health metrics, and providing engineers with actionable insights through an intuitive web interface.
+Modern applications are often built using multiple services, making it difficult to identify failures, understand
+dependencies, and monitor overall system health. Sentinel aims to simplify this by continuously monitoring registered
+services, collecting health metrics, and providing engineers with actionable insights through an intuitive web
+interface.
 
-The project is being built as a production-inspired engineering platform with a strong focus on scalability, clean architecture, maintainability, and developer experience.
+The project is being built as a production-inspired engineering platform with a strong focus on scalability, clean
+architecture, maintainability, and developer experience.
 
 ---
 
@@ -39,4 +44,5 @@ Once the application is running, you'll be able to:
 * Analyze service health metrics and recent activity.
 * Simulate failures using mock services to test monitoring capabilities.
 
-> **Note:** Sentinel is currently under active development. Features will be introduced incrementally as the project evolves.
+> **Note:** Sentinel is currently under active development. Features will be introduced incrementally as the project
+> evolves.

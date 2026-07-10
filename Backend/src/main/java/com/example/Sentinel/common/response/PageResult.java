@@ -25,15 +25,16 @@ public class PageResult<T> {
     private boolean isLast;
 
     public static <T> PageResult<T> from(Page<T> page) {
-        return PageResult.<T>builder()
-                         .content(page.getContent())
-                         .page(page.getNumber())
-                         .size(page.getSize())
-                         .totalElements(page.getTotalElements())
-                         .totalPages(page.getTotalPages())
-                         .isFirst(page.isFirst())
-                         .isLast(page.isLast())
-                         .build();
+        return PageResult
+                .<T>builder()
+                .content(page.getContent())
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .isFirst(page.isFirst())
+                .isLast(page.isLast())
+                .build();
     }
 
 }

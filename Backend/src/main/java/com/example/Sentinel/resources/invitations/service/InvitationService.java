@@ -8,9 +8,7 @@ import java.util.UUID;
 
 public interface InvitationService {
 
-    Invitation createInvitation(String email,
-                                Org org,
-                                Role role);
+    Invitation createInvitation(String email, Org org, Role role);
 
     Invitation validateInvitation(String invitationToken);
 

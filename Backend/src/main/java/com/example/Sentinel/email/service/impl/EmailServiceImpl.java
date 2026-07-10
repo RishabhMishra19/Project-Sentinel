@@ -23,11 +23,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmail(EmailRequest request) {
         String html = buildHtml(request);
 
-        emailProvider.send(
-                request.getTo(),
-                request.getSubject(),
-                html
-        );
+        emailProvider.send(request.getTo(), request.getSubject(), html);
     }
 
     private String buildHtml(EmailRequest request) {
@@ -36,10 +32,7 @@ public class EmailServiceImpl implements EmailService {
 
         for (Map.Entry<String, Object> entry : request.getVariables().entrySet()) {
 
-            html = html.replace(
-                    "{{" + entry.getKey() + "}}",
-                    String.valueOf(entry.getValue())
-            );
+            html = html.replace("{{" + entry.getKey() + "}}", String.valueOf(entry.getValue()));
         }
 
         return html;
@@ -47,16 +40,12 @@ public class EmailServiceImpl implements EmailService {
 
     private String loadTemplate(EmailTemplate template) {
 
-        try (InputStream inputStream =
-                     new ClassPathResource(template.getPath()).getInputStream()) {
+        try (InputStream inputStream = new ClassPathResource(template.getPath()).getInputStream()) {
 
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
         } catch (IOException ex) {
-            throw new IllegalStateException(
-                    "Unable to load email template: " + template.getPath(),
-                    ex
-            );
+            throw new IllegalStateException("Unable to load email template: " + template.getPath(), ex);
         }
     }
 }

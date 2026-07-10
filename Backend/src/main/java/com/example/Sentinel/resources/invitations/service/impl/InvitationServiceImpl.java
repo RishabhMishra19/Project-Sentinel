@@ -38,47 +38,42 @@ public class InvitationServiceImpl implements InvitationService {
     private long invitationExpiration;
 
     @Override
-    public Invitation createInvitation(String email,
-                                       Org org,
-                                       Role role) {
-        invitationRepository.findByEmailAndStatus(email, InvitationStatus.PENDING)
-                            .ifPresent(invitation -> {
-                                if (invitation.getExpiresAt().isAfter(Instant.now())) {
-                                    throw new BadRequestException(
-                                            InvitationErrorCodes.ACTIVE_INVITATION_ALREADY_EXISTS,
-                                            "An active invitation already exists."
-                                    );
-                                }
-                            });
+    public Invitation createInvitation(String email, Org org, Role role) {
+        invitationRepository.findByEmailAndStatus(email, InvitationStatus.PENDING).ifPresent(invitation -> {
+            if (invitation.getExpiresAt().isAfter(Instant.now())) {
+                throw new BadRequestException(InvitationErrorCodes.ACTIVE_INVITATION_ALREADY_EXISTS,
+                                              "An active invitation already exists.");
+            }
+        });
 
         String invitationToken = tokenService.generateToken();
 
         Instant now = Instant.now();
 
-        Invitation invitation = Invitation.builder()
-                                          .email(email)
-                                          .org(org)
-                                          .role(role)
-                                          .hashedToken(tokenService.hash(invitationToken))
-                                          .expiresAt(now.plusMillis(invitationExpiration))
-                                          .status(InvitationStatus.PENDING)
-                                          .build();
+        Invitation invitation = Invitation
+                .builder()
+                .email(email)
+                .org(org)
+                .role(role)
+                .hashedToken(tokenService.hash(invitationToken))
+                .expiresAt(now.plusMillis(invitationExpiration))
+                .status(InvitationStatus.PENDING)
+                .build();
 
         invitationRepository.save(invitation);
 
-        emailService.sendEmail(
-                EmailRequest.builder()
-                            .to(email)
-                            .subject("You're invited to Sentinel")
-                            .template(EmailTemplate.INVITATION)
-                            .variables(Map.of(
-                                    "invitationUrl",
-                                    "frontendBaseUrl" + "/set-password?token=" + invitationToken,
-                                    "organizationName", org.getName(),
-                                    "roleName", role.getName()
-                            ))
-                            .build()
-        );
+        emailService.sendEmail(EmailRequest
+                                       .builder()
+                                       .to(email)
+                                       .subject("You're invited to Sentinel")
+                                       .template(EmailTemplate.INVITATION)
+                                       .variables(Map.of("invitationUrl",
+                                                         "frontendBaseUrl" + "/set-password?token=" + invitationToken,
+                                                         "organizationName",
+                                                         org.getName(),
+                                                         "roleName",
+                                                         role.getName()))
+                                       .build());
 
         return invitation;
     }
@@ -89,31 +84,20 @@ public class InvitationServiceImpl implements InvitationService {
 
         Invitation invitation = invitationRepository
                 .findByTokenHash(tokenHash)
-                .orElseThrow(() ->
-                                     new ResourceNotFoundException(InvitationErrorCodes.INVITATION_NOT_FOUND,
-                                             "Invitation not found."
-                                     )
-                );
+                .orElseThrow(() -> new ResourceNotFoundException(InvitationErrorCodes.INVITATION_NOT_FOUND,
+                                                                 "Invitation not found."));
 
         if (invitation.getStatus() == InvitationStatus.ACCEPTED) {
-            throw new BadRequestException(
-                    InvitationErrorCodes.INVITATION_ALREADY_ACCEPTED,
-                    "Invitation already accepted."
-            );
+            throw new BadRequestException(InvitationErrorCodes.INVITATION_ALREADY_ACCEPTED,
+                                          "Invitation already accepted.");
         }
 
         if (invitation.getStatus() == InvitationStatus.REVOKED) {
-            throw new BadRequestException(
-                    InvitationErrorCodes.INVITATION_REVOKED,
-                    "Invitation has been revoked."
-            );
+            throw new BadRequestException(InvitationErrorCodes.INVITATION_REVOKED, "Invitation has been revoked.");
         }
 
         if (invitation.getExpiresAt().isBefore(Instant.now())) {
-            throw new BadRequestException(
-                    InvitationErrorCodes.INVITATION_EXPIRED,
-                    "Invitation has expired."
-            );
+            throw new BadRequestException(InvitationErrorCodes.INVITATION_EXPIRED, "Invitation has expired.");
         }
 
         return invitation;
@@ -128,21 +112,19 @@ public class InvitationServiceImpl implements InvitationService {
 
     @Override
     public void revokeInvitation(UUID invitationId) {
-        Invitation invitation = invitationRepository.findById(invitationId)
-                .orElseThrow(()->new ResourceNotFoundException(InvitationErrorCodes.INVITATION_NOT_FOUND, "Invitation not found."));
+        Invitation invitation = invitationRepository
+                .findById(invitationId)
+                .orElseThrow(() -> new ResourceNotFoundException(InvitationErrorCodes.INVITATION_NOT_FOUND,
+                                                                 "Invitation not found."));
 
         if (invitation.getStatus() == InvitationStatus.REVOKED) {
-            throw new BadRequestException(
-                    InvitationErrorCodes.INVITATION_REVOKED,
-                    "Invitation has already been revoked."
-            );
+            throw new BadRequestException(InvitationErrorCodes.INVITATION_REVOKED,
+                                          "Invitation has already been revoked.");
         }
 
         if (invitation.getStatus() == InvitationStatus.ACCEPTED) {
-            throw new BadRequestException(
-                    InvitationErrorCodes.INVITATION_ALREADY_ACCEPTED,
-                    "Accepted invitations cannot be revoked."
-            );
+            throw new BadRequestException(InvitationErrorCodes.INVITATION_ALREADY_ACCEPTED,
+                                          "Accepted invitations cannot be revoked.");
         }
 
         invitation.setStatus(InvitationStatus.REVOKED);
@@ -156,53 +138,41 @@ public class InvitationServiceImpl implements InvitationService {
     @Transactional
     public Invitation resendInvitation(UUID invitationId) {
 
-        Invitation invitation = invitationRepository.findById(invitationId)
-                                                    .orElseThrow(() -> new ResourceNotFoundException(
-                                                            InvitationErrorCodes.INVITATION_NOT_FOUND,
-                                                            "Invitation not found."
-                                                    ));
+        Invitation invitation = invitationRepository
+                .findById(invitationId)
+                .orElseThrow(() -> new ResourceNotFoundException(InvitationErrorCodes.INVITATION_NOT_FOUND,
+                                                                 "Invitation not found."));
 
         if (invitation.getStatus() == InvitationStatus.ACCEPTED) {
-            throw new BadRequestException(
-                    InvitationErrorCodes.INVITATION_ALREADY_ACCEPTED,
-                    "Accepted invitations cannot be resent."
-            );
+            throw new BadRequestException(InvitationErrorCodes.INVITATION_ALREADY_ACCEPTED,
+                                          "Accepted invitations cannot be resent.");
         }
 
         if (invitation.getStatus() == InvitationStatus.REVOKED) {
-            throw new BadRequestException(
-                    InvitationErrorCodes.INVITATION_REVOKED,
-                    "Revoked invitations cannot be resent."
-            );
+            throw new BadRequestException(InvitationErrorCodes.INVITATION_REVOKED,
+                                          "Revoked invitations cannot be resent.");
         }
 
         String invitationToken = tokenService.generateToken();
 
-        invitation.setHashedToken(
-                tokenService.hash(invitationToken)
-        );
+        invitation.setHashedToken(tokenService.hash(invitationToken));
 
-        invitation.setExpiresAt(
-                Instant.now().plusMillis(invitationExpiration)
-        );
+        invitation.setExpiresAt(Instant.now().plusMillis(invitationExpiration));
 
         invitation.setStatus(InvitationStatus.PENDING);
 
-        emailService.sendEmail(
-                EmailRequest.builder()
-                            .to(invitation.getEmail())
-                            .subject("You're invited to Sentinel")
-                            .template(EmailTemplate.INVITATION)
-                            .variables(Map.of(
-                                    "invitationUrl",
-                                    "frontendBaseUrl" + "/set-password?token=" + invitationToken,
-                                    "organizationName",
-                                    invitation.getOrg().getName(),
-                                    "roleName",
-                                    invitation.getRole().getName()
-                            ))
-                            .build()
-        );
+        emailService.sendEmail(EmailRequest
+                                       .builder()
+                                       .to(invitation.getEmail())
+                                       .subject("You're invited to Sentinel")
+                                       .template(EmailTemplate.INVITATION)
+                                       .variables(Map.of("invitationUrl",
+                                                         "frontendBaseUrl" + "/set-password?token=" + invitationToken,
+                                                         "organizationName",
+                                                         invitation.getOrg().getName(),
+                                                         "roleName",
+                                                         invitation.getRole().getName()))
+                                       .build());
 
         return invitation;
     }

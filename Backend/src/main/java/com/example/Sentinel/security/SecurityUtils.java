@@ -11,13 +11,10 @@ import org.springframework.stereotype.Component;
 public class SecurityUtils {
 
     public CustomUserDetails getCurrentUser() {
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails user)) {
-            throw new UnauthorizedException(CommonErrorCodes.USER_UNAUTHENTICATED,
-                                            "User is not authenticated."
-            );
+            throw new UnauthorizedException(CommonErrorCodes.USER_UNAUTHENTICATED, "User is not authenticated.");
         }
 
         return user;

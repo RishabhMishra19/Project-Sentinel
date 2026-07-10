@@ -39,33 +39,21 @@ public final class ResponseBuilder {
         return error(status, errorCode, message, null);
     }
 
-    public static ResponseEntity<ErrorResponse> error(
-            HttpStatus status,
-            String errorCode,
-            String message,
-            List<FieldErrorResponse> errors
-    ) {
+    public static ResponseEntity<ErrorResponse> error(HttpStatus status, String errorCode, String message, List<FieldErrorResponse> errors) {
         return ResponseEntity.status(status).body(buildError(errorCode, message, errors));
     }
 
     private static <T> ApiResponse<T> buildSuccess(String message, T data) {
-        return ApiResponse.<T>builder()
-                          .message(message)
-                          .data(data)
-                          .timestamp(Instant.now())
-                          .build();
+        return ApiResponse.<T>builder().message(message).data(data).timestamp(Instant.now()).build();
     }
 
-    private static ErrorResponse buildError(
-            String errorCode,
-            String message,
-            List<FieldErrorResponse> errors
-    ) {
-        return ErrorResponse.builder()
-                            .errorCode(errorCode)
-                            .message(message)
-                            .errors(errors)
-                            .timestamp(Instant.now())
-                            .build();
+    private static ErrorResponse buildError(String errorCode, String message, List<FieldErrorResponse> errors) {
+        return ErrorResponse
+                .builder()
+                .errorCode(errorCode)
+                .message(message)
+                .errors(errors)
+                .timestamp(Instant.now())
+                .build();
     }
 }

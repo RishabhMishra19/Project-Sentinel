@@ -36,12 +36,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public String generate(User user) {
         Instant now = Instant.now();
         String refreshToken = tokenService.generateToken();
-        RefreshToken entity = RefreshToken.builder()
-                                          .user(user)
-                                          .tokenHash(tokenService.hash(refreshToken))
-                                          .createdAt(now)
-                                          .expiresAt(now.plusMillis(refreshTokenExpiration))
-                                          .build();
+        RefreshToken entity = RefreshToken
+                .builder()
+                .user(user)
+                .tokenHash(tokenService.hash(refreshToken))
+                .createdAt(now)
+                .expiresAt(now.plusMillis(refreshTokenExpiration))
+                .build();
         refreshTokenRepository.save(entity);
         return refreshToken;
     }
@@ -52,23 +53,16 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         RefreshToken token = refreshTokenRepository
                 .findByTokenHash(tokenHash)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        RefreshTokenErrorCodes.REFRESH_TOKEN_NOT_FOUND,
-                        "Refresh Token not found."
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException(RefreshTokenErrorCodes.REFRESH_TOKEN_NOT_FOUND,
+                                                                 "Refresh Token not found."));
 
         if (token.getRevokedAt() != null) {
-            throw new BadRequestException(
-                    RefreshTokenErrorCodes.REFRESH_TOKEN_REVOKED,
-                    "Refresh token has been revoked."
-            );
+            throw new BadRequestException(RefreshTokenErrorCodes.REFRESH_TOKEN_REVOKED,
+                                          "Refresh token has been revoked.");
         }
 
         if (token.getExpiresAt().isBefore(Instant.now())) {
-            throw new BadRequestException(
-                    RefreshTokenErrorCodes.REFRESH_TOKEN_EXPIRED,
-                    "Refresh token has expired."
-            );
+            throw new BadRequestException(RefreshTokenErrorCodes.REFRESH_TOKEN_EXPIRED, "Refresh token has expired.");
         }
 
         return token;

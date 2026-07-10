@@ -51,26 +51,19 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),
+                                                                                   request.getPassword()));
 
-        User user = userRepository.findByEmail(request.getEmail())
-                                  .orElseThrow(() -> new ResourceNotFoundException(
-                                          UserErrorCodes.USER_NOT_FOUND,
-                                          "User not found."
-                                  ));
+        User user = userRepository
+                .findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));
 
         return this.buildAuthResponse(user);
     }
 
     @Override
     public AuthResponse refreshAccessToken(RefreshTokenRequest request) {
-        RefreshToken refreshToken =
-                refreshTokenService.validate(request.getRefreshToken());
+        RefreshToken refreshToken = refreshTokenService.validate(request.getRefreshToken());
 
         User user = refreshToken.getUser();
 
@@ -79,8 +72,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(LogoutRequest request) {
-        RefreshToken refreshToken =
-                refreshTokenService.validate(request.getRefreshToken());
+        RefreshToken refreshToken = refreshTokenService.validate(request.getRefreshToken());
 
         refreshTokenService.revoke(refreshToken);
     }
@@ -89,37 +81,27 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public AuthResponse setPassword(SetPasswordRequest request) {
 
-        Invitation invitation = invitationService.validateInvitation(
-                request.getInvitationToken()
-        );
+        Invitation invitation = invitationService.validateInvitation(request.getInvitationToken());
 
         if (userRepository.existsByEmail(invitation.getEmail())) {
-            throw new BadRequestException(
-                    UserErrorCodes.USER_ALREADY_EXISTS,
-                    "User already exists."
-            );
+            throw new BadRequestException(UserErrorCodes.USER_ALREADY_EXISTS, "User already exists.");
         }
 
-        User user = User.builder()
-                        .name(invitation.getName())
-                        .email(invitation.getEmail())
-                        .passwordHash(passwordEncoder.encode(request.getPassword()))
-                        .status(UserStatus.ACTIVE)
-                        .build();
+        User user = User
+                .builder()
+                .name(invitation.getName())
+                .email(invitation.getEmail())
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .status(UserStatus.ACTIVE)
+                .build();
 
         user = userRepository.save(user);
 
-        UserOrg userOrg = UserOrg.builder()
-                                 .user(user)
-                                 .org(invitation.getOrg())
-                                 .build();
+        UserOrg userOrg = UserOrg.builder().user(user).org(invitation.getOrg()).build();
 
         userOrgRepository.save(userOrg);
 
-        UserRole userRole = UserRole.builder()
-                                    .user(user)
-                                    .role(invitation.getRole())
-                                    .build();
+        UserRole userRole = UserRole.builder().user(user).role(invitation.getRole()).build();
 
         userRoleRepository.save(userRole);
 
@@ -130,32 +112,24 @@ public class AuthServiceImpl implements AuthService {
 
     private AuthResponse buildAuthResponse(User user) {
 
-        JwtClaims jwtClaims = JwtClaims.builder()
-                                       .userId(user.getId())
-                                       .email(user.getEmail())
-                                       .build();
+        JwtClaims jwtClaims = JwtClaims.builder().userId(user.getId()).email(user.getEmail()).build();
 
         String accessToken = jwtService.generateAccessToken(jwtClaims);
 
         String refreshToken = refreshTokenService.generate(user);
 
-        List<String> permissions =
-                permissionService.getPermissionsByUserId(user.getId());
+        List<String> permissions = permissionService.getPermissionsByUserId(user.getId());
 
-        CurrentUserResponse currentUser =
-                CurrentUserResponse.builder()
-                                   .id(user.getId())
-                                   .name(user.getName())
-                                   .email(user.getEmail())
-                                   .status(user.getStatus())
-                                   .permissions(permissions)
-                                   .build();
+        CurrentUserResponse currentUser = CurrentUserResponse
+                .builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .status(user.getStatus())
+                .permissions(permissions)
+                .build();
 
-        return AuthResponse.builder()
-                           .accessToken(accessToken)
-                           .refreshToken(refreshToken)
-                           .user(currentUser)
-                           .build();
+        return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).user(currentUser).build();
     }
 
 }

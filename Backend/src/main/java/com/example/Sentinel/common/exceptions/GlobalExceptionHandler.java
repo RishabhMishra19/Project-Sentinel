@@ -25,29 +25,27 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
-        List<FieldErrorResponse> errors = ex.getBindingResult()
-                                            .getFieldErrors()
-                                            .stream()
-                                            .map(error -> FieldErrorResponse.builder()
-                                                                            .field(error.getField())
-                                                                            .message(error.getDefaultMessage())
-                                                                            .build())
-                                            .toList();
+        List<FieldErrorResponse> errors = ex
+                .getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> FieldErrorResponse
+                        .builder()
+                        .field(error.getField())
+                        .message(error.getDefaultMessage())
+                        .build())
+                .toList();
 
-        return ResponseBuilder.error(
-                HttpStatus.BAD_REQUEST,
-                CommonErrorCodes.VALIDATION_ERROR,
-                "Validation failed",
-                errors
-        );
+        return ResponseBuilder.error(HttpStatus.BAD_REQUEST,
+                                     CommonErrorCodes.VALIDATION_ERROR,
+                                     "Validation failed",
+                                     errors);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-        return ResponseBuilder.error(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                CommonErrorCodes.INTERNAL_SERVER_ERROR,
-                "Something went wrong. Please try again later."
-        );
+        return ResponseBuilder.error(HttpStatus.INTERNAL_SERVER_ERROR,
+                                     CommonErrorCodes.INTERNAL_SERVER_ERROR,
+                                     "Something went wrong. Please try again later.");
     }
 }

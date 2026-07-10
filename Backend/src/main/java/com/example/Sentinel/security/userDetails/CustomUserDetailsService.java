@@ -25,40 +25,31 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public @NonNull UserDetails loadUserByUsername(@NonNull String email) {
-        User user = userRepository.findByEmail(email)
-                                  .orElseThrow(() -> new ResourceNotFoundException(
-                                          UserErrorCodes.USER_NOT_FOUND,
-                                          "User not found."
-                                  ));
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));
 
         return this.build(user);
     }
 
     public CustomUserDetails loadCustomUserByUserId(UUID userId) {
-        User user = userRepository.findById(userId)
-                                  .orElseThrow(() -> new ResourceNotFoundException(
-                                          UserErrorCodes.USER_NOT_FOUND,
-                                          "User not found."
-                                  ));
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));
 
         return this.build(user);
     }
 
-    private CustomUserDetails build(User user){
-        List<GrantedAuthority> authorities =
-                permissionRepository.findPermissionsByUserId(user.getId())
-                                    .stream()
-                                    .<GrantedAuthority>map(permission ->
-                                                 new SimpleGrantedAuthority(
-                                                         permission.getEntity().name() + "_" + permission.getAction().name()
-                                                 )
-                                    )
-                                    .toList();
-        return new CustomUserDetails(
-                user.getId(),
-                user.getEmail(),
-                user.getPasswordHash(),
-                authorities
-        );
+    private CustomUserDetails build(User user) {
+        List<GrantedAuthority> authorities = permissionRepository
+                .findPermissionsByUserId(user.getId())
+                .stream()
+                .<GrantedAuthority>map(permission -> new SimpleGrantedAuthority(permission
+                                                                                        .getEntity()
+                                                                                        .name() + "_" + permission
+                        .getAction()
+                        .name()))
+                .toList();
+        return new CustomUserDetails(user.getId(), user.getEmail(), user.getPasswordHash(), authorities);
     }
 }

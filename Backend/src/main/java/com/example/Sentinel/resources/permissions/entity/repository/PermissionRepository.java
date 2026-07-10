@@ -10,14 +10,14 @@ import java.util.UUID;
 public interface PermissionRepository extends JpaRepository<Permission, UUID> {
 
     @Query("""
-    SELECT p
-    FROM Permission p
-    JOIN RolePermission rp ON rp.permission = p
-    JOIN UserRole ur ON ur.role = rp.role
-    WHERE ur.user.id = :userId
-    AND ur.status = 'ACTIVE'
-    AND rp.status = 'ACTIVE'
-    AND p.status = 'ACTIVE'
-    """)
+            SELECT p
+            FROM Permission p
+            JOIN RolePermission rp ON rp.permission = p
+            JOIN UserRole ur ON ur.role = rp.role
+            WHERE ur.user.id = :userId
+            AND ur.status = 'ACTIVE'
+            AND rp.status = 'ACTIVE'
+            AND p.status = 'ACTIVE'
+            """)
     List<Permission> findPermissionsByUserId(UUID userId);
 }

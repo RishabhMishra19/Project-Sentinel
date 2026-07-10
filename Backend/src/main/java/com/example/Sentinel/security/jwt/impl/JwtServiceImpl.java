@@ -29,23 +29,25 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateAccessToken(JwtClaims claims) {
         Instant now = Instant.now();
-        return Jwts.builder()
-                   .subject(claims.getEmail())
-                   .claim("userId", claims.getUserId().toString())
-                   .issuedAt(Date.from(now))
-                   .expiration(Date.from(now.plusMillis(accessTokenExpiration)))
-                   .signWith(getSigningKey())
-                   .compact();
+        return Jwts
+                .builder()
+                .subject(claims.getEmail())
+                .claim("userId", claims.getUserId().toString())
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusMillis(accessTokenExpiration)))
+                .signWith(getSigningKey())
+                .compact();
     }
 
     @Override
     public JwtClaims extractClaims(String accessToken) {
         Claims claims = extractAllClaims(accessToken);
 
-        return JwtClaims.builder()
-                        .userId(UUID.fromString(claims.get("userId", String.class)))
-                        .email(claims.getSubject())
-                        .build();
+        return JwtClaims
+                .builder()
+                .userId(UUID.fromString(claims.get("userId", String.class)))
+                .email(claims.getSubject())
+                .build();
     }
 
     @Override
@@ -59,11 +61,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                   .verifyWith(getSigningKey())
-                   .build()
-                   .parseSignedClaims(token)
-                   .getPayload();
+        return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload();
     }
 
     private SecretKey getSigningKey() {

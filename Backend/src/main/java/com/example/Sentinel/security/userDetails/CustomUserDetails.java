@@ -21,12 +21,7 @@ public class CustomUserDetails implements UserDetails {
     private final Collection<? extends GrantedAuthority> authorities;
 
     public static CustomUserDetails from(User user) {
-        return new CustomUserDetails(
-                user.getId(),
-                user.getEmail(),
-                user.getPasswordHash(),
-                Collections.emptyList()
-        );
+        return new CustomUserDetails(user.getId(), user.getEmail(), user.getPasswordHash(), Collections.emptyList());
     }
 
     @Override
