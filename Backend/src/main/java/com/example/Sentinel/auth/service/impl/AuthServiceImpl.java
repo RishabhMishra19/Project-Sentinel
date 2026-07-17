@@ -7,8 +7,10 @@ import com.example.Sentinel.auth.dto.request.SetPasswordRequest;
 import com.example.Sentinel.auth.dto.response.AuthResponse;
 import com.example.Sentinel.auth.dto.response.CurrentUserResponse;
 import com.example.Sentinel.auth.service.AuthService;
+import com.example.Sentinel.common.constants.CommonErrorCodes;
 import com.example.Sentinel.common.exceptions.BadRequestException;
 import com.example.Sentinel.common.exceptions.ResourceNotFoundException;
+import com.example.Sentinel.common.exceptions.UnauthorizedException;
 import com.example.Sentinel.resources.invitations.entity.Invitation;
 import com.example.Sentinel.resources.invitations.entity.InvitationStatus;
 import com.example.Sentinel.resources.invitations.service.InvitationService;
@@ -28,6 +30,7 @@ import com.example.Sentinel.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,9 +54,19 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),
-                                                                                   request.getPassword()));
-
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (AuthenticationException ex) {
+            throw new UnauthorizedException(
+                    CommonErrorCodes.INVALID_CREDENTIALS,
+                    "Invalid email or password."
+            );
+        }
         User user = userRepository
                 .findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));

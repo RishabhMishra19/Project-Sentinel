@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public @NonNull UserDetails loadUserByUsername(@NonNull String email) {
         User user = userRepository
                 .findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
         return this.build(user);
     }
@@ -35,7 +36,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public CustomUserDetails loadCustomUserByUserId(UUID userId) {
         User user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));
+                .orElseThrow(() -> new UsernameNotFoundException( "User not found."));
 
         return this.build(user);
     }

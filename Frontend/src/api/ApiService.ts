@@ -8,6 +8,7 @@ class ApiService {
   }
 
   public async post<T, R>(url: string, body: T, config?: AxiosRequestConfig): Promise<R> {
+    console.log("rishabh", import.meta.env.VITE_API_BASE_URL);
     const { data } = await apiClient.post<R>(url, body, config);
     return data;
   }
