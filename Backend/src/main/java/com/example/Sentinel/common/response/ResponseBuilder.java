@@ -11,23 +11,23 @@ public final class ResponseBuilder {
 
     private ResponseBuilder() {}
 
-    public static <T> ResponseEntity<ApiResponse<T>> ok(String message, T data) {
+    public static <T> ResponseEntity<ApiSuccessResponse<T>> ok(String message, T data) {
         return ResponseEntity.ok(buildSuccess(message, data));
     }
 
-    public static ResponseEntity<ApiResponse<Void>> ok(String message) {
+    public static ResponseEntity<ApiSuccessResponse<Void>> ok(String message) {
         return ResponseEntity.ok(buildSuccess(message, null));
     }
 
-    public static <T> ResponseEntity<ApiResponse<T>> created(String message, T data) {
+    public static <T> ResponseEntity<ApiSuccessResponse<T>> created(String message, T data) {
         return ResponseEntity.status(HttpStatus.CREATED).body(buildSuccess(message, data));
     }
 
-    public static ResponseEntity<ApiResponse<Void>> created(String message) {
+    public static ResponseEntity<ApiSuccessResponse<Void>> created(String message) {
         return ResponseEntity.status(HttpStatus.CREATED).body(buildSuccess(message, null));
     }
 
-    public static <T> ResponseEntity<ApiResponse<PageResult<T>>> ok(String message, Page<T> page) {
+    public static <T> ResponseEntity<ApiSuccessResponse<PageResult<T>>> ok(String message, Page<T> page) {
         return ResponseEntity.ok(buildSuccess(message, PageResult.from(page)));
     }
 
@@ -35,20 +35,20 @@ public final class ResponseBuilder {
         return ResponseEntity.noContent().build();
     }
 
-    public static ResponseEntity<ErrorResponse> error(HttpStatus status, String errorCode, String message) {
+    public static ResponseEntity<ApiErrorResponse> error(HttpStatus status, String errorCode, String message) {
         return error(status, errorCode, message, null);
     }
 
-    public static ResponseEntity<ErrorResponse> error(HttpStatus status, String errorCode, String message, List<FieldErrorResponse> errors) {
+    public static ResponseEntity<ApiErrorResponse> error(HttpStatus status, String errorCode, String message, List<FieldErrorResponse> errors) {
         return ResponseEntity.status(status).body(buildError(errorCode, message, errors));
     }
 
-    private static <T> ApiResponse<T> buildSuccess(String message, T data) {
-        return ApiResponse.<T>builder().message(message).data(data).timestamp(Instant.now()).build();
+    private static <T> ApiSuccessResponse<T> buildSuccess(String message, T data) {
+        return ApiSuccessResponse.<T>builder().message(message).data(data).timestamp(Instant.now()).build();
     }
 
-    private static ErrorResponse buildError(String errorCode, String message, List<FieldErrorResponse> errors) {
-        return ErrorResponse
+    private static ApiErrorResponse buildError(String errorCode, String message, List<FieldErrorResponse> errors) {
+        return ApiErrorResponse
                 .builder()
                 .errorCode(errorCode)
                 .message(message)

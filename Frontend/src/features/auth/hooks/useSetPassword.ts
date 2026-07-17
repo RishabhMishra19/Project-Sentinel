@@ -1,40 +1,24 @@
-import {useMutation} from "@tanstack/react-query";
-import {useNavigate} from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 import authApi from "../api/authApi";
-import {authenticate} from "../authSlice";
+import { authenticate } from "../authSlice";
 
-import {ROUTES} from "@/app/router/routes";
-import {authStorage} from "@/common/storage/authStorage";
-import {useAppDispatch} from "@/common/hooks/useAppDispatch";
+import { ROUTES } from "@/router/routes";
+import LocalStorageService from "@/storage/LocalStorageService";
+import { useAppDispatch } from "@/reduxStore/hooks";
 
 export default function useSetPassword() {
+  const dispatch = useAppDispatch();
 
-    const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
-
-    return useMutation({
-
-        mutationFn: authApi.setPassword,
-
-        onSuccess(response) {
-
-            authStorage.saveRefreshToken(
-                response.refreshToken
-            );
-
-            dispatch(
-                authenticate({
-                    accessToken: response.accessToken,
-                    user: response.user,
-                })
-            );
-
-            navigate(ROUTES.DASHBOARD);
-
-        },
-
-    });
-
+  return useMutation({
+    mutationFn: authApi.setPassword,
+    onSuccess(response) {
+      LocalStorageService.saveRefreshToken(response.refreshToken);
+      dispatch(authenticate({ currentUser: response.user }));
+      navigate(ROUTES.DASHBOARD);
+    },
+  });
 }

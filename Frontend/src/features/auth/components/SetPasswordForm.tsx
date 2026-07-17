@@ -1,158 +1,67 @@
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import {Button} from "@/common/components/ui/button";
-import {Input} from "@/common/components/ui/input";
-import {Label} from "@/common/components/ui/label";
+import { Button } from "@/components/ui/button";
 
-import PasswordField from "@/common/components/forms/PasswordField";
-import PasswordRequirements from "@/common/components/forms/PasswordRequirements";
-
-import {type SetPasswordFormData, setPasswordSchema,} from "../validation/setPasswordSchema";
+import { type SetPasswordFormData, setPasswordSchema } from "../validation/setPasswordSchema";
 
 import useSetPassword from "../hooks/useSetPassword";
+import PasswordField from "@/components/ui/PasswordField";
 
 interface SetPasswordFormProps {
-
-    invitationToken: string;
-
+  invitationToken: string;
 }
 
-export default function SetPasswordForm({
+export default function SetPasswordForm({ invitationToken }: SetPasswordFormProps) {
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isValid },
+  } = useForm<SetPasswordFormData>({
+    resolver: zodResolver(setPasswordSchema),
+    mode: "onChange",
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-                                            invitationToken,
+  const password = useWatch({ control, name: "password" });
 
-                                        }: SetPasswordFormProps) {
+  const { mutate, isPending } = useSetPassword();
 
-    const {
+  const onSubmit = (data: SetPasswordFormData) => {
+    mutate({ invitationToken, password: data.password });
+  };
 
-        register,
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <PasswordField
+        id="password"
+        label="Password"
+        placeholder="Enter password"
+        registration={register("password")}
+        error={errors.password?.message}
+        showRequirements={true}
+        password={password}
+      />
 
-        handleSubmit,
+      <PasswordField
+        id="confirmPassword"
+        label="Confirm Password"
+        placeholder="Confirm password"
+        registration={register("confirmPassword")}
+        error={errors.confirmPassword?.message}
+      />
 
-        watch,
-
-        formState: {
-
-            errors,
-
-            isValid,
-
-        },
-
-    } = useForm<SetPasswordFormData>({
-
-        resolver: zodResolver(setPasswordSchema),
-
-        mode: "onChange",
-
-        defaultValues: {
-
-            name: "",
-
-            password: "",
-
-            confirmPassword: "",
-
-        },
-
-    });
-
-    const password = watch("password");
-
-    const {
-
-        mutate,
-
-        isPending,
-
-    } = useSetPassword();
-
-    function onSubmit(data: SetPasswordFormData) {
-
-        mutate({
-
-            invitationToken,
-
-            name: data.name,
-
-            password: data.password,
-
-        });
-
-    }
-
-    return (
-
-        <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-6"
-        >
-
-            <div className="space-y-2">
-
-                <Label htmlFor="name">
-
-                    Full Name
-
-                </Label>
-
-                <Input
-                    id="name"
-                    placeholder="John Doe"
-                    {...register("name")}
-                />
-
-                {
-                    errors.name && (
-
-                        <p className="text-sm text-red-500">
-
-                            {errors.name.message}
-
-                        </p>
-
-                    )
-                }
-
-            </div>
-
-            <PasswordField
-                id="password"
-                label="Password"
-                placeholder="Enter password"
-                registration={register("password")}
-                error={errors.password?.message}
-            />
-
-            <PasswordRequirements
-                password={password}
-            />
-
-            <PasswordField
-                id="confirmPassword"
-                label="Confirm Password"
-                placeholder="Confirm password"
-                registration={register("confirmPassword")}
-                error={errors.confirmPassword?.message}
-            />
-
-            <Button
-                type="submit"
-                className="w-full"
-                disabled={!isValid || isPending}
-            >
-
-                {
-                    isPending
-                        ? "Creating Account..."
-                        : "Create Account"
-                }
-
-            </Button>
-
-        </form>
-
-    );
-
+      <Button
+        type="submit"
+        className="w-full h-12 rounded-xl bg-blue-600 font-semibold hover:bg-blue-700 cursor-pointer"
+        disabled={!isValid || isPending}
+      >
+        {isPending ? "Activating Account..." : "Activate Account"}
+      </Button>
+    </form>
+  );
 }

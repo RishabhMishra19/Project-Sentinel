@@ -1,60 +1,33 @@
-import {useEffect} from "react";
+import { useEffect } from "react";
 
 import authApi from "../api/authApi";
-import {authenticate, finishLoading, logout,} from "../authSlice";
+import { authenticate, finishLoading, logout } from "../authSlice";
 
-import {authStorage} from "@/common/storage/authStorage";
-import {useAppDispatch} from "@/common/hooks/useAppDispatch";
+import LocalStorageService from "@/storage/LocalStorageService";
+import { useAppDispatch } from "@/reduxStore/hooks";
 
 export default function useRestoreSession() {
+  const dispatch = useAppDispatch();
 
-    const dispatch = useAppDispatch();
+  useEffect(() => {
+    async function restoreSession() {
+      const refreshToken = LocalStorageService.getRefreshToken();
 
-    useEffect(() => {
+      if (!refreshToken) {
+        dispatch(finishLoading());
+        return;
+      }
 
-        async function restoreSession() {
+      try {
+        const { accessToken, user } = await authApi.refreshToken({ refreshToken });
+        LocalStorageService.saveAccessToken(accessToken);
+        dispatch(authenticate({ currentUser: user }));
+      } catch {
+        LocalStorageService.removeRefreshToken();
+        dispatch(logout());
+      }
+    }
 
-            const refreshToken =
-                authStorage.getRefreshToken();
-
-            if (!refreshToken) {
-
-                dispatch(finishLoading());
-
-                return;
-
-            }
-
-            try {
-
-                const response =
-                    await authApi.refreshAccessToken({
-                        refreshToken,
-                    });
-
-                authStorage.saveRefreshToken(
-                    response.refreshToken
-                );
-
-                dispatch(
-                    authenticate({
-                        accessToken: response.accessToken,
-                        user: response.user,
-                    })
-                );
-
-            } catch {
-
-                authStorage.removeRefreshToken();
-
-                dispatch(logout());
-
-            }
-
-        }
-
-        restoreSession();
-
-    }, [dispatch]);
-
+    restoreSession();
+  }, [dispatch]);
 }

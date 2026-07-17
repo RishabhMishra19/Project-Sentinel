@@ -1,52 +1,34 @@
-import ApiService from "@/common/api/ApiService";
+import ApiService from "@/api/ApiService";
 
-import type {LoginRequest} from "../dto/LoginRequest";
-import type {RefreshTokenRequest} from "../dto/RefreshTokenRequest";
-import type {SetPasswordRequest} from "../dto/SetPasswordRequest";
+import type { LoginRequest } from "../dto/request/LoginRequest";
+import type { RefreshTokenRequest } from "../dto/request/RefreshTokenRequest";
+import type { SetPasswordRequest } from "../dto/request/SetPasswordRequest";
 
-import type {AuthResponse} from "../dto/AuthResponse";
-import {API_ENDPOINTS} from "@/common/constants/ApiEndpoints.ts";
-
-const BASE_URL = "/auth";
+import type { AuthResponse } from "../dto/response/AuthResponse";
+import { API_ENDPOINTS } from "@/api/ApiEndpoints";
 
 class AuthApi {
+  login(request: LoginRequest) {
+    return ApiService.post<LoginRequest, AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, request);
+  }
 
-    login(request: LoginRequest) {
+  refreshToken(request: RefreshTokenRequest) {
+    return ApiService.post<RefreshTokenRequest, AuthResponse>(
+      API_ENDPOINTS.AUTH.REFRESH_ACCESS_TOKEN,
+      request,
+    );
+  }
 
-        return ApiService.post<LoginRequest, AuthResponse>(
-            API_ENDPOINTS.AUTH.LOGIN,
-            request
-        );
+  logout(request: LoginRequest) {
+    return ApiService.post(API_ENDPOINTS.AUTH.LOGOUT, request);
+  }
 
-    }
-
-    refreshToken(request: RefreshTokenRequest) {
-
-        return ApiService.post<RefreshTokenRequest, AuthResponse>(
-            API_ENDPOINTS.AUTH.REFRESH_ACCESS_TOKEN,
-            request
-        );
-
-    }
-
-    logout(request: LoginRequest) {
-
-        return ApiService.post(
-            API_ENDPOINTS.AUTH.LOGOUT,
-            request
-        );
-
-    }
-
-    setPassword(request: SetPasswordRequest) {
-
-        return ApiService.post<SetPasswordRequest, AuthResponse>(
-            API_ENDPOINTS.AUTH.SET_PASSWORD,
-            request
-        );
-
-    }
-
+  setPassword(request: SetPasswordRequest) {
+    return ApiService.post<SetPasswordRequest, AuthResponse>(
+      API_ENDPOINTS.AUTH.SET_PASSWORD,
+      request,
+    );
+  }
 }
 
 export default new AuthApi();
