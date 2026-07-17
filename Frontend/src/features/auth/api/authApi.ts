@@ -7,6 +7,7 @@ import type { SetPasswordRequest } from "../dto/request/SetPasswordRequest";
 import type { AuthResponse, CurrentUser } from "../dto/response/AuthResponse";
 import { API_ENDPOINTS } from "@/api/ApiEndpoints";
 import type { ApiSuccessResponse } from "@/api/ApiResponse";
+import type { LogoutRequest } from "../dto/request/LogoutRequest";
 
 class AuthApi {
   login(request: LoginRequest) {
@@ -23,8 +24,11 @@ class AuthApi {
     );
   }
 
-  logout(request: LoginRequest) {
-    return ApiService.post(API_ENDPOINTS.AUTH.LOGOUT, request);
+  logout(request: LogoutRequest) {
+    return ApiService.post<LogoutRequest, ApiSuccessResponse<null>>(
+      API_ENDPOINTS.AUTH.LOGOUT,
+      request,
+    );
   }
 
   setPassword(request: SetPasswordRequest) {

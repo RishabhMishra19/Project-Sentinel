@@ -1,4 +1,5 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { UserMenu } from "@/layouts/UserMenu";
 
 export function AppNavbar() {
   return (
@@ -12,6 +13,7 @@ export function AppNavbar() {
         {/* ThemeToggle */}
         {/* Notifications */}
         {/* UserMenu */}
+        <UserMenu />
       </div>
     </header>
   );
