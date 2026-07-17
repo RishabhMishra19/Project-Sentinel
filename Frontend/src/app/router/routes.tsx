@@ -1,15 +1,15 @@
 export const ROUTES = {
-    LOGIN: "/login",
-    SET_PASSWORD: "/set-password",
+  LOGIN: "/login",
+  SET_PASSWORD: "/set-password",
 
-    DASHBOARD: "/dashboard",
+  DASHBOARD: "/dashboard",
 
-    USERS: "/users",
-    ORGS: "/orgs",
-    PROJECTS: "/projects",
+  USERS: "/users",
+  ORGS: "/orgs",
+  PROJECTS: "/projects",
 
-    ENVS: "/envs",
-    API_KEYS: "/api-keys",
+  ENVS: "/envs",
+  API_KEYS: "/api-keys",
 
-    SETTINGS: "/settings",
+  SETTINGS: "/settings",
 } as const;

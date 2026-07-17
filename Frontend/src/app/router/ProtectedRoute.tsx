@@ -1,37 +1,20 @@
-import {Navigate, Outlet} from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 import Loader from "@/common/components/loader/Loader";
-import {useAppSelector} from "@/common/hooks/useAppSelector";
+import { useAppSelector } from "@/common/hooks/useAppSelector";
 
-import {ROUTES} from "./routes";
+import { ROUTES } from "./routes";
 
-export default function ProtectedRoute() {
+export const ProtectedRoute = () => {
+  const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
 
-    const {
+  if (isLoading) {
+    return <Loader />;
+  }
 
-        isAuthenticated,
+  if (!isAuthenticated) {
+    return <Navigate to={ROUTES.LOGIN} replace />;
+  }
 
-        isLoading,
-
-    } = useAppSelector(state => state.auth);
-
-    if (isLoading) {
-
-        return <Loader/>;
-
-    }
-
-    if (!isAuthenticated) {
-
-        return (
-            <Navigate
-                to={ROUTES.LOGIN}
-                replace
-            />
-        );
-
-    }
-
-    return <Outlet/>;
-
-}
+  return <Outlet />;
+};
