@@ -54,7 +54,7 @@ public class JwtServiceImpl implements JwtService {
     public boolean isTokenValid(String accessToken) {
         try {
             Claims claims = extractAllClaims(accessToken);
-            return !claims.getExpiration().after(new Date());
+            return claims.getExpiration().after(new Date());
         } catch (JwtException | IllegalArgumentException ex) {
             return false;
         }

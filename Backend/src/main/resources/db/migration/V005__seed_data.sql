@@ -62,8 +62,8 @@ INSERT INTO users (id,
                    updated_at)
 VALUES (gen_random_uuid(),
         'Sentinel',
-        'rishabhpnd19@gmail.com',
-        NULL,
+        'rishabhpndt19@gmail.com',
+        '$2a$10$5Ug0GOK6McMmf8ix.62/PODGiwmFtqEA5haFj4odI1oJCZoQBAZ5i',
         TRUE,
         'ACTIVE',
         CURRENT_TIMESTAMP,
@@ -80,7 +80,7 @@ SELECT gen_random_uuid(),
        CURRENT_TIMESTAMP
 FROM users u
          JOIN roles r ON r.name = 'SUPER_USER'
-WHERE u.email = 'rishabhpnd19@gmail.com';
+WHERE u.email = 'rishabhpndt19@gmail.com';
 
 
 -- MAP ROLE -> ALL PERMISSIONS
@@ -105,27 +105,27 @@ WHERE r.name = 'SUPER_USER';
 UPDATE users
 SET created_by = u.id,
     updated_by = u.id FROM users u
-WHERE u.email = 'rishabhpnd19@gmail.com';
+WHERE u.email = 'rishabhpndt19@gmail.com';
 
 UPDATE roles
 SET created_by = u.id,
     updated_by = u.id FROM users u
-WHERE u.email = 'rishabhpnd19@gmail.com';
+WHERE u.email = 'rishabhpndt19@gmail.com';
 
 UPDATE permissions
 SET created_by = u.id,
     updated_by = u.id FROM users u
-WHERE u.email = 'rishabhpnd19@gmail.com';
+WHERE u.email = 'rishabhpndt19@gmail.com';
 
 UPDATE user_roles
 SET created_by = u.id,
     updated_by = u.id FROM users u
-WHERE u.email = 'rishabhpnd19@gmail.com';
+WHERE u.email = 'rishabhpndt19@gmail.com';
 
 UPDATE role_permissions
 SET created_by = u.id,
     updated_by = u.id FROM users u
-WHERE u.email = 'rishabhpnd19@gmail.com';
+WHERE u.email = 'rishabhpndt19@gmail.com';
 
 
 -- ADD SELF REFERENCING FOREIGN KEYS

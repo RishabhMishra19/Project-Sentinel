@@ -5,6 +5,7 @@ import com.example.Sentinel.auth.dto.request.LogoutRequest;
 import com.example.Sentinel.auth.dto.request.RefreshTokenRequest;
 import com.example.Sentinel.auth.dto.request.SetPasswordRequest;
 import com.example.Sentinel.auth.dto.response.AuthResponse;
+import com.example.Sentinel.auth.dto.response.CurrentUserResponse;
 import com.example.Sentinel.auth.service.AuthService;
 import com.example.Sentinel.common.response.ApiSuccessResponse;
 import com.example.Sentinel.common.response.ResponseBuilder;
@@ -50,4 +51,10 @@ public class AuthController {
         authService.logout(request);
         return ResponseBuilder.ok("logged out");
     }
+
+    @PostMapping("/me")
+    public ResponseEntity<ApiSuccessResponse<CurrentUserResponse>> me() {
+        return ResponseBuilder.ok("logged out", authService.getLoggedInUser());
+    }
+
 }

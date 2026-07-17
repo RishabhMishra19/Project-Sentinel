@@ -10,12 +10,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
 @Entity
 @Table(name = "user_orgs", uniqueConstraints = @UniqueConstraint(name = "uq_user_orgs", columnNames = {"user_id", "org_id"}))
 public class UserOrg extends CreatedBaseEntity {

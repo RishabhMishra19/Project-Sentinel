@@ -13,12 +13,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
 @Entity
 @Table(name = "role_permissions", uniqueConstraints = @UniqueConstraint(name = "uq_role_permissions", columnNames = {"role_id", "permission_id"}))
 public class RolePermission extends UpdatableBaseEntity {

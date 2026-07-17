@@ -27,8 +27,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
-        ex.printStackTrace();
-
         List<FieldErrorResponse> errors = ex
                 .getBindingResult()
                 .getFieldErrors()
@@ -56,7 +54,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleAuthenticationException(Exception ex) {
         return ResponseBuilder.error(
                 HttpStatus.UNAUTHORIZED,
-                "AUTH_001",
+                CommonErrorCodes.INVALID_CREDENTIALS,
                 "Invalid email or password."
         );
     }

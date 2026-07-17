@@ -7,6 +7,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -16,6 +17,7 @@ import tools.jackson.databind.JsonNode;
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
 @Entity
 @Table(name = "audit_logs")
 public class AuditLog extends CreatedBaseEntity {

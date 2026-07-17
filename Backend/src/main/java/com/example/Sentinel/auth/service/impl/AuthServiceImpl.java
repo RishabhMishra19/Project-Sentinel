@@ -25,17 +25,20 @@ import com.example.Sentinel.resources.users.constants.UserErrorCodes;
 import com.example.Sentinel.resources.users.entity.User;
 import com.example.Sentinel.resources.users.entity.UserStatus;
 import com.example.Sentinel.resources.users.entity.repository.UserRepository;
+import com.example.Sentinel.security.SecurityUtils;
 import com.example.Sentinel.security.jwt.JwtClaims;
 import com.example.Sentinel.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -50,23 +53,16 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserOrgRepository userOrgRepository;
     private final UserRoleRepository userRoleRepository;
-
+    private final SecurityUtils securityUtils;
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
-                    )
-            );
-        } catch (AuthenticationException ex) {
-            throw new UnauthorizedException(
-                    CommonErrorCodes.INVALID_CREDENTIALS,
-                    "Invalid email or password."
-            );
-        }
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
         User user = userRepository
                 .findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));
@@ -123,6 +119,15 @@ public class AuthServiceImpl implements AuthService {
         return this.buildAuthResponse(user);
     }
 
+    @Override
+    public CurrentUserResponse getLoggedInUser() {
+        UUID currentLoggedInUserId = securityUtils.getCurrentUser().getId();
+        User loggedInUser = userRepository
+                .findById(currentLoggedInUserId)
+                .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));
+        return this.buildUserResponse(loggedInUser);
+    }
+
     private AuthResponse buildAuthResponse(User user) {
 
         JwtClaims jwtClaims = JwtClaims.builder().userId(user.getId()).email(user.getEmail()).build();
@@ -131,9 +136,15 @@ public class AuthServiceImpl implements AuthService {
 
         String refreshToken = refreshTokenService.generate(user);
 
+        CurrentUserResponse currentUser = this.buildUserResponse(user);
+
+        return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).user(currentUser).build();
+    }
+
+    private CurrentUserResponse buildUserResponse(User user) {
         List<String> permissions = permissionService.getPermissionsByUserId(user.getId());
 
-        CurrentUserResponse currentUser = CurrentUserResponse
+        return CurrentUserResponse
                 .builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -141,8 +152,6 @@ public class AuthServiceImpl implements AuthService {
                 .status(user.getStatus())
                 .permissions(permissions)
                 .build();
-
-        return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).user(currentUser).build();
     }
 
 }

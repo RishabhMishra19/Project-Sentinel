@@ -46,7 +46,9 @@ apiClient.interceptors.response.use(
 
     try {
       originalRequest._retry = true;
-      const { accessToken } = await authApi.refreshToken({ refreshToken });
+      const {
+        data: { accessToken },
+      } = await authApi.refreshToken({ refreshToken });
 
       LocalStorageService.saveAccessToken(accessToken);
 

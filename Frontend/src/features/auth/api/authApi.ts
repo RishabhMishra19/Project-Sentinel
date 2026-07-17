@@ -4,16 +4,20 @@ import type { LoginRequest } from "../dto/request/LoginRequest";
 import type { RefreshTokenRequest } from "../dto/request/RefreshTokenRequest";
 import type { SetPasswordRequest } from "../dto/request/SetPasswordRequest";
 
-import type { AuthResponse } from "../dto/response/AuthResponse";
+import type { AuthResponse, CurrentUser } from "../dto/response/AuthResponse";
 import { API_ENDPOINTS } from "@/api/ApiEndpoints";
+import type { ApiSuccessResponse } from "@/api/ApiResponse";
 
 class AuthApi {
   login(request: LoginRequest) {
-    return ApiService.post<LoginRequest, AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, request);
+    return ApiService.post<LoginRequest, ApiSuccessResponse<AuthResponse>>(
+      API_ENDPOINTS.AUTH.LOGIN,
+      request,
+    );
   }
 
   refreshToken(request: RefreshTokenRequest) {
-    return ApiService.post<RefreshTokenRequest, AuthResponse>(
+    return ApiService.post<RefreshTokenRequest, ApiSuccessResponse<AuthResponse>>(
       API_ENDPOINTS.AUTH.REFRESH_ACCESS_TOKEN,
       request,
     );
@@ -24,9 +28,16 @@ class AuthApi {
   }
 
   setPassword(request: SetPasswordRequest) {
-    return ApiService.post<SetPasswordRequest, AuthResponse>(
+    return ApiService.post<SetPasswordRequest, ApiSuccessResponse<AuthResponse>>(
       API_ENDPOINTS.AUTH.SET_PASSWORD,
       request,
+    );
+  }
+
+  me() {
+    return ApiService.post<Record<string, never>, ApiSuccessResponse<CurrentUser>>(
+      API_ENDPOINTS.AUTH.ME,
+      {},
     );
   }
 }

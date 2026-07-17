@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
     LOGOUT: `${BASE_AUTH}/logout`,
     SET_PASSWORD: `${BASE_AUTH}/set-password`,
     REFRESH_ACCESS_TOKEN: `${BASE_AUTH}/refresh-token`,
+    ME: `${BASE_AUTH}/me`,
   },
 
   USERS: {

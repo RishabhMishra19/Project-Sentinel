@@ -12,12 +12,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
 @Entity
 @Table(name = "project_envs", uniqueConstraints = @UniqueConstraint(name = "uq_project_envs", columnNames = {"project_id", "name"}))
 public class ProjectEnv extends UpdatableBaseEntity {

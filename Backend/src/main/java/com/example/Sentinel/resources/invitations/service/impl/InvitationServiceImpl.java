@@ -31,7 +31,6 @@ public class InvitationServiceImpl implements InvitationService {
     private final InvitationRepository invitationRepository;
     private final EmailService emailService;
     private final TokenService tokenService;
-    private final UserRepository userRepository;
     private final SecurityUtils securityUtils;
 
     @Value("${app.invitation-expiration}")

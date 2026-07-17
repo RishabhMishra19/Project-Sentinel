@@ -11,19 +11,16 @@ export default function useRestoreSession() {
 
   useEffect(() => {
     async function restoreSession() {
-      const refreshToken = LocalStorageService.getRefreshToken();
-
-      if (!refreshToken) {
-        dispatch(finishLoading());
-        return;
-      }
-
       try {
-        const { accessToken, user } = await authApi.refreshToken({ refreshToken });
-        LocalStorageService.saveAccessToken(accessToken);
-        dispatch(authenticate({ currentUser: user }));
+        const accessToken = LocalStorageService.getAccessToken();
+        if (accessToken === null) {
+          dispatch(finishLoading());
+          return;
+        }
+        const { data: currentUser } = await authApi.me();
+        dispatch(authenticate({ currentUser }));
       } catch {
-        LocalStorageService.removeRefreshToken();
+        LocalStorageService.clearAuth();
         dispatch(logout());
       }
     }

@@ -16,8 +16,9 @@ export default function useLogin() {
   return useMutation({
     mutationFn: authApi.login,
     onSuccess(response) {
-      LocalStorageService.saveRefreshToken(response.refreshToken);
-      dispatch(authenticate({ currentUser: response.user }));
+      LocalStorageService.saveRefreshToken(response.data.refreshToken);
+      LocalStorageService.saveAccessToken(response.data.accessToken);
+      dispatch(authenticate({ currentUser: response.data.user }));
       navigate(ROUTES.DASHBOARD);
     },
   });
