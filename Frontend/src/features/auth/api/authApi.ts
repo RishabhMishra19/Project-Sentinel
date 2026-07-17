@@ -8,6 +8,7 @@ import type { AuthResponse, CurrentUser } from "../dto/response/AuthResponse";
 import { API_ENDPOINTS } from "@/api/ApiEndpoints";
 import type { ApiSuccessResponse } from "@/api/ApiResponse";
 import type { LogoutRequest } from "../dto/request/LogoutRequest";
+import type { ChangePasswordRequest } from "../dto/request/ChangePasswordRequest";
 
 class AuthApi {
   login(request: LoginRequest) {
@@ -42,6 +43,13 @@ class AuthApi {
     return ApiService.post<Record<string, never>, ApiSuccessResponse<CurrentUser>>(
       API_ENDPOINTS.AUTH.ME,
       {},
+    );
+  }
+
+  changePassword(request: ChangePasswordRequest) {
+    return ApiService.post<ChangePasswordRequest, ApiSuccessResponse<null>>(
+      API_ENDPOINTS.AUTH.CHANGE_PASSWORD,
+      request,
     );
   }
 }

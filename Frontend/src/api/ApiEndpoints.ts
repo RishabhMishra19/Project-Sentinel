@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
     SET_PASSWORD: `${BASE_AUTH}/set-password`,
     REFRESH_ACCESS_TOKEN: `${BASE_AUTH}/refresh-token`,
     ME: `${BASE_AUTH}/me`,
+    CHANGE_PASSWORD: `${BASE_AUTH}/change-password`,
   },
 
   USERS: {

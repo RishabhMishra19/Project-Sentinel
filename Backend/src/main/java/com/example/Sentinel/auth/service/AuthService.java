@@ -1,5 +1,6 @@
 package com.example.Sentinel.auth.service;
 
+import com.example.Sentinel.auth.dto.request.ChangePasswordRequest;
 import com.example.Sentinel.auth.dto.request.LoginRequest;
 import com.example.Sentinel.auth.dto.request.LogoutRequest;
 import com.example.Sentinel.auth.dto.request.RefreshTokenRequest;
@@ -18,5 +19,7 @@ public interface AuthService {
     AuthResponse setPassword(SetPasswordRequest request);
 
     CurrentUserResponse getLoggedInUser();
+
+    void changePassword(ChangePasswordRequest request);
 
 }

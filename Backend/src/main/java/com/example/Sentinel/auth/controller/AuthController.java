@@ -1,5 +1,6 @@
 package com.example.Sentinel.auth.controller;
 
+import com.example.Sentinel.auth.dto.request.ChangePasswordRequest;
 import com.example.Sentinel.auth.dto.request.LoginRequest;
 import com.example.Sentinel.auth.dto.request.LogoutRequest;
 import com.example.Sentinel.auth.dto.request.RefreshTokenRequest;
@@ -55,6 +56,14 @@ public class AuthController {
     @PostMapping("/me")
     public ResponseEntity<ApiSuccessResponse<CurrentUserResponse>> me() {
         return ResponseBuilder.ok("logged out", authService.getLoggedInUser());
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiSuccessResponse<Void>> changePassword(
+            @RequestBody ChangePasswordRequest request
+    ) {
+        authService.changePassword(request);
+        return ResponseBuilder.ok("password changed");
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.Sentinel.auth.service.impl;
 
+import com.example.Sentinel.auth.dto.request.ChangePasswordRequest;
 import com.example.Sentinel.auth.dto.request.LoginRequest;
 import com.example.Sentinel.auth.dto.request.LogoutRequest;
 import com.example.Sentinel.auth.dto.request.RefreshTokenRequest;
@@ -126,6 +127,15 @@ public class AuthServiceImpl implements AuthService {
                 .findById(currentLoggedInUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));
         return this.buildUserResponse(loggedInUser);
+    }
+
+    @Override
+    public void changePassword(ChangePasswordRequest request) {
+        UUID currentLoggedInUserId = securityUtils.getCurrentUser().getId();
+        User loggedInUser = userRepository
+                .findById(currentLoggedInUserId)
+                .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));
+        loggedInUser.setPasswordHash(passwordEncoder.encode(request.getPassword()));
     }
 
     private AuthResponse buildAuthResponse(User user) {
