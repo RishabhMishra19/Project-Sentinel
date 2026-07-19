@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -75,6 +77,18 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         refreshToken.setRevokedAt(Instant.now());
         refreshToken.setRevokedBy(revokedBy);
         refreshTokenRepository.save(refreshToken);
+    }
+
+    @Override
+    public void revokeAllByUser(UUID userId) {
+        CustomUserDetails currentUser = securityUtils.getCurrentUser();
+        User revokedBy = userRepository.getReferenceById(currentUser.getId());
+        List<RefreshToken> refreshTokens = refreshTokenRepository.findByUserId(userId);
+        refreshTokens.forEach(refreshToken -> {
+            refreshToken.setRevokedAt(Instant.now());
+            refreshToken.setRevokedBy(revokedBy);
+        });
+        refreshTokenRepository.saveAll(refreshTokens);
     }
 
 }

@@ -9,10 +9,10 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import { User, Settings, LogOut } from "lucide-react";
-import useLogut from "@/features/auth/hooks/useLogout";
+import useUserMenu from "@/features/auth/hooks/useUserMenu";
 
 export function UserMenu() {
-  const { handleLogout } = useLogut();
+  const { handleLogout, handleProfileClick } = useUserMenu();
 
   return (
     <DropdownMenu>
@@ -30,7 +30,7 @@ export function UserMenu() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleProfileClick}>
           <User className="mr-2 h-4 w-4" />
           Profile
         </DropdownMenuItem>

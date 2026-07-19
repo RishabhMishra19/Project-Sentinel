@@ -11,6 +11,7 @@ import SetPasswordPage from "@/features/auth/pages/SetPasswordPage";
 import DashboardPage from "@/features/dashboard/pages/DashboardPage";
 import AuthenticatedLayout from "@/layouts/AuthenticatedLayout";
 import UnauthenticatedLayout from "@/layouts/UnauthenticatedLayout";
+import ProfileDetailsPage from "@/features/profile/pages/ProfileDetailsPage";
 
 export default function AppRouter() {
   return (
@@ -27,6 +28,7 @@ export default function AppRouter() {
       <Route element={<AuthenticatedRoute />}>
         <Route element={<AuthenticatedLayout />}>
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+          <Route path={ROUTES.PROFILE} element={<ProfileDetailsPage />} />
         </Route>
       </Route>
     </Routes>

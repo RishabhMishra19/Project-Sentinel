@@ -13,10 +13,10 @@ CREATE TABLE role_permissions
     status        VARCHAR(30) NOT NULL,
 
     created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by    UUID,
+    created_by    UUID NOT NULL,
 
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_by    UUID,
+    updated_by    UUID NOT NULL,
 
     CONSTRAINT uq_role_permissions UNIQUE (role_id, permission_id),
 
@@ -44,10 +44,10 @@ CREATE TABLE user_roles
     status     VARCHAR(30) NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by UUID,
+    created_by UUID NOT NULL,
 
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_by UUID,
+    updated_by UUID NOT NULL,
 
     CONSTRAINT uq_user_roles UNIQUE (user_id, role_id),
 

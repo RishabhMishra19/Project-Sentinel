@@ -3,6 +3,7 @@ export const ROUTES = {
   SET_PASSWORD: "/set-password",
 
   DASHBOARD: "/dashboard",
+  PROFILE: "/profile",
 
   USERS: "/users",
   ORGS: "/orgs",

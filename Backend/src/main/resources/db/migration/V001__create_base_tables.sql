@@ -39,10 +39,10 @@ CREATE TABLE roles
     status     VARCHAR(30)  NOT NULL,
 
     created_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by UUID,
+    created_by UUID NOT NULL,
 
     updated_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_by UUID,
+    updated_by UUID NOT NULL,
 
     CONSTRAINT fk_roles_created_by
         FOREIGN KEY (created_by) REFERENCES users (id),
@@ -62,10 +62,10 @@ CREATE TABLE permissions
     status     VARCHAR(30) NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by UUID,
+    created_by UUID NOT NULL,
 
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_by UUID,
+    updated_by UUID NOT NULL,
 
     CONSTRAINT uq_permissions_entity_action
         UNIQUE (entity, action),
@@ -87,10 +87,10 @@ CREATE TABLE organizations
     status     VARCHAR(30)  NOT NULL,
 
     created_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by UUID         NOT NULL,
+    created_by UUID NOT NULL,
 
     updated_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_by UUID         NOT NULL,
+    updated_by UUID NOT NULL,
 
     CONSTRAINT fk_organizations_created_by
         FOREIGN KEY (created_by) REFERENCES users (id),

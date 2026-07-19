@@ -8,18 +8,20 @@ import com.example.Sentinel.auth.dto.request.SetPasswordRequest;
 import com.example.Sentinel.auth.dto.response.AuthResponse;
 import com.example.Sentinel.auth.dto.response.CurrentUserResponse;
 import com.example.Sentinel.auth.service.AuthService;
-import com.example.Sentinel.common.constants.CommonErrorCodes;
 import com.example.Sentinel.common.exceptions.BadRequestException;
 import com.example.Sentinel.common.exceptions.ResourceNotFoundException;
-import com.example.Sentinel.common.exceptions.UnauthorizedException;
 import com.example.Sentinel.resources.invitations.entity.Invitation;
 import com.example.Sentinel.resources.invitations.entity.InvitationStatus;
 import com.example.Sentinel.resources.invitations.service.InvitationService;
+import com.example.Sentinel.resources.orgs.entity.Org;
 import com.example.Sentinel.resources.permissions.entity.service.PermissionService;
 import com.example.Sentinel.resources.refreshTokens.entity.RefreshToken;
 import com.example.Sentinel.resources.refreshTokens.service.RefreshTokenService;
+import com.example.Sentinel.resources.roles.entity.RoleStatus;
+import com.example.Sentinel.resources.userRoles.entity.service.UserRoleService;
 import com.example.Sentinel.resources.userOrgs.entity.UserOrg;
 import com.example.Sentinel.resources.userOrgs.entity.repository.UserOrgRepository;
+import com.example.Sentinel.resources.userOrgs.entity.service.UserOrgService;
 import com.example.Sentinel.resources.userRoles.entity.UserRole;
 import com.example.Sentinel.resources.userRoles.entity.repository.UserRoleRepository;
 import com.example.Sentinel.resources.users.constants.UserErrorCodes;
@@ -32,8 +34,6 @@ import com.example.Sentinel.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,8 +53,10 @@ public class AuthServiceImpl implements AuthService {
     private final InvitationService invitationService;
     private final PasswordEncoder passwordEncoder;
     private final UserOrgRepository userOrgRepository;
+    private final UserOrgService userOrgService;
     private final UserRoleRepository userRoleRepository;
     private final SecurityUtils securityUtils;
+    private final UserRoleService userRoleService;
 
     @Override
     public AuthResponse login(LoginRequest request) {
@@ -136,6 +138,7 @@ public class AuthServiceImpl implements AuthService {
                 .findById(currentLoggedInUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(UserErrorCodes.USER_NOT_FOUND, "User not found."));
         loggedInUser.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        refreshTokenService.revokeAllByUser(loggedInUser.getId());
     }
 
     private AuthResponse buildAuthResponse(User user) {
@@ -153,6 +156,9 @@ public class AuthServiceImpl implements AuthService {
 
     private CurrentUserResponse buildUserResponse(User user) {
         List<String> permissions = permissionService.getPermissionsByUserId(user.getId());
+        List<UserRole> roles = userRoleService.findRolesByUserId(user.getId());
+        List<String> rolesList = roles.stream().filter(v-> RoleStatus.ACTIVE.equals(v.getRole().getStatus())).map(v->v.getRole().getName()).toList();
+        Org org = userOrgService.findOrgByUserId(user.getId());
 
         return CurrentUserResponse
                 .builder()
@@ -161,6 +167,12 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .status(user.getStatus())
                 .permissions(permissions)
+                .roles(rolesList)
+                .orgId(org.getId())
+                .orgName(org.getName())
+                .emailVerified(user.isEmailVerified())
+                .lastLoginAt(user.getLastLoginAt())
+                .createdAt(user.getCreatedAt())
                 .build();
     }
 

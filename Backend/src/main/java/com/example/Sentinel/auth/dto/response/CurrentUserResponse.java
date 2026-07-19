@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +26,8 @@ public class CurrentUserResponse {
 
     private UserStatus status;
 
+    private Boolean emailVerified;
+
     private UUID orgId;
 
     private String orgName;
@@ -32,4 +35,9 @@ public class CurrentUserResponse {
     private List<String> permissions;
 
     private List<String> roles;
+
+    private Instant lastLoginAt;
+
+    private Instant createdAt;
+
 }

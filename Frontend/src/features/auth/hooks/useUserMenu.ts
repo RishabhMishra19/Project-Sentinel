@@ -35,5 +35,9 @@ export default function useLogut() {
     mutate({ refreshToken });
   };
 
-  return { handleLogout };
+  const handleProfileClick = () => {
+    navigate(ROUTES.PROFILE);
+  };
+
+  return { handleLogout, handleProfileClick };
 }
