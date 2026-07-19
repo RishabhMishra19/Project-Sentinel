@@ -17,6 +17,7 @@ import ProjectsPage from "@/features/projects/pages/ProjectsPage";
 import EnvironmentsPage from "@/features/environments/pages/EnvironmentsPage";
 import ApiKeysPage from "@/features/apiKeys/pages/ApiKeysPage";
 import UsersPage from "@/features/users/pages/UsersPage";
+import SettingsPage from "@/features/settings/pages/SettingsPage";
 
 export default function AppRouter() {
   return (
@@ -40,6 +41,7 @@ export default function AppRouter() {
           <Route path={ROUTES.API_KEYS} element={<ApiKeysPage />} />
           <Route path={ROUTES.USERS} element={<UsersPage />} />
           <Route path={ROUTES.PROFILE} element={<ProfileDetailsPage />} />
+          <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
         </Route>
       </Route>
     </Routes>

@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import QueryProvider from "./QueryProvider";
 import { store } from "../reduxStore/store";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "./ThemeProvider";
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -12,12 +13,14 @@ interface AppProviderProps {
 
 export default function AppProvider({ children }: AppProviderProps) {
   return (
-    <ReduxProvider store={store}>
-      <QueryProvider>
-        <TooltipProvider>
-          <BrowserRouter>{children}</BrowserRouter>
-        </TooltipProvider>
-      </QueryProvider>
-    </ReduxProvider>
+    <ThemeProvider>
+      <ReduxProvider store={store}>
+        <QueryProvider>
+          <TooltipProvider>
+            <BrowserRouter>{children}</BrowserRouter>
+          </TooltipProvider>
+        </QueryProvider>
+      </ReduxProvider>
+    </ThemeProvider>
   );
 }
