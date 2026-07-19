@@ -1,3 +1,5 @@
+import ExampleDatatable from "@/components/common/datatable/Example";
+
 export default function DashboardPage() {
-    return <h1>Dashboard</h1>;
+  return <ExampleDatatable />;
 }

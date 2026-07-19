@@ -3,7 +3,7 @@ import { Lock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import { ChangePasswordDialog } from "./ChangePasswordDialog";
+import { ChangePasswordDialog } from "../../auth/components/ChangePasswordDialog";
 import { useState } from "react";
 
 export function PasswordCard() {
