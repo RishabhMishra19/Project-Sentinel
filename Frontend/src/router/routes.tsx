@@ -6,10 +6,10 @@ export const ROUTES = {
   PROFILE: "/profile",
 
   USERS: "/users",
-  ORGS: "/orgs",
+  ORGS: "/organizations",
   PROJECTS: "/projects",
 
-  ENVS: "/envs",
+  ENVS: "/environments",
   API_KEYS: "/api-keys",
 
   SETTINGS: "/settings",

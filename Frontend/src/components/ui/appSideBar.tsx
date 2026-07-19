@@ -63,20 +63,38 @@ export function AppSidebar() {
   const { pathname } = useLocation();
 
   return (
-    <Sidebar>
-      <SidebarHeader className="border-b">
+    <Sidebar className="bg-sidebar border-r border-sidebar-border">
+      <SidebarHeader className=" border-sidebar-border">
         <div className="flex h-16 items-center px-4">
-          <span className="text-xl font-bold">Sentinel</span>
+          <span className="text-xl font-bold">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                S
+              </div>
+              <span className="text-lg font-semibold">Sentinel</span>
+            </div>
+          </span>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarMenu>
+        <SidebarMenu className="px-2">
           {navigation.map((item) => (
             <SidebarMenuItem key={item.url}>
               <SidebarMenuButton
                 isActive={pathname.startsWith(item.url)}
                 render={<Link to={item.url} />}
+                className="
+                  h-10 rounded-lg
+                  text-sidebar-foreground
+                  hover:bg-sidebar-accent
+                  hover:text-sidebar-foreground
+
+                  data-[active=true]:bg-primary
+                  data-[active=true]:text-primary-foreground
+                  data-[active=true]:font-medium
+                  data-[active=true]:shadow-sm
+                "
               >
                 <item.icon className="h-4 w-4" />
                 <span>{item.title}</span>
@@ -86,7 +104,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter className="border-t">
+      <SidebarFooter className="border-t border-sidebar-border">
         <div className="px-4 py-3 text-xs text-muted-foreground">Sentinel v1.0.0</div>
       </SidebarFooter>
     </Sidebar>

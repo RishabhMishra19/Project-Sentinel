@@ -12,6 +12,11 @@ import DashboardPage from "@/features/dashboard/pages/DashboardPage";
 import AuthenticatedLayout from "@/layouts/AuthenticatedLayout";
 import UnauthenticatedLayout from "@/layouts/UnauthenticatedLayout";
 import ProfileDetailsPage from "@/features/profile/pages/ProfileDetailsPage";
+import OrganizationsPage from "@/features/orgs/pages/OrganizationsPage";
+import ProjectsPage from "@/features/projects/pages/ProjectsPage";
+import EnvironmentsPage from "@/features/environments/pages/EnvironmentsPage";
+import ApiKeysPage from "@/features/apiKeys/pages/ApiKeysPage";
+import UsersPage from "@/features/users/pages/UsersPage";
 
 export default function AppRouter() {
   return (
@@ -28,6 +33,12 @@ export default function AppRouter() {
       <Route element={<AuthenticatedRoute />}>
         <Route element={<AuthenticatedLayout />}>
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+          <Route path={ROUTES.PROFILE} element={<ProfileDetailsPage />} />
+          <Route path={ROUTES.ORGS} element={<OrganizationsPage />} />
+          <Route path={ROUTES.PROJECTS} element={<ProjectsPage />} />
+          <Route path={ROUTES.ENVS} element={<EnvironmentsPage />} />
+          <Route path={ROUTES.API_KEYS} element={<ApiKeysPage />} />
+          <Route path={ROUTES.USERS} element={<UsersPage />} />
           <Route path={ROUTES.PROFILE} element={<ProfileDetailsPage />} />
         </Route>
       </Route>
