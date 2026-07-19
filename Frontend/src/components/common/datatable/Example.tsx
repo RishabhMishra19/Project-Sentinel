@@ -50,6 +50,12 @@ const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "name",
     header: "Project",
+    meta: {
+      search: {
+        enabled: true,
+        placeholder: "Search project...",
+      },
+    },
   },
   {
     accessorKey: "environment",
@@ -63,6 +69,9 @@ const columns: ColumnDef<Project>[] = [
           { label: "Development", value: "Development" },
         ],
       },
+      sort: {
+        enabled: true,
+      },
     },
   },
   {
@@ -75,6 +84,10 @@ const columns: ColumnDef<Project>[] = [
           { label: "Active", value: "Active" },
           { label: "Inactive", value: "Inactive" },
         ],
+      },
+      search: {
+        enabled: true,
+        placeholder: "Search project...",
       },
     },
     cell: ({ row }) => (

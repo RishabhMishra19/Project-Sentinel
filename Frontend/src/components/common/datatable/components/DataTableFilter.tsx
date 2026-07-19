@@ -1,6 +1,5 @@
-import { useMemo } from "react";
-import type { Table } from "@tanstack/react-table";
-import { Check, ChevronDown, type LucideIcon } from "lucide-react";
+import type { Column, Table } from "@tanstack/react-table";
+import { Check, ChevronDown } from "lucide-react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
@@ -16,30 +15,19 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-interface DataTableFilterOption {
-  label: string;
-  value: string;
-  icon?: LucideIcon;
-}
-
 interface DataTableFilterProps<TData> {
   table: Table<TData>;
-  columnId: string;
-  title: string;
-  options: DataTableFilterOption[];
+  column: Column<TData>;
 }
 
-export function DataTableFilter<TData>({
-  table,
-  columnId,
-  title,
-  options,
-}: DataTableFilterProps<TData>) {
-  const column = table.getColumn(columnId);
+export function DataTableFilter<TData>({ column }: DataTableFilterProps<TData>) {
+  const filter = column.columnDef.meta?.filter;
 
-  const selected = useMemo(() => (column?.getFilterValue() as string[]) ?? [], [column]);
+  if (!filter || filter.type !== "select") {
+    return null;
+  }
 
-  if (!column) return null;
+  const selected = (column.getFilterValue() as string[]) ?? [];
 
   const toggle = (value: string) => {
     const exists = selected.includes(value);
@@ -49,6 +37,8 @@ export function DataTableFilter<TData>({
     column.setFilterValue(next.length ? next : undefined);
   };
 
+  const title = typeof column.columnDef.header === "string" ? column.columnDef.header : column.id;
+
   return (
     <Popover>
       <PopoverTrigger>
@@ -57,25 +47,23 @@ export function DataTableFilter<TData>({
 
           {selected.length > 0 && <Badge variant="secondary">{selected.length}</Badge>}
 
-          <ChevronDown className="size-4 opacity-60" />
+          <ChevronDown className="ml-2 size-4 opacity-60" />
         </Button>
       </PopoverTrigger>
 
       <PopoverContent className="w-56 p-0">
         <Command>
-          <CommandInput placeholder={`Search ${title}...`} />
+          <CommandInput placeholder={filter.placeholder ?? `Search ${title}...`} />
 
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
 
             <CommandGroup>
-              {options.map((option) => {
+              {filter.options?.map((option) => {
                 const checked = selected.includes(option.value);
 
                 return (
                   <CommandItem key={option.value} onSelect={() => toggle(option.value)}>
-                    {option.icon && <option.icon className="mr-2 size-4 text-muted-foreground" />}
-
                     <span className="flex-1">{option.label}</span>
 
                     {checked && <Check className="size-4" />}
