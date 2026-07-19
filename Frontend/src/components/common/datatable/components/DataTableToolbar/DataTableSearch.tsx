@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/select";
 
 import { cn } from "@/lib/utils";
-import { useDebounce } from "../hooks/useDebounce";
 import type { SelectRootChangeEventDetails } from "@base-ui/react";
+import { useDebounce } from "../../hooks/useDebounce";
 
 interface DataTableSearchProps<TData> {
   table: Table<TData>;
@@ -55,9 +55,9 @@ export function DataTableSearch<TData>({
   const placeholder = column?.columnDef.meta?.search?.placeholder ?? "Search...";
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center", className)}>
       <Select value={selectedColumn} onValueChange={handleColumnChange}>
-        <SelectTrigger className="w-48">
+        <SelectTrigger className="w-30">
           <SelectValue />
         </SelectTrigger>
 

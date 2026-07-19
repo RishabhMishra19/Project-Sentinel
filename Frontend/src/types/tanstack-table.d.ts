@@ -11,7 +11,7 @@ declare module "@tanstack/react-table" {
       enabled: boolean;
     };
     filter?: {
-      type: "text" | "select";
+      type: "select" | "date" | "date-range" | "boolean";
       placeholder?: string;
       options?: {
         label: string;

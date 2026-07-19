@@ -10,7 +10,11 @@ export function DataTableRowsBody<TData>({ table }: DataTableRowsBodyProps<TData
   return (
     <>
       {table.getRowModel().rows.map((row) => (
-        <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className="h-12">
+        <TableRow
+          key={row.id}
+          data-state={row.getIsSelected() && "selected"}
+          className="h-12 cursor-pointer"
+        >
           {row.getVisibleCells().map((cell) => (
             <TableCell key={cell.id}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -3,10 +3,9 @@ import type { Table } from "@tanstack/react-table";
 
 import { DataTableActionMenu } from "./DataTableActionMenu";
 import { DataTableAppliedFilters } from "./DataTableAppliedFilters";
-import { DataTableFilter } from "./DataTableFilter";
 import { DataTableSearch } from "./DataTableSearch";
-
-import type { DataTableAction } from "../types";
+import type { DataTableAction } from "../../types";
+import { DataTableFilters } from "./DataTableFilters";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -21,18 +20,12 @@ export function DataTableToolbar<TData>({
   actions = [],
   children,
 }: DataTableToolbarProps<TData>) {
-  const filterableColumns = table
-    .getAllLeafColumns()
-    .filter((column) => column.columnDef.meta?.filter);
-
   return (
-    <div className="border-b bg-muted/30 p-4">
+    <div className="bg-muted/30 py-4">
       <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-1 items-center gap-2">
+        <div className="flex flex-1 items-center justify-between">
           <DataTableSearch table={table} />
-          {filterableColumns.map((column) => (
-            <DataTableFilter key={column.id} table={table} column={column} />
-          ))}
+          <DataTableFilters table={table} />
         </div>
 
         <div className="flex items-center gap-2">

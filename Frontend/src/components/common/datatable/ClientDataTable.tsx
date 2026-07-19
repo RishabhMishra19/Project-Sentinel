@@ -1,10 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
-import { DataTableEmptyBody } from "./components/DataTableEmptyBody";
+import { DataTableEmptyBody } from "./components/DataTableBody/DataTableEmptyBody";
 import { DataTableLayout } from "./components/DataTableLayout";
-import { DataTableLoadingBody } from "./components/DataTableLoadingBody";
+import { DataTableLoadingBody } from "./components/DataTableBody/DataTableLoadingBody";
 import { useClientTable } from "./hooks/useClientTable";
-import { DataTableRowsBody } from "./components/DataTableRowsBody";
+import { DataTableRowsBody } from "./components/DataTableBody/DataTableRowsBody";
 import type { DataTableFilterConfig, DataTableAction } from "./types";
 
 interface ClientDataTableProps<TData> {
