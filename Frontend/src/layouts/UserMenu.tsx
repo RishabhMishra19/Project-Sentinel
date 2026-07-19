@@ -12,7 +12,7 @@ import { User, Settings, LogOut } from "lucide-react";
 import useUserMenu from "@/features/auth/hooks/useUserMenu";
 
 export function UserMenu() {
-  const { handleLogout, handleProfileClick } = useUserMenu();
+  const { handleLogout, handleProfileClick, handleSettingsClick } = useUserMenu();
 
   return (
     <DropdownMenu>
@@ -35,7 +35,7 @@ export function UserMenu() {
           Profile
         </DropdownMenuItem>
 
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSettingsClick}>
           <Settings className="mr-2 h-4 w-4" />
           Settings
         </DropdownMenuItem>

@@ -39,5 +39,9 @@ export default function useLogut() {
     navigate(ROUTES.PROFILE);
   };
 
-  return { handleLogout, handleProfileClick };
+  const handleSettingsClick = () => {
+    navigate(ROUTES.SETTINGS);
+  };
+
+  return { handleLogout, handleProfileClick, handleSettingsClick };
 }
