@@ -14,7 +14,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import type { SelectRootChangeEventDetails } from "@base-ui/react";
-import { useDebounce } from "../../hooks/useDebounce";
+import { useDebounce } from "../../../../../hooks/useDebounce";
 
 interface DataTableSearchProps<TData> {
   table: Table<TData>;
