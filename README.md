@@ -12,8 +12,8 @@ Resume/demo stack: Spring Boot API (`server`), React + TypeScript UI (`client`),
 | Redis     | localhost:6379          |
 | Kafka     | localhost:9092          |
 
-- **server**: Spring Boot (Amazon Corretto 21), Maven, Postgres + Redis + Kafka deps
-- **client**: React + TypeScript (Vite)
+- **server**: Spring Boot (Amazon Corretto 21), Maven, Postgres + Redis + Kafka, JWT auth
+- **client**: React + TypeScript (Vite), Redux, React Query, Tailwind, Axios
 - Postgres data is stored in the Docker volume `postgres_data`
 
 ## Start
@@ -29,6 +29,15 @@ Health check:
 ```bash
 curl http://localhost:8080/actuator/health
 ```
+
+### Seed login
+
+- Email: `rishabhpndt19@gmail.com`
+- Password: `Admin@123`
+- UI: http://localhost:3000/login
+
+Auth APIs: `POST /api/auth/login`, `POST /api/auth/refresh-token`, `POST /api/auth/logout`, `GET /api/auth/me`  
+Postman: [`postman/Auth.postman_collection.json`](postman/Auth.postman_collection.json)
 
 Stop (keep DB volume):
 
@@ -50,5 +59,5 @@ docker compose down -v
 ## Notes
 
 - Server Docker image uses **Amazon Corretto 21**.
-- Spring Initializr generates **Spring Boot 4.1.0**.
-- Client does not call the API yet — feature work comes next.
+- Spring Boot **4.1.0**; schema via **Liquibase**.
+- Access token (15m) in Redux memory; refresh (2h) in HttpOnly cookie + DB.

@@ -1,0 +1,269 @@
+{
+  "info": {
+    "name": "Sentinel Auth",
+    "description": "JWT auth for Sentinel.\n\nbaseUrl = http://localhost:8080\n\nCookie: login and refresh-token set HttpOnly refresh_token. Enable cookies in Postman (Settings → Cookies / Runner cookie jar) so 03 Refresh token works after 01 Login.\n\nRun each folder separately in Collection Runner (top to bottom).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "accessToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1 - Success flow (run in order)",
+      "item": [
+        {
+          "name": "01 Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('has accessToken', () => pm.expect(body.accessToken).to.be.a('string'));",
+                  "pm.test('has user without status', () => {",
+                  "  pm.expect(body.user).to.include.keys('id', 'email', 'displayName');",
+                  "  pm.expect(body.user).to.not.have.property('status');",
+                  "});",
+                  "pm.collectionVariables.set('accessToken', body.accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rishabhpndt19@gmail.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "02 Me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('displayName Sentinel', () => pm.expect(body.user.displayName).to.eql('Sentinel'));",
+                  "pm.test('user has no status', () => pm.expect(body.user).to.not.have.property('status'));",
+                  "pm.test('has SENTINEL_USER role', () => pm.expect(body.roles.some(r => r.name === 'SENTINEL_USER')).to.be.true);",
+                  "pm.test('roles/permissions have no status', () => {",
+                  "  body.roles.forEach(r => {",
+                  "    pm.expect(r).to.not.have.property('status');",
+                  "    (r.permissions || []).forEach(p => pm.expect(p).to.not.have.property('status'));",
+                  "  });",
+                  "});",
+                  "pm.test('ALL permission present', () => {",
+                  "  const perms = body.roles.flatMap(r => r.permissions || []);",
+                  "  pm.expect(perms.some(p => p.name === 'ALL')).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        },
+        {
+          "name": "03 Refresh token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('has accessToken', () => pm.expect(body.accessToken).to.be.a('string'));",
+                  "pm.test('has expiresIn', () => pm.expect(body.expiresIn).to.be.a('number'));",
+                  "pm.collectionVariables.set('accessToken', body.accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/auth/refresh-token"
+          }
+        },
+        {
+          "name": "04 Me with refreshed token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('still Sentinel', () => pm.expect(body.user.displayName).to.eql('Sentinel'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        },
+        {
+          "name": "05 Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('status 204', () => pm.response.to.have.status(204));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Failure: invalid credentials",
+      "item": [
+        {
+          "name": "01 Login with wrong password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 401', () => pm.response.to.have.status(401));",
+                  "const body = pm.response.json();",
+                  "pm.test('errorCode UNAUTHORIZED', () => pm.expect(body.errorCode).to.eql('UNAUTHORIZED'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rishabhpndt19@gmail.com\",\n  \"password\": \"WrongPassword1\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Failure: validation error",
+      "item": [
+        {
+          "name": "01 Login with invalid email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));",
+                  "const body = pm.response.json();",
+                  "pm.test('errorCode VALIDATION_FAILED', () => pm.expect(body.errorCode).to.eql('VALIDATION_FAILED'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 - Failure: unauthorized me",
+      "item": [
+        {
+          "name": "01 Me without token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 401', () => pm.expect(pm.response.code).to.eql(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 - Failure: refresh-token without cookie",
+      "item": [
+        {
+          "name": "01 Refresh token with no cookie",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const jar = pm.cookies.jar();",
+                  "jar.clear(pm.collectionVariables.get('baseUrl'), function () {});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 401', () => pm.expect(pm.response.code).to.eql(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/refresh-token"
+          }
+        }
+      ]
+    }
+  ]
+}

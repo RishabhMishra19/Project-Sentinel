@@ -7,12 +7,14 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:sentinel}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     open-in-view: false
     properties:
       hibernate:
         jdbc:
           time_zone: UTC
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.sql
   data:
     redis:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
@@ -22,6 +24,17 @@ spring:
 
 server:
   port: 8080
+
+sentinel:
+  jwt:
+    secret: ${JWT_SECRET:sentinel-dev-secret-key-must-be-at-least-256-bits-long!!}
+    access-token-ttl: PT15M
+    refresh-token-ttl: PT2H
+  cookie:
+    refresh-token-name: refresh_token
+    path: /api/auth
+    secure: ${COOKIE_SECURE:false}
+    same-site: Lax
 
 management:
   endpoints:
