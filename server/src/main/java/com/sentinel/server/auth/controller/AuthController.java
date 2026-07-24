@@ -6,6 +6,7 @@ import com.sentinel.server.auth.dto.ChangePasswordRequest;
 import com.sentinel.server.auth.dto.LoginRequest;
 import com.sentinel.server.auth.dto.LoginResponse;
 import com.sentinel.server.auth.dto.MeResponse;
+import com.sentinel.server.auth.dto.ProfileResponse;
 import com.sentinel.server.auth.dto.TokenResponse;
 import com.sentinel.server.auth.service.AuthFacade;
 import com.sentinel.server.common.response.ApiResponses;
@@ -62,6 +63,11 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<MeResponse> me(@AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponses.ok(authFacade.me(principal.getId()));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileResponse> profile(@AuthenticationPrincipal UserPrincipal principal) {
+        return ApiResponses.ok(authFacade.profile(principal.getId()));
     }
 
     @PostMapping("/change-password")

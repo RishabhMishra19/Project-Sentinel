@@ -6,6 +6,7 @@ import com.sentinel.server.auth.dto.ChangePasswordRequest;
 import com.sentinel.server.auth.dto.LoginRequest;
 import com.sentinel.server.auth.dto.LoginResponse;
 import com.sentinel.server.auth.dto.MeResponse;
+import com.sentinel.server.auth.dto.ProfileResponse;
 import com.sentinel.server.auth.dto.RefreshTokenIssue;
 import com.sentinel.server.auth.dto.TokenResponse;
 import com.sentinel.server.auth.mapper.AuthMapper;
@@ -69,6 +70,13 @@ public class AuthFacadeImpl implements AuthFacade {
     public MeResponse me(UUID userId) {
         User user = userService.findByIdWithAuthorities(userId);
         return authMapper.toMeResponse(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProfileResponse profile(UUID userId) {
+        User user = userService.findByIdWithAuthorities(userId);
+        return authMapper.toProfileResponse(user);
     }
 
     @Override

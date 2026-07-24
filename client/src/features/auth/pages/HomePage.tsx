@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useLogout } from '../hooks/useLogout'
 import { useAppSelector } from '../../../app/hooks'
 
@@ -17,13 +18,21 @@ export function HomePage() {
               {user?.displayName ?? '…'} ({user?.email ?? '…'})
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => logoutMutation.mutate()}
-            className="rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
-          >
-            Log out
-          </button>
+          <div className="flex gap-2">
+            <Link
+              to="/profile"
+              className="rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
+            >
+              Profile
+            </Link>
+            <button
+              type="button"
+              onClick={() => logoutMutation.mutate()}
+              className="rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
+            >
+              Log out
+            </button>
+          </div>
         </div>
 
         {meStatus === 'loading' || meStatus === 'idle' ? (

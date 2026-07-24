@@ -17,3 +17,42 @@
     cursor: not-allowed;
   }
 }
+
+/* Sonner toast color scheme (success / error / loading / action / cancel) */
+[data-sonner-toaster] {
+  --normal-bg: #ffffff;
+  --normal-border: #e2e8f0;
+  --normal-text: #0f172a;
+
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
+  --success-text: #065f46;
+
+  --error-bg: #fef2f2;
+  --error-border: #fecaca;
+  --error-text: #991b1b;
+
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --warning-text: #92400e;
+
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+  --info-text: #1e3a8a;
+}
+
+[data-sonner-toast].sentinel-toast-loading {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+[data-sonner-toast] [data-button][data-action].sentinel-toast-action {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+[data-sonner-toast] [data-button][data-cancel].sentinel-toast-cancel {
+  background: #e2e8f0;
+  color: #334155;
+}

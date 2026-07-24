@@ -4,6 +4,7 @@ import { useLoadCurrentUser } from '../features/auth/hooks/useLoadCurrentUser'
 import { useRestoreSession } from '../features/auth/hooks/useRestoreSession'
 import { HomePage } from '../features/auth/pages/HomePage'
 import { LoginPage } from '../features/auth/pages/LoginPage'
+import { ProfilePage } from '../features/auth/pages/ProfilePage'
 import { ProtectedRoute } from './ProtectedRoute'
 import { UnprotectedRoute } from './UnprotectedRoute'
 
@@ -28,6 +29,7 @@ export function AppRouter() {
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
         <Route path="*" element={<Navigate to={accessToken ? '/' : '/login'} replace />} />
       </Routes>

@@ -2,7 +2,9 @@ package com.sentinel.server.auth.mapper;
 
 import com.sentinel.server.auth.dto.MeResponse;
 import com.sentinel.server.auth.dto.PermissionSummaryResponse;
+import com.sentinel.server.auth.dto.ProfileResponse;
 import com.sentinel.server.auth.dto.RoleSummaryResponse;
+import com.sentinel.server.auth.dto.UserProfileResponse;
 import com.sentinel.server.auth.dto.UserSummaryResponse;
 import com.sentinel.server.permission.entity.Permission;
 import com.sentinel.server.permission.entity.PermissionStatus;
@@ -20,11 +22,28 @@ public class AuthMapper {
     }
 
     public MeResponse toMeResponse(User user) {
-        List<RoleSummaryResponse> roles = user.getRoles().stream()
+        return new MeResponse(toUserSummary(user), toActiveRoleSummaries(user));
+    }
+
+    public UserProfileResponse toUserProfile(User user) {
+        return new UserProfileResponse(
+                user.getId().toString(),
+                user.getEmail(),
+                user.getDisplayName(),
+                user.getStatus(),
+                user.getCreatedAt(),
+                user.getUpdatedAt());
+    }
+
+    public ProfileResponse toProfileResponse(User user) {
+        return new ProfileResponse(toUserProfile(user), toActiveRoleSummaries(user));
+    }
+
+    private List<RoleSummaryResponse> toActiveRoleSummaries(User user) {
+        return user.getRoles().stream()
                 .filter(role -> role.getStatus() == RoleStatus.ACTIVE)
                 .map(this::toRoleSummary)
                 .toList();
-        return new MeResponse(toUserSummary(user), roles);
     }
 
     public RoleSummaryResponse toRoleSummary(Role role) {

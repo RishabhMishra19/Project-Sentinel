@@ -5,6 +5,7 @@ import com.sentinel.server.auth.dto.AuthRefreshResult;
 import com.sentinel.server.auth.dto.ChangePasswordRequest;
 import com.sentinel.server.auth.dto.LoginRequest;
 import com.sentinel.server.auth.dto.MeResponse;
+import com.sentinel.server.auth.dto.ProfileResponse;
 import java.util.UUID;
 
 public interface AuthFacade {
@@ -16,6 +17,8 @@ public interface AuthFacade {
     void logout(String refreshTokenRaw);
 
     MeResponse me(UUID userId);
+
+    ProfileResponse profile(UUID userId);
 
     AuthRefreshResult changePassword(UUID userId, ChangePasswordRequest request);
 }

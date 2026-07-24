@@ -20,9 +20,30 @@ export interface MeResponse {
   roles: RoleSummary[]
 }
 
+export type UserStatus = 'ACTIVE' | 'INACTIVE'
+
+export interface UserProfile {
+  id: string
+  email: string
+  displayName: string
+  status: UserStatus
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ProfileResponse {
+  user: UserProfile
+  roles: RoleSummary[]
+}
+
 export interface LoginRequest {
   email: string
   password: string
+}
+
+export interface ChangePasswordRequest {
+  oldPassword: string
+  newPassword: string
 }
 
 export interface LoginResponse {

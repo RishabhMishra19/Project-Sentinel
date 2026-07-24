@@ -1,8 +1,10 @@
 import { apiManager } from '../../../shared/api/ApiManager'
 import type {
+  ChangePasswordRequest,
   LoginRequest,
   LoginResponse,
   MeResponse,
+  ProfileResponse,
   TokenResponse,
 } from '../dto/auth.dto'
 
@@ -20,4 +22,12 @@ export function logout(): Promise<void> {
 
 export function me(): Promise<MeResponse> {
   return apiManager.get<MeResponse>('/auth/me')
+}
+
+export function getProfile(): Promise<ProfileResponse> {
+  return apiManager.get<ProfileResponse>('/auth/profile')
+}
+
+export function changePassword(payload: ChangePasswordRequest): Promise<TokenResponse> {
+  return apiManager.post<TokenResponse>('/auth/change-password', payload)
 }
