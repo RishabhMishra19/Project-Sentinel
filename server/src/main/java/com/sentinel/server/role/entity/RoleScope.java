@@ -1,4 +1,4 @@
-package com.sentinel.server.permission.entity;
+package com.sentinel.server.role.entity;
 
 import com.sentinel.server.user.entity.User;
 import jakarta.persistence.Column;
@@ -21,23 +21,35 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "permissions")
+@Table(name = "role_scopes")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Permission {
+public class RoleScope {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "scope_type", nullable = false, length = 32)
+    private RoleScopeType scopeType;
+
+    @Column(name = "scope_id", nullable = true)
+    private UUID scopeId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "permission", nullable = false, length = 32)
+    private com.sentinel.server.permission.entity.PermissionType permission;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private PermissionStatus status;
+    private RoleScopeStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)

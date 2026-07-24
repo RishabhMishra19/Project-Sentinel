@@ -14,7 +14,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("""
             SELECT DISTINCT u FROM User u
             LEFT JOIN FETCH u.roles r
-            LEFT JOIN FETCH r.permissions
+            LEFT JOIN FETCH r.roleScopes
             WHERE u.id = :id
             """)
     Optional<User> findByIdWithRolesAndPermissions(@Param("id") UUID id);
@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("""
             SELECT DISTINCT u FROM User u
             LEFT JOIN FETCH u.roles r
-            LEFT JOIN FETCH r.permissions
+            LEFT JOIN FETCH r.roleScopes
             WHERE LOWER(u.email) = LOWER(:email)
             """)
     Optional<User> findByEmailWithRolesAndPermissions(@Param("email") String email);

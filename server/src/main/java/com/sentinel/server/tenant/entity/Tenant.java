@@ -1,8 +1,6 @@
-package com.sentinel.server.role.entity;
+package com.sentinel.server.tenant.entity;
 
-import com.sentinel.server.tenant.entity.Tenant;
 import com.sentinel.server.user.entity.User;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,40 +11,36 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "tenants")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Role {
+public class Tenant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tenant_id", nullable = false)
-    private Tenant tenant;
-
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "slug", nullable = false, unique = true, length = 100)
+    private String slug;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private RoleStatus status;
+    private TenantStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
@@ -61,9 +55,6 @@ public class Role {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<RoleScope> roleScopes = new HashSet<>();
 
     @PrePersist
     void onCreate() {
