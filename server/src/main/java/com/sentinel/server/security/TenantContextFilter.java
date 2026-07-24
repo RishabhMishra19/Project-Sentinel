@@ -15,7 +15,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/** After JWT: set {@code activeTenantId} from {@code X-Tenant-Id}; non-admins must match home. */
+/**
+ * After JWT: set {@code activeTenantId} from {@code X-Tenant-Id}, or fall back to home tenant.
+ *
+ * <p>Sentinel Admin: header is optional — omit uses {@code homeTenantId} when present, otherwise
+ * leaves {@code activeTenantId} null; when present, the tenant must exist. Non-admins: header is
+ * also optional (falls back to home); when present must match home tenant.
+ */
 @Component
 @RequiredArgsConstructor
 public class TenantContextFilter extends OncePerRequestFilter {
@@ -28,14 +34,17 @@ public class TenantContextFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String raw = request.getHeader(TENANT_ID_HEADER);
-        if (raw == null || raw.isBlank()) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserPrincipal principal)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof UserPrincipal principal)) {
+        String raw = request.getHeader(TENANT_ID_HEADER);
+        if (raw == null || raw.isBlank()) {
+            if (principal.getHomeTenantId() != null) {
+                setActiveTenant(principal, principal.getHomeTenantId());
+            }
             filterChain.doFilter(request, response);
             return;
         }
@@ -48,22 +57,25 @@ public class TenantContextFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (principal.isSentinelAdmin()) {
-            if (!tenantRepository.existsById(tenantId)) {
-                reject(response, HttpServletResponse.SC_NOT_FOUND, "NOT_FOUND", "Tenant not found");
-                return;
-            }
-        } else if (!tenantId.equals(principal.getHomeTenantId())) {
+        if (!tenantRepository.existsById(tenantId)) {
+            reject(response, HttpServletResponse.SC_NOT_FOUND, "NOT_FOUND", "Tenant not found");
+            return;
+        }
+
+        if (!principal.isSentinelAdmin() && !tenantId.equals(principal.getHomeTenantId())) {
             reject(response, HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN", "Access Denied");
             return;
         }
 
+        setActiveTenant(principal, tenantId);
+        filterChain.doFilter(request, response);
+    }
+
+    private static void setActiveTenant(UserPrincipal principal, UUID tenantId) {
         UserPrincipal updated = principal.withActiveTenantId(tenantId);
         SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken(
                         updated, null, updated.getAuthorities()));
-
-        filterChain.doFilter(request, response);
     }
 
     private static void reject(HttpServletResponse response, int status, String code, String message)
