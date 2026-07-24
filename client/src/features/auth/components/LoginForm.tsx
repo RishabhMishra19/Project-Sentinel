@@ -47,7 +47,7 @@ export const LoginForm = () => {
       <button
         type="submit"
         disabled={loginMutation.isPending}
-        className="cursor-pointer rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+        className="cursor-pointer rounded bg-accent px-4 py-2 text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loginMutation.isPending ? 'Signing in…' : 'Sign in'}
       </button>

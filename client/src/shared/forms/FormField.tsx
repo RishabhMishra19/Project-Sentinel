@@ -1,7 +1,7 @@
 import type { FieldError, UseFormRegisterReturn } from 'react-hook-form'
 
 const inputClassName =
-  'rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-600'
+  'rounded border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-ring'
 
 type FormFieldProps = {
   label: string
@@ -18,7 +18,7 @@ export const FormField = ({
   error,
   registration,
 }: FormFieldProps) => (
-  <label className="flex flex-col gap-1 text-sm text-slate-700">
+  <label className="flex flex-col gap-1 text-sm text-foreground">
     {label}
     <input
       type={type}
@@ -27,7 +27,7 @@ export const FormField = ({
       {...registration}
     />
     {error?.message ? (
-      <span className="text-sm text-red-600">{error.message}</span>
+      <span className="text-sm text-danger">{error.message}</span>
     ) : null}
   </label>
 )
