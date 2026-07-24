@@ -74,7 +74,7 @@ export const DataTableTable = <T extends Record<string, unknown>>({
   return (
     <div className="relative overflow-x-auto">
       <table className="w-full border-collapse text-left text-sm">
-        <thead className="bg-chrome/60 text-muted">
+        <thead className="bg-chrome/60 text-muted dark:bg-white/8">
           <tr>
             {columns.map((column) => {
               const isSorted = sorting?.id === column.id
