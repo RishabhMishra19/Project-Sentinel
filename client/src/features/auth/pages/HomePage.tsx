@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
-import { useLogout } from '../hooks/useLogout'
 import { useAppSelector } from '../../../app/hooks'
+import { ROUTES } from '../../../routes/paths'
+import { useLogout } from '../hooks/useLogout'
 
 export function HomePage() {
   const user = useAppSelector((state) => state.auth.user)
@@ -20,7 +21,7 @@ export function HomePage() {
           </div>
           <div className="flex gap-2">
             <Link
-              to="/profile"
+              to={ROUTES.PROFILE}
               className="cursor-pointer rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
             >
               Profile

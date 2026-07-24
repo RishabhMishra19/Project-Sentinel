@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ROUTES } from '../../../routes/paths'
 import { ChangePasswordModal } from '../components/ChangePasswordModal'
 import { useProfile } from '../hooks/useProfile'
 
@@ -28,7 +29,7 @@ export function ProfilePage() {
           </div>
           <div className="flex gap-2">
             <Link
-              to="/"
+              to={ROUTES.HOME}
               className="cursor-pointer rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
             >
               Home

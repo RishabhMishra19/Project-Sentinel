@@ -2,11 +2,12 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { store } from '../../app/store'
 import { clearAuth, setCredentials } from '../../features/auth/slices/authSlice'
 import type { TokenResponse } from '../../features/auth/dto/auth.dto'
+import { API_BASE, AUTH_API_ROUTES } from './apiRoutes'
 
 type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean }
 
 export const axiosClient = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -26,7 +27,7 @@ let refreshPromise: Promise<string | null> | null = null
 async function refreshAccessToken(): Promise<string | null> {
   try {
     const { data } = await axios.post<TokenResponse>(
-      '/api/auth/refresh-token',
+      `${API_BASE}${AUTH_API_ROUTES.REFRESH_TOKEN}`,
       {},
       { withCredentials: true },
     )

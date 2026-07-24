@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch } from '../../../app/hooks'
+import { ROUTES } from '../../../routes/paths'
 import { clearAuth } from '../slices/authSlice'
 import { logout } from '../api/authApi'
 
@@ -14,7 +15,7 @@ export function useLogout() {
     onSettled: () => {
       dispatch(clearAuth())
       queryClient.clear()
-      navigate('/login', { replace: true })
+      navigate(ROUTES.LOGIN, { replace: true })
     },
   })
 }
