@@ -14,7 +14,7 @@ server/target/
 server/.mvn/wrapper/maven-wrapper.jar
 
 # Node / Vite
-client/node_modules/
+node_modules/
 client/dist/
 
 # Logs
