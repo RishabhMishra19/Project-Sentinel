@@ -26,7 +26,10 @@ export function OverviewPage() {
               <li key={role.id} className="rounded border border-border p-4">
                 <p className="font-medium text-foreground">{role.name}</p>
                 <p className="mt-2 text-sm text-muted">
-                  Permissions: {role.permissions.map((p) => p.name).join(', ') || 'none'}
+                  Scopes:{' '}
+                  {role.scopes
+                    .map((s) => `${s.scopeType}${s.scopeId ? `:${s.scopeId.slice(0, 8)}` : ''} (${s.permission})`)
+                    .join(', ') || 'none'}
                 </p>
               </li>
             ))}

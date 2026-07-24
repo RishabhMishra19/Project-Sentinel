@@ -4,15 +4,17 @@ export interface UserSummary {
   displayName: string
 }
 
-export interface PermissionSummary {
+export interface RoleScopeSummary {
   id: string
-  name: string
+  scopeType: string
+  scopeId: string | null
+  permission: string
 }
 
 export interface RoleSummary {
   id: string
   name: string
-  permissions: PermissionSummary[]
+  scopes: RoleScopeSummary[]
 }
 
 export interface MeResponse {
@@ -27,6 +29,7 @@ export interface UserProfile {
   email: string
   displayName: string
   status: UserStatus
+  sentinelAdmin: boolean
   createdAt: string
   updatedAt: string
   lastLoginAt: string | null
