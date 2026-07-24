@@ -1,5 +1,6 @@
 import { renderCell } from './cells/renderCell'
 import { DataTableRowActions } from './DataTableRowActions'
+import { tableCellInnerClassName } from './styles'
 import type {
   DataTableColumn,
   DataTableSort,
@@ -15,6 +16,8 @@ type DataTableTableProps<T extends Record<string, unknown>> = {
   rowActions?: RowAction<T>[]
   isLoading?: boolean
   emptyMessage?: string
+  /** Used for skeleton rows when loading with no data yet */
+  skeletonRowCount?: number
 }
 
 const SortIndicator = ({
@@ -43,6 +46,16 @@ const nextSort = (
   return null
 }
 
+const SkeletonCell = ({ className }: { className?: string }) => (
+  <td className="px-3 py-2 align-middle">
+    <div className={tableCellInnerClassName}>
+      <div
+        className={`h-4 animate-pulse rounded bg-chrome ${className ?? 'w-full'}`}
+      />
+    </div>
+  </td>
+)
+
 export const DataTableTable = <T extends Record<string, unknown>>({
   columns,
   rows,
@@ -52,17 +65,14 @@ export const DataTableTable = <T extends Record<string, unknown>>({
   rowActions,
   isLoading,
   emptyMessage = 'No results',
+  skeletonRowCount = 10,
 }: DataTableTableProps<T>) => {
   const showActions = Boolean(rowActions && rowActions.length > 0)
   const colSpan = columns.length + (showActions ? 1 : 0)
+  const showSkeletons = Boolean(isLoading)
 
   return (
     <div className="relative overflow-x-auto">
-      {isLoading ? (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/60 text-sm text-muted">
-          Loading…
-        </div>
-      ) : null}
       <table className="w-full border-collapse text-left text-sm">
         <thead className="bg-chrome/60 text-muted">
           <tr>
@@ -106,7 +116,24 @@ export const DataTableTable = <T extends Record<string, unknown>>({
           </tr>
         </thead>
         <tbody>
-          {rows.length === 0 ? (
+          {showSkeletons
+            ? Array.from(
+                { length: skeletonRowCount },
+                (_, index) => (
+                  <tr
+                    key={`skeleton-${index}`}
+                    className="border-b border-border last:border-b-0"
+                  >
+                    {columns.map((column) => (
+                      <SkeletonCell key={column.id} />
+                    ))}
+                    {showActions ? <SkeletonCell className="w-20" /> : null}
+                  </tr>
+                ),
+              )
+            : null}
+
+          {!showSkeletons && rows.length === 0 ? (
             <tr>
               <td
                 colSpan={colSpan}
@@ -115,7 +142,9 @@ export const DataTableTable = <T extends Record<string, unknown>>({
                 {emptyMessage}
               </td>
             </tr>
-          ) : (
+          ) : null}
+
+          {!showSkeletons &&
             rows.map((row) => (
               <tr
                 key={getRowId(row)}
@@ -123,17 +152,20 @@ export const DataTableTable = <T extends Record<string, unknown>>({
               >
                 {columns.map((column) => (
                   <td key={column.id} className="px-3 py-2 align-middle">
-                    {renderCell(column.cell, row)}
+                    <div className={tableCellInnerClassName}>
+                      {renderCell(column.cell, row)}
+                    </div>
                   </td>
                 ))}
                 {showActions && rowActions ? (
                   <td className="px-3 py-2 align-middle">
-                    <DataTableRowActions row={row} actions={rowActions} />
+                    <div className={tableCellInnerClassName}>
+                      <DataTableRowActions row={row} actions={rowActions} />
+                    </div>
                   </td>
                 ) : null}
               </tr>
-            ))
-          )}
+            ))}
         </tbody>
       </table>
     </div>

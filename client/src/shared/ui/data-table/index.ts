@@ -1,4 +1,8 @@
 export { DataTable } from './DataTable'
+export { useClientDataTable } from './hooks/useClientDataTable'
+export { useServerDataTable } from './hooks/useServerDataTable'
+
+export type { DataTableQueryState } from './hooks/types'
 
 export type {
   DataTableBadgeVariant,

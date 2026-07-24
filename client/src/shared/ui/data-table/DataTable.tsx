@@ -53,6 +53,7 @@ export const DataTable = <T extends Record<string, unknown>>({
           rowActions={rowActions}
           isLoading={isLoading}
           emptyMessage={emptyMessage}
+          skeletonRowCount={pagination?.pageSize}
         />
         {pagination ? <DataTablePaginationBar pagination={pagination} /> : null}
       </div>
