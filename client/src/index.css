@@ -1,6 +1,51 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-background: #fafbfc;
+  --color-surface: #ffffff;
+  --color-foreground: #111827;
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-accent: #2563eb;
+  --color-accent-foreground: #ffffff;
+  --color-accent-soft: #eff6ff;
+  --color-primary: #111827;
+  --color-primary-foreground: #ffffff;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-ring: #2563eb;
+
+  /* Always-dark auth marketing panel (does not flip with theme) */
+  --color-brand-panel: #0c0f14;
+  --color-brand-panel-foreground: #f8fafc;
+  --color-brand-panel-muted: #94a3b8;
+  --color-brand-panel-border: #334155;
+}
+
+.dark {
+  --color-background: #0c0f14;
+  --color-surface: #151a22;
+  --color-foreground: #e5e7eb;
+  --color-muted: #9ca3af;
+  --color-border: #2a3340;
+  --color-accent: #60a5fa;
+  --color-accent-foreground: #0c0f14;
+  --color-accent-soft: color-mix(in srgb, #60a5fa 16%, #0c0f14);
+  --color-primary: #e5e7eb;
+  --color-primary-foreground: #0c0f14;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-ring: #60a5fa;
+}
+
 @layer base {
+  html,
+  body {
+    @apply bg-background text-foreground;
+  }
+
   a[href],
   button:not(:disabled),
   [type="button"]:not(:disabled),
@@ -19,41 +64,45 @@
   }
 }
 
-/* Sonner toast color scheme (success / error / loading / action / cancel) */
+/* Sonner toast color scheme — driven by semantic tokens */
 [data-sonner-toaster] {
-  --normal-bg: #ffffff;
-  --normal-border: #e2e8f0;
-  --normal-text: #0f172a;
+  --normal-bg: var(--color-surface);
+  --normal-border: var(--color-border);
+  --normal-text: var(--color-foreground);
 
-  --success-bg: #ecfdf5;
-  --success-border: #a7f3d0;
-  --success-text: #065f46;
+  --success-bg: color-mix(in srgb, #059669 12%, var(--color-surface));
+  --success-border: color-mix(in srgb, #059669 35%, var(--color-border));
+  --success-text: #059669;
 
-  --error-bg: #fef2f2;
-  --error-border: #fecaca;
-  --error-text: #991b1b;
+  --error-bg: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface));
+  --error-border: color-mix(in srgb, var(--color-danger) 35%, var(--color-border));
+  --error-text: var(--color-danger);
 
-  --warning-bg: #fffbeb;
-  --warning-border: #fde68a;
-  --warning-text: #92400e;
+  --warning-bg: color-mix(in srgb, var(--color-warning) 12%, var(--color-surface));
+  --warning-border: color-mix(in srgb, var(--color-warning) 35%, var(--color-border));
+  --warning-text: var(--color-warning);
 
-  --info-bg: #eff6ff;
-  --info-border: #bfdbfe;
-  --info-text: #1e3a8a;
+  --info-bg: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  --info-border: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  --info-text: var(--color-accent);
+}
+
+.dark [data-sonner-toaster] {
+  --success-text: #34d399;
 }
 
 [data-sonner-toast].sentinel-toast-loading {
-  background: #f8fafc !important;
-  border-color: #cbd5e1 !important;
-  color: #334155 !important;
+  background: var(--color-background) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-muted) !important;
 }
 
 [data-sonner-toast] [data-button][data-action].sentinel-toast-action {
-  background: #0f172a;
-  color: #ffffff;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
 }
 
 [data-sonner-toast] [data-button][data-cancel].sentinel-toast-cancel {
-  background: #e2e8f0;
-  color: #334155;
+  background: var(--color-border);
+  color: var(--color-foreground);
 }
