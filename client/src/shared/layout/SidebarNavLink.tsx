@@ -2,9 +2,9 @@ import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 
 const inactiveClass =
-  'flex items-center gap-2.5 rounded px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground'
+  'flex items-center gap-2.5 rounded px-3 py-2 text-sm text-muted hover:bg-accent/25 hover:text-accent'
 const activeClass =
-  'relative flex items-center gap-2.5 rounded bg-accent-soft px-3 py-2 text-sm font-medium text-accent before:absolute before:top-1 before:bottom-1 before:left-0 before:w-1 before:rounded-full before:bg-accent'
+  'flex items-center gap-2.5 rounded bg-accent px-3 py-2 text-sm font-medium text-accent-foreground'
 
 type SidebarNavLinkProps = {
   to: string
