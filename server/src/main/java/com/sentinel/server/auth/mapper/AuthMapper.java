@@ -18,7 +18,8 @@ import org.springframework.stereotype.Component;
 public class AuthMapper {
 
     public UserSummaryResponse toUserSummary(User user) {
-        return new UserSummaryResponse(user.getId().toString(), user.getEmail(), user.getDisplayName());
+        return new UserSummaryResponse(
+                user.getId().toString(), user.getEmail(), user.getDisplayName(), user.isSentinelAdmin());
     }
 
     public MeResponse toMeResponse(User user) {

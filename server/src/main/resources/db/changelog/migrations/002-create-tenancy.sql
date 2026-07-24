@@ -18,6 +18,15 @@ CREATE UNIQUE INDEX idx_tenants_slug ON tenants (slug);
 CREATE INDEX idx_tenants_status ON tenants (status);
 CREATE INDEX idx_tenants_created_by ON tenants (created_by);
 
+-- changeset sentinel:002-users-tenant-fk
+-- Tenant users must have tenant_id; Sentinel platform admins must not.
+ALTER TABLE users
+    ADD CONSTRAINT fk_users_tenant FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE RESTRICT,
+    ADD CONSTRAINT chk_users_tenant_vs_platform CHECK (
+        (is_sentinel_admin = TRUE AND tenant_id IS NULL)
+        OR (is_sentinel_admin = FALSE AND tenant_id IS NOT NULL)
+    );
+
 -- changeset sentinel:002-roles
 -- All roles belong to a tenant. Platform operators use users.is_sentinel_admin (not roles).
 CREATE TABLE roles (
@@ -47,19 +56,6 @@ CREATE TABLE user_roles (
 );
 
 CREATE INDEX idx_user_roles_user_id ON user_roles (user_id);
-
--- changeset sentinel:002-tenant-users
-CREATE TABLE tenant_users (
-    id UUID NOT NULL PRIMARY KEY,
-    tenant_id UUID NOT NULL,
-    user_id UUID NOT NULL,
-    CONSTRAINT uk_tenant_users_tenant_user UNIQUE (tenant_id, user_id),
-    CONSTRAINT fk_tenant_users_tenant FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE,
-    CONSTRAINT fk_tenant_users_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-);
-
-CREATE INDEX idx_tenant_users_user_id ON tenant_users (user_id);
-CREATE INDEX idx_tenant_users_tenant_id ON tenant_users (tenant_id);
 
 -- changeset sentinel:002-role-scopes
 -- permission per scope: ALL | READ | READ_AND_WRITE

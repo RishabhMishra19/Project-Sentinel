@@ -1,6 +1,7 @@
 package com.sentinel.server.user.entity;
 
 import com.sentinel.server.role.entity.Role;
+import com.sentinel.server.tenant.entity.Tenant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -50,6 +52,10 @@ public class User {
 
     @Column(name = "is_sentinel_admin", nullable = false)
     private boolean sentinelAdmin;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "tenant_id", nullable = true)
+    private Tenant tenant;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;

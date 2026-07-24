@@ -52,6 +52,12 @@ export function ProfilePage() {
                 <dd className="mt-1 text-foreground">{user.status}</dd>
               </div>
               <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-muted">
+                  Sentinel admin
+                </dt>
+                <dd className="mt-1 text-foreground">{user.sentinelAdmin ? 'Yes' : 'No'}</dd>
+              </div>
+              <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">Created</dt>
                 <dd className="mt-1 text-foreground">{formatDate(user.createdAt)}</dd>
               </div>

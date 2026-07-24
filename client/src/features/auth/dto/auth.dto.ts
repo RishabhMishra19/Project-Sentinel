@@ -2,6 +2,7 @@ export interface UserSummary {
   id: string
   email: string
   displayName: string
+  sentinelAdmin: boolean
 }
 
 export interface RoleScopeSummary {

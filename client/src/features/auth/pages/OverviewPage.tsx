@@ -11,6 +11,11 @@ export function OverviewPage() {
         <p className="text-sm text-muted">
           {user?.displayName ?? '…'} ({user?.email ?? '…'})
         </p>
+        {meStatus === 'ready' ? (
+          <p className="mt-1 text-sm text-muted">
+            Sentinel admin: {user?.sentinelAdmin ? 'Yes' : 'No'}
+          </p>
+        ) : null}
       </div>
 
       {meStatus === 'loading' || meStatus === 'idle' ? (
