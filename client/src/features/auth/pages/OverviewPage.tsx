@@ -8,7 +8,6 @@ export function OverviewPage() {
   return (
     <div className="mx-auto max-w-3xl rounded-xl border border-border bg-surface p-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-semibold text-foreground">Overview</h1>
         <p className="text-sm text-muted">
           {user?.displayName ?? '…'} ({user?.email ?? '…'})
         </p>

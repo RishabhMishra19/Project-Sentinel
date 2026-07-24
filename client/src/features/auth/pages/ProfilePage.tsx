@@ -21,10 +21,7 @@ export function ProfilePage() {
     <>
       <div className="mx-auto max-w-3xl rounded-xl border border-border bg-surface p-8">
         <div className="mb-6 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-semibold text-foreground">Profile</h1>
-            <p className="text-sm text-muted">Your account details</p>
-          </div>
+          <p className="text-sm text-muted">Your account details</p>
           <button
             type="button"
             onClick={() => setChangePasswordOpen(true)}

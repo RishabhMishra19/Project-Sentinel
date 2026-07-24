@@ -1,6 +1,7 @@
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
 import { ROUTES } from '../../routes/paths'
+import { SidebarItem, type SidebarMode } from './SidebarItem'
 
 function getInitials(displayName?: string | null, email?: string | null) {
   const source = displayName?.trim() || email?.trim() || '?'
@@ -11,8 +12,13 @@ function getInitials(displayName?: string | null, email?: string | null) {
   return source.slice(0, 2).toUpperCase()
 }
 
-export function LoggedInUserCard() {
+type LoggedInUserCardProps = {
+  mode?: SidebarMode
+}
+
+export function LoggedInUserCard({ mode = 'expanded' }: LoggedInUserCardProps) {
   const user = useAppSelector((state) => state.auth.user)
+  const navigate = useNavigate()
   const location = useLocation()
   const isProfileActive = location.pathname === ROUTES.PROFILE
 
@@ -20,43 +26,48 @@ export function LoggedInUserCard() {
   const isLoadingUser = !user && (meStatus === 'idle' || meStatus === 'loading')
   const initials = getInitials(user?.displayName, user?.email)
 
-  return (
-    <Link
-      to={ROUTES.PROFILE}
-      className={`flex w-full items-center gap-3 rounded border px-3 py-2.5 text-left transition-colors ${
-        isProfileActive
-          ? 'border-accent/40 bg-accent-soft'
-          : 'border-border bg-surface hover:border-accent/30 hover:bg-accent-soft/60'
-      }`}
-    >
-      <span
-        className={`inline-flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-          isProfileActive
-            ? 'bg-accent text-accent-foreground'
-            : 'bg-accent-soft text-accent'
-        }`}
-        aria-hidden
-      >
-        {isLoadingUser ? '…' : initials}
-      </span>
+  const email = user?.email ?? 'No email'
+  const displayName = user?.displayName ?? 'Unknown'
 
-      <span className="flex min-w-0 flex-1 flex-col">
-        {isLoadingUser ? (
-          <>
-            <span className="truncate text-sm font-medium text-muted">Loading…</span>
-            <span className="mt-0.5 truncate text-xs text-muted">Fetching account</span>
-          </>
-        ) : (
-          <>
-            <span className="truncate text-sm font-medium text-foreground">
-              {user?.displayName ?? 'Unknown'}
-            </span>
-            <span className="mt-0.5 truncate text-xs text-muted">
-              {user?.email ?? 'No email'}
-            </span>
-          </>
-        )}
+  const textNode = isLoadingUser ? (
+    <span className="flex min-w-0 flex-col">
+      <span className="truncate font-medium">Loading…</span>
+      <span className="mt-0.5 truncate text-xs">Fetching account</span>
+    </span>
+  ) : (
+    <span className="flex min-w-0 flex-col">
+      <span className="truncate font-medium" title={displayName}>
+        {displayName}
       </span>
-    </Link>
+      <span className="mt-0.5 truncate text-xs" title={email}>
+        {email}
+      </span>
+    </span>
+  )
+
+  const isCollapsed = mode === 'collapsed'
+  const avatarClass = `inline-flex shrink-0 items-center justify-center rounded-full font-semibold ${
+    isCollapsed ? 'size-8 text-[11px]' : 'size-9 text-xs'
+  } ${
+    isProfileActive
+      ? 'bg-sidebar-item-active-foreground/10 text-sidebar-item-active-foreground'
+      : 'bg-sidebar-item text-sidebar-foreground'
+  }`
+
+  return (
+    <SidebarItem
+      mode={mode}
+      active={isProfileActive}
+      onClick={() => navigate(ROUTES.PROFILE)}
+      className={isCollapsed ? undefined : 'gap-2 py-2.5'}
+      iconNode={
+        <span className={avatarClass} aria-hidden>
+          {isLoadingUser ? '…' : initials}
+        </span>
+      }
+      textNode={
+        isCollapsed ? (isLoadingUser ? 'Loading…' : displayName) : textNode
+      }
+    />
   )
 }

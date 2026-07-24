@@ -5,17 +5,27 @@
 @theme {
   --color-background: #fafbfc;
   --color-surface: #ffffff;
+  --color-chrome: #eef1f4;
   --color-foreground: #111827;
   --color-muted: #6b7280;
   --color-border: #e5e7eb;
-  --color-accent: #2563eb;
+  --color-accent: #3b6ef5;
   --color-accent-foreground: #ffffff;
-  --color-accent-soft: #eff6ff;
+  --color-accent-soft: #e8effe;
   --color-primary: #111827;
   --color-primary-foreground: #ffffff;
   --color-warning: #d97706;
   --color-danger: #dc2626;
-  --color-ring: #2563eb;
+  --color-ring: #3b6ef5;
+
+  /* Floating sidebar — solid blue in light theme */
+  --color-sidebar: #3b6ef5;
+  --color-sidebar-foreground: #ffffff;
+  --color-sidebar-muted: #ffffff;
+  --color-sidebar-tray: rgb(0 0 0 / 0.14);
+  --color-sidebar-item: rgb(255 255 255 / 0.12);
+  --color-sidebar-item-active: #ffffff;
+  --color-sidebar-item-active-foreground: #3b6ef5;
 
   /* Auth marketing panel — stays dark, shifts slightly with theme */
   --color-brand-panel: #0c0f14;
@@ -25,19 +35,29 @@
 }
 
 .dark {
-  --color-background: #151a22;
-  --color-surface: #1c2330;
+  --color-background: #12171f;
+  --color-surface: #1c2533;
+  --color-chrome: #0a0e14;
   --color-foreground: #e5e7eb;
   --color-muted: #9ca3af;
   --color-border: #2a3340;
   --color-accent: #60a5fa;
   --color-accent-foreground: #0c0f14;
-  --color-accent-soft: color-mix(in srgb, #60a5fa 16%, #151a22);
+  --color-accent-soft: color-mix(in srgb, #60a5fa 16%, #1c2533);
   --color-primary: #e5e7eb;
   --color-primary-foreground: #0c0f14;
   --color-warning: #fbbf24;
   --color-danger: #f87171;
   --color-ring: #60a5fa;
+
+  /* Floating sidebar — sinks below elevated surface */
+  --color-sidebar: #0f1620;
+  --color-sidebar-foreground: #f1f5f9;
+  --color-sidebar-muted: #8b9cb3;
+  --color-sidebar-tray: rgb(255 255 255 / 0.05);
+  --color-sidebar-item: rgb(255 255 255 / 0.07);
+  --color-sidebar-item-active: #60a5fa;
+  --color-sidebar-item-active-foreground: #0c0f14;
 
   --color-brand-panel: #0a1628;
   --color-brand-panel-foreground: #f1f5f9;

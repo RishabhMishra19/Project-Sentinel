@@ -35,9 +35,9 @@ export function AppRouter() {
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<ProtectedLayout />}>
-            <Route path={ROUTES.OVERVIEW} element={<OverviewPage />} />
-            <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
-            <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
+            <Route path={ROUTES.OVERVIEW} handle={{ crumb: 'Overview' }} element={<OverviewPage />} />
+            <Route path={ROUTES.PROFILE} handle={{ crumb: 'Profile' }} element={<ProfilePage />} />
+            <Route path={ROUTES.SETTINGS} handle={{ crumb: 'Settings' }} element={<SettingsPage />} />
           </Route>
         </Route>
         <Route
