@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -54,6 +55,19 @@ public class GlobalExceptionHandler {
                         code.name(),
                         code.getReason(),
                         "Invalid email or password",
+                        request.getRequestURI(),
+                        null));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        ErrorCode code = ErrorCode.FORBIDDEN;
+        return ResponseEntity.status(code.getStatus())
+                .body(new ApiError(
+                        Instant.now(),
+                        code.name(),
+                        code.getReason(),
+                        "Access denied",
                         request.getRequestURI(),
                         null));
     }

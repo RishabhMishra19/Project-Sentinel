@@ -13,6 +13,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,17 +32,20 @@ public class TenantController {
 
     private final TenantFacade tenantFacade;
 
+    @PreAuthorize("@accessSupport.isSentinelAdmin()")
     @GetMapping
     public ResponseEntity<PageResponse<TenantResponse>> list(
             Pageable pageable, @RequestParam(required = false) TenantStatus status) {
         return ApiResponses.okPage(tenantFacade.list(pageable, status));
     }
 
+    @PreAuthorize("@accessSupport.canReadTenant()")
     @GetMapping("/{id}")
     public ResponseEntity<TenantResponse> getById(@PathVariable UUID id) {
         return ApiResponses.ok(tenantFacade.getById(id));
     }
 
+    @PreAuthorize("@accessSupport.isSentinelAdmin()")
     @PostMapping
     public ResponseEntity<TenantResponse> create(
             @Valid @RequestBody CreateTenantRequest request,
@@ -49,6 +53,7 @@ public class TenantController {
         return ApiResponses.created(tenantFacade.create(request, principal.getId()));
     }
 
+    @PreAuthorize("@accessSupport.canWriteTenant()")
     @PutMapping("/{id}")
     public ResponseEntity<TenantResponse> update(
             @PathVariable UUID id,
@@ -57,6 +62,7 @@ public class TenantController {
         return ApiResponses.ok(tenantFacade.update(id, request, principal.getId()));
     }
 
+    @PreAuthorize("@accessSupport.isSentinelAdmin()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> softDelete(
             @PathVariable UUID id, @AuthenticationPrincipal UserPrincipal principal) {
