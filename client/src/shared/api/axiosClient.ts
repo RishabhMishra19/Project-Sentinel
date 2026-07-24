@@ -2,7 +2,7 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { store } from '../../app/store'
 import { clearAuth, setCredentials } from '../../features/auth/slices/authSlice'
 import type { TokenResponse } from '../../features/auth/dto/auth.dto'
-import { API_BASE, AUTH_API_ROUTES } from './apiRoutes'
+import { API_BASE, AUTH_API_ROUTES, TENANT_ID_HEADER } from './apiRoutes'
 
 type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean }
 
@@ -15,9 +15,12 @@ export const axiosClient = axios.create({
 })
 
 axiosClient.interceptors.request.use((config) => {
-  const token = store.getState().auth.accessToken
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  const { accessToken, tenant } = store.getState().auth
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`
+  }
+  if (tenant?.id) {
+    config.headers[TENANT_ID_HEADER] = tenant.id
   }
   return config
 })
