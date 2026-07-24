@@ -14,7 +14,7 @@ export function useLogin() {
     mutationFn: (payload: LoginRequest) => login(payload),
     onSuccess: (data) => {
       dispatch(setCredentials({ accessToken: data.accessToken, user: data.user }))
-      navigate(ROUTES.HOME, { replace: true })
+      navigate(ROUTES.OVERVIEW, { replace: true })
     },
   })
 }

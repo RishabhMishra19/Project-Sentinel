@@ -1,11 +1,9 @@
 import { LoginForm } from '../components/LoginForm'
 
 export const LoginPage = () => (
-  <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-    <section className="w-full max-w-lg rounded-xl bg-white p-8 shadow-sm">
-      <h1 className="mb-2 text-3xl font-semibold tracking-tight text-slate-900">Sentinel</h1>
-      <p className="mb-6 text-sm text-slate-600">Sign in to manage API endpoints</p>
-      <LoginForm />
-    </section>
-  </main>
+  <section className="w-full max-w-lg rounded-xl border border-border bg-surface p-8">
+    <h2 className="mb-2 text-2xl font-semibold tracking-tight text-foreground">Sign in</h2>
+    <p className="mb-6 text-sm text-muted">Enter your credentials to continue</p>
+    <LoginForm />
+  </section>
 )

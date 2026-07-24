@@ -2,9 +2,12 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { useAppSelector } from '../app/hooks'
 import { useLoadCurrentUser } from '../features/auth/hooks/useLoadCurrentUser'
 import { useRestoreSession } from '../features/auth/hooks/useRestoreSession'
-import { HomePage } from '../features/auth/pages/HomePage'
+import { OverviewPage } from '../features/auth/pages/OverviewPage'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { ProfilePage } from '../features/auth/pages/ProfilePage'
+import { SettingsPage } from '../features/auth/pages/SettingsPage'
+import { ProtectedLayout } from '../shared/layout/ProtectedLayout'
+import { UnprotectedLayout } from '../shared/layout/UnprotectedLayout'
 import { ROUTES } from './paths'
 import { ProtectedRoute } from './ProtectedRoute'
 import { UnprotectedRoute } from './UnprotectedRoute'
@@ -16,7 +19,7 @@ export function AppRouter() {
 
   if (!ready) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100 text-slate-600">
+      <div className="flex min-h-screen items-center justify-center bg-background text-muted">
         Restoring session…
       </div>
     )
@@ -26,15 +29,20 @@ export function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route element={<UnprotectedRoute />}>
-          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+          <Route element={<UnprotectedLayout />}>
+            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+          </Route>
         </Route>
         <Route element={<ProtectedRoute />}>
-          <Route path={ROUTES.HOME} element={<HomePage />} />
-          <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+          <Route element={<ProtectedLayout />}>
+            <Route path={ROUTES.OVERVIEW} element={<OverviewPage />} />
+            <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+            <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
+          </Route>
         </Route>
         <Route
           path="*"
-          element={<Navigate to={accessToken ? ROUTES.HOME : ROUTES.LOGIN} replace />}
+          element={<Navigate to={accessToken ? ROUTES.OVERVIEW : ROUTES.LOGIN} replace />}
         />
       </Routes>
     </BrowserRouter>
