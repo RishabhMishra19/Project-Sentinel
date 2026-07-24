@@ -36,14 +36,14 @@
 
 .dark {
   --color-background: #12171f;
-  --color-surface: #1c2533;
+  --color-surface: #2a3545;
   --color-chrome: #0a0e14;
   --color-foreground: #e5e7eb;
   --color-muted: #9ca3af;
-  --color-border: #2a3340;
+  --color-border: #3a4658;
   --color-accent: #60a5fa;
   --color-accent-foreground: #0c0f14;
-  --color-accent-soft: color-mix(in srgb, #60a5fa 16%, #1c2533);
+  --color-accent-soft: color-mix(in srgb, #60a5fa 16%, #2a3545);
   --color-primary: #e5e7eb;
   --color-primary-foreground: #0c0f14;
   --color-warning: #fbbf24;

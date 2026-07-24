@@ -16,6 +16,7 @@ export function ProfilePage() {
 
   const user = data?.user
   const roles = data?.roles ?? []
+  const tenant = data?.tenant ?? null
 
   return (
     <>
@@ -56,6 +57,12 @@ export function ProfilePage() {
                   Sentinel admin
                 </dt>
                 <dd className="mt-1 text-foreground">{user.sentinelAdmin ? 'Yes' : 'No'}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-muted">Tenant</dt>
+                <dd className="mt-1 text-foreground">
+                  {tenant ? `${tenant.name} (${tenant.id})` : 'No tenant'}
+                </dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">Created</dt>

@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { MeResponse, RoleSummary, UserSummary } from '../dto/auth.dto'
+import type { MeResponse, RoleSummary, TenantSummary, UserSummary } from '../dto/auth.dto'
 
 export type MeStatus = 'idle' | 'loading' | 'ready' | 'error'
 
@@ -7,6 +7,7 @@ interface AuthState {
   accessToken: string | null
   user: UserSummary | null
   roles: RoleSummary[]
+  tenant: TenantSummary | null
   meStatus: MeStatus
 }
 
@@ -14,6 +15,7 @@ const initialState: AuthState = {
   accessToken: null,
   user: null,
   roles: [],
+  tenant: null,
   meStatus: 'idle',
 }
 
@@ -28,6 +30,7 @@ const authSlice = createSlice({
       }
       // Force /me reload whenever a new access token is set
       state.roles = []
+      state.tenant = null
       state.meStatus = 'idle'
     },
     setMeLoading(state) {
@@ -36,6 +39,7 @@ const authSlice = createSlice({
     setMe(state, action: PayloadAction<MeResponse>) {
       state.user = action.payload.user
       state.roles = action.payload.roles
+      state.tenant = action.payload.tenant
       state.meStatus = 'ready'
     },
     setMeError(state) {
@@ -45,6 +49,7 @@ const authSlice = createSlice({
       state.accessToken = null
       state.user = null
       state.roles = []
+      state.tenant = null
       state.meStatus = 'idle'
     },
   },

@@ -4,12 +4,14 @@ import com.sentinel.server.auth.dto.MeResponse;
 import com.sentinel.server.auth.dto.ProfileResponse;
 import com.sentinel.server.auth.dto.RoleScopeSummaryResponse;
 import com.sentinel.server.auth.dto.RoleSummaryResponse;
+import com.sentinel.server.auth.dto.TenantSummaryResponse;
 import com.sentinel.server.auth.dto.UserProfileResponse;
 import com.sentinel.server.auth.dto.UserSummaryResponse;
 import com.sentinel.server.role.entity.Role;
 import com.sentinel.server.role.entity.RoleScope;
 import com.sentinel.server.role.entity.RoleScopeStatus;
 import com.sentinel.server.role.entity.RoleStatus;
+import com.sentinel.server.tenant.entity.Tenant;
 import com.sentinel.server.user.entity.User;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -22,8 +24,15 @@ public class AuthMapper {
                 user.getId().toString(), user.getEmail(), user.getDisplayName(), user.isSentinelAdmin());
     }
 
+    public TenantSummaryResponse toTenantSummary(Tenant tenant) {
+        if (tenant == null) {
+            return null;
+        }
+        return new TenantSummaryResponse(tenant.getId().toString(), tenant.getName());
+    }
+
     public MeResponse toMeResponse(User user) {
-        return new MeResponse(toUserSummary(user), toActiveRoleSummaries(user));
+        return new MeResponse(toUserSummary(user), toActiveRoleSummaries(user), toTenantSummary(user.getTenant()));
     }
 
     public UserProfileResponse toUserProfile(User user) {
@@ -39,7 +48,8 @@ public class AuthMapper {
     }
 
     public ProfileResponse toProfileResponse(User user) {
-        return new ProfileResponse(toUserProfile(user), toActiveRoleSummaries(user));
+        return new ProfileResponse(
+                toUserProfile(user), toActiveRoleSummaries(user), toTenantSummary(user.getTenant()));
     }
 
     private List<RoleSummaryResponse> toActiveRoleSummaries(User user) {

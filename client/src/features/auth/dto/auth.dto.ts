@@ -18,9 +18,15 @@ export interface RoleSummary {
   scopes: RoleScopeSummary[]
 }
 
+export interface TenantSummary {
+  id: string
+  name: string
+}
+
 export interface MeResponse {
   user: UserSummary
   roles: RoleSummary[]
+  tenant: TenantSummary | null
 }
 
 export type UserStatus = 'ACTIVE' | 'INACTIVE'
@@ -39,6 +45,7 @@ export interface UserProfile {
 export interface ProfileResponse {
   user: UserProfile
   roles: RoleSummary[]
+  tenant: TenantSummary | null
 }
 
 export interface LoginRequest {

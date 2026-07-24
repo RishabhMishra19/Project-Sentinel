@@ -3,6 +3,7 @@ import { useAppSelector } from '../../../app/hooks'
 export function OverviewPage() {
   const user = useAppSelector((state) => state.auth.user)
   const roles = useAppSelector((state) => state.auth.roles)
+  const tenant = useAppSelector((state) => state.auth.tenant)
   const meStatus = useAppSelector((state) => state.auth.meStatus)
 
   return (
@@ -12,9 +13,14 @@ export function OverviewPage() {
           {user?.displayName ?? '…'} ({user?.email ?? '…'})
         </p>
         {meStatus === 'ready' ? (
-          <p className="mt-1 text-sm text-muted">
-            Sentinel admin: {user?.sentinelAdmin ? 'Yes' : 'No'}
-          </p>
+          <>
+            <p className="mt-1 text-sm text-muted">
+              Sentinel admin: {user?.sentinelAdmin ? 'Yes' : 'No'}
+            </p>
+            <p className="mt-1 text-sm text-muted">
+              Tenant: {tenant ? `${tenant.name} (${tenant.id})` : 'No tenant'}
+            </p>
+          </>
         ) : null}
       </div>
 
