@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { useAppSelector } from '../app/hooks'
 import { useLoadCurrentUser } from '../features/auth/hooks/useLoadCurrentUser'
 import { useRestoreSession } from '../features/auth/hooks/useRestoreSession'
@@ -12,10 +12,40 @@ import { ROUTES } from './paths'
 import { ProtectedRoute } from './ProtectedRoute'
 import { UnprotectedRoute } from './UnprotectedRoute'
 
+function FallbackNavigate() {
+  const accessToken = useAppSelector((state) => state.auth.accessToken)
+  return <Navigate to={accessToken ? ROUTES.OVERVIEW : ROUTES.LOGIN} replace />
+}
+
+const router = createBrowserRouter([
+  {
+    element: <UnprotectedRoute />,
+    children: [
+      {
+        element: <UnprotectedLayout />,
+        children: [{ path: ROUTES.LOGIN, element: <LoginPage /> }],
+      },
+    ],
+  },
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <ProtectedLayout />,
+        children: [
+          { path: ROUTES.OVERVIEW, handle: { crumb: 'Overview' }, element: <OverviewPage /> },
+          { path: ROUTES.PROFILE, handle: { crumb: 'Profile' }, element: <ProfilePage /> },
+          { path: ROUTES.SETTINGS, handle: { crumb: 'Settings' }, element: <SettingsPage /> },
+        ],
+      },
+    ],
+  },
+  { path: '*', element: <FallbackNavigate /> },
+])
+
 export function AppRouter() {
   const ready = useRestoreSession()
   useLoadCurrentUser()
-  const accessToken = useAppSelector((state) => state.auth.accessToken)
 
   if (!ready) {
     return (
@@ -25,26 +55,5 @@ export function AppRouter() {
     )
   }
 
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<UnprotectedRoute />}>
-          <Route element={<UnprotectedLayout />}>
-            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-          </Route>
-        </Route>
-        <Route element={<ProtectedRoute />}>
-          <Route element={<ProtectedLayout />}>
-            <Route path={ROUTES.OVERVIEW} handle={{ crumb: 'Overview' }} element={<OverviewPage />} />
-            <Route path={ROUTES.PROFILE} handle={{ crumb: 'Profile' }} element={<ProfilePage />} />
-            <Route path={ROUTES.SETTINGS} handle={{ crumb: 'Settings' }} element={<SettingsPage />} />
-          </Route>
-        </Route>
-        <Route
-          path="*"
-          element={<Navigate to={accessToken ? ROUTES.OVERVIEW : ROUTES.LOGIN} replace />}
-        />
-      </Routes>
-    </BrowserRouter>
-  )
+  return <RouterProvider router={router} />
 }

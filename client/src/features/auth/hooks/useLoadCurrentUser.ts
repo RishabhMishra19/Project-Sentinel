@@ -4,16 +4,20 @@ import { me } from '../api/authApi'
 import { clearAuth, setMe, setMeError, setMeLoading } from '../slices/authSlice'
 
 /**
- * Whenever an access token exists and /me has not been loaded yet, fetch /me into Redux.
+ * Whenever an access token exists, fetch /me into Redux.
  * Independent of which page the user lands on after login.
+ *
+ * Intentionally depends only on `accessToken` (not `meStatus`): including
+ * `meStatus` re-ran this effect after `setMeLoading()`, which cancelled the
+ * in-flight request and then bailed because status was no longer `idle` —
+ * leaving the sidebar stuck on "Fetching account".
  */
 export function useLoadCurrentUser() {
   const dispatch = useAppDispatch()
   const accessToken = useAppSelector((state) => state.auth.accessToken)
-  const meStatus = useAppSelector((state) => state.auth.meStatus)
 
   useEffect(() => {
-    if (!accessToken || meStatus !== 'idle') {
+    if (!accessToken) {
       return
     }
 
@@ -36,5 +40,5 @@ export function useLoadCurrentUser() {
     return () => {
       cancelled = true
     }
-  }, [accessToken, meStatus, dispatch])
+  }, [accessToken, dispatch])
 }
