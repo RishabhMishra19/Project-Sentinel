@@ -4,7 +4,7 @@ import { ThemeToggle } from '../theme'
 export function UnprotectedLayout() {
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      <aside className="flex flex-col justify-between bg-brand-panel px-8 py-12 text-brand-panel-foreground md:w-1/2 md:px-12 lg:px-16">
+      <aside className="flex flex-col justify-between bg-brand-panel px-8 py-12 text-brand-panel-foreground md:w-1/2 md:border-r md:border-brand-panel-border md:px-12 lg:px-16">
         <div className="flex flex-1 flex-col justify-center">
           <div className="flex items-center gap-3">
             <img src="/logo-light.svg" alt="" width={40} height={40} className="shrink-0" />
@@ -47,7 +47,7 @@ export function UnprotectedLayout() {
         </footer>
       </aside>
       <div className="relative flex flex-1 items-center justify-center bg-background px-4 py-10 md:w-1/2">
-        <ThemeToggle className="absolute top-4 right-4" />
+        <ThemeToggle variant="icon" className="absolute top-4 right-4 z-10" />
         <Outlet />
       </div>
     </div>
