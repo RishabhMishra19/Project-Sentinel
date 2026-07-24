@@ -1,22 +1,18 @@
-import { useEffect, useId, useState, type FormEvent } from "react";
-import axios from "axios";
-import { toast } from "../../../shared/ui/toast";
-import { useChangePassword } from "../hooks/useChangePassword";
+import { useEffect, useId } from 'react'
+import { FormField } from '../../../shared/forms/FormField'
+import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
+import { useAppForm } from '../../../shared/forms/useAppForm'
+import { toast } from '../../../shared/ui/toast'
+import { useChangePassword } from '../hooks/useChangePassword'
+import {
+  changePasswordSchema,
+  type ChangePasswordFormValues,
+} from '../schemas/changePassword.schema'
 
 type ChangePasswordModalProps = {
-  open: boolean;
-  onClose: () => void;
-  onSuccess?: () => void;
-};
-
-function apiErrorMessage(error: unknown): string {
-  if (axios.isAxiosError(error)) {
-    const message = error.response?.data?.message;
-    if (typeof message === "string" && message.length > 0) {
-      return message;
-    }
-  }
-  return "Could not change password. Please try again.";
+  open: boolean
+  onClose: () => void
+  onSuccess?: () => void
 }
 
 export function ChangePasswordModal({
@@ -24,62 +20,56 @@ export function ChangePasswordModal({
   onClose,
   onSuccess,
 }: ChangePasswordModalProps) {
-  const titleId = useId();
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [clientError, setClientError] = useState<string | null>(null);
-  const changePasswordMutation = useChangePassword();
-  const { reset: resetMutation } = changePasswordMutation;
+  const titleId = useId()
+  const changePasswordMutation = useChangePassword()
+  const { reset: resetMutation } = changePasswordMutation
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useAppForm<ChangePasswordFormValues>({
+    schema: changePasswordSchema,
+    defaultValues: {
+      oldPassword: '',
+      newPassword: '',
+      confirmNewPassword: '',
+    },
+  })
 
   useEffect(() => {
     if (!open) {
-      return;
+      return
     }
-    setOldPassword("");
-    setNewPassword("");
-    setConfirmNewPassword("");
-    setClientError(null);
-    resetMutation();
-  }, [open, resetMutation]);
+    reset()
+    resetMutation()
+  }, [open, reset, resetMutation])
 
   if (!open) {
-    return null;
+    return null
   }
 
-  function onSubmit(event: FormEvent) {
-    event.preventDefault();
-    setClientError(null);
-
-    if (oldPassword.length < 8 || newPassword.length < 8) {
-      setClientError("Passwords must be at least 8 characters.");
-      return;
-    }
-    if (newPassword !== confirmNewPassword) {
-      setClientError("New password and confirmation do not match.");
-      return;
-    }
-    if (oldPassword === newPassword) {
-      setClientError(
-        "New password must be different from the current password.",
-      );
-      return;
-    }
+  function onSubmit(data: ChangePasswordFormValues) {
+    const { oldPassword, newPassword } = data
 
     void toast
       .promise(
         changePasswordMutation.mutateAsync({ oldPassword, newPassword }),
         {
-          loading: "Updating password…",
-          success: "Password updated successfully.",
-          error: (error) => apiErrorMessage(error),
+          loading: 'Updating password…',
+          success: 'Password updated successfully.',
+          error: (error) =>
+            getApiErrorMessage(
+              error,
+              'Could not change password. Please try again.',
+            ),
         },
       )
       .unwrap()
       .then(() => {
-        onSuccess?.();
-        onClose();
-      });
+        onSuccess?.()
+        onClose()
+      })
   }
 
   return (
@@ -109,50 +99,28 @@ export function ChangePasswordModal({
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm text-slate-700">
-            Current password
-            <input
-              type="password"
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-              required
-              minLength={8}
-              maxLength={128}
-              autoComplete="current-password"
-              className="rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-600"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-slate-700">
-            New password
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-              minLength={8}
-              maxLength={128}
-              autoComplete="new-password"
-              className="rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-600"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-slate-700">
-            Confirm new password
-            <input
-              type="password"
-              value={confirmNewPassword}
-              onChange={(e) => setConfirmNewPassword(e.target.value)}
-              required
-              minLength={8}
-              maxLength={128}
-              autoComplete="new-password"
-              className="rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-600"
-            />
-          </label>
-
-          {clientError ? (
-            <p className="text-sm text-red-600">{clientError}</p>
-          ) : null}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <FormField
+            label="Current password"
+            type="password"
+            autoComplete="current-password"
+            error={errors.oldPassword}
+            registration={register('oldPassword')}
+          />
+          <FormField
+            label="New password"
+            type="password"
+            autoComplete="new-password"
+            error={errors.newPassword}
+            registration={register('newPassword')}
+          />
+          <FormField
+            label="Confirm new password"
+            type="password"
+            autoComplete="new-password"
+            error={errors.confirmNewPassword}
+            registration={register('confirmNewPassword')}
+          />
 
           <div className="mt-2 flex justify-end gap-2">
             <button
@@ -167,11 +135,11 @@ export function ChangePasswordModal({
               disabled={changePasswordMutation.isPending}
               className="rounded bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-800 disabled:opacity-60"
             >
-              {changePasswordMutation.isPending ? "Saving…" : "Update password"}
+              {changePasswordMutation.isPending ? 'Saving…' : 'Update password'}
             </button>
           </div>
         </form>
       </div>
     </div>
-  );
+  )
 }

@@ -1,40 +1,45 @@
-import { useState, type FormEvent } from 'react'
+import { FormError } from '../../../shared/forms/FormError'
+import { FormField } from '../../../shared/forms/FormField'
+import { useAppForm } from '../../../shared/forms/useAppForm'
 import { useLogin } from '../hooks/useLogin'
+import { loginSchema, type LoginFormValues } from '../schemas/login.schema'
 
 export function LoginForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const loginMutation = useLogin()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useAppForm<LoginFormValues>({
+    schema: loginSchema,
+    defaultValues: { email: '', password: '' },
+  })
 
-  function onSubmit(event: FormEvent) {
-    event.preventDefault()
-    loginMutation.mutate({ email, password })
+  function onSubmit(data: LoginFormValues) {
+    loginMutation.mutate(data)
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-md flex-col gap-4">
-      <label className="flex flex-col gap-1 text-sm text-slate-700">
-        Email
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-600"
-        />
-      </label>
-      <label className="flex flex-col gap-1 text-sm text-slate-700">
-        Password
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-600"
-        />
-      </label>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex w-full max-w-md flex-col gap-4"
+    >
+      <FormField
+        label="Email"
+        type="email"
+        autoComplete="username"
+        error={errors.email}
+        registration={register('email')}
+      />
+      <FormField
+        label="Password"
+        type="password"
+        autoComplete="current-password"
+        error={errors.password}
+        registration={register('password')}
+      />
       {loginMutation.isError ? (
-        <p className="text-sm text-red-600">Invalid email or password</p>
+        <FormError>Invalid email or password</FormError>
       ) : null}
       <button
         type="submit"
