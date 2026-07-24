@@ -21,14 +21,14 @@ export function HomePage() {
           <div className="flex gap-2">
             <Link
               to="/profile"
-              className="rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
+              className="cursor-pointer rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
             >
               Profile
             </Link>
             <button
               type="button"
               onClick={() => logoutMutation.mutate()}
-              className="rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
+              className="cursor-pointer rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
             >
               Log out
             </button>

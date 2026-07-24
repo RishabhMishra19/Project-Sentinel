@@ -1,6 +1,7 @@
-import { FormError } from '../../../shared/forms/FormError'
 import { FormField } from '../../../shared/forms/FormField'
+import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { useAppForm } from '../../../shared/forms/useAppForm'
+import { toast } from '../../../shared/ui/toast'
 import { useLogin } from '../hooks/useLogin'
 import { loginSchema, type LoginFormValues } from '../schemas/login.schema'
 
@@ -16,7 +17,17 @@ export function LoginForm() {
   })
 
   function onSubmit(data: LoginFormValues) {
-    loginMutation.mutate(data)
+    void toast
+      .promise(loginMutation.mutateAsync(data), {
+        loading: 'Signing in…',
+        success: 'Signed in successfully.',
+        error: (error) =>
+          getApiErrorMessage(error, 'Invalid email or password'),
+      })
+      .unwrap()
+      .catch(() => {
+        // Error already surfaced via toast
+      })
   }
 
   return (
@@ -38,13 +49,10 @@ export function LoginForm() {
         error={errors.password}
         registration={register('password')}
       />
-      {loginMutation.isError ? (
-        <FormError>Invalid email or password</FormError>
-      ) : null}
       <button
         type="submit"
         disabled={loginMutation.isPending}
-        className="rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 disabled:opacity-60"
+        className="cursor-pointer rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loginMutation.isPending ? 'Signing in…' : 'Sign in'}
       </button>

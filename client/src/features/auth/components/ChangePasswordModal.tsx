@@ -69,6 +69,9 @@ export function ChangePasswordModal({
       .then(() => {
         onSuccess?.();
         onClose();
+      })
+      .catch(() => {
+        // Error already surfaced via toast
       });
   }
 
@@ -93,7 +96,7 @@ export function ChangePasswordModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded border border-slate-300 px-2 py-1 text-sm text-slate-700 hover:bg-slate-50"
+            className="cursor-pointer rounded border border-slate-300 px-2 py-1 text-sm text-slate-700 hover:bg-slate-50"
           >
             Close
           </button>
@@ -126,16 +129,18 @@ export function ChangePasswordModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+              className="cursor-pointer rounded border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={changePasswordMutation.isPending}
-              className="rounded bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-800 disabled:opacity-60"
+              className="cursor-pointer rounded bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {changePasswordMutation.isPending ? "Saving…" : "Update password"}
+              {changePasswordMutation.isPending
+                ? "Updating…"
+                : "Update password"}
             </button>
           </div>
         </form>

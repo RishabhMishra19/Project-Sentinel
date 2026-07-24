@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @layer base {
+  a[href],
   button:not(:disabled),
   [type="button"]:not(:disabled),
   [type="submit"]:not(:disabled),

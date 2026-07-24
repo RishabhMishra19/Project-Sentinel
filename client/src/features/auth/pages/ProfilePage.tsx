@@ -29,14 +29,14 @@ export function ProfilePage() {
           <div className="flex gap-2">
             <Link
               to="/"
-              className="rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
+              className="cursor-pointer rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
             >
               Home
             </Link>
             <button
               type="button"
               onClick={() => setChangePasswordOpen(true)}
-              className="rounded bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
+              className="cursor-pointer rounded bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
             >
               Change password
             </button>
