@@ -9,9 +9,11 @@ import com.sentinel.server.tenant.dto.UpdateTenantRequest;
 import com.sentinel.server.tenant.entity.TenantStatus;
 import com.sentinel.server.tenant.service.TenantFacade;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,8 +37,16 @@ public class TenantController {
     @PreAuthorize("@accessSupport.isSentinelAdmin()")
     @GetMapping
     public ResponseEntity<PageResponse<TenantResponse>> list(
-            Pageable pageable, @RequestParam(required = false) TenantStatus status) {
-        return ApiResponses.okPage(tenantFacade.list(pageable, status));
+            Pageable pageable,
+            @RequestParam(required = false) TenantStatus status,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String searchBy,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate createdFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate createdTo) {
+        return ApiResponses.okPage(
+                tenantFacade.list(pageable, status, q, searchBy, createdFrom, createdTo));
     }
 
     @PreAuthorize("@accessSupport.canReadTenant()")

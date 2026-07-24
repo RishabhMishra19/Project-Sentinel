@@ -1,4 +1,3 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import {
   DataTable,
@@ -6,22 +5,45 @@ import {
   type DataTableQueryState,
 } from '../../../shared/ui/data-table'
 import { primaryButtonClassName } from '../../../shared/ui/data-table/styles'
-import { listDummyTenants } from './dummyTenantsApi'
+import type { TenantResponse } from '../dto/tenant.dto'
+import { useTenantsQuery } from '../hooks/useTenants'
+import { mapTenantListQuery } from './mapTenantListQuery'
 import {
   createTenantRowActions,
   tenantColumns,
 } from './tenantsTableConfig'
 
-export const ServerTenantsTable = () => {
-  const rowActions = useMemo(() => createTenantRowActions(), [])
+type TenantsTableProps = {
+  onCreate: () => void
+  onView: (tenant: TenantResponse) => void
+  onEdit: (tenant: TenantResponse) => void
+  onDeactivate: (tenant: TenantResponse) => void
+}
+
+export const TenantsTable = ({
+  onCreate,
+  onView,
+  onEdit,
+  onDeactivate,
+}: TenantsTableProps) => {
   const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null)
 
-  const { data, isFetching, isPending } = useQuery({
-    queryKey: ['dummy-tenants', 'page', fetchQuery],
-    queryFn: () => listDummyTenants(fetchQuery!),
-    enabled: fetchQuery != null,
-    placeholderData: keepPreviousData,
-  })
+  const listParams = useMemo(
+    () => (fetchQuery ? mapTenantListQuery(fetchQuery) : null),
+    [fetchQuery],
+  )
+
+  const { data, isFetching } = useTenantsQuery(listParams)
+
+  const rowActions = useMemo(
+    () =>
+      createTenantRowActions({
+        onView,
+        onEdit,
+        onDeactivate,
+      }),
+    [onView, onEdit, onDeactivate],
+  )
 
   const pageSize = fetchQuery?.pageSize ?? 10
   const pageCount = data
@@ -36,13 +58,13 @@ export const ServerTenantsTable = () => {
     totalElements: data?.totalElements ?? 0,
     initialState: { pageSize: 10 },
     rowActions,
-    isLoading: isPending || isFetching,
+    isLoading: isFetching || fetchQuery == null,
     onQueryChange: setFetchQuery,
     toolbarActions: (
       <button
         type="button"
         className={primaryButtonClassName}
-        onClick={() => console.info('Create tenant')}
+        onClick={onCreate}
       >
         Create tenant
       </button>

@@ -10,14 +10,17 @@ import com.sentinel.server.tenant.entity.Tenant;
 import com.sentinel.server.tenant.entity.TenantStatus;
 import com.sentinel.server.tenant.mapper.TenantMapper;
 import com.sentinel.server.tenant.repository.TenantRepository;
+import com.sentinel.server.tenant.repository.TenantSpecifications;
 import com.sentinel.server.user.entity.User;
 import com.sentinel.server.user.repository.UserRepository;
+import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +37,17 @@ public class TenantFacadeImpl implements TenantFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<TenantResponse> list(Pageable pageable, TenantStatus status) {
+    public PageResponse<TenantResponse> list(
+            Pageable pageable,
+            TenantStatus status,
+            String q,
+            String searchBy,
+            LocalDate createdFrom,
+            LocalDate createdTo) {
         Pageable effective = withDefaultSort(pageable);
-        Page<Tenant> page =
-                status == null
-                        ? tenantRepository.findAll(effective)
-                        : tenantRepository.findByStatus(status, effective);
+        Specification<Tenant> spec =
+                TenantSpecifications.withFilters(status, q, searchBy, createdFrom, createdTo);
+        Page<Tenant> page = tenantRepository.findAll(spec, effective);
         return PageResponse.from(page.map(tenantMapper::toResponse));
     }
 

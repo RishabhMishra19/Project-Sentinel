@@ -1,8 +1,8 @@
-export { DataTable } from './DataTable'
-export { useClientDataTable } from './hooks/useClientDataTable'
-export { useServerDataTable } from './hooks/useServerDataTable'
+export { DataTable } from "./DataTable";
+export { useClientDataTable } from "./hooks/useClientDataTable";
+export { useServerDataTable } from "./hooks/useServerDataTable";
 
-export type { DataTableQueryState } from './hooks/types'
+export type { DataTableQueryState } from "./utils/createInitialQueryState";
 
 export type {
   DataTableBadgeVariant,
@@ -22,4 +22,4 @@ export type {
   DataTableSearchState,
   DataTableSort,
   RowAction,
-} from './types'
+} from "./types";

@@ -1,7 +1,7 @@
 import type { DataTableColumn, RowAction } from '../../../shared/ui/data-table'
-import type { DummyTenant } from './dummyTenantsData'
+import type { TenantResponse } from '../dto/tenant.dto'
 
-export const tenantColumns: DataTableColumn<DummyTenant>[] = [
+export const tenantColumns: DataTableColumn<TenantResponse>[] = [
   {
     id: 'name',
     header: 'Name',
@@ -43,28 +43,32 @@ export const tenantColumns: DataTableColumn<DummyTenant>[] = [
   },
 ]
 
-export const createTenantRowActions = (): RowAction<DummyTenant>[] => [
+type TenantRowActionHandlers = {
+  onView: (row: TenantResponse) => void
+  onEdit: (row: TenantResponse) => void
+  onDeactivate: (row: TenantResponse) => void
+}
+
+export const createTenantRowActions = ({
+  onView,
+  onEdit,
+  onDeactivate,
+}: TenantRowActionHandlers): RowAction<TenantResponse>[] => [
   {
     id: 'view',
     label: 'View',
-    onClick: (row) => {
-      console.info('View tenant', row.id)
-    },
+    onClick: onView,
   },
   {
     id: 'edit',
     label: 'Edit',
-    onClick: (row) => {
-      console.info('Edit tenant', row.id)
-    },
+    onClick: onEdit,
   },
   {
     id: 'deactivate',
     label: 'Deactivate',
     variant: 'danger',
     hidden: (row) => row.status === 'INACTIVE',
-    onClick: (row) => {
-      console.info('Deactivate tenant', row.id)
-    },
+    onClick: onDeactivate,
   },
 ]

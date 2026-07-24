@@ -5,12 +5,19 @@ import com.sentinel.server.tenant.dto.CreateTenantRequest;
 import com.sentinel.server.tenant.dto.TenantResponse;
 import com.sentinel.server.tenant.dto.UpdateTenantRequest;
 import com.sentinel.server.tenant.entity.TenantStatus;
+import java.time.LocalDate;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 
 public interface TenantFacade {
 
-    PageResponse<TenantResponse> list(Pageable pageable, TenantStatus status);
+    PageResponse<TenantResponse> list(
+            Pageable pageable,
+            TenantStatus status,
+            String q,
+            String searchBy,
+            LocalDate createdFrom,
+            LocalDate createdTo);
 
     TenantResponse getById(UUID id);
 

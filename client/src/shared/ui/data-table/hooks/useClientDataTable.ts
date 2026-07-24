@@ -6,39 +6,35 @@ import {
   type PaginationState,
   type SortingState,
   type Updater,
-} from '@tanstack/react-table'
-import { useEffect, useMemo, type ReactNode } from 'react'
-import type {
-  DataTableColumn,
-  DataTableProps,
-  RowAction,
-} from '../types'
-import { applyClientFilters } from './applyClientFilters'
-import { buildTanStackColumns } from './buildTanStackColumns'
-import type { DataTableQueryState } from './types'
+} from "@tanstack/react-table";
+import { useEffect, useMemo, type ReactNode } from "react";
+import type { DataTableColumn, DataTableProps, RowAction } from "../types";
+import { applyClientFilters } from "../utils/applyClientFilters";
+import type { DataTableQueryState } from "../utils/createInitialQueryState";
 import {
   buildDataTableProps,
   fromTanStackSorting,
   toTanStackSorting,
   useDataTableQueryState,
-} from './useDataTableQueryState'
+} from "./useDataTableQueryState";
+import { buildTanStackColumns } from "../utils/buildTanStackColumns";
 
 type UseClientDataTableOptions<T extends Record<string, unknown>> = {
-  columns: DataTableColumn<T>[]
-  data: T[]
-  getRowId: (row: T) => string
-  initialState?: Partial<DataTableQueryState>
-  enablePagination?: boolean
-  rowActions?: RowAction<T>[]
-  toolbarActions?: ReactNode
-  isLoading?: boolean
-  emptyMessage?: string
-}
+  columns: DataTableColumn<T>[];
+  data: T[];
+  getRowId: (row: T) => string;
+  initialState?: Partial<DataTableQueryState>;
+  enablePagination?: boolean;
+  rowActions?: RowAction<T>[];
+  toolbarActions?: ReactNode;
+  isLoading?: boolean;
+  emptyMessage?: string;
+};
 
 type UseClientDataTableResult<T extends Record<string, unknown>> = {
-  tableProps: DataTableProps<T>
-  query: DataTableQueryState
-}
+  tableProps: DataTableProps<T>;
+  query: DataTableQueryState;
+};
 
 export const useClientDataTable = <T extends Record<string, unknown>>({
   columns,
@@ -59,22 +55,22 @@ export const useClientDataTable = <T extends Record<string, unknown>>({
     clearFilters,
     setPageIndex,
     setPageSize,
-  } = useDataTableQueryState({ columns, initialState })
+  } = useDataTableQueryState({ columns, initialState });
 
   const filteredData = useMemo(
     () => applyClientFilters(data, columns, query.search, query.filters),
     [data, columns, query.search, query.filters],
-  )
+  );
 
   const tanstackColumns = useMemo(
     () => buildTanStackColumns(columns),
     [columns],
-  )
+  );
 
   const sortingState = useMemo(
     () => toTanStackSorting(query.sorting),
     [query.sorting],
-  )
+  );
 
   const paginationState = useMemo<PaginationState>(
     () => ({
@@ -82,7 +78,7 @@ export const useClientDataTable = <T extends Record<string, unknown>>({
       pageSize: query.pageSize,
     }),
     [query.pageIndex, query.pageSize],
-  )
+  );
 
   const table = useReactTable({
     data: filteredData,
@@ -94,17 +90,17 @@ export const useClientDataTable = <T extends Record<string, unknown>>({
     getRowId: (row) => getRowId(row),
     onSortingChange: (updater: Updater<SortingState>) => {
       const next =
-        typeof updater === 'function' ? updater(sortingState) : updater
-      setSorting(fromTanStackSorting(next))
+        typeof updater === "function" ? updater(sortingState) : updater;
+      setSorting(fromTanStackSorting(next));
     },
     onPaginationChange: (updater: Updater<PaginationState>) => {
       const next =
-        typeof updater === 'function' ? updater(paginationState) : updater
+        typeof updater === "function" ? updater(paginationState) : updater;
       if (next.pageSize !== query.pageSize) {
-        setPageSize(next.pageSize)
-        return
+        setPageSize(next.pageSize);
+        return;
       }
-      setPageIndex(next.pageIndex)
+      setPageIndex(next.pageIndex);
     },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -113,23 +109,19 @@ export const useClientDataTable = <T extends Record<string, unknown>>({
       : undefined,
     manualFiltering: true,
     autoResetPageIndex: false,
-  })
+  });
 
-  const pageCount = enablePagination
-    ? Math.max(table.getPageCount(), 1)
-    : 1
+  const pageCount = enablePagination ? Math.max(table.getPageCount(), 1) : 1;
 
   useEffect(() => {
     if (query.pageIndex > pageCount - 1) {
-      setPageIndex(Math.max(pageCount - 1, 0))
+      setPageIndex(Math.max(pageCount - 1, 0));
     }
-  }, [query.pageIndex, pageCount, setPageIndex])
+  }, [query.pageIndex, pageCount, setPageIndex]);
 
   const rows = (
-    enablePagination
-      ? table.getRowModel().rows
-      : table.getSortedRowModel().rows
-  ).map((row) => row.original)
+    enablePagination ? table.getRowModel().rows : table.getSortedRowModel().rows
+  ).map((row) => row.original);
 
   const tableProps = buildDataTableProps({
     columns,
@@ -149,7 +141,7 @@ export const useClientDataTable = <T extends Record<string, unknown>>({
     onFiltersClear: clearFilters,
     onPageIndexChange: setPageIndex,
     onPageSizeChange: setPageSize,
-  })
+  });
 
-  return { tableProps, query }
-}
+  return { tableProps, query };
+};

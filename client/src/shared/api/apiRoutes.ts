@@ -10,3 +10,8 @@ export const AUTH_API_ROUTES = {
   PROFILE: '/auth/profile',
   CHANGE_PASSWORD: '/auth/change-password',
 } as const
+
+export const TENANTS_API_ROUTES = {
+  LIST: '/tenants',
+  BY_ID: (id: string) => `/tenants/${id}`,
+} as const
