@@ -32,7 +32,8 @@ public class AuthMapper {
                 user.getDisplayName(),
                 user.getStatus(),
                 user.getCreatedAt(),
-                user.getUpdatedAt());
+                user.getUpdatedAt(),
+                user.getLastLoginAt());
     }
 
     public ProfileResponse toProfileResponse(User user) {

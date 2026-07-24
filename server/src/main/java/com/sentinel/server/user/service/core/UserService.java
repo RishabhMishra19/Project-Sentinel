@@ -9,5 +9,7 @@ public interface UserService {
 
     User findByIdWithAuthorities(UUID id);
 
+    User recordLastLogin(User user);
+
     User updatePasswordHash(UUID userId, String newPasswordHash);
 }

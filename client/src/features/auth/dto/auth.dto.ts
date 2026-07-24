@@ -29,6 +29,7 @@ export interface UserProfile {
   status: UserStatus
   createdAt: string
   updatedAt: string
+  lastLoginAt: string | null
 }
 
 export interface ProfileResponse {

@@ -39,6 +39,7 @@ public class AuthFacadeImpl implements AuthFacade {
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new UnauthorizedException("Invalid email or password");
         }
+        user = userService.recordLastLogin(user);
         String accessToken = jwtService.createAccessToken(user);
         RefreshTokenIssue refresh = refreshTokenService.issue(user);
         LoginResponse response = new LoginResponse(

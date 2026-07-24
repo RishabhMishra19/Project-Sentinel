@@ -77,6 +77,14 @@ export function ProfilePage() {
                 </dt>
                 <dd className="mt-1 text-slate-900">{formatDate(user.updatedAt)}</dd>
               </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Last login
+                </dt>
+                <dd className="mt-1 text-slate-900">
+                  {user.lastLoginAt ? formatDate(user.lastLoginAt) : 'Never'}
+                </dd>
+              </div>
             </dl>
 
             <div className="space-y-3">

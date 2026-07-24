@@ -4,6 +4,7 @@ import com.sentinel.server.common.exception.UnauthorizedException;
 import com.sentinel.server.user.entity.User;
 import com.sentinel.server.user.entity.UserStatus;
 import com.sentinel.server.user.repository.UserRepository;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User recordLastLogin(User user) {
+        user.setLastLoginAt(Instant.now());
+        return userRepository.save(user);
+    }
+
+    @Override
     public User updatePasswordHash(UUID userId, String newPasswordHash) {
         User user = userRepository
                 .findById(userId)
@@ -49,6 +56,7 @@ public class UserServiceImpl implements UserService {
             throw new UnauthorizedException("User account is inactive");
         }
         user.setPasswordHash(newPasswordHash);
+        user.setUpdatedAt(Instant.now());
         return userRepository.save(user);
     }
 }

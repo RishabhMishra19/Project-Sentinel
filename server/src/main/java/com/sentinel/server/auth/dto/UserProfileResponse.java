@@ -9,5 +9,6 @@ public record UserProfileResponse(
         String displayName,
         UserStatus status,
         Instant createdAt,
-        Instant updatedAt) {
+        Instant updatedAt,
+        Instant lastLoginAt) {
 }

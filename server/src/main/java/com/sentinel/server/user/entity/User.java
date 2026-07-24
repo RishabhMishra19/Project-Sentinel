@@ -13,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.HashSet;
@@ -54,6 +53,9 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Column(name = "last_login_at", nullable = true)
+    private Instant lastLoginAt;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
@@ -70,10 +72,5 @@ public class User {
         if (updatedAt == null) {
             updatedAt = now;
         }
-    }
-
-    @PreUpdate
-    void onUpdate() {
-        updatedAt = Instant.now();
     }
 }
