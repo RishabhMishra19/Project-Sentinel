@@ -1,7 +1,8 @@
 package com.sentinel.server.security;
 
 import com.sentinel.server.auth.service.core.JwtService;
-import com.sentinel.server.permission.entity.PermissionStatus;
+import com.sentinel.server.permission.entity.PermissionType;
+import com.sentinel.server.role.entity.RoleScopeStatus;
 import com.sentinel.server.role.entity.RoleStatus;
 import com.sentinel.server.user.entity.User;
 import com.sentinel.server.user.service.core.UserService;
@@ -39,14 +40,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UUID userId = jwtService.parseUserId(token);
                 User user = userService.findByIdWithAuthorities(userId);
                 List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                if (user.isSentinelAdmin()) {
+                    authorities.add(new SimpleGrantedAuthority(PermissionType.ALL.name()));
+                }
                 user.getRoles().stream()
                         .filter(role -> role.getStatus() == RoleStatus.ACTIVE)
                         .forEach(role -> {
                             authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-                            role.getPermissions().stream()
-                                    .filter(permission -> permission.getStatus() == PermissionStatus.ACTIVE)
-                                    .forEach(permission ->
-                                            authorities.add(new SimpleGrantedAuthority(permission.getName())));
+                            role.getRoleScopes().stream()
+                                    .filter(scope -> scope.getStatus() == RoleScopeStatus.ACTIVE)
+                                    .forEach(scope -> authorities.add(new SimpleGrantedAuthority(
+                                            scope.getPermission().name())));
                         });
                 UserPrincipal principal =
                         new UserPrincipal(user.getId(), user.getEmail(), user.getStatus(), authorities);

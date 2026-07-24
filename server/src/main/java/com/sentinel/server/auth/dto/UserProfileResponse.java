@@ -8,6 +8,7 @@ public record UserProfileResponse(
         String email,
         String displayName,
         UserStatus status,
+        boolean sentinelAdmin,
         Instant createdAt,
         Instant updatedAt,
         Instant lastLoginAt) {

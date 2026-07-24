@@ -1,14 +1,14 @@
 package com.sentinel.server.auth.mapper;
 
 import com.sentinel.server.auth.dto.MeResponse;
-import com.sentinel.server.auth.dto.PermissionSummaryResponse;
 import com.sentinel.server.auth.dto.ProfileResponse;
+import com.sentinel.server.auth.dto.RoleScopeSummaryResponse;
 import com.sentinel.server.auth.dto.RoleSummaryResponse;
 import com.sentinel.server.auth.dto.UserProfileResponse;
 import com.sentinel.server.auth.dto.UserSummaryResponse;
-import com.sentinel.server.permission.entity.Permission;
-import com.sentinel.server.permission.entity.PermissionStatus;
 import com.sentinel.server.role.entity.Role;
+import com.sentinel.server.role.entity.RoleScope;
+import com.sentinel.server.role.entity.RoleScopeStatus;
 import com.sentinel.server.role.entity.RoleStatus;
 import com.sentinel.server.user.entity.User;
 import java.util.List;
@@ -31,6 +31,7 @@ public class AuthMapper {
                 user.getEmail(),
                 user.getDisplayName(),
                 user.getStatus(),
+                user.isSentinelAdmin(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getLastLoginAt());
@@ -48,14 +49,18 @@ public class AuthMapper {
     }
 
     public RoleSummaryResponse toRoleSummary(Role role) {
-        List<PermissionSummaryResponse> permissions = role.getPermissions().stream()
-                .filter(permission -> permission.getStatus() == PermissionStatus.ACTIVE)
-                .map(this::toPermissionSummary)
+        List<RoleScopeSummaryResponse> scopes = role.getRoleScopes().stream()
+                .filter(scope -> scope.getStatus() == RoleScopeStatus.ACTIVE)
+                .map(this::toScopeSummary)
                 .toList();
-        return new RoleSummaryResponse(role.getId().toString(), role.getName(), permissions);
+        return new RoleSummaryResponse(role.getId().toString(), role.getName(), scopes);
     }
 
-    public PermissionSummaryResponse toPermissionSummary(Permission permission) {
-        return new PermissionSummaryResponse(permission.getId().toString(), permission.getName());
+    public RoleScopeSummaryResponse toScopeSummary(RoleScope scope) {
+        return new RoleScopeSummaryResponse(
+                scope.getId().toString(),
+                scope.getScopeType().name(),
+                scope.getScopeId() != null ? scope.getScopeId().toString() : null,
+                scope.getPermission().name());
     }
 }
