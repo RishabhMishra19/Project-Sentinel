@@ -57,6 +57,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         user.getEmail(),
                         user.getStatus(),
                         user.isSentinelAdmin(),
+                        user.getTenant() != null ? user.getTenant().getId() : null,
+                        null,
                         authorities);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(principal, null, authorities);

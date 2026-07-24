@@ -18,6 +18,8 @@ public class UserPrincipal implements UserDetails {
     private final String email;
     private final UserStatus status;
     private final boolean sentinelAdmin;
+    private final UUID homeTenantId;
+    private final UUID activeTenantId;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public UserPrincipal(
@@ -25,12 +27,21 @@ public class UserPrincipal implements UserDetails {
             String email,
             UserStatus status,
             boolean sentinelAdmin,
+            UUID homeTenantId,
+            UUID activeTenantId,
             Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.status = status;
         this.sentinelAdmin = sentinelAdmin;
+        this.homeTenantId = homeTenantId;
+        this.activeTenantId = activeTenantId;
         this.authorities = authorities;
+    }
+
+    public UserPrincipal withActiveTenantId(UUID activeTenantId) {
+        return new UserPrincipal(
+                id, email, status, sentinelAdmin, homeTenantId, activeTenantId, authorities);
     }
 
     @Override
