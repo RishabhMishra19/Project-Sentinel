@@ -6,7 +6,7 @@ export const loginSchema = z.object({
     .string()
     .trim()
     .min(1, 'Email is required')
-    .email('Enter a valid email'),
+    .pipe(z.email('Enter a valid email')),
   password: passwordFieldSchema,
 })
 
