@@ -2,6 +2,7 @@ package com.sentinel.server.auth.controller;
 
 import com.sentinel.server.auth.dto.AuthLoginResult;
 import com.sentinel.server.auth.dto.AuthRefreshResult;
+import com.sentinel.server.auth.dto.ChangePasswordRequest;
 import com.sentinel.server.auth.dto.LoginRequest;
 import com.sentinel.server.auth.dto.LoginResponse;
 import com.sentinel.server.auth.dto.MeResponse;
@@ -61,5 +62,16 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<MeResponse> me(@AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponses.ok(authFacade.me(principal.getId()));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<TokenResponse> changePassword(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Valid @RequestBody ChangePasswordRequest request,
+            HttpServletResponse response) {
+        AuthRefreshResult result = authFacade.changePassword(principal.getId(), request);
+        cookieAuthSupport.writeRefreshCookie(
+                response, result.refreshTokenRaw(), jwtProperties.getRefreshTokenTtl().toSeconds());
+        return ApiResponses.ok(result.tokenResponse());
     }
 }

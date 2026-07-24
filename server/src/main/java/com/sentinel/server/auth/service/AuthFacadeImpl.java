@@ -2,6 +2,7 @@ package com.sentinel.server.auth.service;
 
 import com.sentinel.server.auth.dto.AuthLoginResult;
 import com.sentinel.server.auth.dto.AuthRefreshResult;
+import com.sentinel.server.auth.dto.ChangePasswordRequest;
 import com.sentinel.server.auth.dto.LoginRequest;
 import com.sentinel.server.auth.dto.LoginResponse;
 import com.sentinel.server.auth.dto.MeResponse;
@@ -10,6 +11,7 @@ import com.sentinel.server.auth.dto.TokenResponse;
 import com.sentinel.server.auth.mapper.AuthMapper;
 import com.sentinel.server.auth.service.core.JwtService;
 import com.sentinel.server.auth.service.core.RefreshTokenService;
+import com.sentinel.server.common.exception.BadRequestException;
 import com.sentinel.server.common.exception.UnauthorizedException;
 import com.sentinel.server.user.entity.User;
 import com.sentinel.server.user.service.core.UserService;
@@ -67,5 +69,22 @@ public class AuthFacadeImpl implements AuthFacade {
     public MeResponse me(UUID userId) {
         User user = userService.findByIdWithAuthorities(userId);
         return authMapper.toMeResponse(user);
+    }
+
+    @Override
+    public AuthRefreshResult changePassword(UUID userId, ChangePasswordRequest request) {
+        User user = userService.findByIdWithAuthorities(userId);
+        if (!passwordEncoder.matches(request.oldPassword(), user.getPasswordHash())) {
+            throw new UnauthorizedException("Invalid current password");
+        }
+        if (request.oldPassword().equals(request.newPassword())) {
+            throw new BadRequestException("New password must be different from the current password");
+        }
+        user = userService.updatePasswordHash(userId, passwordEncoder.encode(request.newPassword()));
+        refreshTokenService.revokeAllForUser(userId);
+        RefreshTokenIssue refresh = refreshTokenService.issue(user);
+        String accessToken = jwtService.createAccessToken(user);
+        return new AuthRefreshResult(
+                new TokenResponse(accessToken, jwtService.getAccessTokenTtlSeconds()), refresh.rawToken());
     }
 }

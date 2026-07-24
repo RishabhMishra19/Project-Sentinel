@@ -14,6 +14,8 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +72,18 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                     token.setRevokedAt(Instant.now());
                     refreshTokenRepository.save(token);
                 });
+    }
+
+    @Override
+    public void revokeAllForUser(UUID userId) {
+        Instant now = Instant.now();
+        List<RefreshToken> activeTokens =
+                refreshTokenRepository.findByUserIdAndStatus(userId, RefreshTokenStatus.ACTIVE);
+        for (RefreshToken token : activeTokens) {
+            token.setStatus(RefreshTokenStatus.REVOKED);
+            token.setRevokedAt(now);
+        }
+        refreshTokenRepository.saveAll(activeTokens);
     }
 
     private String generateRawToken() {

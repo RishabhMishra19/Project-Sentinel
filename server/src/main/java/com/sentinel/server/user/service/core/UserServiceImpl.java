@@ -39,4 +39,16 @@ public class UserServiceImpl implements UserService {
         }
         return user;
     }
+
+    @Override
+    public User updatePasswordHash(UUID userId, String newPasswordHash) {
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new UnauthorizedException("User account is inactive");
+        }
+        user.setPasswordHash(newPasswordHash);
+        return userRepository.save(user);
+    }
 }
