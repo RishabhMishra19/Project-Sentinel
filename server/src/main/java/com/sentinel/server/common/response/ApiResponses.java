@@ -19,4 +19,8 @@ public final class ApiResponses {
     public static ResponseEntity<Void> noContent() {
         return ResponseEntity.noContent().build();
     }
+
+    public static <T> ResponseEntity<PageResponse<T>> okPage(PageResponse<T> page) {
+        return ResponseEntity.ok(page);
+    }
 }

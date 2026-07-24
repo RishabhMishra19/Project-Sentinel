@@ -5,6 +5,8 @@ import java.util.UUID;
 
 public interface UserService {
 
+    User getById(UUID id);
+
     User findActiveByEmailWithAuthorities(String email);
 
     User findByIdWithAuthorities(UUID id);

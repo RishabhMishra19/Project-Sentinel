@@ -1,5 +1,6 @@
 package com.sentinel.server.user.service.core;
 
+import com.sentinel.server.common.exception.ResourceNotFoundException;
 import com.sentinel.server.common.exception.UnauthorizedException;
 import com.sentinel.server.user.entity.User;
 import com.sentinel.server.user.entity.UserStatus;
@@ -16,6 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getById(UUID id) {
+        return userRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
 
     @Override
     @Transactional(readOnly = true)
