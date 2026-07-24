@@ -17,13 +17,19 @@ public class UserPrincipal implements UserDetails {
     private final UUID id;
     private final String email;
     private final UserStatus status;
+    private final boolean sentinelAdmin;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public UserPrincipal(
-            UUID id, String email, UserStatus status, Collection<? extends GrantedAuthority> authorities) {
+            UUID id,
+            String email,
+            UserStatus status,
+            boolean sentinelAdmin,
+            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.status = status;
+        this.sentinelAdmin = sentinelAdmin;
         this.authorities = authorities;
     }
 

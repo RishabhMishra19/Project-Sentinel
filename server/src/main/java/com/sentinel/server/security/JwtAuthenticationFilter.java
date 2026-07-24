@@ -52,8 +52,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     .forEach(scope -> authorities.add(new SimpleGrantedAuthority(
                                             scope.getPermission().name())));
                         });
-                UserPrincipal principal =
-                        new UserPrincipal(user.getId(), user.getEmail(), user.getStatus(), authorities);
+                UserPrincipal principal = new UserPrincipal(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getStatus(),
+                        user.isSentinelAdmin(),
+                        authorities);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(principal, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
