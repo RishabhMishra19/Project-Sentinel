@@ -6,10 +6,12 @@ import { OverviewPage } from '../features/auth/pages/OverviewPage'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { ProfilePage } from '../features/auth/pages/ProfilePage'
 import { SettingsPage } from '../features/auth/pages/SettingsPage'
+import { TenantsPage } from '../features/auth/pages/TenantsPage'
 import { ProtectedLayout } from '../shared/layout/ProtectedLayout'
 import { UnprotectedLayout } from '../shared/layout/UnprotectedLayout'
 import { ROUTES } from './paths'
 import { ProtectedRoute } from './ProtectedRoute'
+import { SentinelAdminRoute } from './SentinelAdminRoute'
 import { UnprotectedRoute } from './UnprotectedRoute'
 
 function FallbackNavigate() {
@@ -36,6 +38,12 @@ const router = createBrowserRouter([
           { path: ROUTES.OVERVIEW, handle: { crumb: 'Overview' }, element: <OverviewPage /> },
           { path: ROUTES.PROFILE, handle: { crumb: 'Profile' }, element: <ProfilePage /> },
           { path: ROUTES.SETTINGS, handle: { crumb: 'Settings' }, element: <SettingsPage /> },
+          {
+            element: <SentinelAdminRoute />,
+            children: [
+              { path: ROUTES.TENANTS, handle: { crumb: 'Tenants' }, element: <TenantsPage /> },
+            ],
+          },
         ],
       },
     ],

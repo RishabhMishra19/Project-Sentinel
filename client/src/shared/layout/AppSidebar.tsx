@@ -1,14 +1,29 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LogoutIcon, OverviewIcon, SettingsIcon, SidebarCloseIcon, SidebarOpenIcon } from '../../assets/icons'
+import { useAppSelector } from '../../app/hooks'
+import {
+  LogoutIcon,
+  OverviewIcon,
+  SettingsIcon,
+  SidebarCloseIcon,
+  SidebarOpenIcon,
+  TenantsIcon,
+} from '../../assets/icons'
 import { useLogout } from '../../features/auth/hooks/useLogout'
 import { ROUTES } from '../../routes/paths'
 import { localStorageManager } from '../storage/LocalStorageManager'
 import { LoggedInUserCard } from './LoggedInUserCard'
+import { NAV_ITEMS } from './navConfig'
 import { SidebarItem, type SidebarMode } from './SidebarItem'
 import { SidebarTray } from './SidebarTray'
 
 const SIDEBAR_MODE_KEY = 'sidebar-mode'
+
+const NAV_ICONS: Record<string, ReactNode> = {
+  overview: <OverviewIcon className="size-4 shrink-0" />,
+  settings: <SettingsIcon className="size-4 shrink-0" />,
+  tenants: <TenantsIcon className="size-4 shrink-0" />,
+}
 
 function readStoredMode(): SidebarMode {
   return localStorageManager.get(SIDEBAR_MODE_KEY) === 'collapsed' ? 'collapsed' : 'expanded'
@@ -20,6 +35,15 @@ export function AppSidebar() {
   const { pathname } = useLocation()
   const [mode, setMode] = useState<SidebarMode>(readStoredMode)
   const isCollapsed = mode === 'collapsed'
+
+  const meStatus = useAppSelector((state) => state.auth.meStatus)
+  const isSentinelAdmin = useAppSelector((state) => state.auth.user?.sentinelAdmin === true)
+
+  const navItems = NAV_ITEMS.filter((item) => {
+    if (!item.onlySentinelAdmin) return true
+    if (meStatus !== 'ready') return false
+    return isSentinelAdmin
+  })
 
   const toggleMode = () => {
     const next: SidebarMode = isCollapsed ? 'expanded' : 'collapsed'
@@ -73,20 +97,16 @@ export function AppSidebar() {
 
       <nav className={`flex flex-1 flex-col ${isCollapsed ? 'px-2' : 'px-3'}`}>
         <SidebarTray mode={mode}>
-          <SidebarItem
-            mode={mode}
-            active={pathname === ROUTES.OVERVIEW}
-            iconNode={<OverviewIcon className="size-4 shrink-0" />}
-            textNode="Overview"
-            onClick={() => navigate(ROUTES.OVERVIEW)}
-          />
-          <SidebarItem
-            mode={mode}
-            active={pathname === ROUTES.SETTINGS}
-            iconNode={<SettingsIcon className="size-4 shrink-0" />}
-            textNode="Settings"
-            onClick={() => navigate(ROUTES.SETTINGS)}
-          />
+          {navItems.map((item) => (
+            <SidebarItem
+              key={item.id}
+              mode={mode}
+              active={pathname === item.path}
+              iconNode={NAV_ICONS[item.id]}
+              textNode={item.label}
+              onClick={() => navigate(item.path)}
+            />
+          ))}
         </SidebarTray>
       </nav>
 
