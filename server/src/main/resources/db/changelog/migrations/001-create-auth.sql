@@ -11,6 +11,8 @@ CREATE TABLE users (
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
+CREATE INDEX idx_users_email ON users (email);
+
 -- changeset sentinel:001-roles
 CREATE TABLE roles (
     id UUID NOT NULL PRIMARY KEY,
@@ -46,6 +48,8 @@ CREATE TABLE user_roles (
     CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles (id)
 );
 
+CREATE INDEX idx_user_roles_user_id ON user_roles (user_id);
+
 -- changeset sentinel:001-role-permissions
 CREATE TABLE role_permissions (
     role_id UUID NOT NULL,
@@ -54,6 +58,8 @@ CREATE TABLE role_permissions (
     CONSTRAINT fk_role_permissions_role FOREIGN KEY (role_id) REFERENCES roles (id),
     CONSTRAINT fk_role_permissions_permission FOREIGN KEY (permission_id) REFERENCES permissions (id)
 );
+
+CREATE INDEX idx_role_permissions_role_id ON role_permissions (role_id);
 
 -- changeset sentinel:001-refresh-tokens
 CREATE TABLE refresh_tokens (
@@ -68,57 +74,4 @@ CREATE TABLE refresh_tokens (
 );
 
 CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens (user_id);
-
--- changeset sentinel:002-seed-user
-INSERT INTO users (id, email, password_hash, display_name, status, created_at, updated_at)
-VALUES (
-    gen_random_uuid(),
-    'rishabhpndt19@gmail.com',
-    '$2a$10$lcHb18xVhZWyp3MxCJfseOHgn7mD6CO/EA16M76nxt1qJPmSQ1pV6',
-    'Sentinel',
-    'ACTIVE',
-    CURRENT_TIMESTAMP,
-    CURRENT_TIMESTAMP
-);
-
--- changeset sentinel:002-seed-permission
-INSERT INTO permissions (id, name, status, created_by, updated_by, created_at, updated_at)
-SELECT
-    gen_random_uuid(),
-    'ALL',
-    'ACTIVE',
-    u.id,
-    u.id,
-    CURRENT_TIMESTAMP,
-    CURRENT_TIMESTAMP
-FROM users u
-WHERE u.email = 'rishabhpndt19@gmail.com';
-
--- changeset sentinel:002-seed-role
-INSERT INTO roles (id, name, status, created_by, updated_by, created_at, updated_at)
-SELECT
-    gen_random_uuid(),
-    'SENTINEL_USER',
-    'ACTIVE',
-    u.id,
-    u.id,
-    CURRENT_TIMESTAMP,
-    CURRENT_TIMESTAMP
-FROM users u
-WHERE u.email = 'rishabhpndt19@gmail.com';
-
--- changeset sentinel:002-seed-role-permission
-INSERT INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
-FROM roles r
-CROSS JOIN permissions p
-WHERE r.name = 'SENTINEL_USER'
-  AND p.name = 'ALL';
-
--- changeset sentinel:002-seed-user-role
-INSERT INTO user_roles (user_id, role_id)
-SELECT u.id, r.id
-FROM users u
-CROSS JOIN roles r
-WHERE u.email = 'rishabhpndt19@gmail.com'
-  AND r.name = 'SENTINEL_USER';
+CREATE INDEX idx_refresh_tokens_token_hash_status ON refresh_tokens (token_hash, status);

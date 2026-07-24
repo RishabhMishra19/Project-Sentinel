@@ -14,7 +14,7 @@ spring:
         jdbc:
           time_zone: UTC
   liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.sql
+    change-log: classpath:db/changelog/db.changelog-master.yml
   data:
     redis:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
