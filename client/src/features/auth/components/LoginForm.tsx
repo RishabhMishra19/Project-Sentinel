@@ -5,7 +5,7 @@ import { toast } from '../../../shared/ui/toast'
 import { useLogin } from '../hooks/useLogin'
 import { loginSchema, type LoginFormValues } from '../schemas/login.schema'
 
-export function LoginForm() {
+export const LoginForm = () => {
   const loginMutation = useLogin()
   const {
     register,
@@ -16,18 +16,13 @@ export function LoginForm() {
     defaultValues: { email: '', password: '' },
   })
 
-  function onSubmit(data: LoginFormValues) {
-    void toast
-      .promise(loginMutation.mutateAsync(data), {
-        loading: 'Signing in…',
-        success: 'Signed in successfully.',
-        error: (error) =>
-          getApiErrorMessage(error, 'Invalid email or password'),
-      })
-      .unwrap()
-      .catch(() => {
-        // Error already surfaced via toast
-      })
+  const onSubmit = (data: LoginFormValues) => {
+    toast.promise(loginMutation.mutateAsync(data), {
+      loading: 'Signing in…',
+      success: 'Signed in successfully.',
+      error: (error) =>
+        getApiErrorMessage(error, 'Invalid email or password'),
+    })
   }
 
   return (

@@ -1,9 +1,9 @@
 import axios from 'axios'
 
-export function getApiErrorMessage(
+export const getApiErrorMessage = (
   error: unknown,
   fallback = 'Something went wrong. Please try again.',
-): string {
+): string => {
   if (axios.isAxiosError(error)) {
     const message = error.response?.data?.message
     if (typeof message === 'string' && message.length > 0) {

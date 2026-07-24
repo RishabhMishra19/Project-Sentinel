@@ -15,11 +15,11 @@ type ChangePasswordModalProps = {
   onSuccess?: () => void;
 };
 
-export function ChangePasswordModal({
+export const ChangePasswordModal = ({
   open,
   onClose,
   onSuccess,
-}: ChangePasswordModalProps) {
+}: ChangePasswordModalProps) => {
   const titleId = useId();
   const changePasswordMutation = useChangePassword();
   const { reset: resetMutation } = changePasswordMutation;
@@ -49,31 +49,26 @@ export function ChangePasswordModal({
     return null;
   }
 
-  function onSubmit(data: ChangePasswordFormValues) {
+  const onSubmit = (data: ChangePasswordFormValues) => {
     const { oldPassword, newPassword } = data;
 
-    void toast
-      .promise(
-        changePasswordMutation.mutateAsync({ oldPassword, newPassword }),
-        {
-          loading: "Updating password…",
-          success: "Password updated successfully.",
-          error: (error) =>
-            getApiErrorMessage(
-              error,
-              "Could not change password. Please try again.",
-            ),
+    toast.promise(
+      changePasswordMutation.mutateAsync({ oldPassword, newPassword }),
+      {
+        loading: "Updating password…",
+        success: () => {
+          onSuccess?.();
+          onClose();
+          return "Password updated successfully.";
         },
-      )
-      .unwrap()
-      .then(() => {
-        onSuccess?.();
-        onClose();
-      })
-      .catch(() => {
-        // Error already surfaced via toast
-      });
-  }
+        error: (error) =>
+          getApiErrorMessage(
+            error,
+            "Could not change password. Please try again.",
+          ),
+      },
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">

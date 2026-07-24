@@ -4,6 +4,6 @@ type FormErrorProps = {
   children: ReactNode
 }
 
-export function FormError({ children }: FormErrorProps) {
-  return <p className="text-sm text-red-600">{children}</p>
-}
+export const FormError = ({ children }: FormErrorProps) => (
+  <p className="text-sm text-red-600">{children}</p>
+)

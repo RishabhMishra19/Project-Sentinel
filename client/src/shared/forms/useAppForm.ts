@@ -14,15 +14,14 @@ type UseAppFormOptions<TFieldValues extends FieldValues> = {
   mode?: "onSubmit" | "onBlur" | "onChange" | "onTouched" | "all";
 };
 
-export function useAppForm<TFieldValues extends FieldValues>({
+export const useAppForm = <TFieldValues extends FieldValues>({
   schema,
   defaultValues,
   mode = "onTouched",
-}: UseAppFormOptions<TFieldValues>): UseFormReturn<TFieldValues> {
-  return useForm<TFieldValues>({
+}: UseAppFormOptions<TFieldValues>): UseFormReturn<TFieldValues> =>
+  useForm<TFieldValues>({
     resolver: zodResolver(schema) as Resolver<TFieldValues>,
     defaultValues,
     mode,
     reValidateMode: "onChange",
   });
-}

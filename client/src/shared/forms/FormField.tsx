@@ -11,25 +11,23 @@ type FormFieldProps = {
   registration: UseFormRegisterReturn
 }
 
-export function FormField({
+export const FormField = ({
   label,
   type = 'text',
   autoComplete,
   error,
   registration,
-}: FormFieldProps) {
-  return (
-    <label className="flex flex-col gap-1 text-sm text-slate-700">
-      {label}
-      <input
-        type={type}
-        autoComplete={autoComplete}
-        className={inputClassName}
-        {...registration}
-      />
-      {error?.message ? (
-        <span className="text-sm text-red-600">{error.message}</span>
-      ) : null}
-    </label>
-  )
-}
+}: FormFieldProps) => (
+  <label className="flex flex-col gap-1 text-sm text-slate-700">
+    {label}
+    <input
+      type={type}
+      autoComplete={autoComplete}
+      className={inputClassName}
+      {...registration}
+    />
+    {error?.message ? (
+      <span className="text-sm text-red-600">{error.message}</span>
+    ) : null}
+  </label>
+)
