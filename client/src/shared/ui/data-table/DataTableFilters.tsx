@@ -24,14 +24,14 @@ export const DataTableFilters = <T extends Record<string, unknown>>({
 
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<Record<string, DataTableFilterValue>>({})
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) {
       return
     }
     setDraft(filters)
-    setHoveredId((current) => current ?? filterable[0]?.id ?? null)
+    setSelectedId(filterable[0]?.id ?? null)
   }, [open, filters, filterable])
 
   if (filterable.length === 0) {
@@ -49,7 +49,7 @@ export const DataTableFilters = <T extends Record<string, unknown>>({
       column.filter != null && isFilterActive(column.filter, draft[column.id]),
   ).length
 
-  const hovered = filterable.find((column) => column.id === hoveredId) ?? null
+  const selected = filterable.find((column) => column.id === selectedId) ?? null
 
   const handleApply = () => {
     const next: Record<string, DataTableFilterValue> = {}
@@ -98,10 +98,9 @@ export const DataTableFilters = <T extends Record<string, unknown>>({
                   <button
                     type="button"
                     className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-sm hover:bg-chrome ${
-                      hoveredId === column.id ? 'bg-chrome' : ''
+                      selectedId === column.id ? 'bg-chrome' : ''
                     }`}
-                    onMouseEnter={() => setHoveredId(column.id)}
-                    onFocus={() => setHoveredId(column.id)}
+                    onClick={() => setSelectedId(column.id)}
                   >
                     <span>{column.header}</span>
                     {active ? (
@@ -113,19 +112,21 @@ export const DataTableFilters = <T extends Record<string, unknown>>({
             })}
           </ul>
           <div className="min-h-[8rem] w-56 p-2">
-            {hovered?.filter ? (
+            {selected?.filter ? (
               <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium text-muted">{hovered.header}</p>
+                <p className="text-xs font-medium text-muted">
+                  {selected.header}
+                </p>
                 <FilterControl
-                  filter={hovered.filter}
-                  value={draft[hovered.id]}
+                  filter={selected.filter}
+                  value={draft[selected.id]}
                   onChange={(_type, value) =>
-                    setDraft((prev) => ({ ...prev, [hovered.id]: value }))
+                    setDraft((prev) => ({ ...prev, [selected.id]: value }))
                   }
                 />
               </div>
             ) : (
-              <p className="text-sm text-muted">Hover a column to filter</p>
+              <p className="text-sm text-muted">Select a column to filter</p>
             )}
           </div>
         </div>

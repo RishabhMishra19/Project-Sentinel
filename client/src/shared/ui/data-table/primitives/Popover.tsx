@@ -4,11 +4,13 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type ReactElement,
   type ReactNode,
 } from 'react'
+import { createPortal } from 'react-dom'
 
 type PopoverProps = {
   trigger: ReactElement<{
@@ -22,6 +24,11 @@ type PopoverProps = {
   contentClassName?: string
   open?: boolean
   onOpenChange?: (open: boolean) => void
+}
+
+type PanelPosition = {
+  top: number
+  left: number
 }
 
 export const Popover = ({
@@ -45,8 +52,49 @@ export const Popover = ({
     [controlledOpen, onOpenChange],
   )
 
-  const rootRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const panelId = useId()
+  const [position, setPosition] = useState<PanelPosition | null>(null)
+
+  const updatePosition = useCallback(() => {
+    const triggerEl = triggerRef.current
+    const panelEl = panelRef.current
+    if (!triggerEl || !panelEl) {
+      return
+    }
+
+    const triggerRect = triggerEl.getBoundingClientRect()
+    const panelRect = panelEl.getBoundingClientRect()
+    const gap = 4
+    const viewportPadding = 8
+
+    let top = triggerRect.bottom + gap
+    if (top + panelRect.height > window.innerHeight - viewportPadding) {
+      top = triggerRect.top - panelRect.height - gap
+    }
+    top = Math.max(
+      viewportPadding,
+      Math.min(top, window.innerHeight - panelRect.height - viewportPadding),
+    )
+
+    let left =
+      align === 'end' ? triggerRect.right - panelRect.width : triggerRect.left
+    left = Math.max(
+      viewportPadding,
+      Math.min(left, window.innerWidth - panelRect.width - viewportPadding),
+    )
+
+    setPosition({ top, left })
+  }, [align])
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setPosition(null)
+      return
+    }
+    updatePosition()
+  }, [open, updatePosition, children])
 
   useEffect(() => {
     if (!open) {
@@ -54,9 +102,14 @@ export const Popover = ({
     }
 
     const onPointerDown = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false)
+      const target = event.target as Node
+      if (
+        triggerRef.current?.contains(target) ||
+        panelRef.current?.contains(target)
+      ) {
+        return
       }
+      setOpen(false)
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -65,13 +118,19 @@ export const Popover = ({
       }
     }
 
+    const onReposition = () => updatePosition()
+
     document.addEventListener('mousedown', onPointerDown)
     document.addEventListener('keydown', onKeyDown)
+    window.addEventListener('resize', onReposition)
+    window.addEventListener('scroll', onReposition, true)
     return () => {
       document.removeEventListener('mousedown', onPointerDown)
       document.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('resize', onReposition)
+      window.removeEventListener('scroll', onReposition, true)
     }
-  }, [open, setOpen])
+  }, [open, setOpen, updatePosition])
 
   const triggerNode = isValidElement(trigger)
     ? cloneElement(trigger, {
@@ -85,19 +144,26 @@ export const Popover = ({
     : trigger
 
   return (
-    <div ref={rootRef} className={`relative inline-flex ${className ?? ''}`}>
+    <div ref={triggerRef} className={`inline-flex ${className ?? ''}`}>
       {triggerNode}
-      {open ? (
-        <div
-          id={panelId}
-          role="dialog"
-          className={`absolute z-50 mt-1 min-w-[10rem] rounded border border-border bg-surface p-2 shadow-md ${
-            align === 'end' ? 'right-0' : 'left-0'
-          } ${contentClassName ?? ''}`}
-        >
-          {children}
-        </div>
-      ) : null}
+      {open
+        ? createPortal(
+            <div
+              ref={panelRef}
+              id={panelId}
+              role="dialog"
+              className={`fixed z-50 min-w-[10rem] rounded border border-border bg-surface p-2 shadow-md ${contentClassName ?? ''}`}
+              style={{
+                top: position?.top ?? -9999,
+                left: position?.left ?? -9999,
+                visibility: position ? 'visible' : 'hidden',
+              }}
+            >
+              {children}
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   )
 }

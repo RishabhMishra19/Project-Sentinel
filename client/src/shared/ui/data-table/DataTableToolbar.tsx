@@ -41,11 +41,13 @@ export const DataTableToolbar = <T extends Record<string, unknown>>({
       />
       {hasRight ? (
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          <DataTableFilters
-            columns={columns}
-            filters={filters}
-            onFiltersChange={onFiltersChange}
-          />
+          {hasFilters ? (
+            <DataTableFilters
+              columns={columns}
+              filters={filters}
+              onFiltersChange={onFiltersChange}
+            />
+          ) : null}
           {toolbarActions}
         </div>
       ) : null}
