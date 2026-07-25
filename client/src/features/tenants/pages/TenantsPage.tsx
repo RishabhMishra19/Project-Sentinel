@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useAppDispatch } from '../../../redux/hooks';
+import { setActiveTenant } from '../../../redux/session/sessionSlice';
 import type { TenantResponse } from '../dto/response/tenant.response'
 import { DeactivateTenantDialog } from "../components/DeactivateTenantDialog";
 import { TenantFormModal } from "../components/TenantFormModal";
@@ -11,6 +13,7 @@ type FormState =
   | { open: true; mode: "edit"; tenant: TenantResponse };
 
 export const TenantsPage = () => {
+  const dispatch = useAppDispatch();
   const [formState, setFormState] = useState<FormState>({ open: false });
   const [viewTenant, setViewTenant] = useState<TenantResponse | null>(null);
   const [deactivateTenant, setDeactivateTenant] =
@@ -22,6 +25,9 @@ export const TenantsPage = () => {
         onCreate={() => setFormState({ open: true, mode: "create" })}
         onView={setViewTenant}
         onEdit={(tenant) => setFormState({ open: true, mode: "edit", tenant })}
+        onLogin={(tenant) =>
+          dispatch(setActiveTenant({ id: tenant.id, name: tenant.name }))
+        }
         onDeactivate={setDeactivateTenant}
       />
 

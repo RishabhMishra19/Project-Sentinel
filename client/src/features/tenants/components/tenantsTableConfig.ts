@@ -46,12 +46,14 @@ export const tenantColumns: DataTableColumn<TenantResponse>[] = [
 type TenantRowActionHandlers = {
   onView: (row: TenantResponse) => void
   onEdit: (row: TenantResponse) => void
+  onLogin: (row: TenantResponse) => void
   onDeactivate: (row: TenantResponse) => void
 }
 
 export const createTenantRowActions = ({
   onView,
   onEdit,
+  onLogin,
   onDeactivate,
 }: TenantRowActionHandlers): RowAction<TenantResponse>[] => [
   {
@@ -63,6 +65,12 @@ export const createTenantRowActions = ({
     id: 'edit',
     label: 'Edit',
     onClick: onEdit,
+  },
+  {
+    id: 'login',
+    label: 'Login',
+    hidden: (row) => row.status === 'INACTIVE',
+    onClick: onLogin,
   },
   {
     id: 'deactivate',

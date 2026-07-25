@@ -17,6 +17,7 @@ type TenantsTableProps = {
   onCreate: () => void
   onView: (tenant: TenantResponse) => void
   onEdit: (tenant: TenantResponse) => void
+  onLogin: (tenant: TenantResponse) => void
   onDeactivate: (tenant: TenantResponse) => void
 }
 
@@ -24,6 +25,7 @@ export const TenantsTable = ({
   onCreate,
   onView,
   onEdit,
+  onLogin,
   onDeactivate,
 }: TenantsTableProps) => {
   const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null)
@@ -40,9 +42,10 @@ export const TenantsTable = ({
       createTenantRowActions({
         onView,
         onEdit,
+        onLogin,
         onDeactivate,
       }),
-    [onView, onEdit, onDeactivate],
+    [onView, onEdit, onLogin, onDeactivate],
   )
 
   const { tableProps } = useServerDataTable({
