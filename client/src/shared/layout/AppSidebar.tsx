@@ -10,7 +10,7 @@ import {
   TenantsIcon,
 } from "../../assets/icons";
 import { useLogout } from "../../features/auth/hooks/useLogout";
-import { SHARED_ROUTES, TENANT_CONTEXT_ROUTES } from "../../routes/paths";
+import { SHARED_ROUTES } from "../../routes/paths";
 import { resolveSessionMode } from "../session/resolveSessionMode";
 import { localStorageManager } from "../storage/LocalStorageManager";
 import { LoggedInUserCard } from "./LoggedInUserCard";
@@ -48,24 +48,7 @@ export function AppSidebar() {
       ? ADMIN_SIDE_BAR_ITEMS
       : TENANT_SIDE_BAR_ITEMS;
 
-  const isNavActive = (path: string) => {
-    if (path === TENANT_CONTEXT_ROUTES.PRODUCTS) {
-      if (pathname === TENANT_CONTEXT_ROUTES.PRODUCTS) {
-        return true;
-      }
-      if (/^\/products\/[^/]+\/services/.test(pathname)) {
-        return false;
-      }
-      return pathname.startsWith(`${TENANT_CONTEXT_ROUTES.PRODUCTS}/`);
-    }
-    if (path === TENANT_CONTEXT_ROUTES.SERVICES) {
-      return (
-        pathname === TENANT_CONTEXT_ROUTES.SERVICES ||
-        /\/services(\/|$)/.test(pathname)
-      );
-    }
-    return pathname === path;
-  };
+  const isNavActive = (path: string) => pathname.startsWith(path);
 
   const toggleMode = () => {
     const next: SidebarMode = isCollapsed ? "expanded" : "collapsed";
