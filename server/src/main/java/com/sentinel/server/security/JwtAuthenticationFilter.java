@@ -1,6 +1,8 @@
 package com.sentinel.server.security;
 
 import com.sentinel.server.auth.service.core.JwtService;
+import com.sentinel.server.common.exception.AccessTokenExpiredException;
+import com.sentinel.server.common.exception.ErrorCode;
 import com.sentinel.server.permission.entity.PermissionType;
 import com.sentinel.server.role.entity.RoleScopeStatus;
 import com.sentinel.server.role.entity.RoleStatus;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,6 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UUID userId = jwtService.parseUserId(token);
                 User user = userService.findByIdWithAuthorities(userId);
                 List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                List<ScopeGrant> scopeGrants = new ArrayList<>();
                 if (user.isSentinelAdmin()) {
                     authorities.add(new SimpleGrantedAuthority(PermissionType.ALL.name()));
                 }
@@ -49,8 +53,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
                             role.getRoleScopes().stream()
                                     .filter(scope -> scope.getStatus() == RoleScopeStatus.ACTIVE)
-                                    .forEach(scope -> authorities.add(new SimpleGrantedAuthority(
-                                            scope.getPermission().name())));
+                                    .forEach(scope -> {
+                                        authorities.add(new SimpleGrantedAuthority(
+                                                scope.getPermission().name()));
+                                        scopeGrants.add(new ScopeGrant(
+                                                scope.getScopeType(),
+                                                scope.getScopeId(),
+                                                scope.getPermission()));
+                                    });
                         });
                 UserPrincipal principal = new UserPrincipal(
                         user.getId(),
@@ -59,14 +69,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         user.isSentinelAdmin(),
                         user.getTenant() != null ? user.getTenant().getId() : null,
                         null,
+                        scopeGrants,
                         authorities);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(principal, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (AccessTokenExpiredException ex) {
+                SecurityContextHolder.clearContext();
+                rejectAccessTokenExpired(response);
+                return;
             } catch (RuntimeException ignored) {
                 SecurityContextHolder.clearContext();
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private static void rejectAccessTokenExpired(HttpServletResponse response) throws IOException {
+        ErrorCode code = ErrorCode.ACCESS_TOKEN_EXPIRED;
+        response.setStatus(code.getStatus().value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter()
+                .write("{\"errorCode\":\""
+                        + code.name()
+                        + "\",\"error\":\""
+                        + code.getReason()
+                        + "\",\"message\":\"Invalid or expired access token\"}");
     }
 }

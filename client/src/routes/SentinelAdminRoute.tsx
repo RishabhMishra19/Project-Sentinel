@@ -1,13 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { useAppSelector } from '../app/hooks'
+import { useAppSelector } from '../redux/hooks'
 import { ROUTES } from './paths'
 
-/** Requires Sentinel admin after /me is ready; redirects others to Overview. */
+/** Requires Sentinel admin after session is ready; redirects others to Overview. */
 export function SentinelAdminRoute() {
-  const meStatus = useAppSelector((state) => state.auth.meStatus)
-  const isSentinelAdmin = useAppSelector((state) => state.auth.user?.sentinelAdmin === true)
+  const user = useAppSelector((state) => state.session.user)
 
-  if (meStatus !== 'ready') {
+  if (!user) {
     return (
       <div className="flex flex-1 items-center justify-center text-muted">
         Loading account…
@@ -15,7 +14,7 @@ export function SentinelAdminRoute() {
     )
   }
 
-  if (!isSentinelAdmin) {
+  if (!user.sentinelAdmin) {
     return <Navigate to={ROUTES.OVERVIEW} replace />
   }
 

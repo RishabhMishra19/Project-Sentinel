@@ -1,0 +1,77 @@
+import { useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { ROUTES } from '../../../routes/paths'
+import type { ServiceResponse } from '../../services/dto/response/service.response'
+import { DeactivateServiceDialog } from '../../services/components/DeactivateServiceDialog'
+import { ServiceFormModal } from '../../services/components/ServiceFormModal'
+import { ServicesTable } from '../../services/components/ServicesTable'
+import { ServiceViewModal } from '../../services/components/ServiceViewModal'
+
+type FormState =
+  | { open: false }
+  | { open: true; mode: 'create' }
+  | { open: true; mode: 'edit'; service: ServiceResponse }
+
+export const ProductServicesPage = () => {
+  const { productId } = useParams<{ productId: string }>()
+  const [formState, setFormState] = useState<FormState>({ open: false })
+  const [viewService, setViewService] = useState<ServiceResponse | null>(null)
+  const [deactivateService, setDeactivateService] =
+    useState<ServiceResponse | null>(null)
+
+  if (!productId) {
+    return (
+      <div className="mx-auto w-full max-w-6xl text-sm text-muted">
+        Product not found.{' '}
+        <Link to={ROUTES.PRODUCTS} className="text-accent underline">
+          Back to products
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+      <div className="flex items-center gap-2 text-sm text-muted">
+        <Link to={ROUTES.PRODUCTS} className="hover:text-foreground">
+          Products
+        </Link>
+        <span>/</span>
+        <span className="text-foreground">Services</span>
+      </div>
+
+      <ServicesTable
+        productId={productId}
+        onCreate={() => setFormState({ open: true, mode: 'create' })}
+        onView={setViewService}
+        onEdit={(service) =>
+          setFormState({ open: true, mode: 'edit', service })
+        }
+        onDeactivate={setDeactivateService}
+      />
+
+      <ServiceFormModal
+        open={formState.open}
+        mode={formState.open ? formState.mode : 'create'}
+        productId={productId}
+        service={
+          formState.open && formState.mode === 'edit' ? formState.service : null
+        }
+        onClose={() => setFormState({ open: false })}
+      />
+
+      <ServiceViewModal
+        open={viewService != null}
+        service={viewService}
+        onClose={() => setViewService(null)}
+      />
+
+      <DeactivateServiceDialog
+        open={deactivateService != null}
+        productId={productId}
+        service={deactivateService}
+        onClose={() => setDeactivateService(null)}
+      />
+    </div>
+  )
+}

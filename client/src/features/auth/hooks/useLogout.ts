@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { useAppDispatch } from '../../../app/hooks'
+import { useAppDispatch } from '../../../redux/hooks'
 import { ROUTES } from '../../../routes/paths'
-import { clearAuth } from '../slices/authSlice'
-import { logout } from '../api/authApi'
+import { clearSession } from '../../../redux/session/sessionSlice'
+import { AuthApi } from '../api/AuthApi'
 
 export function useLogout() {
   const dispatch = useAppDispatch()
@@ -11,9 +11,9 @@ export function useLogout() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: () => logout(),
+    mutationFn: () => AuthApi.logout(),
     onSettled: () => {
-      dispatch(clearAuth())
+      dispatch(clearSession())
       queryClient.clear()
       navigate(ROUTES.LOGIN, { replace: true })
     },

@@ -1,13 +1,14 @@
 import axios from 'axios'
+import type { ApiError } from '../dto/response'
 
 export const getApiErrorMessage = (
   error: unknown,
   fallback = 'Something went wrong. Please try again.',
 ): string => {
   if (axios.isAxiosError(error)) {
-    const message = error.response?.data?.message
-    if (typeof message === 'string' && message.length > 0) {
-      return message
+    const data = error.response?.data as ApiError | undefined
+    if (typeof data?.message === 'string' && data.message.length > 0) {
+      return data.message
     }
   }
   return fallback

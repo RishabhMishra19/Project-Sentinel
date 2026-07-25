@@ -1,24 +1,20 @@
 package com.sentinel.server.auth.service;
 
-import com.sentinel.server.auth.dto.AuthLoginResult;
-import com.sentinel.server.auth.dto.AuthRefreshResult;
-import com.sentinel.server.auth.dto.ChangePasswordRequest;
-import com.sentinel.server.auth.dto.LoginRequest;
-import com.sentinel.server.auth.dto.MeResponse;
-import com.sentinel.server.auth.dto.ProfileResponse;
+import com.sentinel.server.auth.dto.internal.AuthSessionResult;
+import com.sentinel.server.auth.dto.request.ChangePasswordRequest;
+import com.sentinel.server.auth.dto.request.LoginRequest;
+import com.sentinel.server.auth.dto.response.ProfileResponse;
 import java.util.UUID;
 
 public interface AuthFacade {
 
-    AuthLoginResult login(LoginRequest request);
+    AuthSessionResult login(LoginRequest request);
 
-    AuthRefreshResult refresh(String refreshTokenRaw);
+    AuthSessionResult refresh(String refreshTokenRaw);
 
     void logout(String refreshTokenRaw);
 
-    MeResponse me(UUID userId);
-
     ProfileResponse profile(UUID userId);
 
-    AuthRefreshResult changePassword(UUID userId, ChangePasswordRequest request);
+    AuthSessionResult changePassword(UUID userId, ChangePasswordRequest request);
 }

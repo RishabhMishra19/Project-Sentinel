@@ -1,9 +1,9 @@
 package com.sentinel.server.tenant.service;
 
 import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.tenant.dto.CreateTenantRequest;
-import com.sentinel.server.tenant.dto.TenantResponse;
-import com.sentinel.server.tenant.dto.UpdateTenantRequest;
+import com.sentinel.server.tenant.dto.request.CreateTenantRequest;
+import com.sentinel.server.tenant.dto.response.TenantResponse;
+import com.sentinel.server.tenant.dto.request.UpdateTenantRequest;
 import com.sentinel.server.tenant.entity.TenantStatus;
 import java.time.LocalDate;
 import java.util.UUID;

@@ -1,14 +1,10 @@
 package com.sentinel.server.auth.service;
 
-import com.sentinel.server.auth.dto.AuthLoginResult;
-import com.sentinel.server.auth.dto.AuthRefreshResult;
-import com.sentinel.server.auth.dto.ChangePasswordRequest;
-import com.sentinel.server.auth.dto.LoginRequest;
-import com.sentinel.server.auth.dto.LoginResponse;
-import com.sentinel.server.auth.dto.MeResponse;
-import com.sentinel.server.auth.dto.ProfileResponse;
-import com.sentinel.server.auth.dto.RefreshTokenIssue;
-import com.sentinel.server.auth.dto.TokenResponse;
+import com.sentinel.server.auth.dto.internal.AuthSessionResult;
+import com.sentinel.server.auth.dto.request.ChangePasswordRequest;
+import com.sentinel.server.auth.dto.request.LoginRequest;
+import com.sentinel.server.auth.dto.response.ProfileResponse;
+import com.sentinel.server.auth.dto.internal.RefreshTokenIssue;
 import com.sentinel.server.auth.mapper.AuthMapper;
 import com.sentinel.server.auth.service.core.JwtService;
 import com.sentinel.server.auth.service.core.RefreshTokenService;
@@ -34,29 +30,26 @@ public class AuthFacadeImpl implements AuthFacade {
     private final AuthMapper authMapper;
 
     @Override
-    public AuthLoginResult login(LoginRequest request) {
+    public AuthSessionResult login(LoginRequest request) {
         User user = userService.findActiveByEmailWithAuthorities(request.email());
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new UnauthorizedException("Invalid email or password");
         }
         user = userService.recordLastLogin(user);
-        String accessToken = jwtService.createAccessToken(user);
-        RefreshTokenIssue refresh = refreshTokenService.issue(user);
-        LoginResponse response = new LoginResponse(
-                accessToken, jwtService.getAccessTokenTtlSeconds(), authMapper.toUserSummary(user));
-        return new AuthLoginResult(response, refresh.rawToken());
+        return issueSession(user);
     }
 
     @Override
-    public AuthRefreshResult refresh(String refreshTokenRaw) {
+    public AuthSessionResult refresh(String refreshTokenRaw) {
         if (refreshTokenRaw == null || refreshTokenRaw.isBlank()) {
             throw new UnauthorizedException("Missing refresh token");
         }
         RefreshTokenIssue rotated = refreshTokenService.rotate(refreshTokenRaw);
         User user = userService.findByIdWithAuthorities(rotated.entity().getUser().getId());
         String accessToken = jwtService.createAccessToken(user);
-        return new AuthRefreshResult(
-                new TokenResponse(accessToken, jwtService.getAccessTokenTtlSeconds()), rotated.rawToken());
+        return new AuthSessionResult(
+                authMapper.toAuthSessionResponse(accessToken, jwtService.getAccessTokenTtlSeconds(), user),
+                rotated.rawToken());
     }
 
     @Override
@@ -68,20 +61,13 @@ public class AuthFacadeImpl implements AuthFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public MeResponse me(UUID userId) {
-        User user = userService.findByIdWithAuthorities(userId);
-        return authMapper.toMeResponse(user);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public ProfileResponse profile(UUID userId) {
         User user = userService.findByIdWithAuthorities(userId);
         return authMapper.toProfileResponse(user);
     }
 
     @Override
-    public AuthRefreshResult changePassword(UUID userId, ChangePasswordRequest request) {
+    public AuthSessionResult changePassword(UUID userId, ChangePasswordRequest request) {
         User user = userService.findByIdWithAuthorities(userId);
         if (!passwordEncoder.matches(request.oldPassword(), user.getPasswordHash())) {
             throw new UnauthorizedException("Invalid current password");
@@ -91,9 +77,14 @@ public class AuthFacadeImpl implements AuthFacade {
         }
         user = userService.updatePasswordHash(userId, passwordEncoder.encode(request.newPassword()));
         refreshTokenService.revokeAllForUser(userId);
+        return issueSession(user);
+    }
+
+    private AuthSessionResult issueSession(User user) {
         RefreshTokenIssue refresh = refreshTokenService.issue(user);
         String accessToken = jwtService.createAccessToken(user);
-        return new AuthRefreshResult(
-                new TokenResponse(accessToken, jwtService.getAccessTokenTtlSeconds()), refresh.rawToken());
+        return new AuthSessionResult(
+                authMapper.toAuthSessionResponse(accessToken, jwtService.getAccessTokenTtlSeconds(), user),
+                refresh.rawToken());
     }
 }

@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/migrations/004-create-observability.sql
   - include:
       file: db/changelog/migrations/005-seed-data.sql
+  - include:
+      file: db/changelog/migrations/006-catalog-name-uniqueness.sql

@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { getProfile } from '../api/authApi'
+import { AuthApi } from '../api/AuthApi'
 
 export const profileQueryKey = ['auth', 'profile'] as const
 
 export function useProfile() {
   return useQuery({
     queryKey: profileQueryKey,
-    queryFn: getProfile,
+    queryFn: () => AuthApi.getProfile(),
   })
 }

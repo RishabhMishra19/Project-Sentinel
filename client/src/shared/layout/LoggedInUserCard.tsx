@@ -1,10 +1,10 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useAppSelector } from '../../app/hooks'
+import { useAppSelector } from '../../redux/hooks'
 import { ROUTES } from '../../routes/paths'
 import { SidebarItem, type SidebarMode } from './SidebarItem'
 
-function getInitials(displayName?: string | null, email?: string | null) {
-  const source = displayName?.trim() || email?.trim() || '?'
+function getInitials(name?: string | null, email?: string | null) {
+  const source = name?.trim() || email?.trim() || '?'
   const parts = source.split(/\s+/).filter(Boolean)
   if (parts.length >= 2) {
     return `${parts[0]![0]!}${parts[1]![0]!}`.toUpperCase()
@@ -17,17 +17,16 @@ type LoggedInUserCardProps = {
 }
 
 export function LoggedInUserCard({ mode = 'expanded' }: LoggedInUserCardProps) {
-  const user = useAppSelector((state) => state.auth.user)
+  const user = useAppSelector((state) => state.session.user)
   const navigate = useNavigate()
   const location = useLocation()
   const isProfileActive = location.pathname === ROUTES.PROFILE
 
-  const meStatus = useAppSelector((state) => state.auth.meStatus)
-  const isLoadingUser = !user && (meStatus === 'idle' || meStatus === 'loading')
-  const initials = getInitials(user?.displayName, user?.email)
+  const isLoadingUser = !user
+  const initials = getInitials(user?.name, user?.email)
 
   const email = user?.email ?? 'No email'
-  const displayName = user?.displayName ?? 'Unknown'
+  const displayName = user?.name ?? 'Unknown'
 
   const textNode = isLoadingUser ? (
     <span className="flex min-w-0 flex-col">

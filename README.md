@@ -118,7 +118,7 @@ curl http://localhost:8080/actuator/health
 - Password: `Admin@123`
 - UI: http://localhost:3000/login
 
-Auth APIs: `POST /api/auth/login`, `POST /api/auth/refresh-token`, `POST /api/auth/logout`, `GET /api/auth/me`  
+Auth APIs: `POST /api/auth/login`, `POST /api/auth/refresh-token`, `POST /api/auth/logout`, `GET /api/auth/profile`  
 Postman: [`postman/Auth.postman_collection.json`](postman/Auth.postman_collection.json)
 
 Stop (keep DB volume):

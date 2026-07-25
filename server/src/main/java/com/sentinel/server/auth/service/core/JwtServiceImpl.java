@@ -1,7 +1,7 @@
 package com.sentinel.server.auth.service.core;
 
 import com.sentinel.server.security.JwtProperties;
-import com.sentinel.server.common.exception.UnauthorizedException;
+import com.sentinel.server.common.exception.AccessTokenExpiredException;
 import com.sentinel.server.user.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -46,7 +46,7 @@ public class JwtServiceImpl implements JwtService {
                     .getPayload();
             return UUID.fromString(claims.getSubject());
         } catch (JwtException | IllegalArgumentException ex) {
-            throw new UnauthorizedException("Invalid or expired access token");
+            throw new AccessTokenExpiredException();
         }
     }
 

@@ -1,19 +1,19 @@
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { useAppDispatch } from '../../../app/hooks'
+import { useAppDispatch } from '../../../redux/hooks'
 import { ROUTES } from '../../../routes/paths'
-import { setCredentials } from '../slices/authSlice'
-import { login } from '../api/authApi'
-import type { LoginRequest } from '../dto/auth.dto'
+import { setAuthSession } from '../../../redux/session/sessionSlice'
+import { AuthApi } from '../api/AuthApi'
+import type { LoginRequest } from '../dto/request/auth.request'
 
 export function useLogin() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   return useMutation({
-    mutationFn: (payload: LoginRequest) => login(payload),
+    mutationFn: (payload: LoginRequest) => AuthApi.login(payload),
     onSuccess: (data) => {
-      dispatch(setCredentials({ accessToken: data.accessToken, user: data.user }))
+      dispatch(setAuthSession(data))
       navigate(ROUTES.OVERVIEW, { replace: true })
     },
   })

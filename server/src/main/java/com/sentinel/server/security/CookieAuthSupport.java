@@ -36,7 +36,8 @@ public class CookieAuthSupport {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
-    public String readRefreshCookie(HttpServletRequest request) {
+    public String
+    readRefreshCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             return null;

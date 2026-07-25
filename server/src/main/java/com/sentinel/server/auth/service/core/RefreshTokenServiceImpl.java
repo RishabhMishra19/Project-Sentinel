@@ -1,6 +1,6 @@
 package com.sentinel.server.auth.service.core;
 
-import com.sentinel.server.auth.dto.RefreshTokenIssue;
+import com.sentinel.server.auth.dto.internal.RefreshTokenIssue;
 import com.sentinel.server.auth.entity.RefreshToken;
 import com.sentinel.server.auth.entity.RefreshTokenStatus;
 import com.sentinel.server.auth.repository.RefreshTokenRepository;

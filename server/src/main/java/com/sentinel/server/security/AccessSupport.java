@@ -2,7 +2,9 @@ package com.sentinel.server.security;
 
 import com.sentinel.server.common.exception.UnauthorizedException;
 import com.sentinel.server.permission.entity.PermissionType;
+import com.sentinel.server.role.entity.RoleScopeType;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
@@ -16,6 +18,15 @@ import org.springframework.stereotype.Component;
  */
 @Component("accessSupport")
 public class AccessSupport {
+
+    private static final Set<RoleScopeType> CATALOG_SCOPE_TYPES =
+            EnumSet.of(RoleScopeType.TENANT, RoleScopeType.PRODUCT, RoleScopeType.SERVICE);
+
+    private static final Set<PermissionType> READ_PERMISSIONS =
+            EnumSet.of(PermissionType.READ, PermissionType.READ_AND_WRITE, PermissionType.ALL);
+
+    private static final Set<PermissionType> WRITE_PERMISSIONS =
+            EnumSet.of(PermissionType.READ_AND_WRITE, PermissionType.ALL);
 
     public boolean isSentinelAdmin() {
         return currentPrincipal().isSentinelAdmin();
@@ -44,6 +55,34 @@ public class AccessSupport {
             return false;
         }
         return hasAnyAuthority(PermissionType.READ_AND_WRITE.name(), PermissionType.ALL.name());
+    }
+
+    /** Sentinel admin, or active tenant with any catalog scope at read level. */
+    public boolean canReadCatalog() {
+        if (isSentinelAdmin()) {
+            return true;
+        }
+        if (currentPrincipal().getActiveTenantId() == null) {
+            return false;
+        }
+        return hasCatalogPermission(READ_PERMISSIONS);
+    }
+
+    /** Sentinel admin, or active tenant with any catalog scope at write level. */
+    public boolean canWriteCatalog() {
+        if (isSentinelAdmin()) {
+            return true;
+        }
+        if (currentPrincipal().getActiveTenantId() == null) {
+            return false;
+        }
+        return hasCatalogPermission(WRITE_PERMISSIONS);
+    }
+
+    private boolean hasCatalogPermission(Set<PermissionType> allowed) {
+        return currentPrincipal().getScopeGrants().stream()
+                .anyMatch(grant -> CATALOG_SCOPE_TYPES.contains(grant.scopeType())
+                        && allowed.contains(grant.permission()));
     }
 
     private UserPrincipal currentPrincipal() {

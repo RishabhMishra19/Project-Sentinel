@@ -1,13 +1,10 @@
 package com.sentinel.server.auth.controller;
 
-import com.sentinel.server.auth.dto.AuthLoginResult;
-import com.sentinel.server.auth.dto.AuthRefreshResult;
-import com.sentinel.server.auth.dto.ChangePasswordRequest;
-import com.sentinel.server.auth.dto.LoginRequest;
-import com.sentinel.server.auth.dto.LoginResponse;
-import com.sentinel.server.auth.dto.MeResponse;
-import com.sentinel.server.auth.dto.ProfileResponse;
-import com.sentinel.server.auth.dto.TokenResponse;
+import com.sentinel.server.auth.dto.response.AuthSessionResponse;
+import com.sentinel.server.auth.dto.internal.AuthSessionResult;
+import com.sentinel.server.auth.dto.request.ChangePasswordRequest;
+import com.sentinel.server.auth.dto.request.LoginRequest;
+import com.sentinel.server.auth.dto.response.ProfileResponse;
 import com.sentinel.server.auth.service.AuthFacade;
 import com.sentinel.server.common.response.ApiResponses;
 import com.sentinel.server.security.CookieAuthSupport;
@@ -35,21 +32,20 @@ public class AuthController {
     private final JwtProperties jwtProperties;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
+    public ResponseEntity<AuthSessionResponse> login(
             @Valid @RequestBody LoginRequest request, HttpServletResponse response) {
-        AuthLoginResult result = authFacade.login(request);
-        cookieAuthSupport.writeRefreshCookie(
-                response, result.refreshTokenRaw(), jwtProperties.getRefreshTokenTtl().toSeconds());
-        return ApiResponses.ok(result.loginResponse());
+        AuthSessionResult result = authFacade.login(request);
+        writeRefreshCookie(response, result.refreshTokenRaw());
+        return ApiResponses.ok(result.body());
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<TokenResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthSessionResponse> refreshToken(
+            HttpServletRequest request, HttpServletResponse response) {
         String raw = cookieAuthSupport.readRefreshCookie(request);
-        AuthRefreshResult result = authFacade.refresh(raw);
-        cookieAuthSupport.writeRefreshCookie(
-                response, result.refreshTokenRaw(), jwtProperties.getRefreshTokenTtl().toSeconds());
-        return ApiResponses.ok(result.tokenResponse());
+        AuthSessionResult result = authFacade.refresh(raw);
+        writeRefreshCookie(response, result.refreshTokenRaw());
+        return ApiResponses.ok(result.body());
     }
 
     @PostMapping("/logout")
@@ -60,24 +56,23 @@ public class AuthController {
         return ApiResponses.noContent();
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<MeResponse> me(@AuthenticationPrincipal UserPrincipal principal) {
-        return ApiResponses.ok(authFacade.me(principal.getId()));
-    }
-
     @GetMapping("/profile")
     public ResponseEntity<ProfileResponse> profile(@AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponses.ok(authFacade.profile(principal.getId()));
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<TokenResponse> changePassword(
+    public ResponseEntity<AuthSessionResponse> changePassword(
             @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody ChangePasswordRequest request,
             HttpServletResponse response) {
-        AuthRefreshResult result = authFacade.changePassword(principal.getId(), request);
+        AuthSessionResult result = authFacade.changePassword(principal.getId(), request);
+        writeRefreshCookie(response, result.refreshTokenRaw());
+        return ApiResponses.ok(result.body());
+    }
+
+    private void writeRefreshCookie(HttpServletResponse response, String refreshTokenRaw) {
         cookieAuthSupport.writeRefreshCookie(
-                response, result.refreshTokenRaw(), jwtProperties.getRefreshTokenTtl().toSeconds());
-        return ApiResponses.ok(result.tokenResponse());
+                response, refreshTokenRaw, jwtProperties.getRefreshTokenTtl().toSeconds());
     }
 }

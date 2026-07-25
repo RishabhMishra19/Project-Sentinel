@@ -1,7 +1,6 @@
 package com.sentinel.server.common.exception;
 
-import com.sentinel.server.common.dto.ApiError;
-import com.sentinel.server.common.dto.FieldErrorDetail;
+import com.sentinel.server.common.dto.response.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
@@ -32,8 +31,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
-        List<FieldErrorDetail> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
-                .map(err -> new FieldErrorDetail(err.getField(), err.getDefaultMessage()))
+        List<ApiError.FieldError> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
+                .map(err -> new ApiError.FieldError(err.getField(), err.getDefaultMessage()))
                 .toList();
         ErrorCode code = ErrorCode.VALIDATION_FAILED;
         return ResponseEntity.status(code.getStatus())

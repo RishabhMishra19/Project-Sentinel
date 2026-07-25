@@ -5,10 +5,23 @@ export type NavItem = {
   label: string
   path: string
   onlySentinelAdmin?: boolean
+  requiresCatalogRead?: boolean
 }
 
 export const NAV_ITEMS: NavItem[] = [
   { id: 'overview', label: 'Overview', path: ROUTES.OVERVIEW },
   { id: 'settings', label: 'Settings', path: ROUTES.SETTINGS },
   { id: 'tenants', label: 'Tenants', path: ROUTES.TENANTS, onlySentinelAdmin: true },
+  {
+    id: 'products',
+    label: 'Products',
+    path: ROUTES.PRODUCTS,
+    requiresCatalogRead: true,
+  },
+  {
+    id: 'services',
+    label: 'Services',
+    path: ROUTES.SERVICES,
+    requiresCatalogRead: true,
+  },
 ]

@@ -1,0 +1,16 @@
+package com.sentinel.server.common.dto.response;
+
+import java.time.Instant;
+import java.util.List;
+
+public record ApiError(
+        Instant timestamp,
+        String errorCode,
+        String error,
+        String message,
+        String path,
+        List<FieldError> fieldErrors) {
+
+    public record FieldError(String field, String message) {
+    }
+}

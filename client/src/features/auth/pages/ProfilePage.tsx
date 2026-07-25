@@ -14,10 +14,6 @@ export function ProfilePage() {
   const { data, isLoading, isError } = useProfile()
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
 
-  const user = data?.user
-  const roles = data?.roles ?? []
-  const tenant = data?.tenant ?? null
-
   return (
     <>
       <div className="mx-auto max-w-3xl rounded-xl border border-border bg-surface p-8">
@@ -35,60 +31,62 @@ export function ProfilePage() {
         {isLoading ? <p className="text-sm text-muted">Loading profile…</p> : null}
         {isError ? <p className="text-sm text-danger">Failed to load profile</p> : null}
 
-        {user ? (
+        {data ? (
           <div className="space-y-6">
             <dl className="grid gap-4 sm:grid-cols-2">
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">
                   Display name
                 </dt>
-                <dd className="mt-1 text-foreground">{user.displayName}</dd>
+                <dd className="mt-1 text-foreground">{data.name}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">Email</dt>
-                <dd className="mt-1 text-foreground">{user.email}</dd>
+                <dd className="mt-1 text-foreground">{data.email}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">Status</dt>
-                <dd className="mt-1 text-foreground">{user.status}</dd>
+                <dd className="mt-1 text-foreground">{data.status}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">
                   Sentinel admin
                 </dt>
-                <dd className="mt-1 text-foreground">{user.sentinelAdmin ? 'Yes' : 'No'}</dd>
+                <dd className="mt-1 text-foreground">{data.sentinelAdmin ? 'Yes' : 'No'}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">Tenant</dt>
                 <dd className="mt-1 text-foreground">
-                  {tenant ? `${tenant.name} (${tenant.id})` : 'No tenant'}
+                  {data.tenant
+                    ? `${data.tenant.name} (${data.tenant.id})`
+                    : 'No tenant'}
                 </dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">Created</dt>
-                <dd className="mt-1 text-foreground">{formatDate(user.createdAt)}</dd>
+                <dd className="mt-1 text-foreground">{formatDate(data.createdAt)}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">Updated</dt>
-                <dd className="mt-1 text-foreground">{formatDate(user.updatedAt)}</dd>
+                <dd className="mt-1 text-foreground">{formatDate(data.updatedAt)}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">
                   Last login
                 </dt>
                 <dd className="mt-1 text-foreground">
-                  {user.lastLoginAt ? formatDate(user.lastLoginAt) : 'Never'}
+                  {data.lastLoginAt ? formatDate(data.lastLoginAt) : 'Never'}
                 </dd>
               </div>
             </dl>
 
             <div className="space-y-3">
               <h2 className="text-lg font-medium text-foreground">Roles</h2>
-              {roles.length === 0 ? (
+              {data.roles.length === 0 ? (
                 <p className="text-sm text-muted">No roles assigned</p>
               ) : (
                 <ul className="space-y-3">
-                  {roles.map((role) => (
+                  {data.roles.map((role) => (
                     <li key={role.id} className="rounded border border-border p-4">
                       <p className="font-medium text-foreground">{role.name}</p>
                       <p className="mt-2 text-sm text-muted">

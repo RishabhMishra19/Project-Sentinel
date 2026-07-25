@@ -1,6 +1,6 @@
 package com.sentinel.server.tenant.mapper;
 
-import com.sentinel.server.tenant.dto.TenantResponse;
+import com.sentinel.server.tenant.dto.response.TenantResponse;
 import com.sentinel.server.tenant.entity.Tenant;
 import com.sentinel.server.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;

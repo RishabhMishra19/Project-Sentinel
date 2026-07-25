@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "Bad Request"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Unauthorized"),
+    ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "Access token expired"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Forbidden"),
     NOT_FOUND(HttpStatus.NOT_FOUND, "Not Found"),
     CONFLICT(HttpStatus.CONFLICT, "Conflict"),

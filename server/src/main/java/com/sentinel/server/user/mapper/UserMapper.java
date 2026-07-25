@@ -1,6 +1,6 @@
 package com.sentinel.server.user.mapper;
 
-import com.sentinel.server.common.dto.UserBriefResponse;
+import com.sentinel.server.common.dto.response.UserBriefResponse;
 import com.sentinel.server.user.entity.User;
 import org.springframework.stereotype.Component;
 

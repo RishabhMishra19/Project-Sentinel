@@ -2,6 +2,7 @@ package com.sentinel.server.security;
 
 import com.sentinel.server.user.entity.UserStatus;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +21,7 @@ public class UserPrincipal implements UserDetails {
     private final boolean sentinelAdmin;
     private final UUID homeTenantId;
     private final UUID activeTenantId;
+    private final List<ScopeGrant> scopeGrants;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public UserPrincipal(
@@ -29,6 +31,7 @@ public class UserPrincipal implements UserDetails {
             boolean sentinelAdmin,
             UUID homeTenantId,
             UUID activeTenantId,
+            List<ScopeGrant> scopeGrants,
             Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
@@ -36,12 +39,20 @@ public class UserPrincipal implements UserDetails {
         this.sentinelAdmin = sentinelAdmin;
         this.homeTenantId = homeTenantId;
         this.activeTenantId = activeTenantId;
+        this.scopeGrants = scopeGrants == null ? List.of() : List.copyOf(scopeGrants);
         this.authorities = authorities;
     }
 
     public UserPrincipal withActiveTenantId(UUID activeTenantId) {
         return new UserPrincipal(
-                id, email, status, sentinelAdmin, homeTenantId, activeTenantId, authorities);
+                id,
+                email,
+                status,
+                sentinelAdmin,
+                homeTenantId,
+                activeTenantId,
+                scopeGrants,
+                authorities);
     }
 
     @Override

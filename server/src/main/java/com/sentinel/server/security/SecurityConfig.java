@@ -54,7 +54,6 @@ public class SecurityConfig {
                                         "/api/auth/refresh-token",
                                         "/api/auth/logout")
                         .permitAll()
-                        .requestMatchers("/api/auth/me").authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(tenantContextFilter, JwtAuthenticationFilter.class);

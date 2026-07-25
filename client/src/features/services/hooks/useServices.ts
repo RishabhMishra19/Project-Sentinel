@@ -1,0 +1,90 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  createService,
+  deleteService,
+  listAllServices,
+  listServices,
+  updateService,
+} from '../api/servicesApi'
+import type { ServiceListParams, CreateServiceRequest, UpdateServiceRequest } from '../dto/request/service.request'
+
+export const servicesQueryKey = (productId?: string) =>
+  productId ? (['services', productId] as const) : (['services'] as const)
+
+export function useAllServicesQuery(params: ServiceListParams | null) {
+  return useQuery({
+    queryKey: [...servicesQueryKey(), 'list', params],
+    queryFn: () => listAllServices(params!),
+    enabled: params != null,
+  })
+}
+
+export function useServicesQuery(
+  productId: string | undefined,
+  params: ServiceListParams | null,
+) {
+  return useQuery({
+    queryKey: [...servicesQueryKey(productId), 'list', params],
+    queryFn: () => listServices(productId!, params!),
+    enabled: productId != null && params != null,
+  })
+}
+
+export function useCreateService(productId?: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      productId: targetProductId,
+      payload,
+    }: {
+      productId: string
+      payload: CreateServiceRequest
+    }) => createService(targetProductId, payload),
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ['services'] })
+      void queryClient.invalidateQueries({
+        queryKey: servicesQueryKey(variables.productId),
+      })
+      if (productId) {
+        void queryClient.invalidateQueries({
+          queryKey: servicesQueryKey(productId),
+        })
+      }
+    },
+  })
+}
+
+export function useUpdateService(productId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string
+      payload: UpdateServiceRequest
+    }) => updateService(productId, id, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['services'] })
+      void queryClient.invalidateQueries({
+        queryKey: servicesQueryKey(productId),
+      })
+    },
+  })
+}
+
+export function useDeleteService(productId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => deleteService(productId, id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['services'] })
+      void queryClient.invalidateQueries({
+        queryKey: servicesQueryKey(productId),
+      })
+    },
+  })
+}

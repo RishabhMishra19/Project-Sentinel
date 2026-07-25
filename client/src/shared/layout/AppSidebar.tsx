@@ -1,15 +1,18 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAppSelector } from '../../app/hooks'
+import { useAppSelector } from '../../redux/hooks'
 import {
   LogoutIcon,
   OverviewIcon,
+  ProductsIcon,
+  ServicesIcon,
   SettingsIcon,
   SidebarCloseIcon,
   SidebarOpenIcon,
   TenantsIcon,
 } from '../../assets/icons'
 import { useLogout } from '../../features/auth/hooks/useLogout'
+import { canReadCatalog } from '../../shared/permissions/canReadCatalog'
 import { ROUTES } from '../../routes/paths'
 import { localStorageManager } from '../storage/LocalStorageManager'
 import { LoggedInUserCard } from './LoggedInUserCard'
@@ -23,6 +26,8 @@ const NAV_ICONS: Record<string, ReactNode> = {
   overview: <OverviewIcon className="size-4 shrink-0" />,
   settings: <SettingsIcon className="size-4 shrink-0" />,
   tenants: <TenantsIcon className="size-4 shrink-0" />,
+  products: <ProductsIcon className="size-4 shrink-0" />,
+  services: <ServicesIcon className="size-4 shrink-0" />,
 }
 
 function readStoredMode(): SidebarMode {
@@ -36,14 +41,37 @@ export function AppSidebar() {
   const [mode, setMode] = useState<SidebarMode>(readStoredMode)
   const isCollapsed = mode === 'collapsed'
 
-  const meStatus = useAppSelector((state) => state.auth.meStatus)
-  const isSentinelAdmin = useAppSelector((state) => state.auth.user?.sentinelAdmin === true)
+  const user = useAppSelector((state) => state.session.user)
+  const isSentinelAdmin = user?.sentinelAdmin === true
+  const hasCatalogRead = canReadCatalog(isSentinelAdmin, user?.roles ?? [])
 
   const navItems = NAV_ITEMS.filter((item) => {
-    if (!item.onlySentinelAdmin) return true
-    if (meStatus !== 'ready') return false
-    return isSentinelAdmin
+    if (item.onlySentinelAdmin) {
+      if (!user) return false
+      return isSentinelAdmin
+    }
+    if (item.requiresCatalogRead) {
+      if (!user) return false
+      return hasCatalogRead
+    }
+    return true
   })
+
+  const isNavActive = (path: string) => {
+    if (path === ROUTES.PRODUCTS) {
+      if (pathname === ROUTES.PRODUCTS) {
+        return true
+      }
+      if (/^\/products\/[^/]+\/services/.test(pathname)) {
+        return false
+      }
+      return pathname.startsWith(`${ROUTES.PRODUCTS}/`)
+    }
+    if (path === ROUTES.SERVICES) {
+      return pathname === ROUTES.SERVICES || /\/services(\/|$)/.test(pathname)
+    }
+    return pathname === path
+  }
 
   const toggleMode = () => {
     const next: SidebarMode = isCollapsed ? 'expanded' : 'collapsed'
@@ -101,7 +129,7 @@ export function AppSidebar() {
             <SidebarItem
               key={item.id}
               mode={mode}
-              active={pathname === item.path}
+              active={isNavActive(item.path)}
               iconNode={NAV_ICONS[item.id]}
               textNode={item.label}
               onClick={() => navigate(item.path)}

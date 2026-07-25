@@ -1,12 +1,9 @@
 package com.sentinel.server.auth.mapper;
 
-import com.sentinel.server.auth.dto.MeResponse;
-import com.sentinel.server.auth.dto.ProfileResponse;
-import com.sentinel.server.auth.dto.RoleScopeSummaryResponse;
-import com.sentinel.server.auth.dto.RoleSummaryResponse;
-import com.sentinel.server.auth.dto.TenantSummaryResponse;
-import com.sentinel.server.auth.dto.UserProfileResponse;
-import com.sentinel.server.auth.dto.UserSummaryResponse;
+import com.sentinel.server.auth.dto.response.AuthSessionResponse;
+import com.sentinel.server.auth.dto.response.ProfileResponse;
+import com.sentinel.server.auth.dto.response.common.RoleSummaryResponse;
+import com.sentinel.server.auth.dto.response.common.TenantSummaryResponse;
 import com.sentinel.server.role.entity.Role;
 import com.sentinel.server.role.entity.RoleScope;
 import com.sentinel.server.role.entity.RoleScopeStatus;
@@ -19,11 +16,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthMapper {
 
-    public UserSummaryResponse toUserSummary(User user) {
-        return new UserSummaryResponse(
-                user.getId().toString(), user.getEmail(), user.getDisplayName(), user.isSentinelAdmin());
-    }
-
     public TenantSummaryResponse toTenantSummary(Tenant tenant) {
         if (tenant == null) {
             return null;
@@ -31,25 +23,31 @@ public class AuthMapper {
         return new TenantSummaryResponse(tenant.getId().toString(), tenant.getName());
     }
 
-    public MeResponse toMeResponse(User user) {
-        return new MeResponse(toUserSummary(user), toActiveRoleSummaries(user), toTenantSummary(user.getTenant()));
-    }
-
-    public UserProfileResponse toUserProfile(User user) {
-        return new UserProfileResponse(
-                user.getId().toString(),
-                user.getEmail(),
-                user.getDisplayName(),
-                user.getStatus(),
-                user.isSentinelAdmin(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getLastLoginAt());
+    public AuthSessionResponse toAuthSessionResponse(String accessToken, long expiresIn, User user) {
+        return new AuthSessionResponse(
+                accessToken,
+                expiresIn,
+                new AuthSessionResponse.User(
+                        user.getId().toString(),
+                        user.getEmail(),
+                        user.getDisplayName(),
+                        user.isSentinelAdmin(),
+                        toActiveRoleSummaries(user),
+                        toTenantSummary(user.getTenant())));
     }
 
     public ProfileResponse toProfileResponse(User user) {
         return new ProfileResponse(
-                toUserProfile(user), toActiveRoleSummaries(user), toTenantSummary(user.getTenant()));
+                user.getId().toString(),
+                user.getEmail(),
+                user.getDisplayName(),
+                user.isSentinelAdmin(),
+                toActiveRoleSummaries(user),
+                toTenantSummary(user.getTenant()),
+                user.getStatus(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getLastLoginAt());
     }
 
     private List<RoleSummaryResponse> toActiveRoleSummaries(User user) {
@@ -60,15 +58,15 @@ public class AuthMapper {
     }
 
     public RoleSummaryResponse toRoleSummary(Role role) {
-        List<RoleScopeSummaryResponse> scopes = role.getRoleScopes().stream()
+        List<RoleSummaryResponse.Scope> scopes = role.getRoleScopes().stream()
                 .filter(scope -> scope.getStatus() == RoleScopeStatus.ACTIVE)
                 .map(this::toScopeSummary)
                 .toList();
         return new RoleSummaryResponse(role.getId().toString(), role.getName(), scopes);
     }
 
-    public RoleScopeSummaryResponse toScopeSummary(RoleScope scope) {
-        return new RoleScopeSummaryResponse(
+    public RoleSummaryResponse.Scope toScopeSummary(RoleScope scope) {
+        return new RoleSummaryResponse.Scope(
                 scope.getId().toString(),
                 scope.getScopeType().name(),
                 scope.getScopeId() != null ? scope.getScopeId().toString() : null,
