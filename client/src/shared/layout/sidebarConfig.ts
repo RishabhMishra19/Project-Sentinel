@@ -25,6 +25,11 @@ export const TENANT_SIDE_BAR_ITEMS: SidebarItem[] = [
     path: TENANT_CONTEXT_ROUTES.SERVICES,
   },
   {
+    id: "users",
+    label: "Users",
+    path: TENANT_CONTEXT_ROUTES.USERS,
+  },
+  {
     id: "settings",
     label: "Settings",
     path: TENANT_CONTEXT_ROUTES.SETTINGS,

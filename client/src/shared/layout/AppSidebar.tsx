@@ -9,6 +9,7 @@ import {
   SidebarCloseIcon,
   SidebarOpenIcon,
   TenantsIcon,
+  UsersIcon,
 } from "../../assets/icons";
 import { useLogout } from "../../features/auth/hooks/useLogout";
 import { SHARED_ROUTES } from "../../routes/paths";
@@ -25,6 +26,7 @@ const NAV_ICONS: Record<string, ReactNode> = {
   tenants: <TenantsIcon className="size-4 shrink-0" />,
   products: <ProductsIcon className="size-4 shrink-0" />,
   services: <ServicesIcon className="size-4 shrink-0" />,
+  users: <UsersIcon className="size-4 shrink-0" />,
   settings: <SettingsIcon className="size-4 shrink-0" />,
 };
 

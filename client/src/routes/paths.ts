@@ -13,6 +13,7 @@ export const ADMIN_ONLY_ROUTES = {
 export const TENANT_CONTEXT_ROUTES = {
   PRODUCTS: "/products",
   SERVICES: "/services",
+  USERS: "/users",
   SETTINGS: "/settings",
   SETTINGS_ROLES: "/settings/roles",
   PRODUCT_SERVICES: (productId: string) => `/products/${productId}/services`,

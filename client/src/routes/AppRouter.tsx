@@ -11,6 +11,7 @@ import { ProductServicesPage } from "../features/products/pages/ProductServicesP
 import { ProductsPage } from "../features/products/pages/ProductsPage";
 import { ServicesPage } from "../features/services/pages/ServicesPage";
 import { ServiceApiKeysPage } from "../features/apikeys/pages/ServiceApiKeysPage";
+import { UsersPage } from "../features/users/pages/UsersPage";
 import { SettingsPage } from "../features/settings/pages/SettingsPage";
 import { RolesPage } from "../features/roles/pages/RolesPage";
 import { ProtectedLayout } from "../shared/layout/ProtectedLayout";
@@ -88,6 +89,11 @@ const router = createBrowserRouter([
                     path: TENANT_CONTEXT_ROUTES.SERVICES,
                     handle: { crumb: "Services" },
                     element: <ServicesPage />,
+                  },
+                  {
+                    path: TENANT_CONTEXT_ROUTES.USERS,
+                    handle: { crumb: "Users" },
+                    element: <UsersPage />,
                   },
                   {
                     path: TENANT_CONTEXT_ROUTES.SETTINGS,

@@ -36,6 +36,13 @@ export const SERVICE_API_KEYS_API_ROUTES = {
     `/products/${productId}/services/${serviceId}/api-keys/${id}/revoke`,
 } as const
 
+export const USERS_API_ROUTES = {
+  LIST: '/users',
+  BY_ID: (id: string) => `/users/${id}`,
+  ASSIGN_ROLE: (id: string) => `/users/${id}/roles`,
+  MARK_INACTIVE: (id: string) => `/users/${id}/mark-inactive`,
+} as const
+
 export const ROLES_API_ROUTES = {
   LIST: '/roles',
   BY_ID: (id: string) => `/roles/${id}`,
