@@ -142,3 +142,18 @@
     transform: translateY(0);
   }
 }
+
+@keyframes tenant-text-sparkle {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.tenant-text-sparkle {
+  color: var(--color-warning);
+  animation: tenant-text-sparkle 1.6s ease-in-out infinite;
+}
