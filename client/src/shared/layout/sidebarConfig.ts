@@ -24,4 +24,9 @@ export const TENANT_SIDE_BAR_ITEMS: SidebarItem[] = [
     label: "Services",
     path: TENANT_CONTEXT_ROUTES.SERVICES,
   },
+  {
+    id: "settings",
+    label: "Settings",
+    path: TENANT_CONTEXT_ROUTES.SETTINGS,
+  },
 ];

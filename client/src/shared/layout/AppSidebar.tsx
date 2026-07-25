@@ -5,6 +5,7 @@ import {
   LogoutIcon,
   ProductsIcon,
   ServicesIcon,
+  SettingsIcon,
   SidebarCloseIcon,
   SidebarOpenIcon,
   TenantsIcon,
@@ -24,6 +25,7 @@ const NAV_ICONS: Record<string, ReactNode> = {
   tenants: <TenantsIcon className="size-4 shrink-0" />,
   products: <ProductsIcon className="size-4 shrink-0" />,
   services: <ServicesIcon className="size-4 shrink-0" />,
+  settings: <SettingsIcon className="size-4 shrink-0" />,
 };
 
 function readStoredMode(): SidebarMode {
