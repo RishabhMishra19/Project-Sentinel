@@ -3,6 +3,7 @@ import type { RoleResponse } from '../dto/response/role.response'
 import { MarkInactiveRoleDialog } from '../components/MarkInactiveRoleDialog'
 import { RoleCreateModal } from '../components/RoleCreateModal'
 import { RoleEditModal } from '../components/RoleEditModal'
+import { RoleScopesModal } from '../components/RoleScopesModal'
 import { RoleViewModal } from '../components/RoleViewModal'
 import { RolesTable } from '../components/RolesTable'
 
@@ -10,6 +11,7 @@ export const RolesPage = () => {
   const [createOpen, setCreateOpen] = useState(false)
   const [viewRoleId, setViewRoleId] = useState<string | null>(null)
   const [editRole, setEditRole] = useState<RoleResponse | null>(null)
+  const [scopesRole, setScopesRole] = useState<RoleResponse | null>(null)
   const [inactiveRole, setInactiveRole] = useState<RoleResponse | null>(null)
 
   return (
@@ -18,7 +20,7 @@ export const RolesPage = () => {
         onCreate={() => setCreateOpen(true)}
         onView={(role) => setViewRoleId(role.id)}
         onEdit={setEditRole}
-        onShowScopes={() => {}}
+        onShowScopes={setScopesRole}
         onMarkInactive={setInactiveRole}
       />
 
@@ -37,6 +39,12 @@ export const RolesPage = () => {
         open={editRole != null}
         role={editRole}
         onClose={() => setEditRole(null)}
+      />
+
+      <RoleScopesModal
+        open={scopesRole != null}
+        role={scopesRole}
+        onClose={() => setScopesRole(null)}
       />
 
       <MarkInactiveRoleDialog
