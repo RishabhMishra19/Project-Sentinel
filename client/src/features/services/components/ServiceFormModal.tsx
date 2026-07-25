@@ -1,4 +1,4 @@
-import { useEffect, useId } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { FormField } from '../../../shared/forms/FormField'
 import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { useAppForm } from '../../../shared/forms/useAppForm'
@@ -10,6 +10,8 @@ import {
   serviceFormSchema,
   type ServiceFormValues,
 } from '../schemas/service.schema'
+
+const EMPTY_PRODUCTS: ProductResponse[] = []
 
 type ServiceFormModalProps = {
   open: boolean
@@ -26,7 +28,7 @@ export const ServiceFormModal = ({
   open,
   mode,
   productId,
-  products = [],
+  products = EMPTY_PRODUCTS,
   service,
   onClose,
 }: ServiceFormModalProps) => {
@@ -34,10 +36,10 @@ export const ServiceFormModal = ({
   const createMutation = useCreateService(productId)
   const updateProductId = service?.productId ?? productId ?? ''
   const updateMutation = useUpdateService(updateProductId || 'pending')
-  const { reset: resetCreate } = createMutation
-  const { reset: resetUpdate } = updateMutation
   const isPending = createMutation.isPending || updateMutation.isPending
   const needsProductSelect = mode === 'create' && !productId
+  const defaultProductId = productId ?? products[0]?.id ?? ''
+  const wasOpenRef = useRef(false)
 
   const {
     register,
@@ -54,20 +56,22 @@ export const ServiceFormModal = ({
   const selectedProductId = watch('productId')
 
   useEffect(() => {
-    if (!open) {
+    const justOpened = open && !wasOpenRef.current
+    wasOpenRef.current = open
+
+    if (!justOpened) {
       return
     }
-    resetCreate()
-    resetUpdate()
+
     if (mode === 'edit' && service) {
       reset({ name: service.name, productId: service.productId })
     } else {
       reset({
         name: '',
-        productId: productId ?? products[0]?.id ?? '',
+        productId: defaultProductId,
       })
     }
-  }, [open, mode, service, productId, products, reset, resetCreate, resetUpdate])
+  }, [open, mode, service, defaultProductId, reset])
 
   if (!open) {
     return null

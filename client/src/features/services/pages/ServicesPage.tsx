@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react'
+import type { ProductResponse } from '../../products/dto/response/product.response'
 import type { ServiceResponse } from '../dto/response/service.response'
 import { useProductsQuery } from '../../products/hooks/useProducts'
 import { DeactivateServiceDialog } from '../components/DeactivateServiceDialog'
 import { ServiceFormModal } from '../components/ServiceFormModal'
 import { ServicesTable } from '../components/ServicesTable'
 import { ServiceViewModal } from '../components/ServiceViewModal'
+
+const EMPTY_PRODUCTS: ProductResponse[] = []
+
+const ACTIVE_PRODUCTS_PARAMS = {
+  page: 0,
+  size: 100,
+  status: 'ACTIVE' as const,
+}
 
 type FormState =
   | { open: false }
@@ -20,12 +29,8 @@ export const ServicesPage = () => {
     null,
   )
 
-  const productsQuery = useProductsQuery({
-    page: 0,
-    size: 100,
-    status: 'ACTIVE',
-  })
-  const products = productsQuery.data?.content ?? []
+  const productsQuery = useProductsQuery(ACTIVE_PRODUCTS_PARAMS)
+  const products = productsQuery.data?.content ?? EMPTY_PRODUCTS
 
   useEffect(() => {
     if (products.length === 0) {
