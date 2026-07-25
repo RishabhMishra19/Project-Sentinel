@@ -11,6 +11,7 @@ import {
 } from "../../assets/icons";
 import { useLogout } from "../../features/auth/hooks/useLogout";
 import { SHARED_ROUTES, TENANT_CONTEXT_ROUTES } from "../../routes/paths";
+import { resolveSessionMode } from "../session/resolveSessionMode";
 import { localStorageManager } from "../storage/LocalStorageManager";
 import { LoggedInUserCard } from "./LoggedInUserCard";
 import { ADMIN_SIDE_BAR_ITEMS, TENANT_SIDE_BAR_ITEMS } from "./sidebarConfig";
@@ -40,16 +41,12 @@ export function AppSidebar() {
 
   const user = useAppSelector((state) => state.session.user);
   const activeTenant = useAppSelector((state) => state.session.activeTenant);
-  const isSentinelAdmin = user?.sentinelAdmin === true;
-  const isImpersonating = isSentinelAdmin && activeTenant != null;
-  const isPlatformAdmin = isSentinelAdmin && !isImpersonating;
-  const isTenantContext = !isSentinelAdmin || isImpersonating;
+  const sessionMode = resolveSessionMode(user, activeTenant);
 
-  const navItems = isPlatformAdmin
-    ? ADMIN_SIDE_BAR_ITEMS
-    : isTenantContext
-      ? TENANT_SIDE_BAR_ITEMS
-      : [];
+  const navItems =
+    sessionMode === "only_admin"
+      ? ADMIN_SIDE_BAR_ITEMS
+      : TENANT_SIDE_BAR_ITEMS;
 
   const isNavActive = (path: string) => {
     if (path === TENANT_CONTEXT_ROUTES.PRODUCTS) {
@@ -62,7 +59,10 @@ export function AppSidebar() {
       return pathname.startsWith(`${TENANT_CONTEXT_ROUTES.PRODUCTS}/`);
     }
     if (path === TENANT_CONTEXT_ROUTES.SERVICES) {
-      return pathname === TENANT_CONTEXT_ROUTES.SERVICES || /\/services(\/|$)/.test(pathname);
+      return (
+        pathname === TENANT_CONTEXT_ROUTES.SERVICES ||
+        /\/services(\/|$)/.test(pathname)
+      );
     }
     return pathname === path;
   };
