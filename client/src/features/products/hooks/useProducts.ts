@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { ProductsApi } from '../api/ProductsApi'
 import type { ProductListParams, CreateProductRequest, UpdateProductRequest } from '../dto/request/product.request'
 
@@ -17,6 +18,17 @@ export function useCreateProduct() {
 
   return useMutation({
     mutationFn: (payload: CreateProductRequest) => ProductsApi.create(payload),
+    meta: {
+      toast: {
+        loading: 'Creating product…',
+        success: 'Product created successfully.',
+        error: (error) =>
+          getApiErrorMessage(
+            error,
+            'Could not create product. Please try again.',
+          ),
+      },
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: productsQueryKey })
     },
@@ -34,6 +46,17 @@ export function useUpdateProduct() {
       id: string
       payload: UpdateProductRequest
     }) => ProductsApi.update(id, payload),
+    meta: {
+      toast: {
+        loading: 'Updating product…',
+        success: 'Product updated successfully.',
+        error: (error) =>
+          getApiErrorMessage(
+            error,
+            'Could not update product. Please try again.',
+          ),
+      },
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: productsQueryKey })
     },
@@ -45,6 +68,17 @@ export function useDeleteProduct() {
 
   return useMutation({
     mutationFn: (id: string) => ProductsApi.delete(id),
+    meta: {
+      toast: {
+        loading: 'Deactivating product…',
+        success: 'Product deactivated.',
+        error: (error) =>
+          getApiErrorMessage(
+            error,
+            'Could not deactivate product. Please try again.',
+          ),
+      },
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: productsQueryKey })
     },

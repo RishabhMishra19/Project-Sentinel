@@ -1,8 +1,6 @@
 import { useEffect, useId } from 'react'
 import { FormField } from '../../../shared/forms/FormField'
-import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { useAppForm } from '../../../shared/forms/useAppForm'
-import { toast } from '../../../shared/ui/toast'
 import type { ProductResponse } from '../dto/response/product.response'
 import { useCreateProduct, useUpdateProduct } from '../hooks/useProducts'
 import {
@@ -59,35 +57,21 @@ export const ProductFormModal = ({
 
   const onSubmit = (data: ProductFormValues) => {
     if (mode === 'edit' && product) {
-      toast.promise(
-        updateMutation.mutateAsync({ id: product.id, payload: data }),
+      updateMutation.mutate(
+        { id: product.id, payload: data },
         {
-          loading: 'Updating product…',
-          success: () => {
+          onSuccess: () => {
             onClose()
-            return 'Product updated successfully.'
           },
-          error: (error) =>
-            getApiErrorMessage(
-              error,
-              'Could not update product. Please try again.',
-            ),
         },
       )
       return
     }
 
-    toast.promise(createMutation.mutateAsync(data), {
-      loading: 'Creating product…',
-      success: () => {
+    createMutation.mutate(data, {
+      onSuccess: () => {
         onClose()
-        return 'Product created successfully.'
       },
-      error: (error) =>
-        getApiErrorMessage(
-          error,
-          'Could not create product. Please try again.',
-        ),
     })
   }
 

@@ -13,7 +13,8 @@ type PromiseMessages<T> = {
 
 /**
  * App toast helpers on top of sonner.
- * Prefer `toast.promise` for async work (loading → success | error).
+ * Prefer mutation `meta.toast` / QueryCache error toasts for API work.
+ * Use `toast.promise` only for non-React-Query async work.
  */
 export const toast = {
   success(message: string, options?: ExternalToast) {

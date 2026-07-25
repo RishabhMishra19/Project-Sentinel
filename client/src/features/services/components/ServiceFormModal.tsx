@@ -1,6 +1,5 @@
 import { useEffect, useId, useRef } from 'react'
 import { FormField } from '../../../shared/forms/FormField'
-import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { useAppForm } from '../../../shared/forms/useAppForm'
 import { toast } from '../../../shared/ui/toast'
 import type { ProductResponse } from '../../products/dto/response/product.response'
@@ -79,22 +78,15 @@ export const ServiceFormModal = ({
 
   const onSubmit = (data: ServiceFormValues & { productId?: string }) => {
     if (mode === 'edit' && service) {
-      toast.promise(
-        updateMutation.mutateAsync({
+      updateMutation.mutate(
+        {
           id: service.id,
           payload: { name: data.name },
-        }),
+        },
         {
-          loading: 'Updating service…',
-          success: () => {
+          onSuccess: () => {
             onClose()
-            return 'Service updated successfully.'
           },
-          error: (error) =>
-            getApiErrorMessage(
-              error,
-              'Could not update service. Please try again.',
-            ),
         },
       )
       return
@@ -106,22 +98,15 @@ export const ServiceFormModal = ({
       return
     }
 
-    toast.promise(
-      createMutation.mutateAsync({
+    createMutation.mutate(
+      {
         productId: targetProductId,
         payload: { name: data.name },
-      }),
+      },
       {
-        loading: 'Creating service…',
-        success: () => {
+        onSuccess: () => {
           onClose()
-          return 'Service created successfully.'
         },
-        error: (error) =>
-          getApiErrorMessage(
-            error,
-            'Could not create service. Please try again.',
-          ),
       },
     )
   }

@@ -3,9 +3,13 @@ import { Provider as ReduxProvider } from "react-redux";
 import { Toaster } from "sonner";
 import { ThemeProvider, useTheme } from "../shared/theme";
 import { store } from "../redux/store";
+import { createMutationToastCache } from "../shared/api/mutationToastCache";
+import { createQueryToastCache } from "../shared/api/queryToastCache";
 import type { ReactNode } from "react";
 
 const queryClient = new QueryClient({
+  queryCache: createQueryToastCache(),
+  mutationCache: createMutationToastCache(),
   defaultOptions: {
     queries: {
       retry: false,
@@ -22,7 +26,7 @@ const ThemedToaster = () => {
       theme={theme}
       richColors
       closeButton
-      position="top-right"
+      position="bottom-right"
       toastOptions={{
         classNames: {
           toast: "sentinel-toast",

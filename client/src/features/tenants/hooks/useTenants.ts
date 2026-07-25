@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { TenantsApi } from '../api/TenantsApi'
 import type { CreateTenantRequest, TenantListParams, UpdateTenantRequest } from '../dto/request/tenant.request'
 
@@ -17,6 +18,14 @@ export function useCreateTenant() {
 
   return useMutation({
     mutationFn: (payload: CreateTenantRequest) => TenantsApi.create(payload),
+    meta: {
+      toast: {
+        loading: 'Creating tenant…',
+        success: 'Tenant created successfully.',
+        error: (error) =>
+          getApiErrorMessage(error, 'Could not create tenant. Please try again.'),
+      },
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: tenantsQueryKey })
     },
@@ -34,6 +43,14 @@ export function useUpdateTenant() {
       id: string
       payload: UpdateTenantRequest
     }) => TenantsApi.update(id, payload),
+    meta: {
+      toast: {
+        loading: 'Updating tenant…',
+        success: 'Tenant updated successfully.',
+        error: (error) =>
+          getApiErrorMessage(error, 'Could not update tenant. Please try again.'),
+      },
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: tenantsQueryKey })
     },
@@ -45,6 +62,17 @@ export function useDeleteTenant() {
 
   return useMutation({
     mutationFn: (id: string) => TenantsApi.delete(id),
+    meta: {
+      toast: {
+        loading: 'Deactivating tenant…',
+        success: 'Tenant deactivated.',
+        error: (error) =>
+          getApiErrorMessage(
+            error,
+            'Could not deactivate tenant. Please try again.',
+          ),
+      },
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: tenantsQueryKey })
     },

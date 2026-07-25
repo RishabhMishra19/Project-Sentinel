@@ -1,6 +1,4 @@
 import { useId } from 'react'
-import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
-import { toast } from '../../../shared/ui/toast'
 import type { ServiceApiKeyResponse } from '../dto/response/apikey.response'
 import { useRevokeServiceApiKey } from '../hooks/useApiKeys'
 
@@ -27,17 +25,10 @@ export const RevokeApiKeyDialog = ({
   }
 
   const onConfirm = () => {
-    toast.promise(revokeMutation.mutateAsync(apiKey.id), {
-      loading: 'Revoking API key…',
-      success: () => {
+    revokeMutation.mutate(apiKey.id, {
+      onSuccess: () => {
         onClose()
-        return 'API key revoked.'
       },
-      error: (error) =>
-        getApiErrorMessage(
-          error,
-          'Could not revoke API key. Please try again.',
-        ),
     })
   }
 

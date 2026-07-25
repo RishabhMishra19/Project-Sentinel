@@ -1,7 +1,5 @@
 import { FormField } from '../../../shared/forms/FormField'
-import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { useAppForm } from '../../../shared/forms/useAppForm'
-import { toast } from '../../../shared/ui/toast'
 import { useLogin } from '../hooks/useLogin'
 import { loginSchema, type LoginFormValues } from '../schemas/login.schema'
 
@@ -17,12 +15,7 @@ export const LoginForm = () => {
   })
 
   const onSubmit = (data: LoginFormValues) => {
-    toast.promise(loginMutation.mutateAsync(data), {
-      loading: 'Signing in…',
-      success: 'Signed in successfully.',
-      error: (error) =>
-        getApiErrorMessage(error, 'Invalid email or password'),
-    })
+    loginMutation.mutate(data)
   }
 
   return (

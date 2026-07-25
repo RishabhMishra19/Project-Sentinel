@@ -1,6 +1,4 @@
 import { useId } from 'react'
-import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
-import { toast } from '../../../shared/ui/toast'
 import type { TenantResponse } from '../dto/response/tenant.response'
 import { useDeleteTenant } from '../hooks/useTenants'
 
@@ -23,17 +21,10 @@ export const DeactivateTenantDialog = ({
   }
 
   const onConfirm = () => {
-    toast.promise(deleteMutation.mutateAsync(tenant.id), {
-      loading: 'Deactivating tenant…',
-      success: () => {
+    deleteMutation.mutate(tenant.id, {
+      onSuccess: () => {
         onClose()
-        return 'Tenant deactivated.'
       },
-      error: (error) =>
-        getApiErrorMessage(
-          error,
-          'Could not deactivate tenant. Please try again.',
-        ),
     })
   }
 

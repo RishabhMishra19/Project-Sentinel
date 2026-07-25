@@ -1,8 +1,6 @@
 import { useEffect, useId, useRef } from 'react'
 import { FormField } from '../../../shared/forms/FormField'
-import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { useAppForm } from '../../../shared/forms/useAppForm'
-import { toast } from '../../../shared/ui/toast'
 import type { ServiceApiKeyCreatedResponse } from '../dto/response/apikey.response'
 import { useCreateServiceApiKey } from '../hooks/useApiKeys'
 import {
@@ -52,19 +50,15 @@ export const ApiKeyFormModal = ({
   }
 
   const onSubmit = (data: ApiKeyFormValues) => {
-    toast.promise(createMutation.mutateAsync({ name: data.name }), {
-      loading: 'Creating API key…',
-      success: (created) => {
-        onClose()
-        onCreated(created)
-        return 'API key created. Copy it now — it will not be shown again.'
+    createMutation.mutate(
+      { name: data.name },
+      {
+        onSuccess: (created) => {
+          onClose()
+          onCreated(created)
+        },
       },
-      error: (error) =>
-        getApiErrorMessage(
-          error,
-          'Could not create API key. Please try again.',
-        ),
-    })
+    )
   }
 
   return (

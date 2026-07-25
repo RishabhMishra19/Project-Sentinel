@@ -1,8 +1,6 @@
 import { useEffect, useId } from 'react'
 import { FormField } from '../../../shared/forms/FormField'
-import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { useAppForm } from '../../../shared/forms/useAppForm'
-import { toast } from '../../../shared/ui/toast'
 import { useChangePassword } from '../hooks/useChangePassword'
 import {
   changePasswordSchema,
@@ -52,20 +50,13 @@ export const ChangePasswordModal = ({
   const onSubmit = (data: ChangePasswordFormValues) => {
     const { oldPassword, newPassword } = data
 
-    toast.promise(
-      changePasswordMutation.mutateAsync({ oldPassword, newPassword }),
+    changePasswordMutation.mutate(
+      { oldPassword, newPassword },
       {
-        loading: 'Updating password…',
-        success: () => {
+        onSuccess: () => {
           onSuccess?.()
           onClose()
-          return 'Password updated successfully.'
         },
-        error: (error) =>
-          getApiErrorMessage(
-            error,
-            'Could not change password. Please try again.',
-          ),
       },
     )
   }

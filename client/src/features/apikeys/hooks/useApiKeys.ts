@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { ApiKeysApi } from '../api/ApiKeysApi'
 import type {
   CreateServiceApiKeyRequest,
@@ -30,6 +31,18 @@ export function useCreateServiceApiKey(productId: string, serviceId: string) {
   return useMutation({
     mutationFn: (payload: CreateServiceApiKeyRequest) =>
       ApiKeysApi.create(productId, serviceId, payload),
+    meta: {
+      toast: {
+        loading: 'Creating API key…',
+        success:
+          'API key created. Copy it now — it will not be shown again.',
+        error: (error) =>
+          getApiErrorMessage(
+            error,
+            'Could not create API key. Please try again.',
+          ),
+      },
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: apiKeysQueryKey(productId, serviceId),
@@ -43,6 +56,17 @@ export function useRevokeServiceApiKey(productId: string, serviceId: string) {
 
   return useMutation({
     mutationFn: (id: string) => ApiKeysApi.revoke(productId, serviceId, id),
+    meta: {
+      toast: {
+        loading: 'Revoking API key…',
+        success: 'API key revoked.',
+        error: (error) =>
+          getApiErrorMessage(
+            error,
+            'Could not revoke API key. Please try again.',
+          ),
+      },
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: apiKeysQueryKey(productId, serviceId),

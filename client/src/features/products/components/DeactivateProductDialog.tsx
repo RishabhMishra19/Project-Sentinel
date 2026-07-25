@@ -1,6 +1,4 @@
 import { useId } from 'react'
-import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
-import { toast } from '../../../shared/ui/toast'
 import type { ProductResponse } from '../dto/response/product.response'
 import { useDeleteProduct } from '../hooks/useProducts'
 
@@ -23,17 +21,10 @@ export const DeactivateProductDialog = ({
   }
 
   const onConfirm = () => {
-    toast.promise(deleteMutation.mutateAsync(product.id), {
-      loading: 'Deactivating product…',
-      success: () => {
+    deleteMutation.mutate(product.id, {
+      onSuccess: () => {
         onClose()
-        return 'Product deactivated.'
       },
-      error: (error) =>
-        getApiErrorMessage(
-          error,
-          'Could not deactivate product. Please try again.',
-        ),
     })
   }
 

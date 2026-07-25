@@ -1,6 +1,4 @@
 import { useId } from 'react'
-import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
-import { toast } from '../../../shared/ui/toast'
 import type { ServiceResponse } from '../dto/response/service.response'
 import { useDeleteService } from '../hooks/useServices'
 
@@ -25,17 +23,10 @@ export const DeactivateServiceDialog = ({
   }
 
   const onConfirm = () => {
-    toast.promise(deleteMutation.mutateAsync(service.id), {
-      loading: 'Deactivating service…',
-      success: () => {
+    deleteMutation.mutate(service.id, {
+      onSuccess: () => {
         onClose()
-        return 'Service deactivated.'
       },
-      error: (error) =>
-        getApiErrorMessage(
-          error,
-          'Could not deactivate service. Please try again.',
-        ),
     })
   }
 

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { ServicesApi } from '../api/ServicesApi'
 import type { ServiceListParams, CreateServiceRequest, UpdateServiceRequest } from '../dto/request/service.request'
 
@@ -35,6 +36,17 @@ export function useCreateService(productId?: string) {
       productId: string
       payload: CreateServiceRequest
     }) => ServicesApi.create(targetProductId, payload),
+    meta: {
+      toast: {
+        loading: 'Creating service…',
+        success: 'Service created successfully.',
+        error: (error) =>
+          getApiErrorMessage(
+            error,
+            'Could not create service. Please try again.',
+          ),
+      },
+    },
     onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['services'] })
       void queryClient.invalidateQueries({
@@ -60,6 +72,17 @@ export function useUpdateService(productId: string) {
       id: string
       payload: UpdateServiceRequest
     }) => ServicesApi.update(productId, id, payload),
+    meta: {
+      toast: {
+        loading: 'Updating service…',
+        success: 'Service updated successfully.',
+        error: (error) =>
+          getApiErrorMessage(
+            error,
+            'Could not update service. Please try again.',
+          ),
+      },
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['services'] })
       void queryClient.invalidateQueries({
@@ -74,6 +97,17 @@ export function useDeleteService(productId: string) {
 
   return useMutation({
     mutationFn: (id: string) => ServicesApi.delete(productId, id),
+    meta: {
+      toast: {
+        loading: 'Deactivating service…',
+        success: 'Service deactivated.',
+        error: (error) =>
+          getApiErrorMessage(
+            error,
+            'Could not deactivate service. Please try again.',
+          ),
+      },
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['services'] })
       void queryClient.invalidateQueries({

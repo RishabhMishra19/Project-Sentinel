@@ -1,8 +1,6 @@
 import { useEffect, useId } from 'react'
 import { FormField } from '../../../shared/forms/FormField'
-import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
 import { useAppForm } from '../../../shared/forms/useAppForm'
-import { toast } from '../../../shared/ui/toast'
 import type { TenantResponse } from '../dto/response/tenant.response'
 import { useCreateTenant, useUpdateTenant } from '../hooks/useTenants'
 import {
@@ -62,29 +60,21 @@ export const TenantFormModal = ({
 
   const onSubmit = (data: TenantFormValues) => {
     if (mode === 'edit' && tenant) {
-      toast.promise(
-        updateMutation.mutateAsync({ id: tenant.id, payload: data }),
+      updateMutation.mutate(
+        { id: tenant.id, payload: data },
         {
-          loading: 'Updating tenant…',
-          success: () => {
+          onSuccess: () => {
             onClose()
-            return 'Tenant updated successfully.'
           },
-          error: (error) =>
-            getApiErrorMessage(error, 'Could not update tenant. Please try again.'),
         },
       )
       return
     }
 
-    toast.promise(createMutation.mutateAsync(data), {
-      loading: 'Creating tenant…',
-      success: () => {
+    createMutation.mutate(data, {
+      onSuccess: () => {
         onClose()
-        return 'Tenant created successfully.'
       },
-      error: (error) =>
-        getApiErrorMessage(error, 'Could not create tenant. Please try again.'),
     })
   }
 

@@ -12,6 +12,7 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: () => AuthApi.logout(),
+    meta: { silent: true },
     onSettled: () => {
       dispatch(clearSession())
       queryClient.clear()
