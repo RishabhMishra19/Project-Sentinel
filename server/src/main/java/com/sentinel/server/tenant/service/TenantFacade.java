@@ -2,8 +2,9 @@ package com.sentinel.server.tenant.service;
 
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.tenant.dto.request.CreateTenantRequest;
-import com.sentinel.server.tenant.dto.response.TenantResponse;
 import com.sentinel.server.tenant.dto.request.UpdateTenantRequest;
+import com.sentinel.server.tenant.dto.response.CreateTenantResponse;
+import com.sentinel.server.tenant.dto.response.TenantResponse;
 import com.sentinel.server.tenant.entity.TenantStatus;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -21,7 +22,7 @@ public interface TenantFacade {
 
     TenantResponse getById(UUID id);
 
-    TenantResponse create(CreateTenantRequest request, UUID actorId);
+    CreateTenantResponse create(CreateTenantRequest request, UUID actorId);
 
     TenantResponse update(UUID id, UpdateTenantRequest request, UUID actorId);
 

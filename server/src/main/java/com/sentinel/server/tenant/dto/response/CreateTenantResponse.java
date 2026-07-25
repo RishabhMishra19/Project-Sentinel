@@ -5,7 +5,7 @@ import com.sentinel.server.tenant.entity.TenantStatus;
 import java.time.Instant;
 import java.util.List;
 
-public record TenantResponse(
+public record CreateTenantResponse(
         String id,
         String name,
         String slug,
@@ -14,4 +14,9 @@ public record TenantResponse(
         UserBriefResponse createdBy,
         UserBriefResponse updatedBy,
         Instant createdAt,
-        Instant updatedAt) {}
+        Instant updatedAt,
+        AdminSummary admin,
+        String temporaryPassword) {
+
+    public record AdminSummary(String id, String email, String displayName, boolean tenantAdmin) {}
+}

@@ -1,5 +1,6 @@
 package com.sentinel.server.tenant.dto.request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -11,5 +12,6 @@ public record CreateTenantRequest(
                 @Pattern(
                         regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                         message = "must be lowercase letters, digits, and hyphens")
-                String slug) {
-}
+                String slug,
+        @NotBlank @Email @Size(max = 255) String adminEmail,
+        @NotBlank @Size(max = 255) String adminDisplayName) {}

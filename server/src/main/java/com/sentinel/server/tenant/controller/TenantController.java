@@ -4,8 +4,9 @@ import com.sentinel.server.common.response.ApiResponses;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.security.UserPrincipal;
 import com.sentinel.server.tenant.dto.request.CreateTenantRequest;
-import com.sentinel.server.tenant.dto.response.TenantResponse;
 import com.sentinel.server.tenant.dto.request.UpdateTenantRequest;
+import com.sentinel.server.tenant.dto.response.CreateTenantResponse;
+import com.sentinel.server.tenant.dto.response.TenantResponse;
 import com.sentinel.server.tenant.entity.TenantStatus;
 import com.sentinel.server.tenant.service.TenantFacade;
 import jakarta.validation.Valid;
@@ -57,7 +58,7 @@ public class TenantController {
 
     @PreAuthorize("@accessSupport.isSentinelAdmin()")
     @PostMapping
-    public ResponseEntity<TenantResponse> create(
+    public ResponseEntity<CreateTenantResponse> create(
             @Valid @RequestBody CreateTenantRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponses.created(tenantFacade.create(request, principal.getId()));
