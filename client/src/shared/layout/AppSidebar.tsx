@@ -14,7 +14,7 @@ import { canReadCatalog } from '../../shared/permissions/canReadCatalog'
 import { ROUTES } from '../../routes/paths'
 import { localStorageManager } from '../storage/LocalStorageManager'
 import { LoggedInUserCard } from './LoggedInUserCard'
-import { SIDE_BAR_ITEMS } from './navConfig'
+import { SIDE_BAR_ITEMS } from './sidebarConfig'
 import { SidebarItem, type SidebarMode } from './SidebarItem'
 import { SidebarTray } from './SidebarTray'
 
