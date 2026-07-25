@@ -32,14 +32,6 @@ export const ProductServicesPage = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-      <div className="flex items-center gap-2 text-sm text-muted">
-        <Link to={ROUTES.PRODUCTS} className="hover:text-foreground">
-          Products
-        </Link>
-        <span>/</span>
-        <span className="text-foreground">Services</span>
-      </div>
-
       <ServicesTable
         productId={productId}
         onCreate={() => setFormState({ open: true, mode: 'create' })}
