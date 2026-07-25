@@ -1,4 +1,7 @@
-import { ROUTES } from "../../routes/paths";
+import {
+  ADMIN_ONLY_ROUTES,
+  TENANT_CONTEXT_ROUTES,
+} from "../../routes/paths";
 
 export type SidebarItem = {
   id: string;
@@ -7,18 +10,18 @@ export type SidebarItem = {
 };
 
 export const ADMIN_SIDE_BAR_ITEMS: SidebarItem[] = [
-  { id: "tenants", label: "Tenants", path: ROUTES.TENANTS },
+  { id: "tenants", label: "Tenants", path: ADMIN_ONLY_ROUTES.TENANTS },
 ];
 
 export const TENANT_SIDE_BAR_ITEMS: SidebarItem[] = [
   {
     id: "products",
     label: "Products",
-    path: ROUTES.PRODUCTS,
+    path: TENANT_CONTEXT_ROUTES.PRODUCTS,
   },
   {
     id: "services",
     label: "Services",
-    path: ROUTES.SERVICES,
+    path: TENANT_CONTEXT_ROUTES.SERVICES,
   },
 ];

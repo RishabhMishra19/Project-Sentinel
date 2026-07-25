@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../../redux/hooks'
-import { ROUTES } from '../../routes/paths'
+import { SHARED_ROUTES } from '../../routes/paths'
 import { SidebarItem, type SidebarMode } from './SidebarItem'
 
 function getInitials(name?: string | null, email?: string | null) {
@@ -20,7 +20,7 @@ export function LoggedInUserCard({ mode = 'expanded' }: LoggedInUserCardProps) {
   const user = useAppSelector((state) => state.session.user)
   const navigate = useNavigate()
   const location = useLocation()
-  const isProfileActive = location.pathname === ROUTES.PROFILE
+  const isProfileActive = location.pathname === SHARED_ROUTES.PROFILE
 
   const isLoadingUser = !user
   const initials = getInitials(user?.name, user?.email)
@@ -57,7 +57,7 @@ export function LoggedInUserCard({ mode = 'expanded' }: LoggedInUserCardProps) {
     <SidebarItem
       mode={mode}
       active={isProfileActive}
-      onClick={() => navigate(ROUTES.PROFILE)}
+      onClick={() => navigate(SHARED_ROUTES.PROFILE)}
       className={isCollapsed ? undefined : 'gap-2 py-2.5'}
       iconNode={
         <span className={avatarClass} aria-hidden>

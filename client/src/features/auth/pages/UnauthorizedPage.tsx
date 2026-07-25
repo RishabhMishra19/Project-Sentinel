@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ROUTES } from '../../../routes/paths'
+import { SHARED_ROUTES } from '../../../routes/paths'
 
 export function UnauthorizedPage() {
   return (
@@ -13,7 +13,7 @@ export function UnauthorizedPage() {
         profile.
       </p>
       <Link
-        to={ROUTES.PROFILE}
+        to={SHARED_ROUTES.PROFILE}
         className="rounded bg-accent px-3 py-2 text-sm text-accent-foreground hover:opacity-90"
       >
         Go to profile

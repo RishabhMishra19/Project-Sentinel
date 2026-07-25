@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ROUTES } from '../../../routes/paths'
+import { TENANT_CONTEXT_ROUTES } from '../../../routes/paths'
 import type { ServiceResponse } from '../../services/dto/response/service.response'
 import { DeactivateServiceDialog } from '../../services/components/DeactivateServiceDialog'
 import { ServiceFormModal } from '../../services/components/ServiceFormModal'
@@ -23,7 +23,10 @@ export const ProductServicesPage = () => {
     return (
       <div className="mx-auto w-full max-w-6xl text-sm text-muted">
         Product not found.{' '}
-        <Link to={ROUTES.PRODUCTS} className="text-accent underline">
+        <Link
+          to={TENANT_CONTEXT_ROUTES.PRODUCTS}
+          className="text-accent underline"
+        >
           Back to products
         </Link>
       </div>

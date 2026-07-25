@@ -13,7 +13,11 @@ import { ServicesPage } from "../features/services/pages/ServicesPage";
 import { ProtectedLayout } from "../shared/layout/ProtectedLayout";
 import { UnprotectedLayout } from "../shared/layout/UnprotectedLayout";
 import { TenantOnlyRoute } from "./TenantOnlyRoute";
-import { ROUTES } from "./paths";
+import {
+  ADMIN_ONLY_ROUTES,
+  SHARED_ROUTES,
+  TENANT_CONTEXT_ROUTES,
+} from "./paths";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AdminOnlyRoute } from "./AdminOnlyRoute";
 import { SessionRestoreContainer } from "./SessionRestoreContainer";
@@ -21,7 +25,12 @@ import { UnprotectedRoute } from "./UnprotectedRoute";
 
 function FallbackNavigate() {
   const user = useAppSelector((state) => state.session.user);
-  return <Navigate to={user ? ROUTES.PROFILE : ROUTES.LOGIN} replace />;
+  return (
+    <Navigate
+      to={user ? SHARED_ROUTES.PROFILE : SHARED_ROUTES.LOGIN}
+      replace
+    />
+  );
 }
 
 const router = createBrowserRouter([
@@ -33,7 +42,9 @@ const router = createBrowserRouter([
         children: [
           {
             element: <UnprotectedLayout />,
-            children: [{ path: ROUTES.LOGIN, element: <LoginPage /> }],
+            children: [
+              { path: SHARED_ROUTES.LOGIN, element: <LoginPage /> },
+            ],
           },
         ],
       },
@@ -43,9 +54,12 @@ const router = createBrowserRouter([
           {
             element: <ProtectedLayout />,
             children: [
-              { path: "/", element: <Navigate to={ROUTES.PROFILE} replace /> },
               {
-                path: ROUTES.PROFILE,
+                path: "/",
+                element: <Navigate to={SHARED_ROUTES.PROFILE} replace />,
+              },
+              {
+                path: SHARED_ROUTES.PROFILE,
                 handle: { crumb: "Profile" },
                 element: <ProfilePage />,
               },
@@ -53,7 +67,7 @@ const router = createBrowserRouter([
                 element: <AdminOnlyRoute />,
                 children: [
                   {
-                    path: ROUTES.TENANTS,
+                    path: ADMIN_ONLY_ROUTES.TENANTS,
                     handle: { crumb: "Tenants" },
                     element: <TenantsPage />,
                   },
@@ -63,12 +77,12 @@ const router = createBrowserRouter([
                 element: <TenantOnlyRoute />,
                 children: [
                   {
-                    path: ROUTES.PRODUCTS,
+                    path: TENANT_CONTEXT_ROUTES.PRODUCTS,
                     handle: { crumb: "Products" },
                     element: <ProductsPage />,
                   },
                   {
-                    path: ROUTES.SERVICES,
+                    path: TENANT_CONTEXT_ROUTES.SERVICES,
                     handle: { crumb: "Services" },
                     element: <ServicesPage />,
                   },

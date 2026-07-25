@@ -10,7 +10,7 @@ import {
   TenantsIcon,
 } from "../../assets/icons";
 import { useLogout } from "../../features/auth/hooks/useLogout";
-import { ROUTES } from "../../routes/paths";
+import { SHARED_ROUTES, TENANT_CONTEXT_ROUTES } from "../../routes/paths";
 import { localStorageManager } from "../storage/LocalStorageManager";
 import { LoggedInUserCard } from "./LoggedInUserCard";
 import { ADMIN_SIDE_BAR_ITEMS, TENANT_SIDE_BAR_ITEMS } from "./sidebarConfig";
@@ -52,17 +52,17 @@ export function AppSidebar() {
       : [];
 
   const isNavActive = (path: string) => {
-    if (path === ROUTES.PRODUCTS) {
-      if (pathname === ROUTES.PRODUCTS) {
+    if (path === TENANT_CONTEXT_ROUTES.PRODUCTS) {
+      if (pathname === TENANT_CONTEXT_ROUTES.PRODUCTS) {
         return true;
       }
       if (/^\/products\/[^/]+\/services/.test(pathname)) {
         return false;
       }
-      return pathname.startsWith(`${ROUTES.PRODUCTS}/`);
+      return pathname.startsWith(`${TENANT_CONTEXT_ROUTES.PRODUCTS}/`);
     }
-    if (path === ROUTES.SERVICES) {
-      return pathname === ROUTES.SERVICES || /\/services(\/|$)/.test(pathname);
+    if (path === TENANT_CONTEXT_ROUTES.SERVICES) {
+      return pathname === TENANT_CONTEXT_ROUTES.SERVICES || /\/services(\/|$)/.test(pathname);
     }
     return pathname === path;
   };
@@ -85,7 +85,7 @@ export function AppSidebar() {
         }`}
       >
         <Link
-          to={ROUTES.PROFILE}
+          to={SHARED_ROUTES.PROFILE}
           className={`flex min-w-0 items-center tracking-tight text-sidebar-foreground hover:text-sidebar-muted ${
             isCollapsed ? "justify-center" : "gap-2.5 text-xl font-semibold"
           }`}

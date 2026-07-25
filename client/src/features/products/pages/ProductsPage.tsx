@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '../../../routes/paths'
+import { TENANT_CONTEXT_ROUTES } from '../../../routes/paths'
 import type { ProductResponse } from '../dto/response/product.response'
 import { DeactivateProductDialog } from '../components/DeactivateProductDialog'
 import { ProductFormModal } from '../components/ProductFormModal'
@@ -28,7 +28,7 @@ export const ProductsPage = () => {
           setFormState({ open: true, mode: 'edit', product })
         }
         onServices={(product) =>
-          navigate(ROUTES.PRODUCT_SERVICES(product.id))
+          navigate(TENANT_CONTEXT_ROUTES.PRODUCT_SERVICES(product.id))
         }
         onDeactivate={setDeactivateProduct}
       />
