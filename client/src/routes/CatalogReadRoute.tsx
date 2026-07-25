@@ -3,7 +3,7 @@ import { useAppSelector } from '../redux/hooks'
 import { canReadCatalog } from '../shared/permissions/canReadCatalog'
 import { ROUTES } from './paths'
 
-/** Requires product/service read access after session is ready; redirects others to Overview. */
+/** Requires product/service read access after session is ready; redirects others to Settings. */
 export function CatalogReadRoute() {
   const user = useAppSelector((state) => state.session.user)
 
@@ -16,7 +16,7 @@ export function CatalogReadRoute() {
   }
 
   if (!canReadCatalog(user.sentinelAdmin, user.roles)) {
-    return <Navigate to={ROUTES.OVERVIEW} replace />
+    return <Navigate to={ROUTES.SETTINGS} replace />
   }
 
   return <Outlet />

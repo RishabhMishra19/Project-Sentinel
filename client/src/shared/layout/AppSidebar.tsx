@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../../redux/hooks'
 import {
   LogoutIcon,
-  OverviewIcon,
   ProductsIcon,
   ServicesIcon,
   SettingsIcon,
@@ -23,7 +22,6 @@ import { SidebarTray } from './SidebarTray'
 const SIDEBAR_MODE_KEY = 'sidebar-mode'
 
 const NAV_ICONS: Record<string, ReactNode> = {
-  overview: <OverviewIcon className="size-4 shrink-0" />,
   settings: <SettingsIcon className="size-4 shrink-0" />,
   tenants: <TenantsIcon className="size-4 shrink-0" />,
   products: <ProductsIcon className="size-4 shrink-0" />,
@@ -91,7 +89,7 @@ export function AppSidebar() {
         }`}
       >
         <Link
-          to={ROUTES.OVERVIEW}
+          to={ROUTES.SETTINGS}
           className={`flex min-w-0 items-center tracking-tight text-sidebar-foreground hover:text-sidebar-muted ${
             isCollapsed ? 'justify-center' : 'gap-2.5 text-xl font-semibold'
           }`}

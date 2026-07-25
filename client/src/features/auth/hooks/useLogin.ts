@@ -14,7 +14,7 @@ export function useLogin() {
     mutationFn: (payload: LoginRequest) => AuthApi.login(payload),
     onSuccess: (data) => {
       dispatch(setAuthSession(data))
-      navigate(ROUTES.OVERVIEW, { replace: true })
+      navigate(ROUTES.SETTINGS, { replace: true })
     },
   })
 }

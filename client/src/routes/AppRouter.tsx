@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { useAppSelector } from '../redux/hooks'
 import { SessionBootstrapScreen } from '../features/auth/components/SessionBootstrapScreen'
 import { useAppInit } from '../features/auth/hooks/useAppInit'
-import { OverviewPage } from '../features/auth/pages/OverviewPage'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { ProfilePage } from '../features/auth/pages/ProfilePage'
 import { SettingsPage } from '../features/auth/pages/SettingsPage'
@@ -20,7 +19,7 @@ import { UnprotectedRoute } from './UnprotectedRoute'
 
 function FallbackNavigate() {
   const accessToken = useAppSelector((state) => state.session.accessToken)
-  return <Navigate to={accessToken ? ROUTES.OVERVIEW : ROUTES.LOGIN} replace />
+  return <Navigate to={accessToken ? ROUTES.SETTINGS : ROUTES.LOGIN} replace />
 }
 
 const router = createBrowserRouter([
@@ -39,7 +38,7 @@ const router = createBrowserRouter([
       {
         element: <ProtectedLayout />,
         children: [
-          { path: ROUTES.OVERVIEW, handle: { crumb: 'Overview' }, element: <OverviewPage /> },
+          { path: '/', element: <Navigate to={ROUTES.SETTINGS} replace /> },
           { path: ROUTES.PROFILE, handle: { crumb: 'Profile' }, element: <ProfilePage /> },
           { path: ROUTES.SETTINGS, handle: { crumb: 'Settings' }, element: <SettingsPage /> },
           {
