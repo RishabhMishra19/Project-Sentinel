@@ -6,10 +6,9 @@ import { ADMIN_ONLY_ROUTES } from "../../routes/paths";
 export function ActiveTenantBanner() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const user = useAppSelector((state) => state.session.user);
   const activeTenant = useAppSelector((state) => state.session.activeTenant)!;
 
-  const message = `Impersonated as ${user?.email ?? "…"} in tenant: ${activeTenant.name}`;
+  const message = `Logged in to tenant: ${activeTenant.name}`;
 
   const handleEnd = () => {
     dispatch(clearActiveTenant());
@@ -29,7 +28,7 @@ export function ActiveTenantBanner() {
         className="shrink-0 rounded-md bg-danger px-2.5 py-1 text-xs font-medium text-white hover:bg-danger/90"
         onClick={handleEnd}
       >
-        End
+        End Session
       </button>
     </div>
   );
