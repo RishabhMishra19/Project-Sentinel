@@ -11,7 +11,7 @@ import {
 } from "../../assets/icons";
 import { useLogout } from "../../features/auth/hooks/useLogout";
 import { SHARED_ROUTES } from "../../routes/paths";
-import { resolveSessionMode } from "../session/resolveSessionMode";
+import { resolveSessionMode } from "../session/sessionUtils";
 import { localStorageManager } from "../storage/LocalStorageManager";
 import { LoggedInUserCard } from "./LoggedInUserCard";
 import { ADMIN_SIDE_BAR_ITEMS, TENANT_SIDE_BAR_ITEMS } from "./sidebarConfig";

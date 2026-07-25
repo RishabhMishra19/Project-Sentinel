@@ -3,6 +3,14 @@ import type {
   TenantSummary,
 } from "../../features/auth/dto/response/auth.response";
 
+/** Sentinel admin currently logged into a tenant (Login-as). */
+export function isImpersonating(
+  user: AuthSessionUser,
+  activeTenant: TenantSummary | null,
+): boolean {
+  return user.sentinelAdmin === true && activeTenant != null;
+}
+
 /**
  * Keep route guards and nav in sync via this helper only.
  *
@@ -13,10 +21,7 @@ export function resolveSessionMode(
   user: AuthSessionUser,
   activeTenant: TenantSummary | null,
 ) {
-  const isSentinelAdmin = user.sentinelAdmin === true;
-  const isImpersonating = isSentinelAdmin && activeTenant != null;
-
-  if (isSentinelAdmin && !isImpersonating) {
+  if (user.sentinelAdmin === true && !isImpersonating(user, activeTenant)) {
     return "only_admin";
   }
 

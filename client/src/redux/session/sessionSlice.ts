@@ -36,6 +36,7 @@ const sessionSlice = createSlice({
       state.isLoggedIn = true;
       state.isLoading = false;
       // Tenant users: activeTenant is always their home tenant.
+      // Sentinel admins: leave as-is (null = platform mode, or login-as override).
       if (!user.sentinelAdmin) {
         state.activeTenant = user.tenant;
       }
