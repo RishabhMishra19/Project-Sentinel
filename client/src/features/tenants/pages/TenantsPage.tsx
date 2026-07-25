@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from '../../../redux/hooks';
 import { setActiveTenant } from '../../../redux/session/sessionSlice';
+import { TENANT_CONTEXT_ROUTES } from '../../../routes/paths';
 import type { TenantResponse } from '../dto/response/tenant.response'
 import { DeactivateTenantDialog } from "../components/DeactivateTenantDialog";
 import { TenantFormModal } from "../components/TenantFormModal";
@@ -14,6 +16,7 @@ type FormState =
 
 export const TenantsPage = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [formState, setFormState] = useState<FormState>({ open: false });
   const [viewTenant, setViewTenant] = useState<TenantResponse | null>(null);
   const [deactivateTenant, setDeactivateTenant] =
@@ -25,9 +28,10 @@ export const TenantsPage = () => {
         onCreate={() => setFormState({ open: true, mode: "create" })}
         onView={setViewTenant}
         onEdit={(tenant) => setFormState({ open: true, mode: "edit", tenant })}
-        onLogin={(tenant) =>
-          dispatch(setActiveTenant({ id: tenant.id, name: tenant.name }))
-        }
+        onLogin={(tenant) => {
+          dispatch(setActiveTenant({ id: tenant.id, name: tenant.name }));
+          navigate(TENANT_CONTEXT_ROUTES.PRODUCTS);
+        }}
         onDeactivate={setDeactivateTenant}
       />
 
