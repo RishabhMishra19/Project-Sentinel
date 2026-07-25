@@ -4,16 +4,13 @@ import com.sentinel.server.auth.dto.internal.RefreshTokenIssue;
 import com.sentinel.server.auth.entity.RefreshToken;
 import com.sentinel.server.auth.entity.RefreshTokenStatus;
 import com.sentinel.server.auth.repository.RefreshTokenRepository;
+import com.sentinel.server.common.crypto.Sha256Hasher;
 import com.sentinel.server.common.exception.UnauthorizedException;
 import com.sentinel.server.security.JwtProperties;
 import com.sentinel.server.user.entity.User;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -93,12 +90,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     private String hash(String rawToken) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hashed = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(hashed);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 not available", e);
-        }
+        return Sha256Hasher.hash(rawToken);
     }
 }

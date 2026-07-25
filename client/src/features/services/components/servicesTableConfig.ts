@@ -49,12 +49,14 @@ export const productServiceColumns: DataTableColumn<ServiceResponse>[] =
 type ServiceRowActionHandlers = {
   onView: (row: ServiceResponse) => void
   onEdit: (row: ServiceResponse) => void
+  onViewApiKeys: (row: ServiceResponse) => void
   onDeactivate: (row: ServiceResponse) => void
 }
 
 export const createServiceRowActions = ({
   onView,
   onEdit,
+  onViewApiKeys,
   onDeactivate,
 }: ServiceRowActionHandlers): RowAction<ServiceResponse>[] => [
   {
@@ -66,6 +68,11 @@ export const createServiceRowActions = ({
     id: 'edit',
     label: 'Edit',
     onClick: onEdit,
+  },
+  {
+    id: 'api-keys',
+    label: 'View API keys',
+    onClick: onViewApiKeys,
   },
   {
     id: 'deactivate',

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { TENANT_CONTEXT_ROUTES } from '../../../routes/paths'
 import type { ServiceResponse } from '../../services/dto/response/service.response'
 import { DeactivateServiceDialog } from '../../services/components/DeactivateServiceDialog'
@@ -13,6 +13,7 @@ type FormState =
   | { open: true; mode: 'edit'; service: ServiceResponse }
 
 export const ProductServicesPage = () => {
+  const navigate = useNavigate()
   const { productId } = useParams<{ productId: string }>()
   const [formState, setFormState] = useState<FormState>({ open: false })
   const [viewService, setViewService] = useState<ServiceResponse | null>(null)
@@ -41,6 +42,11 @@ export const ProductServicesPage = () => {
         onView={setViewService}
         onEdit={(service) =>
           setFormState({ open: true, mode: 'edit', service })
+        }
+        onViewApiKeys={(service) =>
+          navigate(
+            `${TENANT_CONTEXT_ROUTES.SERVICE_API_KEYS(service.id)}?productId=${service.productId}`,
+          )
         }
         onDeactivate={setDeactivateService}
       />

@@ -14,4 +14,5 @@ export const TENANT_CONTEXT_ROUTES = {
   PRODUCTS: "/products",
   SERVICES: "/services",
   PRODUCT_SERVICES: (productId: string) => `/products/${productId}/services`,
+  SERVICE_API_KEYS: (serviceId: string) => `/services/${serviceId}/api-keys`,
 } as const;

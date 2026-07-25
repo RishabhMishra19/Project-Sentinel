@@ -46,11 +46,14 @@ CREATE TABLE service_api_keys (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     revoked_at TIMESTAMP WITH TIME ZONE NULL,
-    CONSTRAINT uk_service_api_keys_service UNIQUE (service_id),
     CONSTRAINT uk_service_api_keys_key_hash UNIQUE (key_hash),
     CONSTRAINT fk_service_api_keys_service FOREIGN KEY (service_id) REFERENCES services (id) ON DELETE CASCADE,
     CONSTRAINT fk_service_api_keys_created_by FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE RESTRICT,
     CONSTRAINT fk_service_api_keys_updated_by FOREIGN KEY (updated_by) REFERENCES users (id) ON DELETE RESTRICT
 );
+
+CREATE UNIQUE INDEX uk_service_api_keys_service_active
+    ON service_api_keys (service_id)
+    WHERE status = 'ACTIVE';
 
 CREATE INDEX idx_service_api_keys_status ON service_api_keys (status);

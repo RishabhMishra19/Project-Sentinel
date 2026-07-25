@@ -28,6 +28,7 @@ type ServicesTableProps = {
   onCreate: () => void
   onView: (service: ServiceResponse) => void
   onEdit: (service: ServiceResponse) => void
+  onViewApiKeys: (service: ServiceResponse) => void
   onDeactivate: (service: ServiceResponse) => void
 }
 
@@ -40,6 +41,7 @@ export const ServicesTable = ({
   onCreate,
   onView,
   onEdit,
+  onViewApiKeys,
   onDeactivate,
 }: ServicesTableProps) => {
   const effectiveProductId = productId ?? selectedProductId ?? undefined
@@ -55,6 +57,7 @@ export const ServicesTable = ({
       onCreate={onCreate}
       onView={onView}
       onEdit={onEdit}
+      onViewApiKeys={onViewApiKeys}
       onDeactivate={onDeactivate}
     />
   )
@@ -69,6 +72,7 @@ type ServicesTableInnerProps = {
   onCreate: () => void
   onView: (service: ServiceResponse) => void
   onEdit: (service: ServiceResponse) => void
+  onViewApiKeys: (service: ServiceResponse) => void
   onDeactivate: (service: ServiceResponse) => void
 }
 
@@ -81,6 +85,7 @@ const ServicesTableInner = ({
   onCreate,
   onView,
   onEdit,
+  onViewApiKeys,
   onDeactivate,
 }: ServicesTableInnerProps) => {
   const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null)
@@ -101,9 +106,10 @@ const ServicesTableInner = ({
       createServiceRowActions({
         onView,
         onEdit,
+        onViewApiKeys,
         onDeactivate,
       }),
-    [onView, onEdit, onDeactivate],
+    [onView, onEdit, onViewApiKeys, onDeactivate],
   )
 
   const emptyMessage = !effectiveProductId

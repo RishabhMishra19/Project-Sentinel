@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { TENANT_CONTEXT_ROUTES } from '../../../routes/paths'
 import type { ProductResponse } from '../../products/dto/response/product.response'
 import type { ServiceResponse } from '../dto/response/service.response'
 import { useProductsQuery } from '../../products/hooks/useProducts'
@@ -21,6 +23,7 @@ type FormState =
   | { open: true; mode: 'edit'; service: ServiceResponse }
 
 export const ServicesPage = () => {
+  const navigate = useNavigate()
   const [formState, setFormState] = useState<FormState>({ open: false })
   const [viewService, setViewService] = useState<ServiceResponse | null>(null)
   const [deactivateService, setDeactivateService] =
@@ -61,6 +64,11 @@ export const ServicesPage = () => {
         onView={setViewService}
         onEdit={(service) =>
           setFormState({ open: true, mode: 'edit', service })
+        }
+        onViewApiKeys={(service) =>
+          navigate(
+            `${TENANT_CONTEXT_ROUTES.SERVICE_API_KEYS(service.id)}?productId=${service.productId}`,
+          )
         }
         onDeactivate={setDeactivateService}
       />

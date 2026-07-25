@@ -10,6 +10,7 @@ import { TenantsPage } from "../features/tenants/pages/TenantsPage";
 import { ProductServicesPage } from "../features/products/pages/ProductServicesPage";
 import { ProductsPage } from "../features/products/pages/ProductsPage";
 import { ServicesPage } from "../features/services/pages/ServicesPage";
+import { ServiceApiKeysPage } from "../features/apikeys/pages/ServiceApiKeysPage";
 import { ProtectedLayout } from "../shared/layout/ProtectedLayout";
 import { UnprotectedLayout } from "../shared/layout/UnprotectedLayout";
 import { TenantOnlyRoute } from "./TenantOnlyRoute";
@@ -90,6 +91,11 @@ const router = createBrowserRouter([
                     path: "/products/:productId/services",
                     handle: { crumb: "Services" },
                     element: <ProductServicesPage />,
+                  },
+                  {
+                    path: "/services/:serviceId/api-keys",
+                    handle: { crumb: "API keys" },
+                    element: <ServiceApiKeysPage />,
                   },
                 ],
               },
