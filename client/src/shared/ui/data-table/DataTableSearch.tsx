@@ -1,28 +1,27 @@
 import { useMemo } from 'react'
-import type { DataTableColumn, DataTableSearchState } from './types'
+import type { DataTableColumn, DataTableSearchConfig } from './types'
 
 type DataTableSearchProps<T extends Record<string, unknown>> = {
   columns: DataTableColumn<T>[]
-  search?: DataTableSearchState
-  onSearchChange?: (next: DataTableSearchState) => void
+  searchConfig: DataTableSearchConfig
 }
 
 export const DataTableSearch = <T extends Record<string, unknown>>({
   columns,
-  search,
-  onSearchChange,
+  searchConfig,
 }: DataTableSearchProps<T>) => {
+  const { search, onSearchChange } = searchConfig
   const searchable = useMemo(
     () => columns.filter((column) => column.searchable),
     [columns],
   )
 
-  if (searchable.length === 0 || !onSearchChange) {
+  if (searchable.length === 0) {
     return null
   }
 
-  const columnId = search?.columnId || searchable[0].id
-  const value = search?.value ?? ''
+  const columnId = search.columnId || searchable[0].id
+  const value = search.value
   const hasColumnSelect = searchable.length > 1
   const columnHeader =
     searchable.find((column) => column.id === columnId)?.header ?? ''

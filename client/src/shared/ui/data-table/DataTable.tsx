@@ -8,13 +8,9 @@ export const DataTable = <T extends Record<string, unknown>>({
   columns,
   rows,
   getRowId,
-  sorting,
-  onSortingChange,
-  search,
-  onSearchChange,
-  filters = {},
-  onFiltersChange,
-  onFiltersClear,
+  sortingConfig,
+  searchConfig,
+  filtersConfig,
   pagination,
   rowActions,
   toolbarActions,
@@ -27,20 +23,13 @@ export const DataTable = <T extends Record<string, unknown>>({
     <div className="flex flex-col gap-3">
       <DataTableToolbar
         columns={columns}
-        search={search}
-        onSearchChange={onSearchChange}
-        filters={filters}
-        onFiltersChange={onFiltersChange}
+        searchConfig={searchConfig}
+        filtersConfig={filtersConfig}
         toolbarActions={toolbarActions}
       />
 
-      {hasFilterableColumns ? (
-        <AppliedFilterChips
-          columns={columns}
-          filters={filters}
-          onFiltersChange={onFiltersChange}
-          onFiltersClear={onFiltersClear}
-        />
+      {hasFilterableColumns && filtersConfig ? (
+        <AppliedFilterChips columns={columns} filtersConfig={filtersConfig} />
       ) : null}
 
       <div className="overflow-hidden rounded border border-border">
@@ -48,8 +37,7 @@ export const DataTable = <T extends Record<string, unknown>>({
           columns={columns}
           rows={rows}
           getRowId={getRowId}
-          sorting={sorting}
-          onSortingChange={onSortingChange}
+          sortingConfig={sortingConfig}
           rowActions={rowActions}
           isLoading={isLoading}
           emptyMessage={emptyMessage}

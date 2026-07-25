@@ -1,75 +1,72 @@
-import { renderCell } from './cells/renderCell'
-import { DataTableRowActions } from './DataTableRowActions'
-import { tableCellInnerClassName } from './styles'
+import { renderCell } from "./cells/renderCell";
+import { DataTableRowActions } from "./DataTableRowActions";
+import { tableCellInnerClassName } from "./styles";
 import type {
   DataTableColumn,
   DataTableSort,
+  DataTableSortingConfig,
   RowAction,
-} from './types'
+} from "./types";
 
 type DataTableTableProps<T extends Record<string, unknown>> = {
-  columns: DataTableColumn<T>[]
-  rows: T[]
-  getRowId: (row: T) => string
-  sorting?: DataTableSort
-  onSortingChange?: (next: DataTableSort) => void
-  rowActions?: RowAction<T>[]
-  isLoading?: boolean
-  emptyMessage?: string
+  columns: DataTableColumn<T>[];
+  rows: T[];
+  getRowId: (row: T) => string;
+  sortingConfig?: DataTableSortingConfig;
+  rowActions?: RowAction<T>[];
+  isLoading?: boolean;
+  emptyMessage?: string;
   /** Used for skeleton rows when loading with no data yet */
-  skeletonRowCount?: number
-}
+  skeletonRowCount?: number;
+};
 
 const SortIndicator = ({
   active,
   desc,
 }: {
-  active: boolean
-  desc: boolean
+  active: boolean;
+  desc: boolean;
 }) => {
   if (!active) {
-    return <span className="text-muted opacity-40">↕</span>
+    return <span className="text-muted opacity-40">↕</span>;
   }
-  return <span aria-hidden="true">{desc ? '↓' : '↑'}</span>
-}
+  return <span aria-hidden="true">{desc ? "↓" : "↑"}</span>;
+};
 
-const nextSort = (
-  current: DataTableSort,
-  columnId: string,
-): DataTableSort => {
+const nextSort = (current: DataTableSort, columnId: string): DataTableSort => {
   if (!current || current.id !== columnId) {
-    return { id: columnId, desc: false }
+    return { id: columnId, desc: false };
   }
   if (!current.desc) {
-    return { id: columnId, desc: true }
+    return { id: columnId, desc: true };
   }
-  return null
-}
+  return null;
+};
 
 const SkeletonCell = ({ className }: { className?: string }) => (
   <td className="px-3 py-2 align-middle">
     <div className={tableCellInnerClassName}>
       <div
-        className={`h-4 animate-pulse rounded bg-chrome ${className ?? 'w-full'}`}
+        className={`h-4 animate-pulse rounded bg-chrome ${className ?? "w-full"}`}
       />
     </div>
   </td>
-)
+);
 
 export const DataTableTable = <T extends Record<string, unknown>>({
   columns,
   rows,
   getRowId,
-  sorting,
-  onSortingChange,
+  sortingConfig,
   rowActions,
   isLoading,
-  emptyMessage = 'No results',
+  emptyMessage = "No results",
   skeletonRowCount = 10,
 }: DataTableTableProps<T>) => {
-  const showActions = Boolean(rowActions && rowActions.length > 0)
-  const colSpan = columns.length + (showActions ? 1 : 0)
-  const showSkeletons = Boolean(isLoading)
+  const showActions = Boolean(rowActions && rowActions.length > 0);
+  const colSpan = columns.length + (showActions ? 1 : 0);
+  const showSkeletons = Boolean(isLoading);
+  const { sorting, onSortingChange } = sortingConfig ?? {};
 
   return (
     <div className="relative overflow-x-auto">
@@ -77,8 +74,8 @@ export const DataTableTable = <T extends Record<string, unknown>>({
         <thead className="bg-chrome/60 text-muted dark:bg-white/8">
           <tr>
             {columns.map((column) => {
-              const isSorted = sorting?.id === column.id
-              const sortable = Boolean(column.sortable && onSortingChange)
+              const isSorted = sorting?.id === column.id;
+              const sortable = column.sortable && onSortingChange;
               return (
                 <th
                   key={column.id}
@@ -90,7 +87,7 @@ export const DataTableTable = <T extends Record<string, unknown>>({
                       type="button"
                       className="inline-flex items-center gap-1.5 text-foreground"
                       onClick={() =>
-                        onSortingChange?.(nextSort(sorting ?? null, column.id))
+                        onSortingChange(nextSort(sorting ?? null, column.id))
                       }
                     >
                       {column.header}
@@ -103,7 +100,7 @@ export const DataTableTable = <T extends Record<string, unknown>>({
                     column.header
                   )}
                 </th>
-              )
+              );
             })}
             {showActions ? (
               <th
@@ -117,20 +114,17 @@ export const DataTableTable = <T extends Record<string, unknown>>({
         </thead>
         <tbody>
           {showSkeletons
-            ? Array.from(
-                { length: skeletonRowCount },
-                (_, index) => (
-                  <tr
-                    key={`skeleton-${index}`}
-                    className="border-b border-border last:border-b-0"
-                  >
-                    {columns.map((column) => (
-                      <SkeletonCell key={column.id} />
-                    ))}
-                    {showActions ? <SkeletonCell className="w-20" /> : null}
-                  </tr>
-                ),
-              )
+            ? Array.from({ length: skeletonRowCount }, (_, index) => (
+                <tr
+                  key={`skeleton-${index}`}
+                  className="border-b border-border last:border-b-0"
+                >
+                  {columns.map((column) => (
+                    <SkeletonCell key={column.id} />
+                  ))}
+                  {showActions ? <SkeletonCell className="w-20" /> : null}
+                </tr>
+              ))
             : null}
 
           {!showSkeletons && rows.length === 0 ? (
@@ -169,5 +163,5 @@ export const DataTableTable = <T extends Record<string, unknown>>({
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};

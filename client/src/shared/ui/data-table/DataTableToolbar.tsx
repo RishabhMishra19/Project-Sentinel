@@ -3,25 +3,21 @@ import { DataTableFilters } from './DataTableFilters'
 import { DataTableSearch } from './DataTableSearch'
 import type {
   DataTableColumn,
-  DataTableFilterValue,
-  DataTableSearchState,
+  DataTableFiltersConfig,
+  DataTableSearchConfig,
 } from './types'
 
 type DataTableToolbarProps<T extends Record<string, unknown>> = {
   columns: DataTableColumn<T>[]
-  search?: DataTableSearchState
-  onSearchChange?: (next: DataTableSearchState) => void
-  filters?: Record<string, DataTableFilterValue>
-  onFiltersChange?: (next: Record<string, DataTableFilterValue>) => void
+  searchConfig?: DataTableSearchConfig
+  filtersConfig?: DataTableFiltersConfig
   toolbarActions?: ReactNode
 }
 
 export const DataTableToolbar = <T extends Record<string, unknown>>({
   columns,
-  search,
-  onSearchChange,
-  filters = {},
-  onFiltersChange,
+  searchConfig,
+  filtersConfig,
   toolbarActions,
 }: DataTableToolbarProps<T>) => {
   const hasSearch = columns.some((column) => column.searchable)
@@ -34,19 +30,13 @@ export const DataTableToolbar = <T extends Record<string, unknown>>({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <DataTableSearch
-        columns={columns}
-        search={search}
-        onSearchChange={onSearchChange}
-      />
+      {searchConfig ? (
+        <DataTableSearch columns={columns} searchConfig={searchConfig} />
+      ) : null}
       {hasRight ? (
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          {hasFilters ? (
-            <DataTableFilters
-              columns={columns}
-              filters={filters}
-              onFiltersChange={onFiltersChange}
-            />
+          {hasFilters && filtersConfig ? (
+            <DataTableFilters columns={columns} filtersConfig={filtersConfig} />
           ) : null}
           {toolbarActions}
         </div>

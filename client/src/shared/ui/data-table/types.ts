@@ -134,21 +134,30 @@ export type DataTablePagination = {
   onPageSizeChange?: (pageSize: number) => void
 }
 
+export type DataTableSortingConfig = {
+  sorting: DataTableSort
+  onSortingChange: (next: DataTableSort) => void
+}
+
+export type DataTableSearchConfig = {
+  search: DataTableSearchState
+  onSearchChange: (next: DataTableSearchState) => void
+}
+
+export type DataTableFiltersConfig = {
+  filters: Record<string, DataTableFilterValue>
+  onFiltersChange: (next: Record<string, DataTableFilterValue>) => void
+  onFiltersClear: () => void
+}
+
 export type DataTableProps<T extends Record<string, unknown>> = {
   columns: DataTableColumn<T>[]
   rows: T[]
   getRowId: (row: T) => string
 
-  sorting?: DataTableSort
-  onSortingChange?: (next: DataTableSort) => void
-
-  search?: DataTableSearchState
-  onSearchChange?: (next: DataTableSearchState) => void
-
-  filters?: Record<string, DataTableFilterValue>
-  onFiltersChange?: (next: Record<string, DataTableFilterValue>) => void
-  onFiltersClear?: () => void
-
+  sortingConfig?: DataTableSortingConfig
+  searchConfig?: DataTableSearchConfig
+  filtersConfig?: DataTableFiltersConfig
   pagination?: DataTablePagination
 
   rowActions?: RowAction<T>[]

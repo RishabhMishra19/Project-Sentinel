@@ -17,9 +17,12 @@ export type {
   DataTableFilterType,
   DataTableFilterValue,
   DataTableFilterValueByType,
+  DataTableFiltersConfig,
   DataTablePagination,
   DataTableProps,
+  DataTableSearchConfig,
   DataTableSearchState,
   DataTableSort,
+  DataTableSortingConfig,
   RowAction,
 } from "./types";

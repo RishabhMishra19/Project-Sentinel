@@ -4,19 +4,22 @@ import { formatFilterValue } from './filters/formatFilterValue'
 import { isFilterActive } from './filters/isFilterActive'
 import { Popover } from './primitives/Popover'
 import { buttonClassName, primaryButtonClassName } from './styles'
-import type { DataTableColumn, DataTableFilterValue } from './types'
+import type {
+  DataTableColumn,
+  DataTableFilterValue,
+  DataTableFiltersConfig,
+} from './types'
 
 type DataTableFiltersProps<T extends Record<string, unknown>> = {
   columns: DataTableColumn<T>[]
-  filters?: Record<string, DataTableFilterValue>
-  onFiltersChange?: (next: Record<string, DataTableFilterValue>) => void
+  filtersConfig: DataTableFiltersConfig
 }
 
 export const DataTableFilters = <T extends Record<string, unknown>>({
   columns,
-  filters = {},
-  onFiltersChange,
+  filtersConfig,
 }: DataTableFiltersProps<T>) => {
+  const { filters, onFiltersChange } = filtersConfig
   const filterable = useMemo(
     () => columns.filter((column) => column.filter != null),
     [columns],
@@ -61,7 +64,7 @@ export const DataTableFilters = <T extends Record<string, unknown>>({
         next[column.id] = draft[column.id]
       }
     }
-    onFiltersChange?.(next)
+    onFiltersChange(next)
     setOpen(false)
   }
 
@@ -154,17 +157,14 @@ export const DataTableFilters = <T extends Record<string, unknown>>({
 
 type AppliedFilterChipsProps<T extends Record<string, unknown>> = {
   columns: DataTableColumn<T>[]
-  filters: Record<string, DataTableFilterValue>
-  onFiltersChange?: (next: Record<string, DataTableFilterValue>) => void
-  onFiltersClear?: () => void
+  filtersConfig: DataTableFiltersConfig
 }
 
 export const AppliedFilterChips = <T extends Record<string, unknown>>({
   columns,
-  filters,
-  onFiltersChange,
-  onFiltersClear,
+  filtersConfig,
 }: AppliedFilterChipsProps<T>) => {
+  const { filters, onFiltersChange, onFiltersClear } = filtersConfig
   const chips = columns.flatMap((column) => {
     if (!column.filter) {
       return []
@@ -196,22 +196,20 @@ export const AppliedFilterChips = <T extends Record<string, unknown>>({
             onClick={() => {
               const next = { ...filters }
               delete next[chip.id]
-              onFiltersChange?.(next)
+              onFiltersChange(next)
             }}
           >
             ×
           </button>
         </span>
       ))}
-      {onFiltersClear ? (
-        <button
-          type="button"
-          className="text-xs text-muted hover:text-foreground"
-          onClick={onFiltersClear}
-        >
-          Clear all
-        </button>
-      ) : null}
+      <button
+        type="button"
+        className="text-xs text-muted hover:text-foreground"
+        onClick={onFiltersClear}
+      >
+        Clear all
+      </button>
     </div>
   )
 }
