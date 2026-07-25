@@ -1,10 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
+import { sessionPersistListener } from './session/sessionPersistListener'
 import sessionReducer from './session/sessionSlice'
 
 export const store = configureStore({
   reducer: {
     session: sessionReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().prepend(sessionPersistListener.middleware),
 })
 
 export type RootState = ReturnType<typeof store.getState>

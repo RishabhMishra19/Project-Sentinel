@@ -24,43 +24,38 @@ const initialState: SessionState = {
   activeTenant: persisted.activeTenant,
 };
 
-function persist(state: SessionState) {
-  SessionStorage.savePersistedSession({
-    isLoggedIn: state.isLoggedIn,
-    activeTenant: state.activeTenant,
-  });
-}
-
 const sessionSlice = createSlice({
   name: "session",
   initialState,
   reducers: {
     /** Login, refresh, change-password — full session + access token. */
     setAuthSession(state, action: PayloadAction<AuthSessionResponse>) {
-      state.accessToken = action.payload.accessToken;
-      state.user = action.payload.user;
+      const { accessToken, user } = action.payload;
+      state.accessToken = accessToken;
+      state.user = user;
       state.isLoggedIn = true;
       state.isLoading = false;
-      persist(state);
+      // Tenant users: activeTenant is always their home tenant.
+      // Sentinel admins: leave as-is (null = platform mode, or login-as override).
+      if (!user.sentinelAdmin && user.tenant) {
+        state.activeTenant = user.tenant;
+      }
     },
-    /** Admin Login-as-tenant: persist tenant and drive X-Tenant-Id. */
+    /** Admin Login-as-tenant: drive X-Tenant-Id. */
     setActiveTenant(state, action: PayloadAction<TenantSummary>) {
       state.activeTenant = action.payload;
-      persist(state);
     },
-    /** Clear admin Login-as-tenant override (drops X-Tenant-Id). */
+    /** Clear admin Login-as-tenant override (back to platform mode). */
     clearActiveTenant(state) {
       state.activeTenant = null;
-      persist(state);
     },
-    /** Full sign-out: wipe in-memory session and persisted localStorage. */
+    /** Full sign-out: wipe in-memory session. */
     clearSession(state) {
       state.isLoading = false;
       state.accessToken = null;
       state.user = null;
       state.activeTenant = null;
       state.isLoggedIn = false;
-      SessionStorage.clearPersistedSession();
     },
   },
 });
