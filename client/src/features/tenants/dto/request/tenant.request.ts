@@ -5,6 +5,8 @@ export type TenantSearchBy = "name" | "slug";
 export interface CreateTenantRequest {
   name: string;
   slug: string;
+  adminEmail: string;
+  adminDisplayName: string;
 }
 
 export interface UpdateTenantRequest {

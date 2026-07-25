@@ -17,6 +17,15 @@ export const tenantColumns: DataTableColumn<TenantResponse>[] = [
     cell: { type: 'text', getValue: (row) => row.slug },
   },
   {
+    id: 'adminEmails',
+    header: 'Admins',
+    cell: {
+      type: 'text',
+      getValue: (row) =>
+        row.adminEmails.length > 0 ? row.adminEmails.join(', ') : '—',
+    },
+  },
+  {
     id: 'status',
     header: 'Status',
     sortable: true,

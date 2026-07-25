@@ -70,6 +70,14 @@ export const TenantViewModal = ({
           <DetailRow label="Name" value={tenant.name} />
           <DetailRow label="Slug" value={tenant.slug} />
           <DetailRow
+            label="Admins"
+            value={
+              tenant.adminEmails.length > 0
+                ? tenant.adminEmails.join(', ')
+                : '—'
+            }
+          />
+          <DetailRow
             label="Status"
             value={tenant.status === 'ACTIVE' ? 'Active' : 'Inactive'}
           />

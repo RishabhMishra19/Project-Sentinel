@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from '../../../redux/hooks';
 import { setActiveTenant } from '../../../redux/session/sessionSlice';
 import { TENANT_CONTEXT_ROUTES } from '../../../routes/paths';
-import type { TenantResponse } from '../dto/response/tenant.response'
+import type { CreateTenantResponse, TenantResponse } from '../dto/response/tenant.response'
 import { DeactivateTenantDialog } from "../components/DeactivateTenantDialog";
 import { TenantFormModal } from "../components/TenantFormModal";
 import { TenantsTable } from "../components/TenantsTable";
 import { TenantViewModal } from "../components/TenantViewModal";
+import { TempPasswordRevealDialog } from "../../users/components/TempPasswordRevealDialog";
 
 type FormState =
   | { open: false }
@@ -21,6 +22,11 @@ export const TenantsPage = () => {
   const [viewTenant, setViewTenant] = useState<TenantResponse | null>(null);
   const [deactivateTenant, setDeactivateTenant] =
     useState<TenantResponse | null>(null);
+  const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
+
+  const onCreated = (created: CreateTenantResponse) => {
+    setRevealedPassword(created.temporaryPassword);
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
@@ -42,6 +48,15 @@ export const TenantsPage = () => {
           formState.open && formState.mode === "edit" ? formState.tenant : null
         }
         onClose={() => setFormState({ open: false })}
+        onCreated={onCreated}
+      />
+
+      <TempPasswordRevealDialog
+        open={revealedPassword != null}
+        temporaryPassword={revealedPassword}
+        onClose={() => setRevealedPassword(null)}
+        title="Tenant admin temporary password"
+        description="As Sentinel admin, copy this password now and share it securely with the tenant admin. It will not be shown again."
       />
 
       <TenantViewModal
