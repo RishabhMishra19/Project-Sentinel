@@ -11,7 +11,7 @@ import { UnprotectedLayout } from '../shared/layout/UnprotectedLayout'
 import { CatalogReadRoute } from './CatalogReadRoute'
 import { ROUTES } from './paths'
 import { ProtectedRoute } from './ProtectedRoute'
-import { SentinelAdminRoute } from './SentinelAdminRoute'
+import { AdminOnlyRoute } from './AdminOnlyRoute'
 import { SessionRestoreContainer } from './SessionRestoreContainer'
 import { UnprotectedRoute } from './UnprotectedRoute'
 
@@ -42,7 +42,7 @@ const router = createBrowserRouter([
               { path: '/', element: <Navigate to={ROUTES.PROFILE} replace /> },
               { path: ROUTES.PROFILE, handle: { crumb: 'Profile' }, element: <ProfilePage /> },
               {
-                element: <SentinelAdminRoute />,
+                element: <AdminOnlyRoute />,
                 children: [
                   { path: ROUTES.TENANTS, handle: { crumb: 'Tenants' }, element: <TenantsPage /> },
                 ],
