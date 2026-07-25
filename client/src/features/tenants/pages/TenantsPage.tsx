@@ -28,7 +28,7 @@ export const TenantsPage = () => {
         onCreate={() => setFormState({ open: true, mode: "create" })}
         onView={setViewTenant}
         onEdit={(tenant) => setFormState({ open: true, mode: "edit", tenant })}
-        onLogin={(tenant) => {
+        onStartSession={(tenant) => {
           dispatch(setActiveTenant({ id: tenant.id, name: tenant.name }));
           navigate(TENANT_CONTEXT_ROUTES.PRODUCTS);
         }}

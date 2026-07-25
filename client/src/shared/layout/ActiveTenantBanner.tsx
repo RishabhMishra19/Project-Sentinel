@@ -8,7 +8,7 @@ export function ActiveTenantBanner() {
   const navigate = useNavigate();
   const activeTenant = useAppSelector((state) => state.session.activeTenant)!;
 
-  const message = `Logged in to tenant: ${activeTenant.name}`;
+  const message = `Session in tenant: ${activeTenant.name}`;
 
   const handleEnd = () => {
     dispatch(clearActiveTenant());
@@ -28,7 +28,7 @@ export function ActiveTenantBanner() {
         className="shrink-0 rounded-md bg-danger px-2.5 py-1 text-xs font-medium text-white hover:bg-danger/90"
         onClick={handleEnd}
       >
-        End Session
+        End session
       </button>
     </div>
   );
