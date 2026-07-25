@@ -1,12 +1,20 @@
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { clearActiveTenant } from "../../redux/session/sessionSlice";
+import { ADMIN_ONLY_ROUTES } from "../../routes/paths";
 
 export function ActiveTenantBanner() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const user = useAppSelector((state) => state.session.user);
   const activeTenant = useAppSelector((state) => state.session.activeTenant)!;
 
   const message = `Impersonated as ${user?.email ?? "…"} in tenant: ${activeTenant.name}`;
+
+  const handleEnd = () => {
+    dispatch(clearActiveTenant());
+    navigate(ADMIN_ONLY_ROUTES.TENANTS);
+  };
 
   return (
     <div
@@ -19,7 +27,7 @@ export function ActiveTenantBanner() {
       <button
         type="button"
         className="shrink-0 rounded-md bg-danger px-2.5 py-1 text-xs font-medium text-white hover:bg-danger/90"
-        onClick={() => dispatch(clearActiveTenant())}
+        onClick={handleEnd}
       >
         End
       </button>
