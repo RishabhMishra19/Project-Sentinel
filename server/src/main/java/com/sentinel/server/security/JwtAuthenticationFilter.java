@@ -67,6 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         user.getEmail(),
                         user.getStatus(),
                         user.isSentinelAdmin(),
+                        user.isTenantAdmin(),
                         user.getTenant() != null ? user.getTenant().getId() : null,
                         null,
                         scopeGrants,

@@ -55,6 +55,12 @@ export function ProfilePage() {
                 <dd className="mt-1 text-foreground">{data.sentinelAdmin ? 'Yes' : 'No'}</dd>
               </div>
               <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-muted">
+                  Tenant admin
+                </dt>
+                <dd className="mt-1 text-foreground">{data.tenantAdmin ? 'Yes' : 'No'}</dd>
+              </div>
+              <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">Tenant</dt>
                 <dd className="mt-1 text-foreground">
                   {data.tenant

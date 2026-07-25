@@ -1,7 +1,7 @@
 -- liquibase formatted sql
 
 -- changeset sentinel:005-seed-user
-INSERT INTO users (id, email, password_hash, display_name, status, is_sentinel_admin, created_at, updated_at)
+INSERT INTO users (id, email, password_hash, display_name, status, is_sentinel_admin, is_tenant_admin, created_at, updated_at)
 VALUES (
     gen_random_uuid(),
     'rishabhpndt19@gmail.com',
@@ -9,6 +9,7 @@ VALUES (
     'Sentinel',
     'ACTIVE',
     TRUE,
+    FALSE,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
 );

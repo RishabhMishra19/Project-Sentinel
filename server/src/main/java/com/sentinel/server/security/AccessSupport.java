@@ -5,6 +5,7 @@ import com.sentinel.server.permission.entity.PermissionType;
 import com.sentinel.server.role.entity.RoleScopeType;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 /**
  * Shared access helpers for {@code @PreAuthorize}.
  * {@link #isSentinelAdmin()} is platform-wide — not tenant-specific.
+ * {@link #isTenantAdmin()} is company-wide inside the user's home tenant only.
  */
 @Component("accessSupport")
 public class AccessSupport {
@@ -32,9 +34,23 @@ public class AccessSupport {
         return currentPrincipal().isSentinelAdmin();
     }
 
-    /** Sentinel admin, or active tenant with read-level permission. */
+    /**
+     * Tenant admin for the active tenant (must match home tenant). Never grants platform access.
+     */
+    public boolean isTenantAdmin() {
+        UserPrincipal principal = currentPrincipal();
+        if (!principal.isTenantAdmin()) {
+            return false;
+        }
+        if (principal.getActiveTenantId() == null || principal.getHomeTenantId() == null) {
+            return false;
+        }
+        return Objects.equals(principal.getActiveTenantId(), principal.getHomeTenantId());
+    }
+
+    /** Sentinel admin, tenant admin, or active tenant with read-level permission. */
     public boolean canReadTenant() {
-        if (isSentinelAdmin()) {
+        if (isSentinelAdmin() || isTenantAdmin()) {
             return true;
         }
         if (currentPrincipal().getActiveTenantId() == null) {
@@ -46,9 +62,9 @@ public class AccessSupport {
                 PermissionType.ALL.name());
     }
 
-    /** Sentinel admin, or active tenant with write-level permission. */
+    /** Sentinel admin, tenant admin, or active tenant with write-level permission. */
     public boolean canWriteTenant() {
-        if (isSentinelAdmin()) {
+        if (isSentinelAdmin() || isTenantAdmin()) {
             return true;
         }
         if (currentPrincipal().getActiveTenantId() == null) {
@@ -57,9 +73,9 @@ public class AccessSupport {
         return hasAnyAuthority(PermissionType.READ_AND_WRITE.name(), PermissionType.ALL.name());
     }
 
-    /** Sentinel admin, or active tenant with any product/service scope at read level. */
+    /** Sentinel admin, tenant admin, or active tenant with product/service scope at read level. */
     public boolean canReadProductsAndServices() {
-        if (isSentinelAdmin()) {
+        if (isSentinelAdmin() || isTenantAdmin()) {
             return true;
         }
         if (currentPrincipal().getActiveTenantId() == null) {
@@ -68,15 +84,47 @@ public class AccessSupport {
         return hasProductsAndServicesPermission(READ_PERMISSIONS);
     }
 
-    /** Sentinel admin, or active tenant with any product/service scope at write level. */
+    /** Sentinel admin, tenant admin, or active tenant with product/service scope at write level. */
     public boolean canWriteProductsAndServices() {
-        if (isSentinelAdmin()) {
+        if (isSentinelAdmin() || isTenantAdmin()) {
             return true;
         }
         if (currentPrincipal().getActiveTenantId() == null) {
             return false;
         }
         return hasProductsAndServicesPermission(WRITE_PERMISSIONS);
+    }
+
+    /**
+     * Sentinel admin, tenant admin, or active tenant with a TENANT-scoped grant at read level.
+     */
+    public boolean canReadUsers() {
+        if (isSentinelAdmin() || isTenantAdmin()) {
+            return true;
+        }
+        if (currentPrincipal().getActiveTenantId() == null) {
+            return false;
+        }
+        return hasTenantScopePermission(READ_PERMISSIONS);
+    }
+
+    /**
+     * Sentinel admin, tenant admin, or active tenant with a TENANT-scoped grant at write level.
+     */
+    public boolean canWriteUsers() {
+        if (isSentinelAdmin() || isTenantAdmin()) {
+            return true;
+        }
+        if (currentPrincipal().getActiveTenantId() == null) {
+            return false;
+        }
+        return hasTenantScopePermission(WRITE_PERMISSIONS);
+    }
+
+    private boolean hasTenantScopePermission(Set<PermissionType> allowed) {
+        return currentPrincipal().getScopeGrants().stream()
+                .anyMatch(grant -> grant.scopeType() == RoleScopeType.TENANT
+                        && allowed.contains(grant.permission()));
     }
 
     private boolean hasProductsAndServicesPermission(Set<PermissionType> allowed) {

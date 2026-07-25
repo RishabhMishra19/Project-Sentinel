@@ -20,10 +20,11 @@ CREATE INDEX idx_tenants_created_by ON tenants (created_by);
 
 -- changeset sentinel:002-users-tenant-fk
 -- Tenant users must have tenant_id; Sentinel platform admins must not.
+-- Tenant admins are non-platform users only (is_tenant_admin implies not sentinel admin).
 ALTER TABLE users
     ADD CONSTRAINT fk_users_tenant FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE RESTRICT,
     ADD CONSTRAINT chk_users_tenant_vs_platform CHECK (
-        (is_sentinel_admin = TRUE AND tenant_id IS NULL)
+        (is_sentinel_admin = TRUE AND tenant_id IS NULL AND is_tenant_admin = FALSE)
         OR (is_sentinel_admin = FALSE AND tenant_id IS NOT NULL)
     );
 

@@ -24,6 +24,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "users")
@@ -53,6 +54,9 @@ public class User {
     @Column(name = "is_sentinel_admin", nullable = false)
     private boolean sentinelAdmin;
 
+    @Column(name = "is_tenant_admin", nullable = false)
+    private boolean tenantAdmin;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "tenant_id", nullable = true)
     private Tenant tenant;
@@ -71,6 +75,7 @@ public class User {
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "role_id", nullable = false))
+    @BatchSize(size = 25)
     private Set<Role> roles = new HashSet<>();
 
     @PrePersist

@@ -11,7 +11,7 @@ public record AuthSessionResponse(String accessToken, long expiresIn, User user)
             String email,
             String name,
             boolean sentinelAdmin,
+            boolean tenantAdmin,
             List<RoleSummaryResponse> roles,
-            TenantSummaryResponse tenant) {
-    }
+            TenantSummaryResponse tenant) {}
 }

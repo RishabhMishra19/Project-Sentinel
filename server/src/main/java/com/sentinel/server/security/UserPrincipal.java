@@ -19,6 +19,7 @@ public class UserPrincipal implements UserDetails {
     private final String email;
     private final UserStatus status;
     private final boolean sentinelAdmin;
+    private final boolean tenantAdmin;
     private final UUID homeTenantId;
     private final UUID activeTenantId;
     private final List<ScopeGrant> scopeGrants;
@@ -29,6 +30,7 @@ public class UserPrincipal implements UserDetails {
             String email,
             UserStatus status,
             boolean sentinelAdmin,
+            boolean tenantAdmin,
             UUID homeTenantId,
             UUID activeTenantId,
             List<ScopeGrant> scopeGrants,
@@ -37,6 +39,7 @@ public class UserPrincipal implements UserDetails {
         this.email = email;
         this.status = status;
         this.sentinelAdmin = sentinelAdmin;
+        this.tenantAdmin = tenantAdmin;
         this.homeTenantId = homeTenantId;
         this.activeTenantId = activeTenantId;
         this.scopeGrants = scopeGrants == null ? List.of() : List.copyOf(scopeGrants);
@@ -49,6 +52,7 @@ public class UserPrincipal implements UserDetails {
                 email,
                 status,
                 sentinelAdmin,
+                tenantAdmin,
                 homeTenantId,
                 activeTenantId,
                 scopeGrants,

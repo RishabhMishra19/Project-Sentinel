@@ -8,6 +8,7 @@ CREATE TABLE users (
     display_name VARCHAR(255) NOT NULL,
     status VARCHAR(32) NOT NULL,
     is_sentinel_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    is_tenant_admin BOOLEAN NOT NULL DEFAULT FALSE,
     -- FK + CHECK added in 002 after tenants exist (circular: tenants.created_by → users).
     tenant_id UUID NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -19,6 +20,7 @@ CREATE TABLE users (
 CREATE INDEX idx_users_email ON users (email);
 CREATE INDEX idx_users_tenant_id ON users (tenant_id);
 CREATE INDEX idx_users_is_sentinel_admin ON users (is_sentinel_admin) WHERE is_sentinel_admin = TRUE;
+CREATE INDEX idx_users_is_tenant_admin ON users (is_tenant_admin) WHERE is_tenant_admin = TRUE;
 
 -- changeset sentinel:001-refresh-tokens
 CREATE TABLE refresh_tokens (

@@ -32,6 +32,7 @@ public class AuthMapper {
                         user.getEmail(),
                         user.getDisplayName(),
                         user.isSentinelAdmin(),
+                        user.isTenantAdmin(),
                         toActiveRoleSummaries(user),
                         toTenantSummary(user.getTenant())));
     }
@@ -42,6 +43,7 @@ public class AuthMapper {
                 user.getEmail(),
                 user.getDisplayName(),
                 user.isSentinelAdmin(),
+                user.isTenantAdmin(),
                 toActiveRoleSummaries(user),
                 toTenantSummary(user.getTenant()),
                 user.getStatus(),

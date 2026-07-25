@@ -15,10 +15,10 @@ public record ProfileResponse(
         String email,
         String name,
         boolean sentinelAdmin,
+        boolean tenantAdmin,
         List<RoleSummaryResponse> roles,
         TenantSummaryResponse tenant,
         UserStatus status,
         Instant createdAt,
         Instant updatedAt,
-        Instant lastLoginAt) {
-}
+        Instant lastLoginAt) {}

@@ -20,6 +20,7 @@ type AuthSessionUserBase = {
   id: string;
   email: string;
   name: string;
+  tenantAdmin: boolean;
   roles: RoleSummary[];
 };
 
