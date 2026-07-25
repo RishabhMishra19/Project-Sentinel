@@ -35,3 +35,14 @@ export const SERVICE_API_KEYS_API_ROUTES = {
   REVOKE: (productId: string, serviceId: string, id: string) =>
     `/products/${productId}/services/${serviceId}/api-keys/${id}/revoke`,
 } as const
+
+export const ROLES_API_ROUTES = {
+  LIST: '/roles',
+  BY_ID: (id: string) => `/roles/${id}`,
+  MARK_INACTIVE: (id: string) => `/roles/${id}/mark-inactive`,
+  SCOPES: (id: string) => `/roles/${id}/scopes`,
+  SCOPE_BY_ID: (roleId: string, scopeId: string) =>
+    `/roles/${roleId}/scopes/${scopeId}`,
+  DEACTIVATE_SCOPE: (roleId: string, scopeId: string) =>
+    `/roles/${roleId}/scopes/${scopeId}/deactivate`,
+} as const
