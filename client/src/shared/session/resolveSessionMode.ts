@@ -10,10 +10,10 @@ import type {
  * - "tenant_context" — tenant user, or Sentinel admin impersonating a tenant
  */
 export function resolveSessionMode(
-  user: AuthSessionUser | null | undefined,
+  user: AuthSessionUser,
   activeTenant: TenantSummary | null,
 ) {
-  const isSentinelAdmin = user?.sentinelAdmin === true;
+  const isSentinelAdmin = user.sentinelAdmin === true;
   const isImpersonating = isSentinelAdmin && activeTenant != null;
 
   if (isSentinelAdmin && !isImpersonating) {

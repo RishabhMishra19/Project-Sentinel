@@ -39,7 +39,7 @@ export function AppSidebar() {
   const [mode, setMode] = useState<SidebarMode>(readStoredMode);
   const isCollapsed = mode === "collapsed";
 
-  const user = useAppSelector((state) => state.session.user);
+  const user = useAppSelector((state) => state.session.user)!;
   const activeTenant = useAppSelector((state) => state.session.activeTenant);
   const sessionMode = resolveSessionMode(user, activeTenant);
 
