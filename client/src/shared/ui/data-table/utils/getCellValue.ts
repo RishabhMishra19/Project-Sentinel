@@ -1,6 +1,6 @@
 import type { DataTableColumn } from '../types'
 
-export const getCellComparableValue = <T extends Record<string, unknown>>(
+export const getCellComparableValue = <T extends object>(
   row: T,
   column: DataTableColumn<T>,
 ): string | number | boolean | null => {
@@ -21,7 +21,7 @@ export const getCellComparableValue = <T extends Record<string, unknown>>(
   return String(value)
 }
 
-export const getCellSearchText = <T extends Record<string, unknown>>(
+export const getCellSearchText = <T extends object>(
   row: T,
   column: DataTableColumn<T>,
 ): string => {

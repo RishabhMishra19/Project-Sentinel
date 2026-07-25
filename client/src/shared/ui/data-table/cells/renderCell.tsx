@@ -7,7 +7,7 @@ import { DateTimeCell } from './DateTimeCell'
 import { NumberCell } from './NumberCell'
 import { TextCell } from './TextCell'
 
-export const renderCell = <T extends Record<string, unknown>>(
+export const renderCell = <T extends object>(
   cell: DataTableCellConfig<T>,
   row: T,
 ): ReactNode => {

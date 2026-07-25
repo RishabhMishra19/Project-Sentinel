@@ -10,12 +10,12 @@ import type {
   DataTableFiltersConfig,
 } from './types'
 
-type DataTableFiltersProps<T extends Record<string, unknown>> = {
+type DataTableFiltersProps<T extends object> = {
   columns: DataTableColumn<T>[]
   filtersConfig: DataTableFiltersConfig
 }
 
-export const DataTableFilters = <T extends Record<string, unknown>>({
+export const DataTableFilters = <T extends object>({
   columns,
   filtersConfig,
 }: DataTableFiltersProps<T>) => {
@@ -155,12 +155,12 @@ export const DataTableFilters = <T extends Record<string, unknown>>({
   )
 }
 
-type AppliedFilterChipsProps<T extends Record<string, unknown>> = {
+type AppliedFilterChipsProps<T extends object> = {
   columns: DataTableColumn<T>[]
   filtersConfig: DataTableFiltersConfig
 }
 
-export const AppliedFilterChips = <T extends Record<string, unknown>>({
+export const AppliedFilterChips = <T extends object>({
   columns,
   filtersConfig,
 }: AppliedFilterChipsProps<T>) => {

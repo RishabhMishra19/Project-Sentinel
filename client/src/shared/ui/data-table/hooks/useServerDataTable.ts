@@ -16,12 +16,11 @@ import {
 } from "./useDataTableQueryState";
 import { buildTanStackColumns } from "../utils/buildTanStackColumns";
 
-type UseServerDataTableOptions<T extends Record<string, unknown>> = {
+type UseServerDataTableOptions<T extends object> = {
   columns: DataTableColumn<T>[];
   data: T[];
   getRowId: (row: T) => string;
-  pageCount: number;
-  totalElements?: number;
+  totalElements: number;
   initialState?: Partial<DataTableQueryState>;
   rowActions?: RowAction<T>[];
   toolbarActions?: ReactNode;
@@ -31,16 +30,15 @@ type UseServerDataTableOptions<T extends Record<string, unknown>> = {
   onQueryChange?: (query: DataTableQueryState) => void;
 };
 
-type UseServerDataTableResult<T extends Record<string, unknown>> = {
+type UseServerDataTableResult<T extends object> = {
   tableProps: DataTableProps<T>;
   query: DataTableQueryState;
 };
 
-export const useServerDataTable = <T extends Record<string, unknown>>({
+export const useServerDataTable = <T extends object>({
   columns,
   data,
   getRowId,
-  pageCount,
   totalElements,
   initialState,
   rowActions,
@@ -104,6 +102,11 @@ export const useServerDataTable = <T extends Record<string, unknown>>({
     [query.pageIndex, query.pageSize],
   );
 
+  const pageCount = Math.max(
+    Math.ceil(totalElements / Math.max(query.pageSize, 1)),
+    1,
+  );
+
   useReactTable({
     data,
     columns: tanstackColumns,
@@ -139,7 +142,6 @@ export const useServerDataTable = <T extends Record<string, unknown>>({
     rows: data,
     getRowId,
     query,
-    pageCount: Math.max(pageCount, 1),
     totalElements,
     enablePagination: true,
     rowActions,

@@ -19,7 +19,7 @@ import {
 } from "./useDataTableQueryState";
 import { buildTanStackColumns } from "../utils/buildTanStackColumns";
 
-type UseClientDataTableOptions<T extends Record<string, unknown>> = {
+type UseClientDataTableOptions<T extends object> = {
   columns: DataTableColumn<T>[];
   data: T[];
   getRowId: (row: T) => string;
@@ -31,12 +31,12 @@ type UseClientDataTableOptions<T extends Record<string, unknown>> = {
   emptyMessage?: string;
 };
 
-type UseClientDataTableResult<T extends Record<string, unknown>> = {
+type UseClientDataTableResult<T extends object> = {
   tableProps: DataTableProps<T>;
   query: DataTableQueryState;
 };
 
-export const useClientDataTable = <T extends Record<string, unknown>>({
+export const useClientDataTable = <T extends object>({
   columns,
   data,
   getRowId,
@@ -111,7 +111,10 @@ export const useClientDataTable = <T extends Record<string, unknown>>({
     autoResetPageIndex: false,
   });
 
-  const pageCount = enablePagination ? Math.max(table.getPageCount(), 1) : 1;
+  const totalElements = filteredData.length;
+  const pageCount = enablePagination
+    ? Math.max(Math.ceil(totalElements / Math.max(query.pageSize, 1)), 1)
+    : 1;
 
   useEffect(() => {
     if (query.pageIndex > pageCount - 1) {
@@ -128,8 +131,7 @@ export const useClientDataTable = <T extends Record<string, unknown>>({
     rows,
     getRowId,
     query,
-    pageCount,
-    totalElements: filteredData.length,
+    totalElements,
     enablePagination,
     rowActions,
     toolbarActions,

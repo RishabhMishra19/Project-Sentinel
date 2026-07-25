@@ -60,7 +60,7 @@ export type DataTableBadgeVariant =
   | 'muted'
 
 /** Source of truth: cell type → column cell config */
-export type DataTableCellConfigByType<T extends Record<string, unknown>> = {
+export type DataTableCellConfigByType<T extends object> = {
   text: {
     type: 'text'
     getValue: (row: T) => DataTableCellValueByType['text']
@@ -96,11 +96,11 @@ export type DataTableCellConfigByType<T extends Record<string, unknown>> = {
 }
 
 export type DataTableCellConfig<
-  T extends Record<string, unknown>,
+  T extends object,
   C extends DataTableCellType = DataTableCellType,
 > = DataTableCellConfigByType<T>[C]
 
-export type DataTableColumn<T extends Record<string, unknown>> = {
+export type DataTableColumn<T extends object> = {
   id: string
   header: string
   cell: DataTableCellConfig<T>
@@ -116,7 +116,7 @@ export type DataTableSearchState = {
   value: string
 }
 
-export type RowAction<T extends Record<string, unknown>> = {
+export type RowAction<T extends object> = {
   id: string
   label: string
   onClick: (row: T) => void
@@ -128,10 +128,9 @@ export type RowAction<T extends Record<string, unknown>> = {
 export type DataTablePagination = {
   pageIndex: number
   pageSize: number
-  pageCount: number
-  totalElements?: number
+  totalElements: number
   onPageIndexChange: (pageIndex: number) => void
-  onPageSizeChange?: (pageSize: number) => void
+  onPageSizeChange: (pageSize: number) => void
 }
 
 export type DataTableSortingConfig = {
@@ -150,7 +149,7 @@ export type DataTableFiltersConfig = {
   onFiltersClear: () => void
 }
 
-export type DataTableProps<T extends Record<string, unknown>> = {
+export type DataTableProps<T extends object> = {
   columns: DataTableColumn<T>[]
   rows: T[]
   getRowId: (row: T) => string

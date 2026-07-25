@@ -3,12 +3,12 @@ import { Menu } from './primitives/Menu'
 import { buttonClassName } from './styles'
 import type { RowAction } from './types'
 
-type DataTableRowActionsProps<T extends Record<string, unknown>> = {
+type DataTableRowActionsProps<T extends object> = {
   row: T
   actions: RowAction<T>[]
 }
 
-export const DataTableRowActions = <T extends Record<string, unknown>>({
+export const DataTableRowActions = <T extends object>({
   row,
   actions,
 }: DataTableRowActionsProps<T>) => {

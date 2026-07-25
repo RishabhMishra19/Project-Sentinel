@@ -12,12 +12,12 @@ import {
   type DataTableQueryState,
 } from "../utils/createInitialQueryState";
 
-type UseDataTableQueryStateOptions<T extends Record<string, unknown>> = {
+type UseDataTableQueryStateOptions<T extends object> = {
   columns: DataTableColumn<T>[];
   initialState?: Partial<DataTableQueryState>;
 };
 
-export const useDataTableQueryState = <T extends Record<string, unknown>>({
+export const useDataTableQueryState = <T extends object>({
   columns,
   initialState,
 }: UseDataTableQueryStateOptions<T>) => {
@@ -64,12 +64,11 @@ export const useDataTableQueryState = <T extends Record<string, unknown>>({
   };
 };
 
-type BuildTablePropsInput<T extends Record<string, unknown>> = {
+type BuildTablePropsInput<T extends object> = {
   columns: DataTableColumn<T>[];
   rows: T[];
   getRowId: (row: T) => string;
   query: DataTableQueryState;
-  pageCount: number;
   totalElements?: number;
   enablePagination?: boolean;
   rowActions?: RowAction<T>[];
@@ -84,13 +83,12 @@ type BuildTablePropsInput<T extends Record<string, unknown>> = {
   onPageSizeChange: (pageSize: number) => void;
 };
 
-export const buildDataTableProps = <T extends Record<string, unknown>>({
+export const buildDataTableProps = <T extends object>({
   columns,
   rows,
   getRowId,
   query,
-  pageCount,
-  totalElements,
+  totalElements = 0,
   enablePagination = true,
   rowActions,
   toolbarActions,
@@ -130,7 +128,6 @@ export const buildDataTableProps = <T extends Record<string, unknown>>({
     props.pagination = {
       pageIndex: query.pageIndex,
       pageSize: query.pageSize,
-      pageCount,
       totalElements,
       onPageIndexChange,
       onPageSizeChange,

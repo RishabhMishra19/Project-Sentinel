@@ -1,10 +1,10 @@
-import { DataTablePaginationBar } from './DataTablePagination'
-import { AppliedFilterChips } from './DataTableFilters'
-import { DataTableTable } from './DataTableTable'
-import { DataTableToolbar } from './DataTableToolbar'
-import type { DataTableProps } from './types'
+import { DataTablePaginationBar } from "./DataTablePagination";
+import { AppliedFilterChips } from "./DataTableFilters";
+import { DataTableTable } from "./DataTableTable";
+import { DataTableToolbar } from "./DataTableToolbar";
+import type { DataTableProps } from "./types";
 
-export const DataTable = <T extends Record<string, unknown>>({
+export const DataTable = <T extends object>({
   columns,
   rows,
   getRowId,
@@ -17,16 +17,21 @@ export const DataTable = <T extends Record<string, unknown>>({
   isLoading,
   emptyMessage,
 }: DataTableProps<T>) => {
-  const hasFilterableColumns = columns.some((column) => column.filter != null)
+  const hasFilterableColumns = columns.some((column) => column.filter != null);
+  const hasSearchableColumns = columns.some((column) => column.searchable);
+  const shouldShowToolbar =
+    hasFilterableColumns || hasSearchableColumns || toolbarActions;
 
   return (
     <div className="flex flex-col gap-3">
-      <DataTableToolbar
-        columns={columns}
-        searchConfig={searchConfig}
-        filtersConfig={filtersConfig}
-        toolbarActions={toolbarActions}
-      />
+      {shouldShowToolbar ? (
+        <DataTableToolbar
+          columns={columns}
+          searchConfig={searchConfig}
+          filtersConfig={filtersConfig}
+          toolbarActions={toolbarActions}
+        />
+      ) : null}
 
       {hasFilterableColumns && filtersConfig ? (
         <AppliedFilterChips columns={columns} filtersConfig={filtersConfig} />
@@ -46,5 +51,5 @@ export const DataTable = <T extends Record<string, unknown>>({
         {pagination ? <DataTablePaginationBar pagination={pagination} /> : null}
       </div>
     </div>
-  )
-}
+  );
+};

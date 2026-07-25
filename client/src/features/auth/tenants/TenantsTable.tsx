@@ -45,16 +45,10 @@ export const TenantsTable = ({
     [onView, onEdit, onDeactivate],
   )
 
-  const pageSize = fetchQuery?.pageSize ?? 10
-  const pageCount = data
-    ? Math.max(1, Math.ceil(data.totalElements / Math.max(pageSize, 1)))
-    : 1
-
   const { tableProps } = useServerDataTable({
     columns: tenantColumns,
     data: data?.content ?? [],
     getRowId: (row) => row.id,
-    pageCount,
     totalElements: data?.totalElements ?? 0,
     initialState: { pageSize: 10 },
     rowActions,

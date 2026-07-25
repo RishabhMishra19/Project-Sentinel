@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import type { DataTableColumn, DataTableSearchConfig } from './types'
 
-type DataTableSearchProps<T extends Record<string, unknown>> = {
+type DataTableSearchProps<T extends object> = {
   columns: DataTableColumn<T>[]
   searchConfig: DataTableSearchConfig
 }
 
-export const DataTableSearch = <T extends Record<string, unknown>>({
+export const DataTableSearch = <T extends object>({
   columns,
   searchConfig,
 }: DataTableSearchProps<T>) => {

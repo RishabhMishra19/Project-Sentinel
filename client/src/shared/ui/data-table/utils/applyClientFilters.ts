@@ -6,7 +6,7 @@ import type {
 } from "../types";
 import { getCellComparableValue, getCellSearchText } from "./getCellValue";
 
-export const matchesSearch = <T extends Record<string, unknown>>(
+export const matchesSearch = <T extends object>(
   row: T,
   columns: DataTableColumn<T>[],
   search: DataTableSearchState,
@@ -24,7 +24,7 @@ export const matchesSearch = <T extends Record<string, unknown>>(
   return getCellSearchText(row, column).toLowerCase().includes(query);
 };
 
-export const matchesColumnFilter = <T extends Record<string, unknown>>(
+export const matchesColumnFilter = <T extends object>(
   row: T,
   column: DataTableColumn<T>,
   value: DataTableFilterValue | undefined,
@@ -65,7 +65,7 @@ export const matchesColumnFilter = <T extends Record<string, unknown>>(
   }
 };
 
-export const applyClientFilters = <T extends Record<string, unknown>>(
+export const applyClientFilters = <T extends object>(
   data: T[],
   columns: DataTableColumn<T>[],
   search: DataTableSearchState,

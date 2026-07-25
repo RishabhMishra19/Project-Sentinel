@@ -8,7 +8,7 @@ import type {
   RowAction,
 } from "./types";
 
-type DataTableTableProps<T extends Record<string, unknown>> = {
+type DataTableTableProps<T extends object> = {
   columns: DataTableColumn<T>[];
   rows: T[];
   getRowId: (row: T) => string;
@@ -53,7 +53,7 @@ const SkeletonCell = ({ className }: { className?: string }) => (
   </td>
 );
 
-export const DataTableTable = <T extends Record<string, unknown>>({
+export const DataTableTable = <T extends object>({
   columns,
   rows,
   getRowId,
