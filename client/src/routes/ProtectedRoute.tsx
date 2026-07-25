@@ -2,10 +2,10 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useAppSelector } from '../redux/hooks'
 import { ROUTES } from './paths'
 
-/** Requires an access token; redirects anonymous users to login. */
+/** Requires a signed-in user; redirects anonymous users to login. */
 export function ProtectedRoute() {
-  const accessToken = useAppSelector((state) => state.session.accessToken)
-  if (!accessToken) {
+  const user = useAppSelector((state) => state.session.user)
+  if (!user) {
     return <Navigate to={ROUTES.LOGIN} replace />
   }
   return <Outlet />

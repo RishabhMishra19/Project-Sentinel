@@ -4,8 +4,8 @@ import { ROUTES } from './paths'
 
 /** Guest-only routes; redirects authenticated users to Profile. */
 export function UnprotectedRoute() {
-  const accessToken = useAppSelector((state) => state.session.accessToken)
-  if (accessToken) {
+  const user = useAppSelector((state) => state.session.user)
+  if (user) {
     return <Navigate to={ROUTES.PROFILE} replace />
   }
   return <Outlet />
