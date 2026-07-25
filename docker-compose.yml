@@ -50,6 +50,17 @@ services:
       retries: 12
       start_period: 20s
 
+  kafka-ui:
+    image: kafbat/kafka-ui:v1.3.0
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
   server:
     build: ./server
     ports:

@@ -95,6 +95,7 @@ Agents should **batch** runtime events (interval or N requests) rather than one 
 | Postgres  | localhost:5432          | Docker Compose |
 | Redis     | localhost:6379          | Docker Compose |
 | Kafka     | localhost:9092          | Docker Compose |
+| Kafka UI  | http://localhost:8090   | Docker Compose |
 
 - **server**: Spring Boot (Amazon Corretto 21), Maven, Postgres + Redis + Kafka, JWT auth (dashboard); owns schema via Liquibase
 - **ingest** (`sentinel-ingest`): Spring Boot skeleton — shared Postgres + Kafka; no Liquibase; run locally
