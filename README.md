@@ -86,17 +86,22 @@ Agents should **batch** runtime events (interval or N requests) rather than one 
 
 ## Current demo stack
 
-| Service   | URL / port              |
-|-----------|-------------------------|
-| Client    | http://localhost:3000   |
-| Server    | http://localhost:8080   |
-| Postgres  | localhost:5432          |
-| Redis     | localhost:6379          |
-| Kafka     | localhost:9092          |
+| Service   | URL / port              | How it runs |
+|-----------|-------------------------|-------------|
+| Client    | http://localhost:3000   | Docker Compose |
+| Server    | http://localhost:8080   | Docker Compose (or local Maven) |
+| Ingest    | http://localhost:8081   | Local Maven only (for now) |
+| Worker    | http://localhost:8082   | Local Maven only (for now) |
+| Postgres  | localhost:5432          | Docker Compose |
+| Redis     | localhost:6379          | Docker Compose |
+| Kafka     | localhost:9092          | Docker Compose |
 
-- **server**: Spring Boot (Amazon Corretto 21), Maven, Postgres + Redis + Kafka, JWT auth (dashboard)
+- **server**: Spring Boot (Amazon Corretto 21), Maven, Postgres + Redis + Kafka, JWT auth (dashboard); owns schema via Liquibase
+- **ingest** (`sentinel-ingest`): Spring Boot skeleton — shared Postgres + Kafka; no Liquibase; run locally
+- **worker** (`sentinel-worker`): Spring Boot skeleton — shared Postgres + Kafka; no Liquibase; run locally
 - **client**: React + TypeScript (Vite), Redux, React Query, Tailwind, Axios
 - Postgres data is stored in the Docker volume `postgres_data`
+- Docker packaging for ingest/worker is deferred; they are not in `docker-compose.yml` yet
 
 ## Start
 
@@ -111,6 +116,22 @@ Health check:
 ```bash
 curl http://localhost:8080/actuator/health
 ```
+
+### Run ingest / worker locally
+
+With Compose infra up (at least Postgres + Kafka), from separate terminals:
+
+```bash
+cd ingest && ./mvnw spring-boot:run
+cd worker && ./mvnw spring-boot:run
+```
+
+```bash
+curl http://localhost:8081/actuator/health
+curl http://localhost:8082/actuator/health
+```
+
+Defaults: Postgres `localhost:5432/sentinel`, Kafka `localhost:9092`. Schema changes still go through **server** Liquibase only.
 
 ### Seed login
 
@@ -137,10 +158,11 @@ docker compose down -v
 
 - DB name / user / password: `sentinel` / `sentinel` / `sentinel`
 - Server config: `server/src/main/resources/application.yml` (env overrides in Compose)
+- Ingest / worker configs: `ingest/src/main/resources/application.yml`, `worker/src/main/resources/application.yml`
 
 ## Notes
 
 - Server Docker image uses **Amazon Corretto 21**.
-- Spring Boot **4.1.0**; schema via **Liquibase**.
+- Spring Boot **4.1.0**; schema via **server Liquibase** only (ingest/worker use `ddl-auto: validate`, no migrations).
 - Access token (15m) in Redux memory; refresh (2h) in HttpOnly cookie + DB.
-- Ingest / worker split and multi-tenant catalog are **target architecture**; this repo’s running demo is still a single `server` + dashboard auth.
+- Ingest / worker apps exist as local skeletons; request-event produce/consume logic comes later.
