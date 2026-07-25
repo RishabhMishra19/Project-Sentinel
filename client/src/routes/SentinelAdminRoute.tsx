@@ -2,7 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useAppSelector } from '../redux/hooks'
 import { ROUTES } from './paths'
 
-/** Requires Sentinel admin after session is ready; redirects others to Settings. */
+/** Requires Sentinel admin after session is ready; redirects others to Profile. */
 export function SentinelAdminRoute() {
   const user = useAppSelector((state) => state.session.user)
 
@@ -15,7 +15,7 @@ export function SentinelAdminRoute() {
   }
 
   if (!user.sentinelAdmin) {
-    return <Navigate to={ROUTES.SETTINGS} replace />
+    return <Navigate to={ROUTES.PROFILE} replace />
   }
 
   return <Outlet />

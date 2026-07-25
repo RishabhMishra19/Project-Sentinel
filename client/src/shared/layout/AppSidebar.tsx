@@ -5,7 +5,6 @@ import {
   LogoutIcon,
   ProductsIcon,
   ServicesIcon,
-  SettingsIcon,
   SidebarCloseIcon,
   SidebarOpenIcon,
   TenantsIcon,
@@ -22,7 +21,6 @@ import { SidebarTray } from './SidebarTray'
 const SIDEBAR_MODE_KEY = 'sidebar-mode'
 
 const NAV_ICONS: Record<string, ReactNode> = {
-  settings: <SettingsIcon className="size-4 shrink-0" />,
   tenants: <TenantsIcon className="size-4 shrink-0" />,
   products: <ProductsIcon className="size-4 shrink-0" />,
   services: <ServicesIcon className="size-4 shrink-0" />,
@@ -89,7 +87,7 @@ export function AppSidebar() {
         }`}
       >
         <Link
-          to={ROUTES.SETTINGS}
+          to={ROUTES.PROFILE}
           className={`flex min-w-0 items-center tracking-tight text-sidebar-foreground hover:text-sidebar-muted ${
             isCollapsed ? 'justify-center' : 'gap-2.5 text-xl font-semibold'
           }`}

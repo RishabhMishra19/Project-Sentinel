@@ -1,6 +1,5 @@
 export { SunIcon } from './SunIcon'
 export { MoonIcon } from './MoonIcon'
-export { SettingsIcon } from './SettingsIcon'
 export { TenantsIcon } from './TenantsIcon'
 export { ProductsIcon } from './ProductsIcon'
 export { ServicesIcon } from './ServicesIcon'

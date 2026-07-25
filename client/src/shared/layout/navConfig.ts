@@ -9,7 +9,6 @@ export type NavItem = {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { id: 'settings', label: 'Settings', path: ROUTES.SETTINGS },
   { id: 'tenants', label: 'Tenants', path: ROUTES.TENANTS, onlySentinelAdmin: true },
   {
     id: 'products',

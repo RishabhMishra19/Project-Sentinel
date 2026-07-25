@@ -4,7 +4,6 @@ import { SessionBootstrapScreen } from '../features/auth/components/SessionBoots
 import { useAppInit } from '../features/auth/hooks/useAppInit'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { ProfilePage } from '../features/auth/pages/ProfilePage'
-import { SettingsPage } from '../features/auth/pages/SettingsPage'
 import { TenantsPage } from '../features/tenants/pages/TenantsPage'
 import { ProductServicesPage } from '../features/products/pages/ProductServicesPage'
 import { ProductsPage } from '../features/products/pages/ProductsPage'
@@ -19,7 +18,7 @@ import { UnprotectedRoute } from './UnprotectedRoute'
 
 function FallbackNavigate() {
   const accessToken = useAppSelector((state) => state.session.accessToken)
-  return <Navigate to={accessToken ? ROUTES.SETTINGS : ROUTES.LOGIN} replace />
+  return <Navigate to={accessToken ? ROUTES.PROFILE : ROUTES.LOGIN} replace />
 }
 
 const router = createBrowserRouter([
@@ -38,9 +37,8 @@ const router = createBrowserRouter([
       {
         element: <ProtectedLayout />,
         children: [
-          { path: '/', element: <Navigate to={ROUTES.SETTINGS} replace /> },
+          { path: '/', element: <Navigate to={ROUTES.PROFILE} replace /> },
           { path: ROUTES.PROFILE, handle: { crumb: 'Profile' }, element: <ProfilePage /> },
-          { path: ROUTES.SETTINGS, handle: { crumb: 'Settings' }, element: <SettingsPage /> },
           {
             element: <SentinelAdminRoute />,
             children: [
