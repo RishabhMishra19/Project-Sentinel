@@ -20,7 +20,10 @@ export const DataTableToolbar = <T extends object>({
   filtersConfig,
   toolbarActions,
 }: DataTableToolbarProps<T>) => {
-  const hasSearch = columns.some((column) => column.searchable)
+  const searchableColumns = columns
+    .filter((column) => column.searchable)
+    .map((column) => ({ id: column.id, header: column.header }))
+  const hasSearch = searchableColumns.length > 0
   const hasFilters = columns.some((column) => column.filter != null)
   const hasRight = hasFilters || toolbarActions != null
 
@@ -30,8 +33,11 @@ export const DataTableToolbar = <T extends object>({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {searchConfig ? (
-        <DataTableSearch columns={columns} searchConfig={searchConfig} />
+      {searchConfig && hasSearch ? (
+        <DataTableSearch
+          columns={searchableColumns}
+          searchConfig={searchConfig}
+        />
       ) : null}
       {hasRight ? (
         <div className="ml-auto flex flex-wrap items-center gap-2">

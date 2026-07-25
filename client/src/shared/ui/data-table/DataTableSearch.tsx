@@ -1,30 +1,30 @@
-import { useMemo } from 'react'
-import type { DataTableColumn, DataTableSearchConfig } from './types'
+import type { DataTableSearchConfig } from './types'
 
-type DataTableSearchProps<T extends object> = {
-  columns: DataTableColumn<T>[]
+export type SearchableColumnOption = {
+  id: string
+  header: string
+}
+
+type DataTableSearchProps = {
+  columns: SearchableColumnOption[]
   searchConfig: DataTableSearchConfig
 }
 
-export const DataTableSearch = <T extends object>({
+export const DataTableSearch = ({
   columns,
   searchConfig,
-}: DataTableSearchProps<T>) => {
+}: DataTableSearchProps) => {
   const { search, onSearchChange } = searchConfig
-  const searchable = useMemo(
-    () => columns.filter((column) => column.searchable),
-    [columns],
-  )
 
-  if (searchable.length === 0) {
+  if (columns.length === 0) {
     return null
   }
 
-  const columnId = search.columnId || searchable[0].id
+  const columnId = search.columnId || columns[0].id
   const value = search.value
-  const hasColumnSelect = searchable.length > 1
+  const hasColumnSelect = columns.length > 1
   const columnHeader =
-    searchable.find((column) => column.id === columnId)?.header ?? ''
+    columns.find((column) => column.id === columnId)?.header ?? ''
 
   return (
     <div className="flex min-w-0 flex-1 overflow-hidden rounded border border-border bg-surface focus-within:border-ring sm:max-w-md">
@@ -38,7 +38,7 @@ export const DataTableSearch = <T extends object>({
             }
             aria-label="Search column"
           >
-            {searchable.map((column) => (
+            {columns.map((column) => (
               <option key={column.id} value={column.id}>
                 {column.header}
               </option>
