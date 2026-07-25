@@ -64,7 +64,7 @@ CREATE TABLE role_scopes (
     id UUID NOT NULL PRIMARY KEY,
     role_id UUID NOT NULL,
     scope_type VARCHAR(32) NOT NULL,
-    scope_id UUID NULL,
+    scope_id UUID NOT NULL,
     permission VARCHAR(32) NOT NULL,
     status VARCHAR(32) NOT NULL,
     created_by UUID NOT NULL,
@@ -77,11 +77,7 @@ CREATE TABLE role_scopes (
     CONSTRAINT chk_role_scopes_permission CHECK (permission IN ('ALL', 'READ', 'READ_AND_WRITE'))
 );
 
-CREATE UNIQUE INDEX uk_role_scopes_tenant ON role_scopes (role_id)
-    WHERE scope_type = 'TENANT';
-
-CREATE UNIQUE INDEX uk_role_scopes_resource ON role_scopes (role_id, scope_type, scope_id)
-    WHERE scope_type IN ('PRODUCT', 'SERVICE') AND scope_id IS NOT NULL;
+CREATE UNIQUE INDEX uk_role_scopes_resource ON role_scopes (role_id, scope_type, scope_id);
 
 CREATE INDEX idx_role_scopes_role_id ON role_scopes (role_id);
 CREATE INDEX idx_role_scopes_scope ON role_scopes (scope_type, scope_id);

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class AccessSupport {
 
     private static final Set<RoleScopeType> PRODUCT_SERVICE_SCOPE_TYPES =
-            EnumSet.of(RoleScopeType.TENANT, RoleScopeType.PRODUCT, RoleScopeType.SERVICE);
+            EnumSet.of(RoleScopeType.PRODUCT, RoleScopeType.SERVICE);
 
     private static final Set<PermissionType> READ_PERMISSIONS =
             EnumSet.of(PermissionType.READ, PermissionType.READ_AND_WRITE, PermissionType.ALL);
@@ -96,35 +96,17 @@ public class AccessSupport {
     }
 
     /**
-     * Sentinel admin, tenant admin, or active tenant with a TENANT-scoped grant at read level.
+     * Sentinel admin or tenant admin (home tenant only).
      */
     public boolean canReadUsers() {
-        if (isSentinelAdmin() || isTenantAdmin()) {
-            return true;
-        }
-        if (currentPrincipal().getActiveTenantId() == null) {
-            return false;
-        }
-        return hasTenantScopePermission(READ_PERMISSIONS);
+        return isSentinelAdmin() || isTenantAdmin();
     }
 
     /**
-     * Sentinel admin, tenant admin, or active tenant with a TENANT-scoped grant at write level.
+     * Sentinel admin or tenant admin (home tenant only).
      */
     public boolean canWriteUsers() {
-        if (isSentinelAdmin() || isTenantAdmin()) {
-            return true;
-        }
-        if (currentPrincipal().getActiveTenantId() == null) {
-            return false;
-        }
-        return hasTenantScopePermission(WRITE_PERMISSIONS);
-    }
-
-    private boolean hasTenantScopePermission(Set<PermissionType> allowed) {
-        return currentPrincipal().getScopeGrants().stream()
-                .anyMatch(grant -> grant.scopeType() == RoleScopeType.TENANT
-                        && allowed.contains(grant.permission()));
+        return isSentinelAdmin() || isTenantAdmin();
     }
 
     private boolean hasProductsAndServicesPermission(Set<PermissionType> allowed) {

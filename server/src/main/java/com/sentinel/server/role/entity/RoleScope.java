@@ -40,7 +40,7 @@ public class RoleScope {
     @Column(name = "scope_type", nullable = false, length = 32)
     private RoleScopeType scopeType;
 
-    @Column(name = "scope_id", nullable = true)
+    @Column(name = "scope_id", nullable = false)
     private UUID scopeId;
 
     @Enumerated(EnumType.STRING)
