@@ -1,6 +1,6 @@
 import { ROUTES } from '../../routes/paths'
 
-export type NavItem = {
+export type SidebarItem = {
   id: string
   label: string
   path: string
@@ -8,7 +8,7 @@ export type NavItem = {
   requiresCatalogRead?: boolean
 }
 
-export const SIDE_BAR_ITEMS: NavItem[] = [
+export const SIDE_BAR_ITEMS: SidebarItem[] = [
   { id: 'tenants', label: 'Tenants', path: ROUTES.TENANTS, onlySentinelAdmin: true },
   {
     id: 'products',
