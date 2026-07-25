@@ -18,18 +18,29 @@ export const DataTableRowActions = <T extends object>({
   )
 
   if (visible.length === 0) {
-    return null
+    if (actions.length === 0) {
+      return null
+    }
+    return (
+      <button type="button" className={buttonClassName} disabled>
+        Actions
+        <span aria-hidden="true">▾</span>
+      </button>
+    )
   }
 
   if (visible.length === 1) {
     const action = visible[0]
     const disabled = action.disabled?.(row) ?? false
+    const isDanger = action.variant === 'danger'
     return (
       <button
         type="button"
-        className={`${buttonClassName} ${
-          action.variant === 'danger' ? 'text-danger' : ''
-        }`}
+        className={
+          isDanger
+            ? 'inline-flex h-8 items-center gap-1.5 rounded border border-border bg-surface px-2.5 text-sm text-danger hover:bg-danger/10 disabled:opacity-50'
+            : buttonClassName
+        }
         disabled={disabled}
         onClick={() => action.onClick(row)}
       >
