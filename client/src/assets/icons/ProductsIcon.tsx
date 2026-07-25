@@ -2,7 +2,7 @@ type IconProps = {
   className?: string
 }
 
-/** Stacked layers — catalog / product lineup */
+/** Stacked layers — product lineup */
 export const ProductsIcon = ({ className }: IconProps) => (
   <svg
     className={className}

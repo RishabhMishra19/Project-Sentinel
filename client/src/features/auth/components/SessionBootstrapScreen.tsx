@@ -1,5 +1,6 @@
 /**
- * Shown while SessionRestoreContainer is restoring the session before routes render.
+ * Shown while SessionRestoreContainer is restoring the session
+ * (or waiting for user after a signed-in restore) before routes render.
  */
 export function SessionBootstrapScreen() {
   return (
