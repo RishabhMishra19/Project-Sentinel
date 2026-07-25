@@ -130,11 +130,16 @@ export const DataTableTable = <T extends object>({
 
           {!showSkeletons && rows.length === 0 ? (
             <tr>
-              <td
-                colSpan={colSpan}
-                className="px-3 py-8 text-center text-muted"
-              >
-                {emptyMessage}
+              <td colSpan={colSpan} className="px-3 text-center text-muted">
+                {/* Match skeleton/data row height: inner h-8 + py-2 top/bottom */}
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    minHeight: `calc(${skeletonRowCount} * (2rem + 1rem))`,
+                  }}
+                >
+                  {emptyMessage}
+                </div>
               </td>
             </tr>
           ) : null}
