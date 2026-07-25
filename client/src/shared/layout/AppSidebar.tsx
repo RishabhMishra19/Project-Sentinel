@@ -48,7 +48,8 @@ export function AppSidebar() {
       ? ADMIN_SIDE_BAR_ITEMS
       : TENANT_SIDE_BAR_ITEMS;
 
-  const isNavActive = (path: string) => pathname.startsWith(path);
+  const isNavActive = (path: string) =>
+    pathname === path || pathname.startsWith(`${path}/`);
 
   const toggleMode = () => {
     const next: SidebarMode = isCollapsed ? "expanded" : "collapsed";
