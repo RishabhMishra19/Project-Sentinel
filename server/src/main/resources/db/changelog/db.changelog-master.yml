@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/migrations/005-seed-data.sql
   - include:
       file: db/changelog/migrations/006-product-service-name-uniqueness.sql
+  - include:
+      file: db/changelog/migrations/007-create-analytics.sql
