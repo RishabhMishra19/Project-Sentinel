@@ -8,7 +8,7 @@ export type NavItem = {
   requiresCatalogRead?: boolean
 }
 
-export const NAV_ITEMS: NavItem[] = [
+export const SIDE_BAR_ITEMS: NavItem[] = [
   { id: 'tenants', label: 'Tenants', path: ROUTES.TENANTS, onlySentinelAdmin: true },
   {
     id: 'products',

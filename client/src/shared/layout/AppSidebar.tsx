@@ -14,7 +14,7 @@ import { canReadCatalog } from '../../shared/permissions/canReadCatalog'
 import { ROUTES } from '../../routes/paths'
 import { localStorageManager } from '../storage/LocalStorageManager'
 import { LoggedInUserCard } from './LoggedInUserCard'
-import { NAV_ITEMS } from './navConfig'
+import { SIDE_BAR_ITEMS } from './navConfig'
 import { SidebarItem, type SidebarMode } from './SidebarItem'
 import { SidebarTray } from './SidebarTray'
 
@@ -41,7 +41,7 @@ export function AppSidebar() {
   const isSentinelAdmin = user?.sentinelAdmin === true
   const hasCatalogRead = canReadCatalog(isSentinelAdmin, user?.roles ?? [])
 
-  const navItems = NAV_ITEMS.filter((item) => {
+  const navItems = SIDE_BAR_ITEMS.filter((item) => {
     if (item.onlySentinelAdmin) {
       if (!user) return false
       return isSentinelAdmin
