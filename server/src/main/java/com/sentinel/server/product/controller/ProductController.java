@@ -34,7 +34,7 @@ public class ProductController {
 
     private final ProductFacade productFacade;
 
-    @PreAuthorize("@accessSupport.canReadCatalog()")
+    @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping
     public ResponseEntity<PageResponse<ProductResponse>> list(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -56,14 +56,14 @@ public class ProductController {
                 createdTo));
     }
 
-    @PreAuthorize("@accessSupport.canReadCatalog()")
+    @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getById(
             @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID id) {
         return ApiResponses.ok(productFacade.getById(principal.getActiveTenantId(), id));
     }
 
-    @PreAuthorize("@accessSupport.canWriteCatalog()")
+    @PreAuthorize("@accessSupport.canWriteProductsAndServices()")
     @PostMapping
     public ResponseEntity<ProductResponse> create(
             @Valid @RequestBody CreateProductRequest request,
@@ -72,7 +72,7 @@ public class ProductController {
                 productFacade.create(principal.getActiveTenantId(), request, principal.getId()));
     }
 
-    @PreAuthorize("@accessSupport.canWriteCatalog()")
+    @PreAuthorize("@accessSupport.canWriteProductsAndServices()")
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> update(
             @PathVariable UUID id,
@@ -82,7 +82,7 @@ public class ProductController {
                 principal.getActiveTenantId(), id, request, principal.getId()));
     }
 
-    @PreAuthorize("@accessSupport.canWriteCatalog()")
+    @PreAuthorize("@accessSupport.canWriteProductsAndServices()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> softDelete(
             @PathVariable UUID id, @AuthenticationPrincipal UserPrincipal principal) {

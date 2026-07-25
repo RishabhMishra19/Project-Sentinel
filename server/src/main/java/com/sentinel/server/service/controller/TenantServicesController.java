@@ -26,7 +26,7 @@ public class TenantServicesController {
 
     private final ServiceFacade serviceFacade;
 
-    @PreAuthorize("@accessSupport.canReadCatalog()")
+    @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping
     public ResponseEntity<PageResponse<ServiceResponse>> list(
             @AuthenticationPrincipal UserPrincipal principal,
