@@ -1,5 +1,5 @@
-import { inputClassName } from '../styles'
-import type { DataTableFilterValue } from '../types'
+import { inputClassName } from '../../../styles'
+import type { DataTableFilterValue } from '../../../types'
 
 type DateFilterProps = {
   value: DataTableFilterValue<'date'>

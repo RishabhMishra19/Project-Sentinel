@@ -2,7 +2,7 @@ export { DataTable } from "./DataTable";
 export { useClientDataTable } from "./hooks/useClientDataTable";
 export { useServerDataTable } from "./hooks/useServerDataTable";
 
-export type { DataTableQueryState } from "./utils/createInitialQueryState";
+export type { DataTableQueryState } from "./utils/queryState";
 
 export type {
   DataTableBadgeVariant,

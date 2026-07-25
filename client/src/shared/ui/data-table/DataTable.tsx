@@ -1,8 +1,9 @@
-import { DataTablePaginationBar } from "./DataTablePagination";
-import { AppliedFilterChips } from "./DataTableFilters";
-import { DataTableTable } from "./DataTableTable";
-import { DataTableToolbar } from "./DataTableToolbar";
-import type { DataTableProps } from "./types";
+import { AppliedFilterChips } from './components/AppliedFilterChips'
+import { DataTablePaginationBar } from './components/DataTablePagination'
+import { DataTableTable } from './components/DataTableTable'
+import { DataTableToolbar } from './components/DataTableToolbar'
+import { toFilterableColumns } from './components/DataTableFilters/filterUtils'
+import type { DataTableProps } from './types'
 
 export const DataTable = <T extends object>({
   columns,
@@ -17,10 +18,11 @@ export const DataTable = <T extends object>({
   isLoading,
   emptyMessage,
 }: DataTableProps<T>) => {
-  const hasFilterableColumns = columns.some((column) => column.filter != null);
-  const hasSearchableColumns = columns.some((column) => column.searchable);
+  const filterableColumns = toFilterableColumns(columns)
+  const hasFilterableColumns = filterableColumns.length > 0
+  const hasSearchableColumns = columns.some((column) => column.searchable)
   const shouldShowToolbar =
-    hasFilterableColumns || hasSearchableColumns || toolbarActions;
+    hasFilterableColumns || hasSearchableColumns || toolbarActions
 
   return (
     <div className="flex flex-col gap-3">
@@ -34,7 +36,10 @@ export const DataTable = <T extends object>({
       ) : null}
 
       {hasFilterableColumns && filtersConfig ? (
-        <AppliedFilterChips columns={columns} filtersConfig={filtersConfig} />
+        <AppliedFilterChips
+          columns={filterableColumns}
+          filtersConfig={filtersConfig}
+        />
       ) : null}
 
       <div className="overflow-hidden rounded border border-border">
@@ -51,5 +56,5 @@ export const DataTable = <T extends object>({
         {pagination ? <DataTablePaginationBar pagination={pagination} /> : null}
       </div>
     </div>
-  );
-};
+  )
+}

@@ -1,5 +1,5 @@
-import { EMPTY_CELL } from '../styles'
-import type { DataTableCellValueByType } from '../types'
+import { EMPTY_CELL } from '../../styles'
+import type { DataTableCellValueByType } from '../../types'
 
 type NumberCellProps = {
   value: DataTableCellValueByType['number']

@@ -1,12 +1,12 @@
 import { renderCell } from "./cells/renderCell";
 import { DataTableRowActions } from "./DataTableRowActions";
-import { tableCellInnerClassName } from "./styles";
+import { tableCellInnerClassName } from "../styles";
 import type {
   DataTableColumn,
   DataTableSort,
   DataTableSortingConfig,
   RowAction,
-} from "./types";
+} from "../types";
 
 type DataTableTableProps<T extends object> = {
   columns: DataTableColumn<T>[];

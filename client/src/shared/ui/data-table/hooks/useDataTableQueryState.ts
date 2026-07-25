@@ -10,7 +10,7 @@ import type {
 import {
   createInitialQueryState,
   type DataTableQueryState,
-} from "../utils/createInitialQueryState";
+} from "../utils/queryState";
 
 type UseDataTableQueryStateOptions<T extends object> = {
   columns: DataTableColumn<T>[];
@@ -40,10 +40,6 @@ export const useDataTableQueryState = <T extends object>({
     [],
   );
 
-  const clearFilters = useCallback(() => {
-    setQuery((prev) => ({ ...prev, filters: {}, pageIndex: 0 }));
-  }, []);
-
   const setPageIndex = useCallback((pageIndex: number) => {
     setQuery((prev) => ({ ...prev, pageIndex }));
   }, []);
@@ -58,7 +54,6 @@ export const useDataTableQueryState = <T extends object>({
     setSorting,
     setSearch,
     setFilters,
-    clearFilters,
     setPageIndex,
     setPageSize,
   };
@@ -78,7 +73,6 @@ type BuildTablePropsInput<T extends object> = {
   onSortingChange: (next: DataTableSort) => void;
   onSearchChange: (next: DataTableSearchState) => void;
   onFiltersChange: (next: Record<string, DataTableFilterValue>) => void;
-  onFiltersClear: () => void;
   onPageIndexChange: (pageIndex: number) => void;
   onPageSizeChange: (pageSize: number) => void;
 };
@@ -97,7 +91,6 @@ export const buildDataTableProps = <T extends object>({
   onSortingChange,
   onSearchChange,
   onFiltersChange,
-  onFiltersClear,
   onPageIndexChange,
   onPageSizeChange,
 }: BuildTablePropsInput<T>): DataTableProps<T> => {
@@ -116,7 +109,6 @@ export const buildDataTableProps = <T extends object>({
     filtersConfig: {
       filters: query.filters,
       onFiltersChange,
-      onFiltersClear,
     },
     rowActions,
     toolbarActions,

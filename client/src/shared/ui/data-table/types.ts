@@ -149,7 +149,6 @@ export type DataTableSearchConfig = {
 export type DataTableFiltersConfig = {
   filters: Record<string, DataTableFilterValue>;
   onFiltersChange: (next: Record<string, DataTableFilterValue>) => void;
-  onFiltersClear: () => void;
 };
 
 export type DataTableProps<T extends object> = {

@@ -7,14 +7,14 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { DataTableColumn, DataTableProps, RowAction } from "../types";
-import type { DataTableQueryState } from "../utils/createInitialQueryState";
+import type { DataTableQueryState } from "../utils/queryState";
 import {
   buildDataTableProps,
   fromTanStackSorting,
   toTanStackSorting,
   useDataTableQueryState,
 } from "./useDataTableQueryState";
-import { buildTanStackColumns } from "../utils/buildTanStackColumns";
+import { buildTanStackColumns } from "../utils/tanstack";
 
 type UseServerDataTableOptions<T extends object> = {
   columns: DataTableColumn<T>[];
@@ -53,7 +53,6 @@ export const useServerDataTable = <T extends object>({
     setSorting,
     setSearch,
     setFilters,
-    clearFilters,
     setPageIndex,
     setPageSize,
   } = useDataTableQueryState({ columns, initialState });
@@ -151,7 +150,6 @@ export const useServerDataTable = <T extends object>({
     onSortingChange: setSorting,
     onSearchChange: setSearch,
     onFiltersChange: setFilters,
-    onFiltersClear: clearFilters,
     onPageIndexChange: setPageIndex,
     onPageSizeChange: setPageSize,
   });

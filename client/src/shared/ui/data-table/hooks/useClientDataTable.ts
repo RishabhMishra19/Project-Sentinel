@@ -9,15 +9,15 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useMemo, type ReactNode } from "react";
 import type { DataTableColumn, DataTableProps, RowAction } from "../types";
-import { applyClientFilters } from "../utils/applyClientFilters";
-import type { DataTableQueryState } from "../utils/createInitialQueryState";
+import { applyClientFilters } from "../utils/clientFiltering";
+import type { DataTableQueryState } from "../utils/queryState";
 import {
   buildDataTableProps,
   fromTanStackSorting,
   toTanStackSorting,
   useDataTableQueryState,
 } from "./useDataTableQueryState";
-import { buildTanStackColumns } from "../utils/buildTanStackColumns";
+import { buildTanStackColumns } from "../utils/tanstack";
 
 type UseClientDataTableOptions<T extends object> = {
   columns: DataTableColumn<T>[];
@@ -52,7 +52,6 @@ export const useClientDataTable = <T extends object>({
     setSorting,
     setSearch,
     setFilters,
-    clearFilters,
     setPageIndex,
     setPageSize,
   } = useDataTableQueryState({ columns, initialState });
@@ -140,7 +139,6 @@ export const useClientDataTable = <T extends object>({
     onSortingChange: setSorting,
     onSearchChange: setSearch,
     onFiltersChange: setFilters,
-    onFiltersClear: clearFilters,
     onPageIndexChange: setPageIndex,
     onPageSizeChange: setPageSize,
   });

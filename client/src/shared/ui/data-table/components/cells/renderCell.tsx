@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { DataTableCellConfig } from '../types'
+import type { DataTableCellConfig } from '../../types'
 import { BadgeCell } from './BadgeCell'
 import { BooleanCell } from './BooleanCell'
 import { DateCell } from './DateCell'

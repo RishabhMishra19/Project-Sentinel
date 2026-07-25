@@ -1,8 +1,8 @@
-import { EMPTY_CELL } from '../styles'
+import { EMPTY_CELL } from '../../styles'
 import type {
   DataTableBadgeVariant,
   DataTableCellValueByType,
-} from '../types'
+} from '../../types'
 
 type BadgeCellProps = {
   value: DataTableCellValueByType['badge']

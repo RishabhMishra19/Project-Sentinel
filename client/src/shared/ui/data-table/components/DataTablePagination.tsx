@@ -1,5 +1,5 @@
-import { buttonClassName, inputClassName } from "./styles";
-import type { DataTablePagination } from "./types";
+import { buttonClassName, inputClassName } from "../styles";
+import type { DataTablePagination } from "../types";
 
 type DataTablePaginationProps = {
   pagination: DataTablePagination;

@@ -1,31 +1,33 @@
 import type {
   DataTableColumnFilter,
-  DataTableFilterType,
   DataTableFilterValue,
-} from '../types'
-import { BooleanFilter } from './BooleanFilter'
-import { DateFilter } from './DateFilter'
-import { DateRangeFilter } from './DateRangeFilter'
-import { MultiSelectFilter } from './MultiSelectFilter'
-import { SelectFilter } from './SelectFilter'
+} from '../../types'
+import {
+  BooleanFilter,
+  DateFilter,
+  DateRangeFilter,
+  MultiSelectFilter,
+  SelectFilter,
+} from './controls'
 
 type FilterControlProps = {
   filter: DataTableColumnFilter
   value: DataTableFilterValue | undefined
-  onChange: <F extends DataTableFilterType>(
-    type: F,
-    value: DataTableFilterValue<F>,
-  ) => void
+  onChange: (value: DataTableFilterValue) => void
 }
 
-export const FilterControl = ({ filter, value, onChange }: FilterControlProps) => {
+export const FilterControl = ({
+  filter,
+  value,
+  onChange,
+}: FilterControlProps) => {
   switch (filter.type) {
     case 'select':
       return (
         <SelectFilter
           options={filter.options}
           value={(value as DataTableFilterValue<'select'>) ?? null}
-          onChange={(next) => onChange('select', next)}
+          onChange={onChange}
         />
       )
     case 'multiSelect':
@@ -33,21 +35,21 @@ export const FilterControl = ({ filter, value, onChange }: FilterControlProps) =
         <MultiSelectFilter
           options={filter.options}
           value={(value as DataTableFilterValue<'multiSelect'>) ?? []}
-          onChange={(next) => onChange('multiSelect', next)}
+          onChange={onChange}
         />
       )
     case 'boolean':
       return (
         <BooleanFilter
           value={(value as DataTableFilterValue<'boolean'>) ?? null}
-          onChange={(next) => onChange('boolean', next)}
+          onChange={onChange}
         />
       )
     case 'date':
       return (
         <DateFilter
           value={(value as DataTableFilterValue<'date'>) ?? null}
-          onChange={(next) => onChange('date', next)}
+          onChange={onChange}
         />
       )
     case 'dateRange':
@@ -59,7 +61,7 @@ export const FilterControl = ({ filter, value, onChange }: FilterControlProps) =
               to: null,
             }
           }
-          onChange={(next) => onChange('dateRange', next)}
+          onChange={onChange}
         />
       )
   }

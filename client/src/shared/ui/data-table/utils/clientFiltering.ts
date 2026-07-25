@@ -1,10 +1,10 @@
-import { isFilterActive } from "../filters/isFilterActive";
+import { isFilterActive } from "../components/DataTableFilters/filterUtils";
 import type {
   DataTableColumn,
   DataTableFilterValue,
   DataTableSearchState,
 } from "../types";
-import { getCellComparableValue, getCellSearchText } from "./getCellValue";
+import { getCellComparableValue, getCellSearchText } from "./tanstack";
 
 export const matchesSearch = <T extends object>(
   row: T,

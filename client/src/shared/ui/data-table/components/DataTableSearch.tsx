@@ -1,4 +1,4 @@
-import type { DataTableSearchConfig } from './types'
+import type { DataTableSearchConfig } from '../types'
 
 export type SearchableColumnOption = {
   id: string

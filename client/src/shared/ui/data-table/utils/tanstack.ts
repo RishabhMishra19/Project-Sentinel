@@ -1,3 +1,4 @@
+import type { ColumnDef } from '@tanstack/react-table'
 import type { DataTableColumn } from '../types'
 
 export const getCellComparableValue = <T extends object>(
@@ -31,3 +32,13 @@ export const getCellSearchText = <T extends object>(
   }
   return String(value)
 }
+
+export const buildTanStackColumns = <T extends object>(
+  columns: DataTableColumn<T>[],
+): ColumnDef<T, unknown>[] =>
+  columns.map((column) => ({
+    id: column.id,
+    accessorFn: (row) => getCellComparableValue(row, column),
+    enableSorting: Boolean(column.sortable),
+    header: column.header,
+  }))

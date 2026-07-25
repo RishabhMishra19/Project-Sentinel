@@ -1,4 +1,4 @@
-import type { DataTableFilterOption, DataTableFilterValue } from '../types'
+import type { DataTableFilterOption, DataTableFilterValue } from '../../../types'
 
 type MultiSelectFilterProps = {
   value: DataTableFilterValue<'multiSelect'>

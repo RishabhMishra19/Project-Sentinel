@@ -1,5 +1,5 @@
-import { buttonClassName } from '../styles'
-import type { DataTableFilterValue } from '../types'
+import { buttonClassName } from '../../../styles'
+import type { DataTableFilterValue } from '../../../types'
 
 type BooleanFilterProps = {
   value: DataTableFilterValue<'boolean'>
