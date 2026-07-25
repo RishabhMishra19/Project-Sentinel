@@ -1,7 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { useAppSelector } from '../redux/hooks'
-import { SessionBootstrapScreen } from '../features/auth/components/SessionBootstrapScreen'
-import { useAppInit } from '../features/auth/hooks/useAppInit'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { ProfilePage } from '../features/auth/pages/ProfilePage'
 import { TenantsPage } from '../features/tenants/pages/TenantsPage'
@@ -14,70 +12,70 @@ import { CatalogReadRoute } from './CatalogReadRoute'
 import { ROUTES } from './paths'
 import { ProtectedRoute } from './ProtectedRoute'
 import { SentinelAdminRoute } from './SentinelAdminRoute'
+import { SessionRestoreContainer } from './SessionRestoreContainer'
 import { UnprotectedRoute } from './UnprotectedRoute'
 
 function FallbackNavigate() {
-  const accessToken = useAppSelector((state) => state.session.accessToken)
-  return <Navigate to={accessToken ? ROUTES.PROFILE : ROUTES.LOGIN} replace />
+  const user = useAppSelector((state) => state.session.user)
+  return <Navigate to={user ? ROUTES.PROFILE : ROUTES.LOGIN} replace />
 }
 
 const router = createBrowserRouter([
   {
-    element: <UnprotectedRoute />,
+    element: <SessionRestoreContainer />,
     children: [
       {
-        element: <UnprotectedLayout />,
-        children: [{ path: ROUTES.LOGIN, element: <LoginPage /> }],
-      },
-    ],
-  },
-  {
-    element: <ProtectedRoute />,
-    children: [
-      {
-        element: <ProtectedLayout />,
+        element: <UnprotectedRoute />,
         children: [
-          { path: '/', element: <Navigate to={ROUTES.PROFILE} replace /> },
-          { path: ROUTES.PROFILE, handle: { crumb: 'Profile' }, element: <ProfilePage /> },
           {
-            element: <SentinelAdminRoute />,
-            children: [
-              { path: ROUTES.TENANTS, handle: { crumb: 'Tenants' }, element: <TenantsPage /> },
-            ],
+            element: <UnprotectedLayout />,
+            children: [{ path: ROUTES.LOGIN, element: <LoginPage /> }],
           },
+        ],
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
           {
-            element: <CatalogReadRoute />,
+            element: <ProtectedLayout />,
             children: [
+              { path: '/', element: <Navigate to={ROUTES.PROFILE} replace /> },
+              { path: ROUTES.PROFILE, handle: { crumb: 'Profile' }, element: <ProfilePage /> },
               {
-                path: ROUTES.PRODUCTS,
-                handle: { crumb: 'Products' },
-                element: <ProductsPage />,
+                element: <SentinelAdminRoute />,
+                children: [
+                  { path: ROUTES.TENANTS, handle: { crumb: 'Tenants' }, element: <TenantsPage /> },
+                ],
               },
               {
-                path: ROUTES.SERVICES,
-                handle: { crumb: 'Services' },
-                element: <ServicesPage />,
-              },
-              {
-                path: '/products/:productId/services',
-                handle: { crumb: 'Services' },
-                element: <ProductServicesPage />,
+                element: <CatalogReadRoute />,
+                children: [
+                  {
+                    path: ROUTES.PRODUCTS,
+                    handle: { crumb: 'Products' },
+                    element: <ProductsPage />,
+                  },
+                  {
+                    path: ROUTES.SERVICES,
+                    handle: { crumb: 'Services' },
+                    element: <ServicesPage />,
+                  },
+                  {
+                    path: '/products/:productId/services',
+                    handle: { crumb: 'Services' },
+                    element: <ProductServicesPage />,
+                  },
+                ],
               },
             ],
           },
         ],
       },
+      { path: '*', element: <FallbackNavigate /> },
     ],
   },
-  { path: '*', element: <FallbackNavigate /> },
 ])
 
 export function AppRouter() {
-  const { checkingSession } = useAppInit()
-
-  if (checkingSession) {
-    return <SessionBootstrapScreen />
-  }
-
   return <RouterProvider router={router} />
 }

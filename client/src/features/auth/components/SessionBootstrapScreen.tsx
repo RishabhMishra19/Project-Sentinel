@@ -1,5 +1,5 @@
 /**
- * Shown while useAppInit is checkingSession (refresh) before the router mounts.
+ * Shown while SessionRestoreContainer is restoring the session before routes render.
  */
 export function SessionBootstrapScreen() {
   return (
