@@ -1,5 +1,5 @@
 import type { AxiosRequestConfig } from 'axios'
-import { axiosClient } from './axiosClient'
+import { axiosClient } from './AxiosClient'
 
 /**
  * Thin HTTP facade over the current client (Axios).

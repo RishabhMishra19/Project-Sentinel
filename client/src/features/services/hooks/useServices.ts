@@ -1,11 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  createService,
-  deleteService,
-  listAllServices,
-  listServices,
-  updateService,
-} from '../api/servicesApi'
+import { ServicesApi } from '../api/ServicesApi'
 import type { ServiceListParams, CreateServiceRequest, UpdateServiceRequest } from '../dto/request/service.request'
 
 export const servicesQueryKey = (productId?: string) =>
@@ -14,7 +8,7 @@ export const servicesQueryKey = (productId?: string) =>
 export function useAllServicesQuery(params: ServiceListParams | null) {
   return useQuery({
     queryKey: [...servicesQueryKey(), 'list', params],
-    queryFn: () => listAllServices(params!),
+    queryFn: () => ServicesApi.listAll(params!),
     enabled: params != null,
   })
 }
@@ -25,7 +19,7 @@ export function useServicesQuery(
 ) {
   return useQuery({
     queryKey: [...servicesQueryKey(productId), 'list', params],
-    queryFn: () => listServices(productId!, params!),
+    queryFn: () => ServicesApi.list(productId!, params!),
     enabled: productId != null && params != null,
   })
 }
@@ -40,7 +34,7 @@ export function useCreateService(productId?: string) {
     }: {
       productId: string
       payload: CreateServiceRequest
-    }) => createService(targetProductId, payload),
+    }) => ServicesApi.create(targetProductId, payload),
     onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['services'] })
       void queryClient.invalidateQueries({
@@ -65,7 +59,7 @@ export function useUpdateService(productId: string) {
     }: {
       id: string
       payload: UpdateServiceRequest
-    }) => updateService(productId, id, payload),
+    }) => ServicesApi.update(productId, id, payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['services'] })
       void queryClient.invalidateQueries({
@@ -79,7 +73,7 @@ export function useDeleteService(productId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => deleteService(productId, id),
+    mutationFn: (id: string) => ServicesApi.delete(productId, id),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['services'] })
       void queryClient.invalidateQueries({
