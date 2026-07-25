@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Menu } from './primitives/Menu'
+import { Menu } from '../primitives/Menu'
 import { buttonClassName } from './styles'
 import type { RowAction } from './types'
 

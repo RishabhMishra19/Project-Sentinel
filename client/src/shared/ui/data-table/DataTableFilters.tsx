@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { FilterControl } from './filters/FilterControl'
 import { formatFilterValue } from './filters/formatFilterValue'
 import { isFilterActive } from './filters/isFilterActive'
-import { Popover } from './primitives/Popover'
+import { Popover } from '../primitives/Popover'
 import { buttonClassName, primaryButtonClassName } from './styles'
 import type {
   DataTableColumn,

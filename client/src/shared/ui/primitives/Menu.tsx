@@ -20,7 +20,12 @@ type MenuProps = {
   className?: string
 }
 
-export const Menu = ({ trigger, items, align = 'end', className }: MenuProps) => {
+export const Menu = ({
+  trigger,
+  items,
+  align = 'end',
+  className,
+}: MenuProps) => {
   const [open, setOpen] = useState(false)
 
   return (
