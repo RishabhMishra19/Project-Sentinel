@@ -4,12 +4,14 @@ export type SidebarItem = {
   id: string
   label: string
   path: string
-  onlySentinelAdmin?: boolean
   requiresCatalogRead?: boolean
 }
 
-export const SIDE_BAR_ITEMS: SidebarItem[] = [
-  { id: 'tenants', label: 'Tenants', path: ROUTES.TENANTS, onlySentinelAdmin: true },
+export const ADMIN_SIDE_BAR_ITEMS: SidebarItem[] = [
+  { id: 'tenants', label: 'Tenants', path: ROUTES.TENANTS },
+]
+
+export const TENANT_SIDE_BAR_ITEMS: SidebarItem[] = [
   {
     id: 'products',
     label: 'Products',

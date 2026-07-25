@@ -14,7 +14,7 @@ import { canReadCatalog } from '../../shared/permissions/canReadCatalog'
 import { ROUTES } from '../../routes/paths'
 import { localStorageManager } from '../storage/LocalStorageManager'
 import { LoggedInUserCard } from './LoggedInUserCard'
-import { SIDE_BAR_ITEMS } from './sidebarConfig'
+import { ADMIN_SIDE_BAR_ITEMS, TENANT_SIDE_BAR_ITEMS } from './sidebarConfig'
 import { SidebarItem, type SidebarMode } from './SidebarItem'
 import { SidebarTray } from './SidebarTray'
 
@@ -38,20 +38,22 @@ export function AppSidebar() {
   const isCollapsed = mode === 'collapsed'
 
   const user = useAppSelector((state) => state.session.user)
+  const activeTenant = useAppSelector((state) => state.session.activeTenant)
   const isSentinelAdmin = user?.sentinelAdmin === true
+  const isImpersonating = isSentinelAdmin && activeTenant != null
+  const isPlatformAdmin = isSentinelAdmin && !isImpersonating
+  const isTenantContext = !isSentinelAdmin || isImpersonating
   const hasCatalogRead = canReadCatalog(isSentinelAdmin, user?.roles ?? [])
 
-  const navItems = SIDE_BAR_ITEMS.filter((item) => {
-    if (item.onlySentinelAdmin) {
-      if (!user) return false
-      return isSentinelAdmin
-    }
-    if (item.requiresCatalogRead) {
-      if (!user) return false
-      return hasCatalogRead
-    }
-    return true
-  })
+  const source = isPlatformAdmin
+    ? ADMIN_SIDE_BAR_ITEMS
+    : isTenantContext
+      ? TENANT_SIDE_BAR_ITEMS
+      : []
+
+  const navItems = source.filter(
+    (item) => !item.requiresCatalogRead || (user != null && hasCatalogRead),
+  )
 
   const isNavActive = (path: string) => {
     if (path === ROUTES.PRODUCTS) {
