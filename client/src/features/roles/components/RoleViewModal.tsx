@@ -1,4 +1,5 @@
-import { ModalViewLayout, QueryGate } from "../../../shared/ui";
+import { DetailRow, ModalViewLayout, QueryGate } from "../../../shared/ui";
+import { formatDateTime } from "../../../shared/utils/dateUtils";
 import { useRoleQuery } from "../hooks/useRoles";
 
 type RoleViewModalProps = {
@@ -6,24 +7,6 @@ type RoleViewModalProps = {
   roleId: string | null;
   onClose: () => void;
 };
-
-const formatDateTime = (value: string | null | undefined) => {
-  if (!value) {
-    return "—";
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return date.toLocaleString();
-};
-
-const DetailRow = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex flex-col gap-0.5">
-    <dt className="text-xs text-muted">{label}</dt>
-    <dd className="text-sm text-foreground">{value}</dd>
-  </div>
-);
 
 export const RoleViewModal = ({ open, roleId, onClose }: RoleViewModalProps) => {
   const { data: role, isFetching, isError } = useRoleQuery(roleId, open);
