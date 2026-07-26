@@ -1,9 +1,9 @@
 package com.sentinel.server.logs.service.core;
 
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.observability.entity.RequestLog;
 import com.sentinel.server.observability.repository.RequestLogRepository;
 import com.sentinel.server.observability.repository.RequestLogSpecifications;
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,32 +22,9 @@ public class RequestLogServiceImpl implements RequestLogService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<RequestLog> search(
-            UUID tenantId,
-            Instant from,
-            Instant to,
-            UUID productId,
-            UUID serviceId,
-            UUID endpointId,
-            Integer statusCode,
-            String statusClass,
-            Integer minDurationMs,
-            String traceId,
-            String requestId,
-            Pageable pageable) {
+    public Page<RequestLog> search(UUID tenantId, ListQueryRequest query, Pageable pageable) {
         Specification<RequestLog> spec =
-                RequestLogSpecifications.forTenantFilters(
-                        tenantId,
-                        from,
-                        to,
-                        productId,
-                        serviceId,
-                        endpointId,
-                        statusCode,
-                        statusClass,
-                        minDurationMs,
-                        traceId,
-                        requestId);
+                RequestLogSpecifications.forTenantFilters(tenantId, query);
         return requestLogRepository.findAll(spec, pageable);
     }
 

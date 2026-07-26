@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
+import type { ListQueryRequest } from '../../../shared/api/listQueryRequest'
 import { RequestLogsApi } from '../api/RequestLogsApi'
-import type { RequestLogListParams } from '../dto/request/requestLog.request'
 
 export const requestLogsQueryKey = ['logs', 'requests'] as const
 
-export function useRequestLogsQuery(params: RequestLogListParams | null) {
+export function useRequestLogsQuery(params: ListQueryRequest | null) {
   return useQuery({
     queryKey: [...requestLogsQueryKey, 'list', params],
     queryFn: () => RequestLogsApi.list(params!),
