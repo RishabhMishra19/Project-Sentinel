@@ -3,6 +3,10 @@ import type {
   DataTableColumnFilter,
   DataTableFilterValue,
 } from '../../types'
+import {
+  PRESET_SUMMARY,
+  matchDateRangePreset,
+} from './controls/DateRangeFilter'
 
 export type FilterableColumnOption = {
   id: string
@@ -77,6 +81,10 @@ export const formatFilterValue = (
       return value as DataTableFilterValue<'date'>
     case 'dateRange': {
       const range = value as DataTableFilterValue<'dateRange'>
+      const preset = matchDateRangePreset(range)
+      if (preset) {
+        return PRESET_SUMMARY[preset]
+      }
       if (range.from && range.to) {
         return `${range.from} – ${range.to}`
       }

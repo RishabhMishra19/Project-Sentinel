@@ -13,7 +13,7 @@ export const FilterEditorPanel = ({
   value,
   onChange,
 }: FilterEditorPanelProps) => (
-  <div className="min-h-[8rem] w-56 p-2">
+  <div className="min-h-[8rem] w-[17.25rem] p-2">
     <div className="flex flex-col gap-2">
       <p className="text-xs font-medium text-muted">{selected.header}</p>
       <FilterControl
