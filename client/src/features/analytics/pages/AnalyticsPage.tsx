@@ -1,9 +1,15 @@
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../navigation";
+import {
+  AppliedFilterChips,
+  dateRangeFromPreset,
+  Filters,
+  type FiltersChange,
+} from "../../../shared/ui/filters";
 import { useProductsQuery } from "../../products/hooks/useProducts";
 import { useAllServicesQuery, useServiceEndpointsQuery } from "../../services/hooks/useServices";
-import type { AnalyticsBucket, AnalyticsScope } from "../dto/request/analytics.request";
+import type { AnalyticsScope } from "../dto/request/analytics.request";
 import type { AnalyticsRankingItem } from "../dto/response/analytics.response";
 import {
   AnalyticsErrorRateChart,
@@ -21,14 +27,13 @@ import {
   useEndpointStatusBreakdownQuery,
 } from "../hooks/useAnalytics";
 import {
-  clampLogsRange,
-  fromDatetimeLocalValue,
-  parseBucket,
-  rangeFromPreset,
-  suggestedBucket,
-  toDatetimeLocalValue,
-  type TimePreset,
-} from "../utils/timeRange";
+  buildAnalyticsFilterFields,
+  dateToFromIso,
+  dateToToIso,
+  filtersFromSearchParams,
+  mapAnalyticsFiltersToPatch,
+} from "../utils/analyticsFilters";
+import { clampLogsRange, parseBucket, suggestedBucket } from "../utils/timeRange";
 
 const TABS: { id: AnalyticsScope; label: string }[] = [
   { id: "TENANT", label: "Tenant" },
@@ -36,17 +41,6 @@ const TABS: { id: AnalyticsScope; label: string }[] = [
   { id: "SERVICE", label: "Service" },
   { id: "ENDPOINT", label: "Endpoint" },
 ];
-
-const PRESETS: TimePreset[] = ["1h", "6h", "24h", "7d", "30d", "90d"];
-
-const BUCKETS: { id: AnalyticsBucket; label: string }[] = [
-  { id: "MINUTE", label: "Minute" },
-  { id: "HOUR", label: "Hour" },
-  { id: "DAY", label: "Day" },
-];
-
-const selectClassName =
-  "min-w-[12rem] rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground";
 
 function parseScope(raw: string | null): AnalyticsScope {
   if (raw === "PRODUCT" || raw === "SERVICE" || raw === "ENDPOINT") {
@@ -64,7 +58,13 @@ export function AnalyticsPage() {
   const serviceId = params.get("serviceId") ?? undefined;
   const endpointId = params.get("endpointId") ?? undefined;
 
-  const defaultRange = useMemo(() => rangeFromPreset("24h"), []);
+  const defaultRange = useMemo(() => {
+    const dates = dateRangeFromPreset("1d");
+    return {
+      from: dateToFromIso(dates.from),
+      to: dateToToIso(dates.to),
+    };
+  }, []);
   const from = params.get("from") ?? defaultRange.from;
   const to = params.get("to") ?? defaultRange.to;
   const bucket = parseBucket(params.get("bucket")) ?? suggestedBucket(from, to);
@@ -115,25 +115,80 @@ export function AnalyticsPage() {
     patchParams(patch);
   };
 
-  const setPreset = (preset: TimePreset) => {
-    const range = rangeFromPreset(preset);
-    patchParams({
-      from: range.from,
-      to: range.to,
-      bucket: suggestedBucket(range.from, range.to),
-    });
-  };
+  const productsQuery = useProductsQuery(
+    scope === "PRODUCT" ? { page: 0, size: 100 } : null,
+  );
+  const servicesQuery = useAllServicesQuery(
+    scope === "SERVICE" || scope === "ENDPOINT"
+      ? { page: 0, size: 100, status: "ACTIVE" }
+      : null,
+  );
+  const services = servicesQuery.data?.content ?? [];
+  const products = productsQuery.data?.content ?? [];
+  const endpointsQuery = useServiceEndpointsQuery(
+    scope === "ENDPOINT" ? serviceId : undefined,
+  );
+  const endpoints = endpointsQuery.data ?? [];
 
-  const setCustomBound = (bound: "from" | "to", localValue: string) => {
-    const iso = fromDatetimeLocalValue(localValue);
-    if (!iso) return;
-    const nextFrom = bound === "from" ? iso : from;
-    const nextTo = bound === "to" ? iso : to;
-    if (new Date(nextFrom).getTime() >= new Date(nextTo).getTime()) return;
+  const filters = useMemo(
+    () => filtersFromSearchParams(params, scope),
+    [params, scope],
+  );
+
+  const filterFields = useMemo(
+    () =>
+      buildAnalyticsFilterFields({
+        scope,
+        productOptions: products.map((p) => ({ label: p.name, value: p.id })),
+        serviceOptions: services.map((s) => ({
+          label: `${s.productName} / ${s.name}`,
+          value: s.id,
+        })),
+        endpointOptions: endpoints.map((ep) => ({
+          label: `${ep.method} ${ep.pathTemplate}`,
+          value: ep.id,
+        })),
+      }),
+    [scope, products, services, endpoints],
+  );
+
+  const onFiltersChange = (next: FiltersChange) => {
+    const mapped = mapAnalyticsFiltersToPatch(next, scope, {
+      productId,
+      serviceId,
+      endpointId,
+    });
+
+    let nextProductId = mapped.productId;
+    let nextServiceId = mapped.serviceId;
+    let nextEndpointId = mapped.endpointId;
+
+    if (scope === "SERVICE" || scope === "ENDPOINT") {
+      const selected = services.find((s) => s.id === nextServiceId);
+      nextProductId = selected?.productId ?? null;
+      if (nextServiceId !== (serviceId ?? null)) {
+        nextEndpointId = null;
+      }
+    }
+
+    if (scope === "PRODUCT") {
+      nextServiceId = null;
+      nextEndpointId = null;
+    } else if (scope === "SERVICE") {
+      nextEndpointId = null;
+    } else if (scope === "TENANT") {
+      nextProductId = null;
+      nextServiceId = null;
+      nextEndpointId = null;
+    }
+
     patchParams({
-      from: nextFrom,
-      to: nextTo,
-      bucket: suggestedBucket(nextFrom, nextTo),
+      productId: nextProductId,
+      serviceId: nextServiceId,
+      endpointId: nextEndpointId,
+      from: mapped.from,
+      to: mapped.to,
+      bucket: mapped.bucket,
     });
   };
 
@@ -173,15 +228,6 @@ export function AnalyticsPage() {
     from,
     to,
   );
-
-  const productsQuery = useProductsQuery(scope === "PRODUCT" ? { page: 0, size: 100 } : null);
-  const servicesQuery = useAllServicesQuery(
-    scope === "SERVICE" || scope === "ENDPOINT" ? { page: 0, size: 100, status: "ACTIVE" } : null,
-  );
-  const services = servicesQuery.data?.content ?? [];
-  const products = productsQuery.data?.content ?? [];
-  const endpointsQuery = useServiceEndpointsQuery(scope === "ENDPOINT" ? serviceId : undefined);
-  const endpoints = endpointsQuery.data ?? [];
 
   // Default each scoped tab to the first available value.
   useEffect(() => {
@@ -272,13 +318,30 @@ export function AnalyticsPage() {
       from: clamped.from,
       to: clamped.to,
     });
-    if (productId) q.set("productId", productId);
-    if (serviceId) q.set("serviceId", serviceId);
-    if (endpointId) q.set("endpointId", endpointId);
+    // Carry over whatever scope filters Logs supports.
+    if (scope === "PRODUCT" || scope === "SERVICE" || scope === "ENDPOINT") {
+      if (productId) q.set("productId", productId);
+    }
+    if (scope === "SERVICE" || scope === "ENDPOINT") {
+      if (serviceId) q.set("serviceId", serviceId);
+    }
+    if (scope === "ENDPOINT" && endpointId) {
+      q.set("endpointId", endpointId);
+    }
     navigate(`/${ROUTE_PATHS.logs}?${q.toString()}`);
   };
 
   const points = timeseriesQuery.data?.points ?? [];
+
+  const filtersConfig = useMemo(
+    () => ({
+      filters,
+      onFiltersChange,
+    }),
+    // onFiltersChange closes over latest URL/list state each render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filters, scope, productId, serviceId, endpointId, services],
+  );
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
@@ -302,170 +365,39 @@ export function AnalyticsPage() {
         })}
       </div>
 
-      <div className="flex flex-col gap-3 rounded-xl border border-border p-4">
+      <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          {PRESETS.map((preset) => (
-            <button
-              key={preset}
-              type="button"
-              onClick={() => setPreset(preset)}
-              className="rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/50"
-            >
-              {preset}
-            </button>
-          ))}
+          <button
+            type="button"
+            onClick={openInLogs}
+            disabled={!scopeReady}
+            className="inline-flex h-7 items-center gap-1.5 rounded border border-accent bg-accent px-2 text-xs text-accent-foreground hover:opacity-90 disabled:opacity-50"
+          >
+            Open in Logs
+          </button>
+          <div className="ml-auto">
+            <Filters fields={filterFields} filtersConfig={filtersConfig} />
+          </div>
         </div>
-
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            From
-            <input
-              type="datetime-local"
-              className={selectClassName}
-              value={toDatetimeLocalValue(from)}
-              onChange={(e) => setCustomBound("from", e.target.value)}
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            To
-            <input
-              type="datetime-local"
-              className={selectClassName}
-              value={toDatetimeLocalValue(to)}
-              onChange={(e) => setCustomBound("to", e.target.value)}
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            Granularity
-            <select
-              className={selectClassName}
-              value={bucket}
-              onChange={(e) => patchParams({ bucket: e.target.value as AnalyticsBucket })}
-            >
-              {BUCKETS.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+        <AppliedFilterChips
+          fields={filterFields}
+          filtersConfig={filtersConfig}
+        />
       </div>
-
-      {scope === "PRODUCT" && (
-        <label className="flex w-fit flex-col gap-1 text-xs text-muted-foreground">
-          Product
-          <select
-            className="min-w-[16rem] rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-            value={productId ?? ""}
-            onChange={(e) =>
-              patchParams({
-                productId: e.target.value || null,
-                serviceId: null,
-                endpointId: null,
-              })
-            }
-          >
-            <option value="">Select product</option>
-            {(productsQuery.data?.content ?? []).map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-
-      {scope === "SERVICE" && (
-        <label className="flex w-fit flex-col gap-1 text-xs text-muted-foreground">
-          Service
-          <select
-            className="min-w-[16rem] rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-            value={serviceId ?? ""}
-            onChange={(e) => {
-              const id = e.target.value || null;
-              const selected = services.find((s) => s.id === id);
-              patchParams({
-                productId: selected?.productId ?? null,
-                serviceId: id,
-                endpointId: null,
-              });
-            }}
-          >
-            <option value="">Select service</option>
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.productName} / {s.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-
-      {scope === "ENDPOINT" && (
-        <div className="flex flex-wrap gap-3">
-          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            Service
-            <select
-              className="min-w-[16rem] rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              value={serviceId ?? ""}
-              onChange={(e) => {
-                const id = e.target.value || null;
-                const selected = services.find((s) => s.id === id);
-                patchParams({
-                  productId: selected?.productId ?? null,
-                  serviceId: id,
-                  endpointId: null,
-                });
-              }}
-            >
-              <option value="">Select service</option>
-              {services.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.productName} / {s.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            Endpoint
-            <select
-              className="min-w-[18rem] rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              value={endpointId ?? ""}
-              disabled={!serviceId || endpointsQuery.isLoading}
-              onChange={(e) =>
-                patchParams({
-                  endpointId: e.target.value || null,
-                })
-              }
-            >
-              <option value="">
-                {!serviceId
-                  ? "Select a service first"
-                  : endpointsQuery.isLoading
-                    ? "Loading endpoints…"
-                    : "Select endpoint"}
-              </option>
-              {endpoints.map((ep) => (
-                <option key={ep.id} value={ep.id}>
-                  {ep.method} {ep.pathTemplate}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      )}
 
       {!scopeReady ? (
         <div className="rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
           {scope === "PRODUCT" && "Select a product to view analytics."}
           {scope === "SERVICE" && "Select a service to view analytics."}
-          {scope === "ENDPOINT" && "Select a service and endpoint to view analytics."}
+          {scope === "ENDPOINT" &&
+            "Select a service and endpoint to view analytics."}
         </div>
       ) : (
         <>
           {summaryQuery.isError || timeseriesQuery.isError ? (
-            <p className="text-sm text-destructive">Could not load analytics for this scope.</p>
+            <p className="text-sm text-destructive">
+              Could not load analytics for this scope.
+            </p>
           ) : null}
 
           <AnalyticsKpiStrip summary={summaryQuery.data} />
@@ -477,20 +409,9 @@ export function AnalyticsPage() {
           </div>
 
           {scope === "ENDPOINT" ? (
-            <div className="flex flex-col gap-4">
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={openInLogs}
-                  className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted/50"
-                >
-                  Open in Logs
-                </button>
-              </div>
-              <div className="grid gap-4 lg:grid-cols-2">
-                <EndpointStatusChart items={statusQuery.data ?? []} />
-                <EndpointExceptionsChart items={exceptionsQuery.data ?? []} />
-              </div>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <EndpointStatusChart items={statusQuery.data ?? []} />
+              <EndpointExceptionsChart items={exceptionsQuery.data ?? []} />
             </div>
           ) : (
             <AnalyticsRankingsTable
