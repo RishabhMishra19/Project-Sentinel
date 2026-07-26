@@ -1,4 +1,4 @@
-package com.sentinel.server.common.crypto;
+package com.sentinel.common.crypto;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

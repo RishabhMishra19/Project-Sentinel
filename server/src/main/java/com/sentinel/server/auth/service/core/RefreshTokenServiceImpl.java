@@ -4,7 +4,7 @@ import com.sentinel.server.auth.dto.internal.RefreshTokenIssue;
 import com.sentinel.server.auth.entity.RefreshToken;
 import com.sentinel.server.auth.entity.RefreshTokenStatus;
 import com.sentinel.server.auth.repository.RefreshTokenRepository;
-import com.sentinel.server.common.crypto.Sha256Hasher;
+import com.sentinel.common.crypto.Sha256Hasher;
 import com.sentinel.server.common.exception.UnauthorizedException;
 import com.sentinel.server.security.JwtProperties;
 import com.sentinel.server.user.entity.User;
