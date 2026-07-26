@@ -3,6 +3,7 @@ import { Popover } from '../primitives/Popover'
 import { FilterColumnList } from './components/FilterColumnList'
 import { FilterEditorPanel } from './components/FilterEditorPanel'
 import { FilterPopoverActions } from './components/FilterPopoverActions'
+import { encodeFilters } from './encodeFilters'
 import {
   collectActiveFilters,
   countActiveFilters,
@@ -46,6 +47,13 @@ export const Filters = ({ fields, filtersConfig }: FiltersProps) => {
     setDraft((prev) => ({ ...prev, [filterId]: value }))
   }
 
+  const emitFilters = (next: Record<string, FilterValue>) => {
+    onFiltersChange({
+      filters: next,
+      apiFilters: encodeFilters(fields, next),
+    })
+  }
+
   return (
     <Popover
       align="end"
@@ -81,7 +89,7 @@ export const Filters = ({ fields, filtersConfig }: FiltersProps) => {
           canReset={draftActiveCount > 0}
           onReset={() => setDraft({})}
           onApply={() => {
-            onFiltersChange(collectActiveFilters(fields, draft))
+            emitFilters(collectActiveFilters(fields, draft))
             setOpen(false)
           }}
         />

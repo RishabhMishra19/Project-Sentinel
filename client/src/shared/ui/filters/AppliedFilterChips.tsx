@@ -1,3 +1,4 @@
+import { encodeFilters } from './encodeFilters'
 import { buildFilterChips } from './filterUtils'
 import type { FilterField, FiltersConfig } from './types'
 
@@ -17,6 +18,13 @@ export const AppliedFilterChips = ({
     return null
   }
 
+  const emitFilters = (next: typeof filters) => {
+    onFiltersChange({
+      filters: next,
+      apiFilters: encodeFilters(fields, next),
+    })
+  }
+
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {chips.map((chip) => (
@@ -32,7 +40,7 @@ export const AppliedFilterChips = ({
             aria-label={`Remove ${chip.header} filter`}
             onClick={() => {
               const { [chip.id]: _removed, ...next } = filters
-              onFiltersChange(next)
+              emitFilters(next)
             }}
           >
             ×
@@ -42,7 +50,7 @@ export const AppliedFilterChips = ({
       <button
         type="button"
         className="text-xs text-muted hover:text-foreground"
-        onClick={() => onFiltersChange({})}
+        onClick={() => emitFilters({})}
       >
         Clear all
       </button>

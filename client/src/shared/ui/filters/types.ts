@@ -18,14 +18,20 @@ export type FilterValueByType = {
   dateTimeRange: { from: string | null; to: string | null }
 }
 
+/** Query-param names for range filters (defaults: from / to). */
+export type FilterRangeApiKeys = {
+  fromKey?: string
+  toKey?: string
+}
+
 /** Source of truth: filter type → field filter config */
 export type FilterConfigByType = {
   select: { type: 'select'; options: FilterOption[] }
   multiSelect: { type: 'multiSelect'; options: FilterOption[] }
   boolean: { type: 'boolean' }
   date: { type: 'date' }
-  dateRange: { type: 'dateRange' }
-  dateTimeRange: { type: 'dateTimeRange' }
+  dateRange: { type: 'dateRange' } & FilterRangeApiKeys
+  dateTimeRange: { type: 'dateTimeRange' } & FilterRangeApiKeys
 }
 
 export type FilterValue<F extends FilterType = FilterType> =
@@ -41,7 +47,15 @@ export type FilterField = {
   filter: FilterFieldConfig
 }
 
+/** Flat wire params produced by encodeFilters (ready for most list APIs). */
+export type ApiFilters = Record<string, string>
+
+export type FiltersChange = {
+  filters: Record<string, FilterValue>
+  apiFilters: ApiFilters
+}
+
 export type FiltersConfig = {
   filters: Record<string, FilterValue>
-  onFiltersChange: (next: Record<string, FilterValue>) => void
+  onFiltersChange: (next: FiltersChange) => void
 }

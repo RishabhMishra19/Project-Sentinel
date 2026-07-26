@@ -10,6 +10,7 @@ export {
   matchDateTimeRangePreset,
   DATE_TIME_PRESET_SUMMARY,
 } from './controls/DateTimeRangeFilter'
+export { encodeFilters } from './encodeFilters'
 export {
   buildFilterChips,
   collectActiveFilters,
@@ -21,12 +22,15 @@ export {
 export type { FilterChip } from './filterUtils'
 
 export type {
+  ApiFilters,
   FilterConfigByType,
   FilterField,
   FilterFieldConfig,
   FilterOption,
+  FilterRangeApiKeys,
   FilterType,
   FilterValue,
   FilterValueByType,
+  FiltersChange,
   FiltersConfig,
 } from './types'

@@ -1,5 +1,5 @@
 import { useCallback, useState, type ReactNode } from "react";
-import type { FilterValue } from "../../filters";
+import type { FiltersChange } from "../../filters";
 import type {
   DataTableColumn,
   DataTableProps,
@@ -33,8 +33,13 @@ export const useDataTableQueryState = <T extends object>({
     setQuery((prev) => ({ ...prev, search, pageIndex: 0 }));
   }, []);
 
-  const setFilters = useCallback((filters: Record<string, FilterValue>) => {
-    setQuery((prev) => ({ ...prev, filters, pageIndex: 0 }));
+  const setFilters = useCallback((next: FiltersChange) => {
+    setQuery((prev) => ({
+      ...prev,
+      filters: next.filters,
+      apiFilters: next.apiFilters,
+      pageIndex: 0,
+    }));
   }, []);
 
   const setPageIndex = useCallback((pageIndex: number) => {
@@ -69,7 +74,7 @@ type BuildTablePropsInput<T extends object> = {
   emptyMessage?: string;
   onSortingChange: (next: DataTableSort) => void;
   onSearchChange: (next: DataTableSearchState) => void;
-  onFiltersChange: (next: Record<string, FilterValue>) => void;
+  onFiltersChange: (next: FiltersChange) => void;
   onPageIndexChange: (pageIndex: number) => void;
   onPageSizeChange: (pageSize: number) => void;
 };
