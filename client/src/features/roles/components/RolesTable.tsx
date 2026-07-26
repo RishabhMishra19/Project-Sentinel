@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { DataTable, useClientDataTable } from "../../../shared/ui/data-table";
+import { DataTable, useDataTable } from "../../../shared/ui/data-table";
 import { primaryButtonClassName } from "../../../shared/ui/data-table/styles";
 import type { RoleResponse } from "../dto/response/role.response";
 import { useRolesQuery } from "../hooks/useRoles";
@@ -20,7 +20,7 @@ export const RolesTable = ({
   onShowScopes,
   onMarkInactive,
 }: RolesTableProps) => {
-  const { data: roles = [], isFetching, isError } = useRolesQuery();
+  const { rows, isLoading, isError } = useRolesQuery();
 
   const rowActions = useMemo(
     () =>
@@ -33,20 +33,21 @@ export const RolesTable = ({
     [onView, onEdit, onShowScopes, onMarkInactive],
   );
 
-  const { tableProps } = useClientDataTable({
+  const { bindPage, toLocalPage } = useDataTable({
     columns: roleColumns,
-    data: roles,
     getRowId: (row) => row.id,
     enablePagination: false,
+    isLoading,
+    isError,
     rowActions,
-    isLoading: isFetching,
     toolbarActions: (
       <button type="button" className={primaryButtonClassName} onClick={onCreate}>
         Create role
       </button>
     ),
-    emptyMessage: isError ? "Could not load roles" : "No roles found",
+    emptyMessage: "No roles found",
+    errorMessage: "Could not load roles",
   });
 
-  return <DataTable {...tableProps} />;
+  return <DataTable {...bindPage(toLocalPage(rows))} />;
 };

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { mapListQuery } from "../../../shared/api/mapQuery";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
 import { RolesApi } from "../api/RolesApi";
 import type {
@@ -11,11 +12,13 @@ import type {
 export const rolesQueryKey = ["roles"] as const;
 
 export const useRolesQuery = (enabled = true) => {
-  return useQuery({
-    queryKey: rolesQueryKey,
-    queryFn: () => RolesApi.list(),
-    enabled,
-  });
+  return mapListQuery(
+    useQuery({
+      queryKey: rolesQueryKey,
+      queryFn: () => RolesApi.list(),
+      enabled,
+    }),
+  );
 };
 
 export const useRoleQuery = (roleId: string | null, enabled = true) => {
@@ -27,11 +30,13 @@ export const useRoleQuery = (roleId: string | null, enabled = true) => {
 };
 
 export const useRoleScopesQuery = (roleId: string | null, enabled = true) => {
-  return useQuery({
-    queryKey: [...rolesQueryKey, roleId, "scopes"],
-    queryFn: () => RolesApi.listScopes(roleId!),
-    enabled: enabled && roleId != null,
-  });
+  return mapListQuery(
+    useQuery({
+      queryKey: [...rolesQueryKey, roleId, "scopes"],
+      queryFn: () => RolesApi.listScopes(roleId!),
+      enabled: enabled && roleId != null,
+    }),
+  );
 };
 
 export const useCreateRole = () => {
