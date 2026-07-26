@@ -9,6 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import type { AnalyticsTimeseriesPoint } from "../dto/response/analytics.response";
+import { ChartShell } from "./ChartShell";
 
 const AXIS = { fontSize: 12, fill: "var(--color-muted-foreground, #737373)" };
 const GRID = "var(--color-border, #e5e5e5)";
@@ -29,37 +30,6 @@ const formatTick = (iso: string) => {
     hour: "2-digit",
     minute: "2-digit",
   });
-};
-
-type ChartShellProps = {
-  title: string;
-  xLabel: string;
-  yLabel: string;
-  children: React.ReactNode;
-  empty?: boolean;
-};
-
-const ChartShell = ({ title, xLabel, yLabel, children, empty }: ChartShellProps) => {
-  return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
-      <h3 className="text-sm font-medium text-foreground">{title}</h3>
-      {empty ? (
-        <p className="py-16 text-center text-sm text-muted-foreground">No data in this range.</p>
-      ) : (
-        <div className="flex gap-1">
-          <div className="relative w-6 shrink-0 self-stretch">
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-90 whitespace-nowrap text-xs text-muted-foreground">
-              {yLabel}
-            </span>
-          </div>
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <div className="h-64 w-full">{children}</div>
-            <p className="text-center text-xs text-muted-foreground">{xLabel}</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
 };
 
 export const AnalyticsVolumeChart = ({ points }: { points: AnalyticsTimeseriesPoint[] }) => {
