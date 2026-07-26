@@ -61,12 +61,21 @@ public final class RequestLogSpecifications {
                 preds.add(cb.equal(root.get("statusCode"), statusCode));
             }
             if (statusClass != null && !statusClass.isBlank()) {
-                switch (statusClass.trim().toLowerCase()) {
-                    case "2xx" -> preds.add(cb.between(root.get("statusCode"), 200, 299));
-                    case "3xx" -> preds.add(cb.between(root.get("statusCode"), 300, 399));
-                    case "4xx" -> preds.add(cb.between(root.get("statusCode"), 400, 499));
-                    case "5xx" -> preds.add(cb.between(root.get("statusCode"), 500, 599));
-                    default -> {}
+                List<Predicate> classPreds = new ArrayList<>();
+                for (String token : statusClass.split(",")) {
+                    if (token == null || token.isBlank()) {
+                        continue;
+                    }
+                    switch (token.trim().toLowerCase()) {
+                        case "2xx" -> classPreds.add(cb.between(root.get("statusCode"), 200, 299));
+                        case "3xx" -> classPreds.add(cb.between(root.get("statusCode"), 300, 399));
+                        case "4xx" -> classPreds.add(cb.between(root.get("statusCode"), 400, 499));
+                        case "5xx" -> classPreds.add(cb.between(root.get("statusCode"), 500, 599));
+                        default -> {}
+                    }
+                }
+                if (!classPreds.isEmpty()) {
+                    preds.add(cb.or(classPreds.toArray(Predicate[]::new)));
                 }
             }
             if (minDurationMs != null) {
