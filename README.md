@@ -86,23 +86,27 @@ Agents should **batch** runtime events (interval or N requests) rather than one 
 
 ## Current demo stack
 
-| Service  | URL / port            | How it runs                     |
-| -------- | --------------------- | ------------------------------- |
-| Client   | http://localhost:3000 | Docker Compose                  |
-| Server   | http://localhost:8080 | Docker Compose (or local Maven) |
-| Ingest   | http://localhost:8081 | Local Maven only (for now)      |
-| Worker   | http://localhost:8082 | Local Maven only (for now)      |
-| Postgres | localhost:5432        | Docker Compose                  |
-| Redis    | localhost:6379        | Docker Compose                  |
-| Kafka    | localhost:9092        | Docker Compose                  |
-| Kafka UI | http://localhost:8090 | Docker Compose                  |
+| Service  | URL / port            | How it runs                              |
+| -------- | --------------------- | ---------------------------------------- |
+| Client   | http://localhost:3000 | Docker Compose                           |
+| Server   | http://localhost:8080 | Docker Compose (or local Maven)          |
+| Ingest   | http://localhost:8081 | Docker Compose (or local Maven)          |
+| Worker   | http://localhost:8082 | Docker Compose (or local Maven)          |
+| Postgres | localhost:5432        | Docker Compose                           |
+| Redis    | localhost:6379        | Docker Compose                           |
+| Kafka    | localhost:9092        | Docker Compose                           |
+| Kafka UI | http://localhost:8090 | Docker Compose                           |
 
-- **server**: Spring Boot (Amazon Corretto 21), Maven, Postgres + Redis + Kafka, JWT auth (dashboard); owns schema via Liquibase
-- **ingest** (`sentinel-ingest`): Spring Boot — shared Postgres + Kafka; no Liquibase; service-key auth + instance/event APIs (see `docs/plans/ingest.md`); run locally
-- **worker** (`sentinel-worker`): Spring Boot skeleton — shared Postgres + Kafka; no Liquibase; run locally
+Maven layout is a **multi-module reactor** at the repo root (`common`, `server`, `ingest`, `worker`). Shared persistence lives in `common`; Liquibase stays on **server** only.
+
+- **server**: Spring Boot (Amazon Corretto 21), Postgres + Redis + Kafka, JWT auth (dashboard); owns schema via Liquibase
+- **ingest** (`sentinel-ingest`): Spring Boot — shared Postgres + Kafka; no Liquibase; depends on `common`
+- **worker** (`sentinel-worker`): Spring Boot skeleton — shared Postgres + Kafka; no Liquibase; depends on `common`
+- **common**: shared jar (entities/repos/utilities); not a deployable
 - **client**: React + TypeScript (Vite), Redux, React Query, Tailwind, Axios
 - Postgres data is stored in the Docker volume `postgres_data`
-- Docker packaging for ingest/worker is deferred; they are not in `docker-compose.yml` yet
+
+Docker images for `server` / `ingest` / `worker` build from the **repo root** context (`./mvn -pl <module> -am package`) so `common` is on the classpath.
 
 ## Start
 
@@ -112,24 +116,28 @@ With Docker Desktop running:
 docker compose up --build
 ```
 
-Health check:
+Health checks:
 
 ```bash
 curl http://localhost:8080/actuator/health
-```
-
-### Run ingest / worker locally
-
-With Compose infra up (at least Postgres + Kafka), from separate terminals:
-
-```bash
-cd ingest && ./mvnw spring-boot:run
-cd worker && ./mvnw spring-boot:run
-```
-
-```bash
 curl http://localhost:8081/actuator/health
 curl http://localhost:8082/actuator/health
+```
+
+### Run Java apps locally with Maven
+
+From the repo root (with Compose infra up — at least Postgres + Kafka, and Redis for server):
+
+```bash
+./mvnw -pl server -am spring-boot:run
+./mvnw -pl ingest -am spring-boot:run
+./mvnw -pl worker -am spring-boot:run
+```
+
+Or package everything:
+
+```bash
+./mvnw -pl server,ingest,worker -am package
 ```
 
 Defaults: Postgres `localhost:5432/sentinel`, Kafka `localhost:9092`. Schema changes still go through **server** Liquibase only.

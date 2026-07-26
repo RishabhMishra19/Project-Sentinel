@@ -1,0 +1,11 @@
+**/target
+**/node_modules
+**/.git
+**/.idea
+**/.vscode
+**/client
+**/docs
+**/postman
+**/scripts
+**/*.md
+**/.DS_Store

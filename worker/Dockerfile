@@ -7,13 +7,13 @@ COPY server ./server
 COPY ingest ./ingest
 COPY worker ./worker
 
-RUN mvn -pl server -am -B -q package -DskipTests \
-    && cp server/target/server-0.0.1-SNAPSHOT.jar /app/app.jar
+RUN mvn -pl worker -am -B -q package -DskipTests \
+    && cp worker/target/sentinel-worker-0.0.1-SNAPSHOT.jar /app/app.jar
 
 FROM amazoncorretto:21
 WORKDIR /app
 
 COPY --from=build /app/app.jar app.jar
 
-EXPOSE 8080
+EXPOSE 8082
 ENTRYPOINT ["java", "-jar", "app.jar"]
