@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 export const TenantsIcon = ({ className }: IconProps) => (
   <svg
@@ -22,4 +22,4 @@ export const TenantsIcon = ({ className }: IconProps) => (
     <path d="M12 10h.01" />
     <path d="M12 14h.01" />
   </svg>
-)
+);

@@ -1,18 +1,18 @@
-import { useState } from 'react'
-import { ChangePasswordModal } from '../components/ChangePasswordModal'
-import { useProfile } from '../hooks/useProfile'
+import { useState } from "react";
+import { ChangePasswordModal } from "../components/ChangePasswordModal";
+import { useProfile } from "../hooks/useProfile";
 
 function formatDate(value: string): string {
-  const date = new Date(value)
+  const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
-    return value
+    return value;
   }
-  return date.toLocaleString()
+  return date.toLocaleString();
 }
 
 export function ProfilePage() {
-  const { data, isLoading, isError } = useProfile()
-  const [changePasswordOpen, setChangePasswordOpen] = useState(false)
+  const { data, isLoading, isError } = useProfile();
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   return (
     <>
@@ -52,20 +52,18 @@ export function ProfilePage() {
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">
                   Sentinel admin
                 </dt>
-                <dd className="mt-1 text-foreground">{data.sentinelAdmin ? 'Yes' : 'No'}</dd>
+                <dd className="mt-1 text-foreground">{data.sentinelAdmin ? "Yes" : "No"}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">
                   Tenant admin
                 </dt>
-                <dd className="mt-1 text-foreground">{data.tenantAdmin ? 'Yes' : 'No'}</dd>
+                <dd className="mt-1 text-foreground">{data.tenantAdmin ? "Yes" : "No"}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted">Tenant</dt>
                 <dd className="mt-1 text-foreground">
-                  {data.tenant
-                    ? `${data.tenant.name} (${data.tenant.id})`
-                    : 'No tenant'}
+                  {data.tenant ? `${data.tenant.name} (${data.tenant.id})` : "No tenant"}
                 </dd>
               </div>
               <div>
@@ -81,7 +79,7 @@ export function ProfilePage() {
                   Last login
                 </dt>
                 <dd className="mt-1 text-foreground">
-                  {data.lastLoginAt ? formatDate(data.lastLoginAt) : 'Never'}
+                  {data.lastLoginAt ? formatDate(data.lastLoginAt) : "Never"}
                 </dd>
               </div>
             </dl>
@@ -96,13 +94,13 @@ export function ProfilePage() {
                     <li key={role.id} className="rounded border border-border p-4">
                       <p className="font-medium text-foreground">{role.name}</p>
                       <p className="mt-2 text-sm text-muted">
-                        Scopes:{' '}
+                        Scopes:{" "}
                         {role.scopes
                           .map(
                             (s) =>
-                              `${s.scopeType}${s.scopeId ? `:${s.scopeId.slice(0, 8)}` : ''} (${s.permission})`,
+                              `${s.scopeType}${s.scopeId ? `:${s.scopeId.slice(0, 8)}` : ""} (${s.permission})`,
                           )
-                          .join(', ') || 'none'}
+                          .join(", ") || "none"}
                       </p>
                     </li>
                   ))}
@@ -113,10 +111,7 @@ export function ProfilePage() {
         ) : null}
       </div>
 
-      <ChangePasswordModal
-        open={changePasswordOpen}
-        onClose={() => setChangePasswordOpen(false)}
-      />
+      <ChangePasswordModal open={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
     </>
-  )
+  );
 }

@@ -1,21 +1,18 @@
-import { useEffect, useId } from 'react'
-import { FormField } from '../../../shared/forms/FormField'
-import { useAppForm } from '../../../shared/forms/useAppForm'
-import { useCreateRole } from '../hooks/useRoles'
-import {
-  createRoleFormSchema,
-  type CreateRoleFormValues,
-} from '../schemas/role.schema'
+import { useEffect, useId } from "react";
+import { FormField } from "../../../shared/forms/FormField";
+import { useAppForm } from "../../../shared/forms/useAppForm";
+import { useCreateRole } from "../hooks/useRoles";
+import { createRoleFormSchema, type CreateRoleFormValues } from "../schemas/role.schema";
 
 type RoleCreateModalProps = {
-  open: boolean
-  onClose: () => void
-}
+  open: boolean;
+  onClose: () => void;
+};
 
 export const RoleCreateModal = ({ open, onClose }: RoleCreateModalProps) => {
-  const titleId = useId()
-  const createMutation = useCreateRole()
-  const { reset: resetMutation } = createMutation
+  const titleId = useId();
+  const createMutation = useCreateRole();
+  const { reset: resetMutation } = createMutation;
 
   const {
     register,
@@ -24,28 +21,28 @@ export const RoleCreateModal = ({ open, onClose }: RoleCreateModalProps) => {
     formState: { errors },
   } = useAppForm<CreateRoleFormValues>({
     schema: createRoleFormSchema,
-    defaultValues: { name: '' },
-  })
+    defaultValues: { name: "" },
+  });
 
   useEffect(() => {
     if (!open) {
-      return
+      return;
     }
-    resetMutation()
-    reset({ name: '' })
-  }, [open, reset, resetMutation])
+    resetMutation();
+    reset({ name: "" });
+  }, [open, reset, resetMutation]);
 
   if (!open) {
-    return null
+    return null;
   }
 
   const onSubmit = (data: CreateRoleFormValues) => {
     createMutation.mutate(data, {
       onSuccess: () => {
-        onClose()
+        onClose();
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -80,7 +77,7 @@ export const RoleCreateModal = ({ open, onClose }: RoleCreateModalProps) => {
             type="text"
             autoComplete="off"
             error={errors.name}
-            registration={register('name')}
+            registration={register("name")}
           />
 
           <div className="mt-2 flex justify-end gap-2">
@@ -96,11 +93,11 @@ export const RoleCreateModal = ({ open, onClose }: RoleCreateModalProps) => {
               disabled={createMutation.isPending}
               className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {createMutation.isPending ? 'Creating…' : 'Create role'}
+              {createMutation.isPending ? "Creating…" : "Create role"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 /** Linked modules — services / capabilities */
 export const ServicesIcon = ({ className }: IconProps) => (
@@ -20,4 +20,4 @@ export const ServicesIcon = ({ className }: IconProps) => (
     <path d="M10 6.5h2.5a2 2 0 0 1 2 2V10" />
     <path d="M14 17.5h-2.5a2 2 0 0 1-2-2V14" />
   </svg>
-)
+);

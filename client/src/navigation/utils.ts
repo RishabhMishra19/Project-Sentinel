@@ -1,7 +1,4 @@
-import type {
-  AuthSessionUser,
-  TenantSummary,
-} from "../features/auth/dto/response/auth.response";
+import type { AuthSessionUser, TenantSummary } from "../features/auth/dto/response/auth.response";
 import { ROUTE_PATHS } from "./constants";
 import { protectedPageRoutes } from "./routes/protected.routes";
 import type { SentinelRouteObject, SidebarItem } from "./types";
@@ -81,9 +78,7 @@ function toAbsolutePath(path: string): string {
 }
 
 /** Flatten route trees into sidebar entries sorted by `navigation.order`. */
-export const getSideBarItems = (
-  routes: SentinelRouteObject[],
-): SidebarItem[] => {
+export const getSideBarItems = (routes: SentinelRouteObject[]): SidebarItem[] => {
   return collectNavigableSidebarItems(routes).sort((a, b) => a.order - b.order);
 };
 
@@ -100,9 +95,7 @@ export function getFirstAccessiblePath(
   return collectIndexOrderedRoutes(routes)
     .sort((a, b) => a.indexOrder - b.indexOrder)
     .find((route) =>
-      route.isAccessibleTo
-        ? route.isAccessibleTo(isLoggedIn, user, activeTenant)
-        : true,
+      route.isAccessibleTo ? route.isAccessibleTo(isLoggedIn, user, activeTenant) : true,
     )?.path;
 }
 

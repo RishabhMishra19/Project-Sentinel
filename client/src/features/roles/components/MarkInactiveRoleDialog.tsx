@@ -1,32 +1,28 @@
-import { useId } from 'react'
-import type { RoleResponse } from '../dto/response/role.response'
-import { useMarkRoleInactive } from '../hooks/useRoles'
+import { useId } from "react";
+import type { RoleResponse } from "../dto/response/role.response";
+import { useMarkRoleInactive } from "../hooks/useRoles";
 
 type MarkInactiveRoleDialogProps = {
-  open: boolean
-  role: RoleResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  role: RoleResponse | null;
+  onClose: () => void;
+};
 
-export const MarkInactiveRoleDialog = ({
-  open,
-  role,
-  onClose,
-}: MarkInactiveRoleDialogProps) => {
-  const titleId = useId()
-  const inactiveMutation = useMarkRoleInactive()
+export const MarkInactiveRoleDialog = ({ open, role, onClose }: MarkInactiveRoleDialogProps) => {
+  const titleId = useId();
+  const inactiveMutation = useMarkRoleInactive();
 
   if (!open || !role) {
-    return null
+    return null;
   }
 
   const onConfirm = () => {
     inactiveMutation.mutate(role.id, {
       onSuccess: () => {
-        onClose()
+        onClose();
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -56,9 +52,8 @@ export const MarkInactiveRoleDialog = ({
         </div>
 
         <p className="text-sm text-muted">
-          Deactivate{' '}
-          <span className="font-medium text-foreground">{role.name}</span>? It
-          will no longer be assignable to users.
+          Deactivate <span className="font-medium text-foreground">{role.name}</span>? It will no
+          longer be assignable to users.
         </p>
 
         <div className="mt-6 flex justify-end gap-2">
@@ -75,10 +70,10 @@ export const MarkInactiveRoleDialog = ({
             disabled={inactiveMutation.isPending}
             className="cursor-pointer rounded bg-danger px-4 py-2 text-sm text-white hover:bg-danger/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {inactiveMutation.isPending ? 'Deactivating…' : 'Deactivate'}
+            {inactiveMutation.isPending ? "Deactivating…" : "Deactivate"}
           </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

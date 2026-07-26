@@ -1,31 +1,23 @@
-import { useEffect, useId } from 'react'
-import { useAppForm } from '../../../shared/forms/useAppForm'
-import type { RoleScopeResponse } from '../dto/response/role.response'
-import { useUpdateRoleScope } from '../hooks/useRoles'
-import {
-  updateRoleScopeFormSchema,
-  type UpdateRoleScopeFormValues,
-} from '../schemas/role.schema'
+import { useEffect, useId } from "react";
+import { useAppForm } from "../../../shared/forms/useAppForm";
+import type { RoleScopeResponse } from "../dto/response/role.response";
+import { useUpdateRoleScope } from "../hooks/useRoles";
+import { updateRoleScopeFormSchema, type UpdateRoleScopeFormValues } from "../schemas/role.schema";
 
 const selectClassName =
-  'rounded border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-ring'
+  "rounded border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-ring";
 
 type RoleScopeEditModalProps = {
-  open: boolean
-  roleId: string | null
-  scope: RoleScopeResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  roleId: string | null;
+  scope: RoleScopeResponse | null;
+  onClose: () => void;
+};
 
-export const RoleScopeEditModal = ({
-  open,
-  roleId,
-  scope,
-  onClose,
-}: RoleScopeEditModalProps) => {
-  const titleId = useId()
-  const updateMutation = useUpdateRoleScope(roleId)
-  const { reset: resetMutation } = updateMutation
+export const RoleScopeEditModal = ({ open, roleId, scope, onClose }: RoleScopeEditModalProps) => {
+  const titleId = useId();
+  const updateMutation = useUpdateRoleScope(roleId);
+  const { reset: resetMutation } = updateMutation;
 
   const {
     register,
@@ -34,19 +26,19 @@ export const RoleScopeEditModal = ({
     formState: { errors },
   } = useAppForm<UpdateRoleScopeFormValues>({
     schema: updateRoleScopeFormSchema,
-    defaultValues: { permission: 'READ' },
-  })
+    defaultValues: { permission: "READ" },
+  });
 
   useEffect(() => {
     if (!open || !scope) {
-      return
+      return;
     }
-    resetMutation()
-    reset({ permission: scope.permission })
-  }, [open, scope, reset, resetMutation])
+    resetMutation();
+    reset({ permission: scope.permission });
+  }, [open, scope, reset, resetMutation]);
 
   if (!open || !roleId || !scope) {
-    return null
+    return null;
   }
 
   const onSubmit = (data: UpdateRoleScopeFormValues) => {
@@ -54,11 +46,11 @@ export const RoleScopeEditModal = ({
       { scopeId: scope.id, payload: data },
       {
         onSuccess: () => {
-          onClose()
+          onClose();
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-foreground/40 px-4">
@@ -95,15 +87,13 @@ export const RoleScopeEditModal = ({
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm text-foreground">
             Permission
-            <select className={selectClassName} {...register('permission')}>
+            <select className={selectClassName} {...register("permission")}>
               <option value="READ">READ</option>
               <option value="READ_AND_WRITE">READ_AND_WRITE</option>
               <option value="ALL">ALL</option>
             </select>
             {errors.permission?.message ? (
-              <span className="text-sm text-danger">
-                {errors.permission.message}
-              </span>
+              <span className="text-sm text-danger">{errors.permission.message}</span>
             ) : null}
           </label>
 
@@ -120,11 +110,11 @@ export const RoleScopeEditModal = ({
               disabled={updateMutation.isPending}
               className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {updateMutation.isPending ? 'Saving…' : 'Save changes'}
+              {updateMutation.isPending ? "Saving…" : "Save changes"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};

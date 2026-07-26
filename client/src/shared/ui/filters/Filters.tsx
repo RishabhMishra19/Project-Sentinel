@@ -1,58 +1,53 @@
-import { useEffect, useState } from 'react'
-import { Popover } from '../primitives/Popover'
-import { FilterColumnList } from './components/FilterColumnList'
-import { FilterEditorPanel } from './components/FilterEditorPanel'
-import { FilterPopoverActions } from './components/FilterPopoverActions'
-import { encodeFilters } from './encodeFilters'
-import {
-  collectActiveFilters,
-  countActiveFilters,
-} from './filterUtils'
-import { buttonClassName } from './styles'
-import type { FilterField, FilterValue, FiltersConfig } from './types'
+import { useEffect, useState } from "react";
+import { Popover } from "../primitives/Popover";
+import { FilterColumnList } from "./components/FilterColumnList";
+import { FilterEditorPanel } from "./components/FilterEditorPanel";
+import { FilterPopoverActions } from "./components/FilterPopoverActions";
+import { encodeFilters } from "./encodeFilters";
+import { collectActiveFilters, countActiveFilters } from "./filterUtils";
+import { buttonClassName } from "./styles";
+import type { FilterField, FilterValue, FiltersConfig } from "./types";
 
 type FiltersProps = {
-  fields: FilterField[]
-  filtersConfig: FiltersConfig
-}
+  fields: FilterField[];
+  filtersConfig: FiltersConfig;
+};
 
 export const Filters = ({ fields, filtersConfig }: FiltersProps) => {
-  const { filters, onFiltersChange } = filtersConfig
+  const { filters, onFiltersChange } = filtersConfig;
 
-  const [open, setOpen] = useState(false)
-  const [draft, setDraft] = useState<Record<string, FilterValue>>({})
-  const [selectedId, setSelectedId] = useState(() => fields[0]?.id ?? '')
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<Record<string, FilterValue>>({});
+  const [selectedId, setSelectedId] = useState(() => fields[0]?.id ?? "");
 
   useEffect(() => {
     if (!open) {
-      return
+      return;
     }
-    setDraft(filters)
+    setDraft(filters);
     setSelectedId((prev) =>
-      fields.some((field) => field.id === prev)
-        ? prev
-        : (fields[0]?.id ?? ''),
-    )
-  }, [open, filters, fields])
+      fields.some((field) => field.id === prev) ? prev : (fields[0]?.id ?? ""),
+    );
+  }, [open, filters, fields]);
 
   if (fields.length === 0) {
-    return null
+    return null;
   }
 
-  const selected = fields.find((field) => field.id === selectedId) ?? fields[0]
-  const appliedCount = countActiveFilters(fields, filters)
-  const draftActiveCount = countActiveFilters(fields, draft)
+  const selected = fields.find((field) => field.id === selectedId) ?? fields[0];
+  const appliedCount = countActiveFilters(fields, filters);
+  const draftActiveCount = countActiveFilters(fields, draft);
 
   const handleDraftChange = (filterId: string, value: FilterValue) => {
-    setDraft((prev) => ({ ...prev, [filterId]: value }))
-  }
+    setDraft((prev) => ({ ...prev, [filterId]: value }));
+  };
 
   const emitFilters = (next: Record<string, FilterValue>) => {
     onFiltersChange({
       filters: next,
       apiFilters: encodeFilters(fields, next),
-    })
-  }
+    });
+  };
 
   return (
     <Popover
@@ -89,11 +84,11 @@ export const Filters = ({ fields, filtersConfig }: FiltersProps) => {
           canReset={draftActiveCount > 0}
           onReset={() => setDraft({})}
           onApply={() => {
-            emitFilters(collectActiveFilters(fields, draft))
-            setOpen(false)
+            emitFilters(collectActiveFilters(fields, draft));
+            setOpen(false);
           }}
         />
       </div>
     </Popover>
-  )
-}
+  );
+};

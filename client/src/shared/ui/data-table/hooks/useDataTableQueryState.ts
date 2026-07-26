@@ -7,10 +7,7 @@ import type {
   DataTableSort,
   RowAction,
 } from "../types";
-import {
-  createInitialQueryState,
-  type DataTableQueryState,
-} from "../utils/queryState";
+import { createInitialQueryState, type DataTableQueryState } from "../utils/queryState";
 
 type UseDataTableQueryStateOptions<T extends object> = {
   columns: DataTableColumn<T>[];
@@ -134,9 +131,7 @@ export const buildDataTableProps = <T extends object>({
 export const toTanStackSorting = (sorting: DataTableSort) =>
   sorting ? [{ id: sorting.id, desc: sorting.desc }] : [];
 
-export const fromTanStackSorting = (
-  sorting: { id: string; desc: boolean }[],
-): DataTableSort => {
+export const fromTanStackSorting = (sorting: { id: string; desc: boolean }[]): DataTableSort => {
   const first = sorting[0];
   if (!first) {
     return null;

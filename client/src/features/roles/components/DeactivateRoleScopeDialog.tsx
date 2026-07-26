@@ -1,13 +1,13 @@
-import { useId } from 'react'
-import type { RoleScopeResponse } from '../dto/response/role.response'
-import { useDeactivateRoleScope } from '../hooks/useRoles'
+import { useId } from "react";
+import type { RoleScopeResponse } from "../dto/response/role.response";
+import { useDeactivateRoleScope } from "../hooks/useRoles";
 
 type DeactivateRoleScopeDialogProps = {
-  open: boolean
-  roleId: string | null
-  scope: RoleScopeResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  roleId: string | null;
+  scope: RoleScopeResponse | null;
+  onClose: () => void;
+};
 
 export const DeactivateRoleScopeDialog = ({
   open,
@@ -15,20 +15,20 @@ export const DeactivateRoleScopeDialog = ({
   scope,
   onClose,
 }: DeactivateRoleScopeDialogProps) => {
-  const titleId = useId()
-  const deactivateMutation = useDeactivateRoleScope(roleId)
+  const titleId = useId();
+  const deactivateMutation = useDeactivateRoleScope(roleId);
 
   if (!open || !roleId || !scope) {
-    return null
+    return null;
   }
 
   const onConfirm = () => {
     deactivateMutation.mutate(scope.id, {
       onSuccess: () => {
-        onClose()
+        onClose();
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-foreground/40 px-4">
@@ -58,10 +58,10 @@ export const DeactivateRoleScopeDialog = ({
         </div>
 
         <p className="text-sm text-muted">
-          Deactivate{' '}
+          Deactivate{" "}
           <span className="font-medium text-foreground">
             {scope.scopeType}: {scope.scopeName}
-          </span>{' '}
+          </span>{" "}
           ({scope.permission})? It will no longer grant access.
         </p>
 
@@ -79,10 +79,10 @@ export const DeactivateRoleScopeDialog = ({
             disabled={deactivateMutation.isPending}
             className="cursor-pointer rounded bg-danger px-4 py-2 text-sm text-white hover:bg-danger/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {deactivateMutation.isPending ? 'Deactivating…' : 'Deactivate'}
+            {deactivateMutation.isPending ? "Deactivating…" : "Deactivate"}
           </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

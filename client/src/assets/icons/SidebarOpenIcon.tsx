@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 /** Expand sidebar */
 export const SidebarOpenIcon = ({ className }: IconProps) => (
@@ -19,4 +19,4 @@ export const SidebarOpenIcon = ({ className }: IconProps) => (
     <path d="M9 3v18" />
     <path d="m14 9 3 3-3 3" />
   </svg>
-)
+);

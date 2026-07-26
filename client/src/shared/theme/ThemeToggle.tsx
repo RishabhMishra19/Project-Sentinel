@@ -1,15 +1,15 @@
-import { MoonIcon, SunIcon } from '../../assets/icons'
-import { useTheme } from './ThemeProvider'
+import { MoonIcon, SunIcon } from "../../assets/icons";
+import { useTheme } from "./ThemeProvider";
 
 type ThemeToggleProps = {
-  className?: string
-}
+  className?: string;
+};
 
-export const ThemeToggle = ({ className = '' }: ThemeToggleProps) => {
-  const { theme, toggleTheme } = useTheme()
-  const isDark = theme === 'dark'
-  const Icon = isDark ? SunIcon : MoonIcon
-  const label = isDark ? 'Switch to light mode' : 'Switch to dark mode'
+export const ThemeToggle = ({ className = "" }: ThemeToggleProps) => {
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
+  const Icon = isDark ? SunIcon : MoonIcon;
+  const label = isDark ? "Switch to light mode" : "Switch to dark mode";
 
   return (
     <span className={className}>
@@ -30,5 +30,5 @@ export const ThemeToggle = ({ className = '' }: ThemeToggleProps) => {
         </span>
       </span>
     </span>
-  )
-}
+  );
+};

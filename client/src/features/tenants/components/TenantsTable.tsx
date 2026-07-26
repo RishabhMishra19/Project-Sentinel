@@ -1,25 +1,22 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState } from "react";
 import {
   DataTable,
   useServerDataTable,
   type DataTableQueryState,
-} from '../../../shared/ui/data-table'
-import { primaryButtonClassName } from '../../../shared/ui/data-table/styles'
-import type { TenantResponse } from '../dto/response/tenant.response'
-import { useTenantsQuery } from '../hooks/useTenants'
-import { mapTenantListQuery } from './mapTenantListQuery'
-import {
-  createTenantRowActions,
-  tenantColumns,
-} from './tenantsTableConfig'
+} from "../../../shared/ui/data-table";
+import { primaryButtonClassName } from "../../../shared/ui/data-table/styles";
+import type { TenantResponse } from "../dto/response/tenant.response";
+import { useTenantsQuery } from "../hooks/useTenants";
+import { mapTenantListQuery } from "./mapTenantListQuery";
+import { createTenantRowActions, tenantColumns } from "./tenantsTableConfig";
 
 type TenantsTableProps = {
-  onCreate: () => void
-  onView: (tenant: TenantResponse) => void
-  onEdit: (tenant: TenantResponse) => void
-  onStartSession: (tenant: TenantResponse) => void
-  onDeactivate: (tenant: TenantResponse) => void
-}
+  onCreate: () => void;
+  onView: (tenant: TenantResponse) => void;
+  onEdit: (tenant: TenantResponse) => void;
+  onStartSession: (tenant: TenantResponse) => void;
+  onDeactivate: (tenant: TenantResponse) => void;
+};
 
 export const TenantsTable = ({
   onCreate,
@@ -28,14 +25,14 @@ export const TenantsTable = ({
   onStartSession,
   onDeactivate,
 }: TenantsTableProps) => {
-  const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null)
+  const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null);
 
   const listParams = useMemo(
     () => (fetchQuery ? mapTenantListQuery(fetchQuery) : null),
     [fetchQuery],
-  )
+  );
 
-  const { data, isFetching } = useTenantsQuery(listParams)
+  const { data, isFetching } = useTenantsQuery(listParams);
 
   const rowActions = useMemo(
     () =>
@@ -46,7 +43,7 @@ export const TenantsTable = ({
         onDeactivate,
       }),
     [onView, onEdit, onStartSession, onDeactivate],
-  )
+  );
 
   const { tableProps } = useServerDataTable({
     columns: tenantColumns,
@@ -58,16 +55,12 @@ export const TenantsTable = ({
     isLoading: isFetching || fetchQuery == null,
     onQueryChange: setFetchQuery,
     toolbarActions: (
-      <button
-        type="button"
-        className={primaryButtonClassName}
-        onClick={onCreate}
-      >
+      <button type="button" className={primaryButtonClassName} onClick={onCreate}>
         Create tenant
       </button>
     ),
-    emptyMessage: 'No tenants match your filters',
-  })
+    emptyMessage: "No tenants match your filters",
+  });
 
-  return <DataTable {...tableProps} />
-}
+  return <DataTable {...tableProps} />;
+};

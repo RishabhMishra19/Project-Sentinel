@@ -13,9 +13,7 @@ export function SessionBootstrapScreen() {
       >
         <div className="flex items-center gap-3">
           <img src="/logo-light.svg" alt="" width={36} height={36} className="shrink-0" />
-          <span className="text-2xl font-semibold tracking-tight text-foreground">
-            Sentinel
-          </span>
+          <span className="text-2xl font-semibold tracking-tight text-foreground">Sentinel</span>
         </div>
 
         <div
@@ -29,5 +27,5 @@ export function SessionBootstrapScreen() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 export const ChevronRightIcon = ({ className }: IconProps) => (
   <svg
@@ -16,4 +16,4 @@ export const ChevronRightIcon = ({ className }: IconProps) => (
   >
     <path d="m9 18 6-6-6-6" />
   </svg>
-)
+);

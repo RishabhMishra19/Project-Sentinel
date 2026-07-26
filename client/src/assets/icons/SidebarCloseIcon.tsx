@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 /** Collapse sidebar */
 export const SidebarCloseIcon = ({ className }: IconProps) => (
@@ -19,4 +19,4 @@ export const SidebarCloseIcon = ({ className }: IconProps) => (
     <path d="M9 3v18" />
     <path d="m16 15-3-3 3-3" />
   </svg>
-)
+);

@@ -1,42 +1,32 @@
-import { useId } from 'react'
-import type { TenantResponse } from '../dto/response/tenant.response'
+import { useId } from "react";
+import type { TenantResponse } from "../dto/response/tenant.response";
 
 type TenantViewModalProps = {
-  open: boolean
-  tenant: TenantResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  tenant: TenantResponse | null;
+  onClose: () => void;
+};
 
 const formatDateTime = (value: string) => {
-  const date = new Date(value)
+  const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
-    return value
+    return value;
   }
-  return date.toLocaleString()
-}
+  return date.toLocaleString();
+};
 
-const DetailRow = ({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) => (
+const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col gap-0.5">
     <dt className="text-xs text-muted">{label}</dt>
     <dd className="text-sm text-foreground">{value}</dd>
   </div>
-)
+);
 
-export const TenantViewModal = ({
-  open,
-  tenant,
-  onClose,
-}: TenantViewModalProps) => {
-  const titleId = useId()
+export const TenantViewModal = ({ open, tenant, onClose }: TenantViewModalProps) => {
+  const titleId = useId();
 
   if (!open || !tenant) {
-    return null
+    return null;
   }
 
   return (
@@ -71,16 +61,9 @@ export const TenantViewModal = ({
           <DetailRow label="Slug" value={tenant.slug} />
           <DetailRow
             label="Admins"
-            value={
-              tenant.adminEmails.length > 0
-                ? tenant.adminEmails.join(', ')
-                : '—'
-            }
+            value={tenant.adminEmails.length > 0 ? tenant.adminEmails.join(", ") : "—"}
           />
-          <DetailRow
-            label="Status"
-            value={tenant.status === 'ACTIVE' ? 'Active' : 'Inactive'}
-          />
+          <DetailRow label="Status" value={tenant.status === "ACTIVE" ? "Active" : "Inactive"} />
           <DetailRow label="Created" value={formatDateTime(tenant.createdAt)} />
           <DetailRow
             label="Created by"
@@ -104,5 +87,5 @@ export const TenantViewModal = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

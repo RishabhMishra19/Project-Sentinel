@@ -1,67 +1,66 @@
-import type { DataTableColumn, RowAction } from '../../../shared/ui/data-table'
-import type { TenantResponse } from '../dto/response/tenant.response'
+import type { DataTableColumn, RowAction } from "../../../shared/ui/data-table";
+import type { TenantResponse } from "../dto/response/tenant.response";
 
 export const tenantColumns: DataTableColumn<TenantResponse>[] = [
   {
-    id: 'name',
-    header: 'Name',
+    id: "name",
+    header: "Name",
     searchable: true,
     sortable: true,
-    cell: { type: 'text', getValue: (row) => row.name },
+    cell: { type: "text", getValue: (row) => row.name },
   },
   {
-    id: 'slug',
-    header: 'Slug',
+    id: "slug",
+    header: "Slug",
     searchable: true,
     sortable: true,
-    cell: { type: 'text', getValue: (row) => row.slug },
+    cell: { type: "text", getValue: (row) => row.slug },
   },
   {
-    id: 'adminEmails',
-    header: 'Admins',
+    id: "adminEmails",
+    header: "Admins",
     cell: {
-      type: 'text',
-      getValue: (row) =>
-        row.adminEmails.length > 0 ? row.adminEmails.join(', ') : '—',
+      type: "text",
+      getValue: (row) => (row.adminEmails.length > 0 ? row.adminEmails.join(", ") : "—"),
     },
   },
   {
-    id: 'status',
-    header: 'Status',
+    id: "status",
+    header: "Status",
     sortable: true,
     filter: {
-      type: 'select',
+      type: "select",
       options: [
-        { label: 'Active', value: 'ACTIVE' },
-        { label: 'Inactive', value: 'INACTIVE' },
+        { label: "Active", value: "ACTIVE" },
+        { label: "Inactive", value: "INACTIVE" },
       ],
     },
     cell: {
-      type: 'badge',
+      type: "badge",
       getValue: (row) => row.status,
-      labels: { ACTIVE: 'Active', INACTIVE: 'Inactive' },
-      variants: { ACTIVE: 'success', INACTIVE: 'muted' },
+      labels: { ACTIVE: "Active", INACTIVE: "Inactive" },
+      variants: { ACTIVE: "success", INACTIVE: "muted" },
     },
   },
   {
-    id: 'createdAt',
-    header: 'Created',
+    id: "createdAt",
+    header: "Created",
     sortable: true,
     filter: {
-      type: 'dateRange',
-      fromKey: 'from',
-      toKey: 'to',
+      type: "dateRange",
+      fromKey: "from",
+      toKey: "to",
     },
-    cell: { type: 'datetime', getValue: (row) => row.createdAt },
+    cell: { type: "datetime", getValue: (row) => row.createdAt },
   },
-]
+];
 
 type TenantRowActionHandlers = {
-  onView: (row: TenantResponse) => void
-  onEdit: (row: TenantResponse) => void
-  onStartSession: (row: TenantResponse) => void
-  onDeactivate: (row: TenantResponse) => void
-}
+  onView: (row: TenantResponse) => void;
+  onEdit: (row: TenantResponse) => void;
+  onStartSession: (row: TenantResponse) => void;
+  onDeactivate: (row: TenantResponse) => void;
+};
 
 export const createTenantRowActions = ({
   onView,
@@ -70,26 +69,26 @@ export const createTenantRowActions = ({
   onDeactivate,
 }: TenantRowActionHandlers): RowAction<TenantResponse>[] => [
   {
-    id: 'view',
-    label: 'View',
+    id: "view",
+    label: "View",
     onClick: onView,
   },
   {
-    id: 'edit',
-    label: 'Edit',
+    id: "edit",
+    label: "Edit",
     onClick: onEdit,
   },
   {
-    id: 'start-session',
-    label: 'Start session',
-    hidden: (row) => row.status === 'INACTIVE',
+    id: "start-session",
+    label: "Start session",
+    hidden: (row) => row.status === "INACTIVE",
     onClick: onStartSession,
   },
   {
-    id: 'deactivate',
-    label: 'Deactivate',
-    variant: 'danger',
-    hidden: (row) => row.status === 'INACTIVE',
+    id: "deactivate",
+    label: "Deactivate",
+    variant: "danger",
+    hidden: (row) => row.status === "INACTIVE",
     onClick: onDeactivate,
   },
-]
+];

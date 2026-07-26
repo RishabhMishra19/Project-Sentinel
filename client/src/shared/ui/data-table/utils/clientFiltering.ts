@@ -1,28 +1,25 @@
-import { isFilterActive } from '../../filters'
-import type { FilterValue } from '../../filters'
-import type {
-  DataTableColumn,
-  DataTableSearchState,
-} from '../types'
-import { getCellComparableValue, getCellSearchText } from './tanstack'
+import { isFilterActive } from "../../filters";
+import type { FilterValue } from "../../filters";
+import type { DataTableColumn, DataTableSearchState } from "../types";
+import { getCellComparableValue, getCellSearchText } from "./tanstack";
 
 export const matchesSearch = <T extends object>(
   row: T,
   columns: DataTableColumn<T>[],
   search: DataTableSearchState,
 ): boolean => {
-  const query = search.value.trim().toLowerCase()
+  const query = search.value.trim().toLowerCase();
   if (!query) {
-    return true
+    return true;
   }
 
-  const column = columns.find((item) => item.id === search.columnId)
+  const column = columns.find((item) => item.id === search.columnId);
   if (!column) {
-    return true
+    return true;
   }
 
-  return getCellSearchText(row, column).toLowerCase().includes(query)
-}
+  return getCellSearchText(row, column).toLowerCase().includes(query);
+};
 
 export const matchesColumnFilter = <T extends object>(
   row: T,
@@ -30,64 +27,64 @@ export const matchesColumnFilter = <T extends object>(
   value: FilterValue | undefined,
 ): boolean => {
   if (!column.filter || !isFilterActive(column.filter, value)) {
-    return true
+    return true;
   }
 
-  const cellValue = getCellComparableValue(row, column)
+  const cellValue = getCellComparableValue(row, column);
 
   switch (column.filter.type) {
-    case 'select':
-      return String(cellValue ?? '') === value
-    case 'multiSelect': {
-      const selected = value as FilterValue<'multiSelect'>
-      return selected.includes(String(cellValue ?? ''))
+    case "select":
+      return String(cellValue ?? "") === value;
+    case "multiSelect": {
+      const selected = value as FilterValue<"multiSelect">;
+      return selected.includes(String(cellValue ?? ""));
     }
-    case 'boolean':
-      return cellValue === value
-    case 'date': {
-      const day = String(cellValue ?? '').slice(0, 10)
-      return day === value
+    case "boolean":
+      return cellValue === value;
+    case "date": {
+      const day = String(cellValue ?? "").slice(0, 10);
+      return day === value;
     }
-    case 'dateRange': {
-      const range = value as FilterValue<'dateRange'>
-      const day = String(cellValue ?? '').slice(0, 10)
+    case "dateRange": {
+      const range = value as FilterValue<"dateRange">;
+      const day = String(cellValue ?? "").slice(0, 10);
       if (!day) {
-        return false
+        return false;
       }
       if (range.from && day < range.from) {
-        return false
+        return false;
       }
       if (range.to && day > range.to) {
-        return false
+        return false;
       }
-      return true
+      return true;
     }
-    case 'dateTimeRange': {
-      const range = value as FilterValue<'dateTimeRange'>
-      const instant = String(cellValue ?? '')
+    case "dateTimeRange": {
+      const range = value as FilterValue<"dateTimeRange">;
+      const instant = String(cellValue ?? "");
       if (!instant) {
-        return false
+        return false;
       }
-      const ms = new Date(instant).getTime()
+      const ms = new Date(instant).getTime();
       if (Number.isNaN(ms)) {
-        return false
+        return false;
       }
       if (range.from) {
-        const fromMs = new Date(range.from).getTime()
+        const fromMs = new Date(range.from).getTime();
         if (!Number.isNaN(fromMs) && ms < fromMs) {
-          return false
+          return false;
         }
       }
       if (range.to) {
-        const toMs = new Date(range.to).getTime()
+        const toMs = new Date(range.to).getTime();
         if (!Number.isNaN(toMs) && ms > toMs) {
-          return false
+          return false;
         }
       }
-      return true
+      return true;
     }
   }
-}
+};
 
 export const applyClientFilters = <T extends object>(
   data: T[],
@@ -97,9 +94,7 @@ export const applyClientFilters = <T extends object>(
 ): T[] =>
   data.filter((row) => {
     if (!matchesSearch(row, columns, search)) {
-      return false
+      return false;
     }
-    return columns.every((column) =>
-      matchesColumnFilter(row, column, filters[column.id]),
-    )
-  })
+    return columns.every((column) => matchesColumnFilter(row, column, filters[column.id]));
+  });

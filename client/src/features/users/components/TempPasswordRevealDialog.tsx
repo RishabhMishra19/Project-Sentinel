@@ -1,38 +1,38 @@
-import { useId, useState } from 'react'
-import { toast } from '../../../shared/ui/toast'
+import { useId, useState } from "react";
+import { toast } from "../../../shared/ui/toast";
 
 type TempPasswordRevealDialogProps = {
-  open: boolean
-  temporaryPassword: string | null
-  onClose: () => void
-  title?: string
-  description?: string
-}
+  open: boolean;
+  temporaryPassword: string | null;
+  onClose: () => void;
+  title?: string;
+  description?: string;
+};
 
 export const TempPasswordRevealDialog = ({
   open,
   temporaryPassword,
   onClose,
-  title = 'Temporary password',
-  description = 'Copy this password now and share it securely with the user. It will not be shown again.',
+  title = "Temporary password",
+  description = "Copy this password now and share it securely with the user. It will not be shown again.",
 }: TempPasswordRevealDialogProps) => {
-  const titleId = useId()
-  const [copied, setCopied] = useState(false)
+  const titleId = useId();
+  const [copied, setCopied] = useState(false);
 
   if (!open || !temporaryPassword) {
-    return null
+    return null;
   }
 
   const onCopy = async () => {
     try {
-      await navigator.clipboard.writeText(temporaryPassword)
-      setCopied(true)
-      toast.success('Temporary password copied to clipboard.')
-      window.setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(temporaryPassword);
+      setCopied(true);
+      toast.success("Temporary password copied to clipboard.");
+      window.setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error('Could not copy temporary password.')
+      toast.error("Could not copy temporary password.");
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -72,7 +72,7 @@ export const TempPasswordRevealDialog = ({
             onClick={() => void onCopy()}
             className="shrink-0 cursor-pointer rounded border border-border px-3 py-1.5 text-sm text-foreground hover:bg-surface"
           >
-            {copied ? 'Copied' : 'Copy'}
+            {copied ? "Copied" : "Copy"}
           </button>
         </div>
 
@@ -87,5 +87,5 @@ export const TempPasswordRevealDialog = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,23 +1,20 @@
-import { useEffect, useId } from 'react'
-import { FormField } from '../../../shared/forms/FormField'
-import { useAppForm } from '../../../shared/forms/useAppForm'
-import type { UserResponse } from '../dto/response/user.response'
-import { useUpdateUser } from '../hooks/useUsers'
-import {
-  updateUserFormSchema,
-  type UpdateUserFormValues,
-} from '../schemas/user.schema'
+import { useEffect, useId } from "react";
+import { FormField } from "../../../shared/forms/FormField";
+import { useAppForm } from "../../../shared/forms/useAppForm";
+import type { UserResponse } from "../dto/response/user.response";
+import { useUpdateUser } from "../hooks/useUsers";
+import { updateUserFormSchema, type UpdateUserFormValues } from "../schemas/user.schema";
 
 type UserEditModalProps = {
-  open: boolean
-  user: UserResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  user: UserResponse | null;
+  onClose: () => void;
+};
 
 export const UserEditModal = ({ open, user, onClose }: UserEditModalProps) => {
-  const titleId = useId()
-  const updateMutation = useUpdateUser()
-  const { reset: resetMutation } = updateMutation
+  const titleId = useId();
+  const updateMutation = useUpdateUser();
+  const { reset: resetMutation } = updateMutation;
 
   const {
     register,
@@ -26,19 +23,19 @@ export const UserEditModal = ({ open, user, onClose }: UserEditModalProps) => {
     formState: { errors },
   } = useAppForm<UpdateUserFormValues>({
     schema: updateUserFormSchema,
-    defaultValues: { displayName: '' },
-  })
+    defaultValues: { displayName: "" },
+  });
 
   useEffect(() => {
     if (!open || !user) {
-      return
+      return;
     }
-    resetMutation()
-    reset({ displayName: user.displayName })
-  }, [open, user, reset, resetMutation])
+    resetMutation();
+    reset({ displayName: user.displayName });
+  }, [open, user, reset, resetMutation]);
 
   if (!open || !user) {
-    return null
+    return null;
   }
 
   const onSubmit = (data: UpdateUserFormValues) => {
@@ -46,11 +43,11 @@ export const UserEditModal = ({ open, user, onClose }: UserEditModalProps) => {
       { id: user.id, payload: data },
       {
         onSuccess: () => {
-          onClose()
+          onClose();
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -85,7 +82,7 @@ export const UserEditModal = ({ open, user, onClose }: UserEditModalProps) => {
             type="text"
             autoComplete="off"
             error={errors.displayName}
-            registration={register('displayName')}
+            registration={register("displayName")}
           />
 
           <div className="mt-2 flex justify-end gap-2">
@@ -101,11 +98,11 @@ export const UserEditModal = ({ open, user, onClose }: UserEditModalProps) => {
               disabled={updateMutation.isPending}
               className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {updateMutation.isPending ? 'Saving…' : 'Save changes'}
+              {updateMutation.isPending ? "Saving…" : "Save changes"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};

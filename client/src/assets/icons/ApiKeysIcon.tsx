@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 /** Key mark for API keys nav */
 export const ApiKeysIcon = ({ className }: IconProps) => (
@@ -19,4 +19,4 @@ export const ApiKeysIcon = ({ className }: IconProps) => (
     <path d="m21 2-9.6 9.6" />
     <path d="m15.5 7.5 3 3L22 7l-3-3" />
   </svg>
-)
+);

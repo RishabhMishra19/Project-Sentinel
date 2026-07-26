@@ -17,8 +17,7 @@ export class SessionStorage {
 
   static loadPersistedSession(): PersistedSession {
     return {
-      isLoggedIn:
-        localStorageManager.get(SessionStorage.IS_LOGGED_IN_KEY) === "true",
+      isLoggedIn: localStorageManager.get(SessionStorage.IS_LOGGED_IN_KEY) === "true",
       activeTenant: SessionStorage.readActiveTenant(),
     };
   }

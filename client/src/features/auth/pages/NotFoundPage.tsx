@@ -7,9 +7,7 @@ export function NotFoundPage() {
   const user = useAppSelector((state) => state.session.user);
   const activeTenant = useAppSelector((state) => state.session.activeTenant);
 
-  const homePath = user
-    ? resolvePostLoginPath(user, activeTenant)
-    : `/${ROUTE_PATHS.login}`;
+  const homePath = user ? resolvePostLoginPath(user, activeTenant) : `/${ROUTE_PATHS.login}`;
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-chrome p-3">

@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 export const LogoutIcon = ({ className }: IconProps) => (
   <svg
@@ -18,4 +18,4 @@ export const LogoutIcon = ({ className }: IconProps) => (
     <polyline points="16 17 21 12 16 7" />
     <line x1="21" x2="9" y1="12" y2="12" />
   </svg>
-)
+);

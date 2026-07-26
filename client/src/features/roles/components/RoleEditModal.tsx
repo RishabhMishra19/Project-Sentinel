@@ -1,23 +1,20 @@
-import { useEffect, useId } from 'react'
-import { FormField } from '../../../shared/forms/FormField'
-import { useAppForm } from '../../../shared/forms/useAppForm'
-import type { RoleResponse } from '../dto/response/role.response'
-import { useUpdateRole } from '../hooks/useRoles'
-import {
-  updateRoleFormSchema,
-  type UpdateRoleFormValues,
-} from '../schemas/role.schema'
+import { useEffect, useId } from "react";
+import { FormField } from "../../../shared/forms/FormField";
+import { useAppForm } from "../../../shared/forms/useAppForm";
+import type { RoleResponse } from "../dto/response/role.response";
+import { useUpdateRole } from "../hooks/useRoles";
+import { updateRoleFormSchema, type UpdateRoleFormValues } from "../schemas/role.schema";
 
 type RoleEditModalProps = {
-  open: boolean
-  role: RoleResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  role: RoleResponse | null;
+  onClose: () => void;
+};
 
 export const RoleEditModal = ({ open, role, onClose }: RoleEditModalProps) => {
-  const titleId = useId()
-  const updateMutation = useUpdateRole()
-  const { reset: resetMutation } = updateMutation
+  const titleId = useId();
+  const updateMutation = useUpdateRole();
+  const { reset: resetMutation } = updateMutation;
 
   const {
     register,
@@ -26,19 +23,19 @@ export const RoleEditModal = ({ open, role, onClose }: RoleEditModalProps) => {
     formState: { errors },
   } = useAppForm<UpdateRoleFormValues>({
     schema: updateRoleFormSchema,
-    defaultValues: { name: '' },
-  })
+    defaultValues: { name: "" },
+  });
 
   useEffect(() => {
     if (!open || !role) {
-      return
+      return;
     }
-    resetMutation()
-    reset({ name: role.name })
-  }, [open, role, reset, resetMutation])
+    resetMutation();
+    reset({ name: role.name });
+  }, [open, role, reset, resetMutation]);
 
   if (!open || !role) {
-    return null
+    return null;
   }
 
   const onSubmit = (data: UpdateRoleFormValues) => {
@@ -46,11 +43,11 @@ export const RoleEditModal = ({ open, role, onClose }: RoleEditModalProps) => {
       { id: role.id, payload: data },
       {
         onSuccess: () => {
-          onClose()
+          onClose();
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -85,7 +82,7 @@ export const RoleEditModal = ({ open, role, onClose }: RoleEditModalProps) => {
             type="text"
             autoComplete="off"
             error={errors.name}
-            registration={register('name')}
+            registration={register("name")}
           />
 
           <div className="mt-2 flex justify-end gap-2">
@@ -101,11 +98,11 @@ export const RoleEditModal = ({ open, role, onClose }: RoleEditModalProps) => {
               disabled={updateMutation.isPending}
               className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {updateMutation.isPending ? 'Saving…' : 'Save changes'}
+              {updateMutation.isPending ? "Saving…" : "Save changes"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};

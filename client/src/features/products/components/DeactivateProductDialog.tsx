@@ -1,32 +1,32 @@
-import { useId } from 'react'
-import type { ProductResponse } from '../dto/response/product.response'
-import { useDeleteProduct } from '../hooks/useProducts'
+import { useId } from "react";
+import type { ProductResponse } from "../dto/response/product.response";
+import { useDeleteProduct } from "../hooks/useProducts";
 
 type DeactivateProductDialogProps = {
-  open: boolean
-  product: ProductResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  product: ProductResponse | null;
+  onClose: () => void;
+};
 
 export const DeactivateProductDialog = ({
   open,
   product,
   onClose,
 }: DeactivateProductDialogProps) => {
-  const titleId = useId()
-  const deleteMutation = useDeleteProduct()
+  const titleId = useId();
+  const deleteMutation = useDeleteProduct();
 
   if (!open || !product) {
-    return null
+    return null;
   }
 
   const onConfirm = () => {
     deleteMutation.mutate(product.id, {
       onSuccess: () => {
-        onClose()
+        onClose();
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -56,9 +56,8 @@ export const DeactivateProductDialog = ({
         </div>
 
         <p className="text-sm text-muted">
-          Deactivate{' '}
-          <span className="font-medium text-foreground">{product.name}</span>?
-          The product will be marked inactive. Child services are not changed.
+          Deactivate <span className="font-medium text-foreground">{product.name}</span>? The
+          product will be marked inactive. Child services are not changed.
         </p>
 
         <div className="mt-6 flex justify-end gap-2">
@@ -75,10 +74,10 @@ export const DeactivateProductDialog = ({
             disabled={deleteMutation.isPending}
             className="cursor-pointer rounded bg-danger px-4 py-2 text-sm text-white hover:bg-danger/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {deleteMutation.isPending ? 'Deactivating…' : 'Deactivate'}
+            {deleteMutation.isPending ? "Deactivating…" : "Deactivate"}
           </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

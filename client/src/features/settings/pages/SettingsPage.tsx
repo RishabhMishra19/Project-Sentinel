@@ -11,9 +11,7 @@ export const SettingsPage = () => {
         <button
           type="button"
           className={primaryButtonClassName}
-          onClick={() =>
-            navigate(`/${ROUTE_PATHS.settings}/${ROUTE_PATHS.settingsRoles}`)
-          }
+          onClick={() => navigate(`/${ROUTE_PATHS.settings}/${ROUTE_PATHS.settingsRoles}`)}
         >
           Manage Roles
         </button>

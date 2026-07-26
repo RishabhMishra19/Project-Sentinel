@@ -1,32 +1,24 @@
-import { useEffect, useId } from 'react'
-import { FormField } from '../../../shared/forms/FormField'
-import { useAppForm } from '../../../shared/forms/useAppForm'
-import type { ProductResponse } from '../dto/response/product.response'
-import { useCreateProduct, useUpdateProduct } from '../hooks/useProducts'
-import {
-  productFormSchema,
-  type ProductFormValues,
-} from '../schemas/product.schema'
+import { useEffect, useId } from "react";
+import { FormField } from "../../../shared/forms/FormField";
+import { useAppForm } from "../../../shared/forms/useAppForm";
+import type { ProductResponse } from "../dto/response/product.response";
+import { useCreateProduct, useUpdateProduct } from "../hooks/useProducts";
+import { productFormSchema, type ProductFormValues } from "../schemas/product.schema";
 
 type ProductFormModalProps = {
-  open: boolean
-  mode: 'create' | 'edit'
-  product: ProductResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  mode: "create" | "edit";
+  product: ProductResponse | null;
+  onClose: () => void;
+};
 
-export const ProductFormModal = ({
-  open,
-  mode,
-  product,
-  onClose,
-}: ProductFormModalProps) => {
-  const titleId = useId()
-  const createMutation = useCreateProduct()
-  const updateMutation = useUpdateProduct()
-  const { reset: resetCreate } = createMutation
-  const { reset: resetUpdate } = updateMutation
-  const isPending = createMutation.isPending || updateMutation.isPending
+export const ProductFormModal = ({ open, mode, product, onClose }: ProductFormModalProps) => {
+  const titleId = useId();
+  const createMutation = useCreateProduct();
+  const updateMutation = useUpdateProduct();
+  const { reset: resetCreate } = createMutation;
+  const { reset: resetUpdate } = updateMutation;
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
   const {
     register,
@@ -35,45 +27,45 @@ export const ProductFormModal = ({
     formState: { errors },
   } = useAppForm<ProductFormValues>({
     schema: productFormSchema,
-    defaultValues: { name: '' },
-  })
+    defaultValues: { name: "" },
+  });
 
   useEffect(() => {
     if (!open) {
-      return
+      return;
     }
-    resetCreate()
-    resetUpdate()
-    if (mode === 'edit' && product) {
-      reset({ name: product.name })
+    resetCreate();
+    resetUpdate();
+    if (mode === "edit" && product) {
+      reset({ name: product.name });
     } else {
-      reset({ name: '' })
+      reset({ name: "" });
     }
-  }, [open, mode, product, reset, resetCreate, resetUpdate])
+  }, [open, mode, product, reset, resetCreate, resetUpdate]);
 
   if (!open) {
-    return null
+    return null;
   }
 
   const onSubmit = (data: ProductFormValues) => {
-    if (mode === 'edit' && product) {
+    if (mode === "edit" && product) {
       updateMutation.mutate(
         { id: product.id, payload: data },
         {
           onSuccess: () => {
-            onClose()
+            onClose();
           },
         },
-      )
-      return
+      );
+      return;
     }
 
     createMutation.mutate(data, {
       onSuccess: () => {
-        onClose()
+        onClose();
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -91,7 +83,7 @@ export const ProductFormModal = ({
       >
         <div className="mb-4 flex items-start justify-between gap-4">
           <h2 id={titleId} className="text-xl font-semibold text-foreground">
-            {mode === 'edit' ? 'Edit product' : 'Create product'}
+            {mode === "edit" ? "Edit product" : "Create product"}
           </h2>
           <button
             type="button"
@@ -108,7 +100,7 @@ export const ProductFormModal = ({
             type="text"
             autoComplete="off"
             error={errors.name}
-            registration={register('name')}
+            registration={register("name")}
           />
 
           <div className="mt-2 flex justify-end gap-2">
@@ -125,16 +117,16 @@ export const ProductFormModal = ({
               className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isPending
-                ? mode === 'edit'
-                  ? 'Saving…'
-                  : 'Creating…'
-                : mode === 'edit'
-                  ? 'Save changes'
-                  : 'Create product'}
+                ? mode === "edit"
+                  ? "Saving…"
+                  : "Creating…"
+                : mode === "edit"
+                  ? "Save changes"
+                  : "Create product"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};

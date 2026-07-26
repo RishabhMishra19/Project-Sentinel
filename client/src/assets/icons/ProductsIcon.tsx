@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 /** Stacked layers — product lineup */
 export const ProductsIcon = ({ className }: IconProps) => (
@@ -19,4 +19,4 @@ export const ProductsIcon = ({ className }: IconProps) => (
     <path d="M2 12l10 5 10-5" />
     <path d="M2 17l10 5 10-5" />
   </svg>
-)
+);

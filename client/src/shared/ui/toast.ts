@@ -1,15 +1,15 @@
-import { toast as sonnerToast, type ExternalToast } from 'sonner'
+import { toast as sonnerToast, type ExternalToast } from "sonner";
 
 type ToastAction = {
-  label: string
-  onClick: () => void
-}
+  label: string;
+  onClick: () => void;
+};
 
 type PromiseMessages<T> = {
-  loading: string
-  success: string | ((data: T) => string)
-  error: string | ((error: unknown) => string)
-}
+  loading: string;
+  success: string | ((data: T) => string);
+  error: string | ((error: unknown) => string);
+};
 
 /**
  * App toast helpers on top of sonner.
@@ -18,28 +18,28 @@ type PromiseMessages<T> = {
  */
 export const toast = {
   success(message: string, options?: ExternalToast) {
-    return sonnerToast.success(message, options)
+    return sonnerToast.success(message, options);
   },
 
   error(message: string, options?: ExternalToast) {
-    return sonnerToast.error(message, options)
+    return sonnerToast.error(message, options);
   },
 
   loading(message: string, options?: ExternalToast) {
-    return sonnerToast.loading(message, options)
+    return sonnerToast.loading(message, options);
   },
 
   info(message: string, options?: ExternalToast) {
-    return sonnerToast.info(message, options)
+    return sonnerToast.info(message, options);
   },
 
   warning(message: string, options?: ExternalToast) {
-    return sonnerToast.warning(message, options)
+    return sonnerToast.warning(message, options);
   },
 
   /** Loading → success or error when the promise settles. */
   promise<T>(promise: Promise<T>, messages: PromiseMessages<T>) {
-    return sonnerToast.promise(promise, messages)
+    return sonnerToast.promise(promise, messages);
   },
 
   /** Toast with a primary action button. */
@@ -50,19 +50,19 @@ export const toast = {
         label: action.label,
         onClick: action.onClick,
       },
-    })
+    });
   },
 
   /** Toast with a dismiss/cancel control (and optional primary action). */
   cancellable(
     message: string,
     options: {
-      cancelLabel?: string
-      onCancel?: () => void
-      action?: ToastAction
+      cancelLabel?: string;
+      onCancel?: () => void;
+      action?: ToastAction;
     } & ExternalToast = {},
   ) {
-    const { cancelLabel = 'Dismiss', onCancel, action, ...rest } = options
+    const { cancelLabel = "Dismiss", onCancel, action, ...rest } = options;
     return sonnerToast(message, {
       ...rest,
       cancel: {
@@ -77,10 +77,10 @@ export const toast = {
             },
           }
         : {}),
-    })
+    });
   },
 
   dismiss(id?: string | number) {
-    sonnerToast.dismiss(id)
+    sonnerToast.dismiss(id);
   },
-}
+};

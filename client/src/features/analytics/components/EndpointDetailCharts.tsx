@@ -1,21 +1,10 @@
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
-import type {
-  ExceptionMetricItem,
-  StatusBreakdownItem,
-} from '../dto/response/analytics.response'
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import type { ExceptionMetricItem, StatusBreakdownItem } from "../dto/response/analytics.response";
 
-const AXIS = { fontSize: 12, fill: 'var(--color-muted-foreground, #737373)' }
-const GRID = 'var(--color-border, #e5e5e5)'
-const BAR = '#0f766e'
-const CHART_MARGIN = { top: 8, right: 12, bottom: 4, left: 4 }
+const AXIS = { fontSize: 12, fill: "var(--color-muted-foreground, #737373)" };
+const GRID = "var(--color-border, #e5e5e5)";
+const BAR = "#0f766e";
+const CHART_MARGIN = { top: 8, right: 12, bottom: 4, left: 4 };
 
 function ChartFrame({
   title,
@@ -25,12 +14,12 @@ function ChartFrame({
   emptyMessage,
   children,
 }: {
-  title: string
-  xLabel: string
-  yLabel: string
-  empty: boolean
-  emptyMessage: string
-  children: React.ReactNode
+  title: string;
+  xLabel: string;
+  yLabel: string;
+  empty: boolean;
+  emptyMessage: string;
+  children: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
@@ -51,7 +40,7 @@ function ChartFrame({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export function EndpointStatusChart({ items }: { items: StatusBreakdownItem[] }) {
@@ -73,14 +62,10 @@ export function EndpointStatusChart({ items }: { items: StatusBreakdownItem[] })
         </BarChart>
       </ResponsiveContainer>
     </ChartFrame>
-  )
+  );
 }
 
-export function EndpointExceptionsChart({
-  items,
-}: {
-  items: ExceptionMetricItem[]
-}) {
+export function EndpointExceptionsChart({ items }: { items: ExceptionMetricItem[] }) {
   return (
     <ChartFrame
       title="Exceptions"
@@ -106,5 +91,5 @@ export function EndpointExceptionsChart({
         </BarChart>
       </ResponsiveContainer>
     </ChartFrame>
-  )
+  );
 }

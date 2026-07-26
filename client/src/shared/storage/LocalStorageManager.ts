@@ -5,15 +5,15 @@
 class LocalStorageManager {
   get(key: string): string | null {
     try {
-      return localStorage.getItem(key)
+      return localStorage.getItem(key);
     } catch {
-      return null
+      return null;
     }
   }
 
   set(key: string, value: string): void {
     try {
-      localStorage.setItem(key, value)
+      localStorage.setItem(key, value);
     } catch {
       // Ignore quota / private-mode failures
     }
@@ -21,15 +21,15 @@ class LocalStorageManager {
 
   remove(key: string): void {
     try {
-      localStorage.removeItem(key)
+      localStorage.removeItem(key);
     } catch {
       // Ignore private-mode failures
     }
   }
 
   has(key: string): boolean {
-    return this.get(key) !== null
+    return this.get(key) !== null;
   }
 }
 
-export const localStorageManager = new LocalStorageManager()
+export const localStorageManager = new LocalStorageManager();

@@ -1,16 +1,16 @@
-import { inputClassName } from '../styles'
-import type { FilterOption, FilterValue } from '../types'
+import { inputClassName } from "../styles";
+import type { FilterOption, FilterValue } from "../types";
 
 type SelectFilterProps = {
-  value: FilterValue<'select'>
-  options: FilterOption[]
-  onChange: (value: FilterValue<'select'>) => void
-}
+  value: FilterValue<"select">;
+  options: FilterOption[];
+  onChange: (value: FilterValue<"select">) => void;
+};
 
 export const SelectFilter = ({ value, options, onChange }: SelectFilterProps) => (
   <select
     className={`${inputClassName} w-full`}
-    value={value ?? ''}
+    value={value ?? ""}
     onChange={(event) => onChange(event.target.value || null)}
   >
     <option value="">Any</option>
@@ -20,4 +20,4 @@ export const SelectFilter = ({ value, options, onChange }: SelectFilterProps) =>
       </option>
     ))}
   </select>
-)
+);

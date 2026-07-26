@@ -1,34 +1,30 @@
-import { useId, useState } from 'react'
-import { toast } from '../../../shared/ui/toast'
+import { useId, useState } from "react";
+import { toast } from "../../../shared/ui/toast";
 
 type ApiKeyRevealDialogProps = {
-  open: boolean
-  apiKey: string | null
-  onClose: () => void
-}
+  open: boolean;
+  apiKey: string | null;
+  onClose: () => void;
+};
 
-export const ApiKeyRevealDialog = ({
-  open,
-  apiKey,
-  onClose,
-}: ApiKeyRevealDialogProps) => {
-  const titleId = useId()
-  const [copied, setCopied] = useState(false)
+export const ApiKeyRevealDialog = ({ open, apiKey, onClose }: ApiKeyRevealDialogProps) => {
+  const titleId = useId();
+  const [copied, setCopied] = useState(false);
 
   if (!open || !apiKey) {
-    return null
+    return null;
   }
 
   const onCopy = async () => {
     try {
-      await navigator.clipboard.writeText(apiKey)
-      setCopied(true)
-      toast.success('API key copied to clipboard.')
-      window.setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(apiKey);
+      setCopied(true);
+      toast.success("API key copied to clipboard.");
+      window.setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error('Could not copy API key.')
+      toast.error("Could not copy API key.");
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -70,7 +66,7 @@ export const ApiKeyRevealDialog = ({
             onClick={() => void onCopy()}
             className="shrink-0 cursor-pointer rounded border border-border px-3 py-1.5 text-sm text-foreground hover:bg-surface"
           >
-            {copied ? 'Copied' : 'Copy'}
+            {copied ? "Copied" : "Copy"}
           </button>
         </div>
 
@@ -85,5 +81,5 @@ export const ApiKeyRevealDialog = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

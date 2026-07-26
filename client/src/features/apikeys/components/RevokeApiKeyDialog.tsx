@@ -1,14 +1,14 @@
-import { useId } from 'react'
-import type { ServiceApiKeyResponse } from '../dto/response/apikey.response'
-import { useRevokeServiceApiKey } from '../hooks/useApiKeys'
+import { useId } from "react";
+import type { ServiceApiKeyResponse } from "../dto/response/apikey.response";
+import { useRevokeServiceApiKey } from "../hooks/useApiKeys";
 
 type RevokeApiKeyDialogProps = {
-  open: boolean
-  productId: string
-  serviceId: string
-  apiKey: ServiceApiKeyResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  productId: string;
+  serviceId: string;
+  apiKey: ServiceApiKeyResponse | null;
+  onClose: () => void;
+};
 
 export const RevokeApiKeyDialog = ({
   open,
@@ -17,20 +17,20 @@ export const RevokeApiKeyDialog = ({
   apiKey,
   onClose,
 }: RevokeApiKeyDialogProps) => {
-  const titleId = useId()
-  const revokeMutation = useRevokeServiceApiKey(productId, serviceId)
+  const titleId = useId();
+  const revokeMutation = useRevokeServiceApiKey(productId, serviceId);
 
   if (!open || !apiKey) {
-    return null
+    return null;
   }
 
   const onConfirm = () => {
     revokeMutation.mutate(apiKey.id, {
       onSuccess: () => {
-        onClose()
+        onClose();
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -60,10 +60,8 @@ export const RevokeApiKeyDialog = ({
         </div>
 
         <p className="text-sm text-muted">
-          Revoke{' '}
-          <span className="font-medium text-foreground">{apiKey.name}</span>?
-          This cannot be undone. Agents using this key will stop authenticating
-          until you create a new key.
+          Revoke <span className="font-medium text-foreground">{apiKey.name}</span>? This cannot be
+          undone. Agents using this key will stop authenticating until you create a new key.
         </p>
 
         <div className="mt-6 flex justify-end gap-2">
@@ -80,10 +78,10 @@ export const RevokeApiKeyDialog = ({
             disabled={revokeMutation.isPending}
             className="cursor-pointer rounded bg-danger px-4 py-2 text-sm text-white hover:bg-danger/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {revokeMutation.isPending ? 'Revoking…' : 'Revoke'}
+            {revokeMutation.isPending ? "Revoking…" : "Revoke"}
           </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

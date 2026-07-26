@@ -1,10 +1,7 @@
 import { Navigate, useLocation, useMatches } from "react-router-dom";
 import { useAppSelector } from "../../redux/hooks";
 import { AuthenticatedLayout } from "../../shared/layout/AuthenticatedLayout";
-import {
-  resolvePageHeader,
-  type PageMatch,
-} from "../../shared/layout/pageHeader";
+import { resolvePageHeader, type PageMatch } from "../../shared/layout/pageHeader";
 import { ROUTE_PATHS } from "../constants";
 
 export const ProtectedRouteContainer = () => {

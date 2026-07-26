@@ -1,32 +1,28 @@
-import { useId } from 'react'
-import type { UserResponse } from '../dto/response/user.response'
-import { useMarkUserInactive } from '../hooks/useUsers'
+import { useId } from "react";
+import type { UserResponse } from "../dto/response/user.response";
+import { useMarkUserInactive } from "../hooks/useUsers";
 
 type MarkInactiveUserDialogProps = {
-  open: boolean
-  user: UserResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  user: UserResponse | null;
+  onClose: () => void;
+};
 
-export const MarkInactiveUserDialog = ({
-  open,
-  user,
-  onClose,
-}: MarkInactiveUserDialogProps) => {
-  const titleId = useId()
-  const inactiveMutation = useMarkUserInactive()
+export const MarkInactiveUserDialog = ({ open, user, onClose }: MarkInactiveUserDialogProps) => {
+  const titleId = useId();
+  const inactiveMutation = useMarkUserInactive();
 
   if (!open || !user) {
-    return null
+    return null;
   }
 
   const onConfirm = () => {
     inactiveMutation.mutate(user.id, {
       onSuccess: () => {
-        onClose()
+        onClose();
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -56,9 +52,8 @@ export const MarkInactiveUserDialog = ({
         </div>
 
         <p className="text-sm text-muted">
-          Mark{' '}
-          <span className="font-medium text-foreground">{user.displayName}</span>{' '}
-          ({user.email}) inactive? They will no longer be able to sign in.
+          Mark <span className="font-medium text-foreground">{user.displayName}</span> ({user.email}
+          ) inactive? They will no longer be able to sign in.
         </p>
 
         <div className="mt-6 flex justify-end gap-2">
@@ -75,10 +70,10 @@ export const MarkInactiveUserDialog = ({
             disabled={inactiveMutation.isPending}
             className="cursor-pointer rounded bg-danger px-4 py-2 text-sm text-white hover:bg-danger/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {inactiveMutation.isPending ? 'Marking…' : 'Mark inactive'}
+            {inactiveMutation.isPending ? "Marking…" : "Mark inactive"}
           </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

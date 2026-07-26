@@ -2,13 +2,7 @@ import type { ReactNode } from "react";
 import type { FilterFieldConfig, FiltersConfig } from "../filters";
 
 export type DataTableCellType =
-  | "text"
-  | "number"
-  | "date"
-  | "datetime"
-  | "boolean"
-  | "badge"
-  | "custom";
+  "text" | "number" | "date" | "datetime" | "boolean" | "badge" | "custom";
 
 export type DataTableCellValueByType = {
   text: string | null | undefined;
@@ -20,12 +14,7 @@ export type DataTableCellValueByType = {
   custom: never;
 };
 
-export type DataTableBadgeVariant =
-  | "default"
-  | "success"
-  | "warning"
-  | "danger"
-  | "muted";
+export type DataTableBadgeVariant = "default" | "success" | "warning" | "danger" | "muted";
 
 /** Source of truth: cell type → column cell config */
 export type DataTableCellConfigByType<T extends object> = {

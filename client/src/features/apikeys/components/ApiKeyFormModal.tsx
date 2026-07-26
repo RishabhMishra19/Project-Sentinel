@@ -1,20 +1,17 @@
-import { useEffect, useId, useRef } from 'react'
-import { FormField } from '../../../shared/forms/FormField'
-import { useAppForm } from '../../../shared/forms/useAppForm'
-import type { ServiceApiKeyCreatedResponse } from '../dto/response/apikey.response'
-import { useCreateServiceApiKey } from '../hooks/useApiKeys'
-import {
-  apiKeyFormSchema,
-  type ApiKeyFormValues,
-} from '../schemas/apikey.schema'
+import { useEffect, useId, useRef } from "react";
+import { FormField } from "../../../shared/forms/FormField";
+import { useAppForm } from "../../../shared/forms/useAppForm";
+import type { ServiceApiKeyCreatedResponse } from "../dto/response/apikey.response";
+import { useCreateServiceApiKey } from "../hooks/useApiKeys";
+import { apiKeyFormSchema, type ApiKeyFormValues } from "../schemas/apikey.schema";
 
 type ApiKeyFormModalProps = {
-  open: boolean
-  productId: string
-  serviceId: string
-  onClose: () => void
-  onCreated: (created: ServiceApiKeyCreatedResponse) => void
-}
+  open: boolean;
+  productId: string;
+  serviceId: string;
+  onClose: () => void;
+  onCreated: (created: ServiceApiKeyCreatedResponse) => void;
+};
 
 export const ApiKeyFormModal = ({
   open,
@@ -23,9 +20,9 @@ export const ApiKeyFormModal = ({
   onClose,
   onCreated,
 }: ApiKeyFormModalProps) => {
-  const titleId = useId()
-  const createMutation = useCreateServiceApiKey(productId, serviceId)
-  const wasOpenRef = useRef(false)
+  const titleId = useId();
+  const createMutation = useCreateServiceApiKey(productId, serviceId);
+  const wasOpenRef = useRef(false);
 
   const {
     register,
@@ -34,19 +31,19 @@ export const ApiKeyFormModal = ({
     formState: { errors },
   } = useAppForm<ApiKeyFormValues>({
     schema: apiKeyFormSchema,
-    defaultValues: { name: '' },
-  })
+    defaultValues: { name: "" },
+  });
 
   useEffect(() => {
-    const justOpened = open && !wasOpenRef.current
-    wasOpenRef.current = open
+    const justOpened = open && !wasOpenRef.current;
+    wasOpenRef.current = open;
     if (justOpened) {
-      reset({ name: '' })
+      reset({ name: "" });
     }
-  }, [open, reset])
+  }, [open, reset]);
 
   if (!open) {
-    return null
+    return null;
   }
 
   const onSubmit = (data: ApiKeyFormValues) => {
@@ -54,12 +51,12 @@ export const ApiKeyFormModal = ({
       { name: data.name },
       {
         onSuccess: (created) => {
-          onClose()
-          onCreated(created)
+          onClose();
+          onCreated(created);
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -94,7 +91,7 @@ export const ApiKeyFormModal = ({
             type="text"
             autoComplete="off"
             error={errors.name}
-            registration={register('name')}
+            registration={register("name")}
           />
 
           <div className="mt-2 flex justify-end gap-2">
@@ -110,11 +107,11 @@ export const ApiKeyFormModal = ({
               disabled={createMutation.isPending}
               className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {createMutation.isPending ? 'Creating…' : 'Create'}
+              {createMutation.isPending ? "Creating…" : "Create"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};

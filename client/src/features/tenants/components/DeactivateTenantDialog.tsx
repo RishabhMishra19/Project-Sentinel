@@ -1,32 +1,28 @@
-import { useId } from 'react'
-import type { TenantResponse } from '../dto/response/tenant.response'
-import { useDeleteTenant } from '../hooks/useTenants'
+import { useId } from "react";
+import type { TenantResponse } from "../dto/response/tenant.response";
+import { useDeleteTenant } from "../hooks/useTenants";
 
 type DeactivateTenantDialogProps = {
-  open: boolean
-  tenant: TenantResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  tenant: TenantResponse | null;
+  onClose: () => void;
+};
 
-export const DeactivateTenantDialog = ({
-  open,
-  tenant,
-  onClose,
-}: DeactivateTenantDialogProps) => {
-  const titleId = useId()
-  const deleteMutation = useDeleteTenant()
+export const DeactivateTenantDialog = ({ open, tenant, onClose }: DeactivateTenantDialogProps) => {
+  const titleId = useId();
+  const deleteMutation = useDeleteTenant();
 
   if (!open || !tenant) {
-    return null
+    return null;
   }
 
   const onConfirm = () => {
     deleteMutation.mutate(tenant.id, {
       onSuccess: () => {
-        onClose()
+        onClose();
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -56,9 +52,8 @@ export const DeactivateTenantDialog = ({
         </div>
 
         <p className="text-sm text-muted">
-          Deactivate <span className="font-medium text-foreground">{tenant.name}</span>
-          ? The tenant will be marked inactive. This can be filtered later, but
-          there is no restore action yet.
+          Deactivate <span className="font-medium text-foreground">{tenant.name}</span>? The tenant
+          will be marked inactive. This can be filtered later, but there is no restore action yet.
         </p>
 
         <div className="mt-6 flex justify-end gap-2">
@@ -75,10 +70,10 @@ export const DeactivateTenantDialog = ({
             disabled={deleteMutation.isPending}
             className="cursor-pointer rounded bg-danger px-4 py-2 text-sm text-white hover:bg-danger/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {deleteMutation.isPending ? 'Deactivating…' : 'Deactivate'}
+            {deleteMutation.isPending ? "Deactivating…" : "Deactivate"}
           </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

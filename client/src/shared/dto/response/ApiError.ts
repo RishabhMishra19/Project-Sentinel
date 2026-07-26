@@ -1,15 +1,15 @@
 /** Mirrors `com.sentinel.server.common.dto.response.ApiError.FieldError`. */
 export interface ApiErrorFieldError {
-  field: string
-  message: string
+  field: string;
+  message: string;
 }
 
 /** Mirrors `com.sentinel.server.common.dto.response.ApiError`. */
 export interface ApiError {
-  timestamp: string
-  errorCode: string
-  error: string
-  message: string
-  path: string
-  fieldErrors: ApiErrorFieldError[] | null
+  timestamp: string;
+  errorCode: string;
+  error: string;
+  message: string;
+  path: string;
+  fieldErrors: ApiErrorFieldError[] | null;
 }

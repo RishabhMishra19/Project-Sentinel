@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 export const MoonIcon = ({ className }: IconProps) => (
   <svg
@@ -16,4 +16,4 @@ export const MoonIcon = ({ className }: IconProps) => (
   >
     <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z" />
   </svg>
-)
+);

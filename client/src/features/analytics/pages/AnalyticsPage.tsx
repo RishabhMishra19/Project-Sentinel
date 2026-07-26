@@ -115,25 +115,16 @@ export function AnalyticsPage() {
     patchParams(patch);
   };
 
-  const productsQuery = useProductsQuery(
-    scope === "PRODUCT" ? { page: 0, size: 100 } : null,
-  );
+  const productsQuery = useProductsQuery(scope === "PRODUCT" ? { page: 0, size: 100 } : null);
   const servicesQuery = useAllServicesQuery(
-    scope === "SERVICE" || scope === "ENDPOINT"
-      ? { page: 0, size: 100, status: "ACTIVE" }
-      : null,
+    scope === "SERVICE" || scope === "ENDPOINT" ? { page: 0, size: 100, status: "ACTIVE" } : null,
   );
   const services = servicesQuery.data?.content ?? [];
   const products = productsQuery.data?.content ?? [];
-  const endpointsQuery = useServiceEndpointsQuery(
-    scope === "ENDPOINT" ? serviceId : undefined,
-  );
+  const endpointsQuery = useServiceEndpointsQuery(scope === "ENDPOINT" ? serviceId : undefined);
   const endpoints = endpointsQuery.data ?? [];
 
-  const filters = useMemo(
-    () => filtersFromSearchParams(params, scope),
-    [params, scope],
-  );
+  const filters = useMemo(() => filtersFromSearchParams(params, scope), [params, scope]);
 
   const filterFields = useMemo(
     () =>
@@ -379,25 +370,19 @@ export function AnalyticsPage() {
             <Filters fields={filterFields} filtersConfig={filtersConfig} />
           </div>
         </div>
-        <AppliedFilterChips
-          fields={filterFields}
-          filtersConfig={filtersConfig}
-        />
+        <AppliedFilterChips fields={filterFields} filtersConfig={filtersConfig} />
       </div>
 
       {!scopeReady ? (
         <div className="rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
           {scope === "PRODUCT" && "Select a product to view analytics."}
           {scope === "SERVICE" && "Select a service to view analytics."}
-          {scope === "ENDPOINT" &&
-            "Select a service and endpoint to view analytics."}
+          {scope === "ENDPOINT" && "Select a service and endpoint to view analytics."}
         </div>
       ) : (
         <>
           {summaryQuery.isError || timeseriesQuery.isError ? (
-            <p className="text-sm text-destructive">
-              Could not load analytics for this scope.
-            </p>
+            <p className="text-sm text-destructive">Could not load analytics for this scope.</p>
           ) : null}
 
           <AnalyticsKpiStrip summary={summaryQuery.data} />

@@ -1,22 +1,22 @@
-export type ProductStatus = 'ACTIVE' | 'INACTIVE'
+export type ProductStatus = "ACTIVE" | "INACTIVE";
 
-export type ProductSearchBy = 'name'
+export type ProductSearchBy = "name";
 
 export interface CreateProductRequest {
-  name: string
+  name: string;
 }
 
 export interface UpdateProductRequest {
-  name: string
+  name: string;
 }
 
 export interface ProductListParams {
-  page?: number
-  size?: number
-  sort?: string
-  status?: ProductStatus
-  q?: string
-  searchBy?: ProductSearchBy
-  from?: string
-  to?: string
+  page?: number;
+  size?: number;
+  sort?: string;
+  status?: ProductStatus;
+  q?: string;
+  searchBy?: ProductSearchBy;
+  from?: string;
+  to?: string;
 }

@@ -1,26 +1,22 @@
-import { useEffect, useId } from 'react'
-import { FormField } from '../../../shared/forms/FormField'
-import { useAppForm } from '../../../shared/forms/useAppForm'
-import { useChangePassword } from '../hooks/useChangePassword'
+import { useEffect, useId } from "react";
+import { FormField } from "../../../shared/forms/FormField";
+import { useAppForm } from "../../../shared/forms/useAppForm";
+import { useChangePassword } from "../hooks/useChangePassword";
 import {
   changePasswordSchema,
   type ChangePasswordFormValues,
-} from '../schemas/changePassword.schema'
+} from "../schemas/changePassword.schema";
 
 type ChangePasswordModalProps = {
-  open: boolean
-  onClose: () => void
-  onSuccess?: () => void
-}
+  open: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+};
 
-export const ChangePasswordModal = ({
-  open,
-  onClose,
-  onSuccess,
-}: ChangePasswordModalProps) => {
-  const titleId = useId()
-  const changePasswordMutation = useChangePassword()
-  const { reset: resetMutation } = changePasswordMutation
+export const ChangePasswordModal = ({ open, onClose, onSuccess }: ChangePasswordModalProps) => {
+  const titleId = useId();
+  const changePasswordMutation = useChangePassword();
+  const { reset: resetMutation } = changePasswordMutation;
   const {
     register,
     handleSubmit,
@@ -29,37 +25,37 @@ export const ChangePasswordModal = ({
   } = useAppForm<ChangePasswordFormValues>({
     schema: changePasswordSchema,
     defaultValues: {
-      oldPassword: '',
-      newPassword: '',
-      confirmNewPassword: '',
+      oldPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
     },
-  })
+  });
 
   useEffect(() => {
     if (!open) {
-      return
+      return;
     }
-    reset()
-    resetMutation()
-  }, [open, reset, resetMutation])
+    reset();
+    resetMutation();
+  }, [open, reset, resetMutation]);
 
   if (!open) {
-    return null
+    return null;
   }
 
   const onSubmit = (data: ChangePasswordFormValues) => {
-    const { oldPassword, newPassword } = data
+    const { oldPassword, newPassword } = data;
 
     changePasswordMutation.mutate(
       { oldPassword, newPassword },
       {
         onSuccess: () => {
-          onSuccess?.()
-          onClose()
+          onSuccess?.();
+          onClose();
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -94,21 +90,21 @@ export const ChangePasswordModal = ({
             type="password"
             autoComplete="current-password"
             error={errors.oldPassword}
-            registration={register('oldPassword')}
+            registration={register("oldPassword")}
           />
           <FormField
             label="New password"
             type="password"
             autoComplete="new-password"
             error={errors.newPassword}
-            registration={register('newPassword')}
+            registration={register("newPassword")}
           />
           <FormField
             label="Confirm new password"
             type="password"
             autoComplete="new-password"
             error={errors.confirmNewPassword}
-            registration={register('confirmNewPassword')}
+            registration={register("confirmNewPassword")}
           />
 
           <div className="mt-2 flex justify-end gap-2">
@@ -124,11 +120,11 @@ export const ChangePasswordModal = ({
               disabled={changePasswordMutation.isPending}
               className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {changePasswordMutation.isPending ? 'Updating…' : 'Update password'}
+              {changePasswordMutation.isPending ? "Updating…" : "Update password"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};

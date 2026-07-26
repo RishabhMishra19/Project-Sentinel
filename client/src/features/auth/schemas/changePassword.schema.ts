@@ -1,5 +1,5 @@
-import { z } from 'zod'
-import { passwordFieldSchema } from '../../../shared/forms/schemas/password'
+import { z } from "zod";
+import { passwordFieldSchema } from "../../../shared/forms/schemas/password";
 
 export const changePasswordSchema = z
   .object({
@@ -8,12 +8,12 @@ export const changePasswordSchema = z
     confirmNewPassword: passwordFieldSchema,
   })
   .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: 'New password and confirmation do not match',
-    path: ['confirmNewPassword'],
+    message: "New password and confirmation do not match",
+    path: ["confirmNewPassword"],
   })
   .refine((data) => data.oldPassword !== data.newPassword, {
-    message: 'New password must be different from the current password',
-    path: ['newPassword'],
-  })
+    message: "New password must be different from the current password",
+    path: ["newPassword"],
+  });
 
-export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;

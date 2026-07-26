@@ -1,32 +1,27 @@
-import { useState, type ReactElement } from 'react'
-import { Popover } from './Popover'
+import { useState, type ReactElement } from "react";
+import { Popover } from "./Popover";
 
 export type MenuItem = {
-  id: string
-  label: string
-  onSelect: () => void
-  disabled?: boolean
-  variant?: 'default' | 'danger'
-}
+  id: string;
+  label: string;
+  onSelect: () => void;
+  disabled?: boolean;
+  variant?: "default" | "danger";
+};
 
 type MenuProps = {
   trigger: ReactElement<{
-    onClick?: (event: React.MouseEvent) => void
-    'aria-expanded'?: boolean
-    'aria-controls'?: string
-  }>
-  items: MenuItem[]
-  align?: 'start' | 'end'
-  className?: string
-}
+    onClick?: (event: React.MouseEvent) => void;
+    "aria-expanded"?: boolean;
+    "aria-controls"?: string;
+  }>;
+  items: MenuItem[];
+  align?: "start" | "end";
+  className?: string;
+};
 
-export const Menu = ({
-  trigger,
-  items,
-  align = 'end',
-  className,
-}: MenuProps) => {
-  const [open, setOpen] = useState(false)
+export const Menu = ({ trigger, items, align = "end", className }: MenuProps) => {
+  const [open, setOpen] = useState(false);
 
   return (
     <Popover
@@ -45,17 +40,17 @@ export const Menu = ({
               role="menuitem"
               disabled={item.disabled}
               className={`w-full rounded px-2 py-1.5 text-left text-sm disabled:opacity-50 ${
-                item.variant === 'danger'
-                  ? 'text-danger hover:bg-danger/10'
-                  : 'text-foreground hover:bg-chrome'
+                item.variant === "danger"
+                  ? "text-danger hover:bg-danger/10"
+                  : "text-foreground hover:bg-chrome"
               }`}
               onClick={(event) => {
-                event.stopPropagation()
+                event.stopPropagation();
                 if (item.disabled) {
-                  return
+                  return;
                 }
-                item.onSelect()
-                setOpen(false)
+                item.onSelect();
+                setOpen(false);
               }}
             >
               {item.label}
@@ -64,5 +59,5 @@ export const Menu = ({
         ))}
       </ul>
     </Popover>
-  )
-}
+  );
+};

@@ -1,42 +1,32 @@
-import { useId } from 'react'
-import type { ServiceResponse } from '../dto/response/service.response'
+import { useId } from "react";
+import type { ServiceResponse } from "../dto/response/service.response";
 
 type ServiceViewModalProps = {
-  open: boolean
-  service: ServiceResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  service: ServiceResponse | null;
+  onClose: () => void;
+};
 
 const formatDateTime = (value: string) => {
-  const date = new Date(value)
+  const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
-    return value
+    return value;
   }
-  return date.toLocaleString()
-}
+  return date.toLocaleString();
+};
 
-const DetailRow = ({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) => (
+const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col gap-0.5">
     <dt className="text-xs text-muted">{label}</dt>
     <dd className="text-sm text-foreground">{value}</dd>
   </div>
-)
+);
 
-export const ServiceViewModal = ({
-  open,
-  service,
-  onClose,
-}: ServiceViewModalProps) => {
-  const titleId = useId()
+export const ServiceViewModal = ({ open, service, onClose }: ServiceViewModalProps) => {
+  const titleId = useId();
 
   if (!open || !service) {
-    return null
+    return null;
   }
 
   return (
@@ -69,10 +59,7 @@ export const ServiceViewModal = ({
         <dl className="flex flex-col gap-3">
           <DetailRow label="Name" value={service.name} />
           <DetailRow label="Product" value={service.productName} />
-          <DetailRow
-            label="Status"
-            value={service.status === 'ACTIVE' ? 'Active' : 'Inactive'}
-          />
+          <DetailRow label="Status" value={service.status === "ACTIVE" ? "Active" : "Inactive"} />
           <DetailRow label="Created" value={formatDateTime(service.createdAt)} />
           <DetailRow
             label="Created by"
@@ -96,5 +83,5 @@ export const ServiceViewModal = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

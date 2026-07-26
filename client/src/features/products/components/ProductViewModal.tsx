@@ -1,42 +1,32 @@
-import { useId } from 'react'
-import type { ProductResponse } from '../dto/response/product.response'
+import { useId } from "react";
+import type { ProductResponse } from "../dto/response/product.response";
 
 type ProductViewModalProps = {
-  open: boolean
-  product: ProductResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  product: ProductResponse | null;
+  onClose: () => void;
+};
 
 const formatDateTime = (value: string) => {
-  const date = new Date(value)
+  const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
-    return value
+    return value;
   }
-  return date.toLocaleString()
-}
+  return date.toLocaleString();
+};
 
-const DetailRow = ({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) => (
+const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col gap-0.5">
     <dt className="text-xs text-muted">{label}</dt>
     <dd className="text-sm text-foreground">{value}</dd>
   </div>
-)
+);
 
-export const ProductViewModal = ({
-  open,
-  product,
-  onClose,
-}: ProductViewModalProps) => {
-  const titleId = useId()
+export const ProductViewModal = ({ open, product, onClose }: ProductViewModalProps) => {
+  const titleId = useId();
 
   if (!open || !product) {
-    return null
+    return null;
   }
 
   return (
@@ -68,10 +58,7 @@ export const ProductViewModal = ({
 
         <dl className="flex flex-col gap-3">
           <DetailRow label="Name" value={product.name} />
-          <DetailRow
-            label="Status"
-            value={product.status === 'ACTIVE' ? 'Active' : 'Inactive'}
-          />
+          <DetailRow label="Status" value={product.status === "ACTIVE" ? "Active" : "Inactive"} />
           <DetailRow label="Created" value={formatDateTime(product.createdAt)} />
           <DetailRow
             label="Created by"
@@ -95,5 +82,5 @@ export const ProductViewModal = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

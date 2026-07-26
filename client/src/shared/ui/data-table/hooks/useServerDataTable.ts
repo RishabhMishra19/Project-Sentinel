@@ -48,18 +48,10 @@ export const useServerDataTable = <T extends object>({
   searchDebounceMs = 300,
   onQueryChange,
 }: UseServerDataTableOptions<T>): UseServerDataTableResult<T> => {
-  const {
-    query,
-    setSorting,
-    setSearch,
-    setFilters,
-    setPageIndex,
-    setPageSize,
-  } = useDataTableQueryState({ columns, initialState });
+  const { query, setSorting, setSearch, setFilters, setPageIndex, setPageSize } =
+    useDataTableQueryState({ columns, initialState });
 
-  const [debouncedSearchValue, setDebouncedSearchValue] = useState(
-    query.search.value,
-  );
+  const [debouncedSearchValue, setDebouncedSearchValue] = useState(query.search.value);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -83,15 +75,9 @@ export const useServerDataTable = <T extends object>({
     onQueryChangeRef.current?.(emittedQuery);
   }, [emittedQuery]);
 
-  const tanstackColumns = useMemo(
-    () => buildTanStackColumns(columns),
-    [columns],
-  );
+  const tanstackColumns = useMemo(() => buildTanStackColumns(columns), [columns]);
 
-  const sortingState = useMemo(
-    () => toTanStackSorting(query.sorting),
-    [query.sorting],
-  );
+  const sortingState = useMemo(() => toTanStackSorting(query.sorting), [query.sorting]);
 
   const paginationState = useMemo<PaginationState>(
     () => ({
@@ -101,10 +87,7 @@ export const useServerDataTable = <T extends object>({
     [query.pageIndex, query.pageSize],
   );
 
-  const pageCount = Math.max(
-    Math.ceil(totalElements / Math.max(query.pageSize, 1)),
-    1,
-  );
+  const pageCount = Math.max(Math.ceil(totalElements / Math.max(query.pageSize, 1)), 1);
 
   useReactTable({
     data,
@@ -116,13 +99,11 @@ export const useServerDataTable = <T extends object>({
     },
     getRowId: (row) => getRowId(row),
     onSortingChange: (updater: Updater<SortingState>) => {
-      const next =
-        typeof updater === "function" ? updater(sortingState) : updater;
+      const next = typeof updater === "function" ? updater(sortingState) : updater;
       setSorting(fromTanStackSorting(next));
     },
     onPaginationChange: (updater: Updater<PaginationState>) => {
-      const next =
-        typeof updater === "function" ? updater(paginationState) : updater;
+      const next = typeof updater === "function" ? updater(paginationState) : updater;
       if (next.pageSize !== query.pageSize) {
         setPageSize(next.pageSize);
         return;

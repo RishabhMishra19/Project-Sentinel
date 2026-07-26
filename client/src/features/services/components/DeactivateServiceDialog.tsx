@@ -1,13 +1,13 @@
-import { useId } from 'react'
-import type { ServiceResponse } from '../dto/response/service.response'
-import { useDeleteService } from '../hooks/useServices'
+import { useId } from "react";
+import type { ServiceResponse } from "../dto/response/service.response";
+import { useDeleteService } from "../hooks/useServices";
 
 type DeactivateServiceDialogProps = {
-  open: boolean
-  productId: string
-  service: ServiceResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  productId: string;
+  service: ServiceResponse | null;
+  onClose: () => void;
+};
 
 export const DeactivateServiceDialog = ({
   open,
@@ -15,20 +15,20 @@ export const DeactivateServiceDialog = ({
   service,
   onClose,
 }: DeactivateServiceDialogProps) => {
-  const titleId = useId()
-  const deleteMutation = useDeleteService(productId)
+  const titleId = useId();
+  const deleteMutation = useDeleteService(productId);
 
   if (!open || !service) {
-    return null
+    return null;
   }
 
   const onConfirm = () => {
     deleteMutation.mutate(service.id, {
       onSuccess: () => {
-        onClose()
+        onClose();
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -58,9 +58,8 @@ export const DeactivateServiceDialog = ({
         </div>
 
         <p className="text-sm text-muted">
-          Deactivate{' '}
-          <span className="font-medium text-foreground">{service.name}</span>?
-          The service will be marked inactive.
+          Deactivate <span className="font-medium text-foreground">{service.name}</span>? The
+          service will be marked inactive.
         </p>
 
         <div className="mt-6 flex justify-end gap-2">
@@ -77,10 +76,10 @@ export const DeactivateServiceDialog = ({
             disabled={deleteMutation.isPending}
             className="cursor-pointer rounded bg-danger px-4 py-2 text-sm text-white hover:bg-danger/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {deleteMutation.isPending ? 'Deactivating…' : 'Deactivate'}
+            {deleteMutation.isPending ? "Deactivating…" : "Deactivate"}
           </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

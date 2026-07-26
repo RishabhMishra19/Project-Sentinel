@@ -1,33 +1,27 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState } from "react";
 import {
   DataTable,
   useServerDataTable,
   type DataTableQueryState,
-} from '../../../shared/ui/data-table'
-import {
-  inputClassName,
-  primaryButtonClassName,
-} from '../../../shared/ui/data-table/styles'
-import type { ProductResponse } from '../../products/dto/response/product.response'
-import type { ServiceResponse } from '../dto/response/service.response'
-import { useServicesQuery } from '../hooks/useServices'
-import { mapServiceListQuery } from '../utils/mapServiceListQuery'
-import {
-  createServiceRowActions,
-  productServiceColumns,
-} from './servicesTableConfig'
+} from "../../../shared/ui/data-table";
+import { inputClassName, primaryButtonClassName } from "../../../shared/ui/data-table/styles";
+import type { ProductResponse } from "../../products/dto/response/product.response";
+import type { ServiceResponse } from "../dto/response/service.response";
+import { useServicesQuery } from "../hooks/useServices";
+import { mapServiceListQuery } from "../utils/mapServiceListQuery";
+import { createServiceRowActions, productServiceColumns } from "./servicesTableConfig";
 
 type ServicesTableProps = {
-  products?: ProductResponse[]
-  selectedProductId?: string | null
-  onProductChange?: (productId: string) => void
-  productsLoading?: boolean
-  onCreate: () => void
-  onView: (service: ServiceResponse) => void
-  onEdit: (service: ServiceResponse) => void
-  onViewApiKeys: (service: ServiceResponse) => void
-  onDeactivate: (service: ServiceResponse) => void
-}
+  products?: ProductResponse[];
+  selectedProductId?: string | null;
+  onProductChange?: (productId: string) => void;
+  productsLoading?: boolean;
+  onCreate: () => void;
+  onView: (service: ServiceResponse) => void;
+  onEdit: (service: ServiceResponse) => void;
+  onViewApiKeys: (service: ServiceResponse) => void;
+  onDeactivate: (service: ServiceResponse) => void;
+};
 
 export const ServicesTable = ({
   products,
@@ -40,11 +34,11 @@ export const ServicesTable = ({
   onViewApiKeys,
   onDeactivate,
 }: ServicesTableProps) => {
-  const effectiveProductId = selectedProductId ?? undefined
+  const effectiveProductId = selectedProductId ?? undefined;
 
   return (
     <ServicesTableInner
-      key={effectiveProductId ?? 'no-product'}
+      key={effectiveProductId ?? "no-product"}
       effectiveProductId={effectiveProductId}
       products={products}
       selectedProductId={selectedProductId}
@@ -56,21 +50,21 @@ export const ServicesTable = ({
       onViewApiKeys={onViewApiKeys}
       onDeactivate={onDeactivate}
     />
-  )
-}
+  );
+};
 
 type ServicesTableInnerProps = {
-  effectiveProductId?: string
-  products?: ProductResponse[]
-  selectedProductId?: string | null
-  onProductChange?: (productId: string) => void
-  productsLoading: boolean
-  onCreate: () => void
-  onView: (service: ServiceResponse) => void
-  onEdit: (service: ServiceResponse) => void
-  onViewApiKeys: (service: ServiceResponse) => void
-  onDeactivate: (service: ServiceResponse) => void
-}
+  effectiveProductId?: string;
+  products?: ProductResponse[];
+  selectedProductId?: string | null;
+  onProductChange?: (productId: string) => void;
+  productsLoading: boolean;
+  onCreate: () => void;
+  onView: (service: ServiceResponse) => void;
+  onEdit: (service: ServiceResponse) => void;
+  onViewApiKeys: (service: ServiceResponse) => void;
+  onDeactivate: (service: ServiceResponse) => void;
+};
 
 const ServicesTableInner = ({
   effectiveProductId,
@@ -84,18 +78,18 @@ const ServicesTableInner = ({
   onViewApiKeys,
   onDeactivate,
 }: ServicesTableInnerProps) => {
-  const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null)
-  const showProductSelect = products != null && onProductChange != null
+  const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null);
+  const showProductSelect = products != null && onProductChange != null;
 
   const listParams = useMemo(
     () => (fetchQuery ? mapServiceListQuery(fetchQuery) : null),
     [fetchQuery],
-  )
+  );
 
   const { data, isFetching } = useServicesQuery(
     effectiveProductId,
     effectiveProductId ? listParams : null,
-  )
+  );
 
   const rowActions = useMemo(
     () =>
@@ -106,15 +100,15 @@ const ServicesTableInner = ({
         onDeactivate,
       }),
     [onView, onEdit, onViewApiKeys, onDeactivate],
-  )
+  );
 
   const emptyMessage = !effectiveProductId
     ? productsLoading
-      ? 'Loading products…'
+      ? "Loading products…"
       : products && products.length === 0
-        ? 'Create a product before managing services'
-        : 'Select a product to view its services'
-    : 'No services match your filters'
+        ? "Create a product before managing services"
+        : "Select a product to view its services"
+    : "No services match your filters";
 
   const { tableProps } = useServerDataTable({
     columns: productServiceColumns,
@@ -124,15 +118,14 @@ const ServicesTableInner = ({
     initialState: { pageSize: 10 },
     rowActions: effectiveProductId ? rowActions : [],
     isLoading:
-      productsLoading ||
-      (effectiveProductId != null && (isFetching || fetchQuery == null)),
+      productsLoading || (effectiveProductId != null && (isFetching || fetchQuery == null)),
     onQueryChange: setFetchQuery,
     toolbarActions: (
       <div className="flex flex-wrap items-center gap-2">
         {showProductSelect ? (
           <select
             className={`${inputClassName} min-w-[10rem]`}
-            value={selectedProductId ?? ''}
+            value={selectedProductId ?? ""}
             disabled={productsLoading || (products?.length ?? 0) === 0}
             onChange={(event) => onProductChange(event.target.value)}
             aria-label="Filter services by product"
@@ -159,7 +152,7 @@ const ServicesTableInner = ({
       </div>
     ),
     emptyMessage,
-  })
+  });
 
-  return <DataTable {...tableProps} />
-}
+  return <DataTable {...tableProps} />;
+};

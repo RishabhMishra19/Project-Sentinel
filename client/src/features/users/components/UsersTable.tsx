@@ -1,22 +1,22 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState } from "react";
 import {
   DataTable,
   useServerDataTable,
   type DataTableQueryState,
-} from '../../../shared/ui/data-table'
-import { primaryButtonClassName } from '../../../shared/ui/data-table/styles'
-import type { UserResponse } from '../dto/response/user.response'
-import { useUsersQuery } from '../hooks/useUsers'
-import { mapUserListQuery } from '../utils/mapUserListQuery'
-import { createUserRowActions, userColumns } from './usersTableConfig'
+} from "../../../shared/ui/data-table";
+import { primaryButtonClassName } from "../../../shared/ui/data-table/styles";
+import type { UserResponse } from "../dto/response/user.response";
+import { useUsersQuery } from "../hooks/useUsers";
+import { mapUserListQuery } from "../utils/mapUserListQuery";
+import { createUserRowActions, userColumns } from "./usersTableConfig";
 
 type UsersTableProps = {
-  onCreate: () => void
-  onView: (user: UserResponse) => void
-  onEdit: (user: UserResponse) => void
-  onAssignRole: (user: UserResponse) => void
-  onMarkInactive: (user: UserResponse) => void
-}
+  onCreate: () => void;
+  onView: (user: UserResponse) => void;
+  onEdit: (user: UserResponse) => void;
+  onAssignRole: (user: UserResponse) => void;
+  onMarkInactive: (user: UserResponse) => void;
+};
 
 export const UsersTable = ({
   onCreate,
@@ -25,14 +25,14 @@ export const UsersTable = ({
   onAssignRole,
   onMarkInactive,
 }: UsersTableProps) => {
-  const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null)
+  const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null);
 
   const listParams = useMemo(
     () => (fetchQuery ? mapUserListQuery(fetchQuery) : null),
     [fetchQuery],
-  )
+  );
 
-  const { data, isFetching, isError } = useUsersQuery(listParams)
+  const { data, isFetching, isError } = useUsersQuery(listParams);
 
   const rowActions = useMemo(
     () =>
@@ -43,7 +43,7 @@ export const UsersTable = ({
         onMarkInactive,
       }),
     [onView, onEdit, onAssignRole, onMarkInactive],
-  )
+  );
 
   const { tableProps } = useServerDataTable({
     columns: userColumns,
@@ -55,18 +55,12 @@ export const UsersTable = ({
     isLoading: isFetching || fetchQuery == null,
     onQueryChange: setFetchQuery,
     toolbarActions: (
-      <button
-        type="button"
-        className={primaryButtonClassName}
-        onClick={onCreate}
-      >
+      <button type="button" className={primaryButtonClassName} onClick={onCreate}>
         Create user
       </button>
     ),
-    emptyMessage: isError
-      ? 'Could not load users'
-      : 'No users match your filters',
-  })
+    emptyMessage: isError ? "Could not load users" : "No users match your filters",
+  });
 
-  return <DataTable {...tableProps} />
-}
+  return <DataTable {...tableProps} />;
+};

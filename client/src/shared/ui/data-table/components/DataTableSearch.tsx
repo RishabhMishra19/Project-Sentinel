@@ -1,30 +1,26 @@
-import type { DataTableSearchConfig } from '../types'
+import type { DataTableSearchConfig } from "../types";
 
 export type SearchableColumnOption = {
-  id: string
-  header: string
-}
+  id: string;
+  header: string;
+};
 
 type DataTableSearchProps = {
-  columns: SearchableColumnOption[]
-  searchConfig: DataTableSearchConfig
-}
+  columns: SearchableColumnOption[];
+  searchConfig: DataTableSearchConfig;
+};
 
-export const DataTableSearch = ({
-  columns,
-  searchConfig,
-}: DataTableSearchProps) => {
-  const { search, onSearchChange } = searchConfig
+export const DataTableSearch = ({ columns, searchConfig }: DataTableSearchProps) => {
+  const { search, onSearchChange } = searchConfig;
 
   if (columns.length === 0) {
-    return null
+    return null;
   }
 
-  const columnId = search.columnId || columns[0].id
-  const value = search.value
-  const hasColumnSelect = columns.length > 1
-  const columnHeader =
-    columns.find((column) => column.id === columnId)?.header ?? ''
+  const columnId = search.columnId || columns[0].id;
+  const value = search.value;
+  const hasColumnSelect = columns.length > 1;
+  const columnHeader = columns.find((column) => column.id === columnId)?.header ?? "";
 
   return (
     <div className="flex min-w-0 flex-1 overflow-hidden rounded border border-border bg-surface focus-within:border-ring sm:max-w-md">
@@ -33,9 +29,7 @@ export const DataTableSearch = ({
           <select
             className="h-full appearance-none bg-transparent py-1.5 pl-2.5 pr-7 text-sm text-foreground outline-none"
             value={columnId}
-            onChange={(event) =>
-              onSearchChange({ columnId: event.target.value, value })
-            }
+            onChange={(event) => onSearchChange({ columnId: event.target.value, value })}
             aria-label="Search column"
           >
             {columns.map((column) => (
@@ -57,10 +51,8 @@ export const DataTableSearch = ({
         className="min-w-0 flex-1 bg-transparent px-2.5 py-1.5 text-sm text-foreground outline-none"
         placeholder={`Search ${columnHeader}…`}
         value={value}
-        onChange={(event) =>
-          onSearchChange({ columnId, value: event.target.value })
-        }
+        onChange={(event) => onSearchChange({ columnId, value: event.target.value })}
       />
     </div>
-  )
-}
+  );
+};

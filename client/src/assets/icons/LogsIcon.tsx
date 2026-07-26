@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 /** List / log lines for Logs nav */
 export const LogsIcon = ({ className }: IconProps) => (
@@ -22,4 +22,4 @@ export const LogsIcon = ({ className }: IconProps) => (
     <path d="M3 12h.01" />
     <path d="M3 18h.01" />
   </svg>
-)
+);

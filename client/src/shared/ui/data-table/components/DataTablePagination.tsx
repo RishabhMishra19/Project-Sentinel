@@ -5,16 +5,8 @@ type DataTablePaginationProps = {
   pagination: DataTablePagination;
 };
 
-export const DataTablePaginationBar = ({
-  pagination,
-}: DataTablePaginationProps) => {
-  const {
-    pageIndex,
-    pageSize,
-    totalElements,
-    onPageIndexChange,
-    onPageSizeChange,
-  } = pagination;
+export const DataTablePaginationBar = ({ pagination }: DataTablePaginationProps) => {
+  const { pageIndex, pageSize, totalElements, onPageIndexChange, onPageSizeChange } = pagination;
 
   const pageCount = pageSize > 0 ? Math.ceil(totalElements / pageSize) : 0;
   const canPrev = pageIndex > 0;

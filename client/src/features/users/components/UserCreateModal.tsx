@@ -1,27 +1,20 @@
-import { useEffect, useId } from 'react'
-import { FormField } from '../../../shared/forms/FormField'
-import { useAppForm } from '../../../shared/forms/useAppForm'
-import type { CreateUserResponse } from '../dto/response/user.response'
-import { useCreateUser } from '../hooks/useUsers'
-import {
-  createUserFormSchema,
-  type CreateUserFormValues,
-} from '../schemas/user.schema'
+import { useEffect, useId } from "react";
+import { FormField } from "../../../shared/forms/FormField";
+import { useAppForm } from "../../../shared/forms/useAppForm";
+import type { CreateUserResponse } from "../dto/response/user.response";
+import { useCreateUser } from "../hooks/useUsers";
+import { createUserFormSchema, type CreateUserFormValues } from "../schemas/user.schema";
 
 type UserCreateModalProps = {
-  open: boolean
-  onClose: () => void
-  onCreated: (created: CreateUserResponse) => void
-}
+  open: boolean;
+  onClose: () => void;
+  onCreated: (created: CreateUserResponse) => void;
+};
 
-export const UserCreateModal = ({
-  open,
-  onClose,
-  onCreated,
-}: UserCreateModalProps) => {
-  const titleId = useId()
-  const createMutation = useCreateUser()
-  const { reset: resetMutation } = createMutation
+export const UserCreateModal = ({ open, onClose, onCreated }: UserCreateModalProps) => {
+  const titleId = useId();
+  const createMutation = useCreateUser();
+  const { reset: resetMutation } = createMutation;
 
   const {
     register,
@@ -30,29 +23,29 @@ export const UserCreateModal = ({
     formState: { errors },
   } = useAppForm<CreateUserFormValues>({
     schema: createUserFormSchema,
-    defaultValues: { email: '', displayName: '' },
-  })
+    defaultValues: { email: "", displayName: "" },
+  });
 
   useEffect(() => {
     if (!open) {
-      return
+      return;
     }
-    resetMutation()
-    reset({ email: '', displayName: '' })
-  }, [open, reset, resetMutation])
+    resetMutation();
+    reset({ email: "", displayName: "" });
+  }, [open, reset, resetMutation]);
 
   if (!open) {
-    return null
+    return null;
   }
 
   const onSubmit = (data: CreateUserFormValues) => {
     createMutation.mutate(data, {
       onSuccess: (created) => {
-        onClose()
-        onCreated(created)
+        onClose();
+        onCreated(created);
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -87,14 +80,14 @@ export const UserCreateModal = ({
             type="email"
             autoComplete="off"
             error={errors.email}
-            registration={register('email')}
+            registration={register("email")}
           />
           <FormField
             label="Display name"
             type="text"
             autoComplete="off"
             error={errors.displayName}
-            registration={register('displayName')}
+            registration={register("displayName")}
           />
 
           <div className="mt-2 flex justify-end gap-2">
@@ -110,11 +103,11 @@ export const UserCreateModal = ({
               disabled={createMutation.isPending}
               className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {createMutation.isPending ? 'Creating…' : 'Create user'}
+              {createMutation.isPending ? "Creating…" : "Create user"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};

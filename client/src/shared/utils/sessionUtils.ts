@@ -17,10 +17,7 @@ export function isImpersonating(
  * - "only_admin" — Sentinel admin in platform mode (no Login-as tenant)
  * - "tenant_context" — tenant user, or Sentinel admin impersonating a tenant
  */
-export function resolveSessionMode(
-  user: AuthSessionUser,
-  activeTenant: TenantSummary | null,
-) {
+export function resolveSessionMode(user: AuthSessionUser, activeTenant: TenantSummary | null) {
   if (user.sentinelAdmin === true && !isImpersonating(user, activeTenant)) {
     return "only_admin";
   }
@@ -41,8 +38,5 @@ export const isTenantUserOrSentinelAdminView = (
   user: AuthSessionUser | null,
   activeTenant: TenantSummary | null,
 ) => {
-  return (
-    isLoggedIn &&
-    (!user?.sentinelAdmin || (user?.sentinelAdmin && !!activeTenant))
-  );
+  return isLoggedIn && (!user?.sentinelAdmin || (user?.sentinelAdmin && !!activeTenant));
 };

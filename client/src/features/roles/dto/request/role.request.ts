@@ -1,20 +1,20 @@
 export interface CreateRoleRequest {
-  name: string
+  name: string;
 }
 
 export interface UpdateRoleRequest {
-  name: string
+  name: string;
 }
 
-export type RoleScopeType = 'PRODUCT' | 'SERVICE'
-export type PermissionType = 'ALL' | 'READ' | 'READ_AND_WRITE'
+export type RoleScopeType = "PRODUCT" | "SERVICE";
+export type PermissionType = "ALL" | "READ" | "READ_AND_WRITE";
 
 export interface CreateRoleScopeRequest {
-  scopeType: RoleScopeType
-  scopeId: string
-  permission: PermissionType
+  scopeType: RoleScopeType;
+  scopeId: string;
+  permission: PermissionType;
 }
 
 export interface UpdateRoleScopeRequest {
-  permission: PermissionType
+  permission: PermissionType;
 }

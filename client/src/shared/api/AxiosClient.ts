@@ -1,8 +1,4 @@
-import axios, {
-  type AxiosError,
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
-} from "axios";
+import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { store } from "../../redux/store";
 import { clearSession, setAuthSession } from "../../redux/session/sessionSlice";
 import type { AuthSessionResponse } from "../../features/auth/dto/response/auth.response";
@@ -74,7 +70,6 @@ const refreshAccessToken = async () => {
 
 const isAccessTokenExpired = (error: AxiosError<ApiError>) => {
   return (
-    error.response?.status === 401 &&
-    error.response?.data?.errorCode === "ACCESS_TOKEN_EXPIRED"
+    error.response?.status === 401 && error.response?.data?.errorCode === "ACCESS_TOKEN_EXPIRED"
   );
 };

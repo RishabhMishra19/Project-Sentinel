@@ -1,19 +1,19 @@
-import type { AnalyticsScope } from '../dto/request/analytics.request'
-import type { AnalyticsRankingItem } from '../dto/response/analytics.response'
-import { formatNumber, formatRate } from '../utils/timeRange'
+import type { AnalyticsScope } from "../dto/request/analytics.request";
+import type { AnalyticsRankingItem } from "../dto/response/analytics.response";
+import { formatNumber, formatRate } from "../utils/timeRange";
 
 const TAB_LABEL: Record<AnalyticsScope, string> = {
-  TENANT: 'Products',
-  PRODUCT: 'Services',
-  SERVICE: 'Endpoints',
-  ENDPOINT: '—',
-}
+  TENANT: "Products",
+  PRODUCT: "Services",
+  SERVICE: "Endpoints",
+  ENDPOINT: "—",
+};
 
 function rowLabel(item: AnalyticsRankingItem, scope: AnalyticsScope) {
-  if (scope === 'SERVICE') {
-    return `${item.method ?? ''} ${item.pathTemplate ?? ''}`.trim() || item.id
+  if (scope === "SERVICE") {
+    return `${item.method ?? ""} ${item.pathTemplate ?? ""}`.trim() || item.id;
   }
-  return item.name ?? item.id
+  return item.name ?? item.id;
 }
 
 export function AnalyticsRankingsTable({
@@ -23,14 +23,14 @@ export function AnalyticsRankingsTable({
   isError,
   onRowClick,
 }: {
-  scope: AnalyticsScope
-  items: AnalyticsRankingItem[]
-  isLoading: boolean
-  isError: boolean
-  onRowClick?: (item: AnalyticsRankingItem) => void
+  scope: AnalyticsScope;
+  items: AnalyticsRankingItem[];
+  isLoading: boolean;
+  isError: boolean;
+  onRowClick?: (item: AnalyticsRankingItem) => void;
 }) {
-  if (scope === 'ENDPOINT') {
-    return null
+  if (scope === "ENDPOINT") {
+    return null;
   }
 
   return (
@@ -43,13 +43,9 @@ export function AnalyticsRankingsTable({
       {isLoading ? (
         <p className="px-4 py-8 text-sm text-muted-foreground">Loading…</p>
       ) : isError ? (
-        <p className="px-4 py-8 text-sm text-destructive">
-          Could not load rankings.
-        </p>
+        <p className="px-4 py-8 text-sm text-destructive">Could not load rankings.</p>
       ) : items.length === 0 ? (
-        <p className="px-4 py-8 text-sm text-muted-foreground">
-          No traffic in this range.
-        </p>
+        <p className="px-4 py-8 text-sm text-muted-foreground">No traffic in this range.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[32rem] text-left text-sm">
@@ -67,22 +63,18 @@ export function AnalyticsRankingsTable({
                   key={item.id}
                   className={
                     onRowClick
-                      ? 'cursor-pointer border-b border-border/60 hover:bg-muted/40'
-                      : 'border-b border-border/60'
+                      ? "cursor-pointer border-b border-border/60 hover:bg-muted/40"
+                      : "border-b border-border/60"
                   }
                   onClick={() => onRowClick?.(item)}
                 >
                   <td className="px-4 py-2.5 font-medium text-foreground">
                     {rowLabel(item, scope)}
                   </td>
+                  <td className="px-4 py-2.5 tabular-nums">{formatNumber(item.requestCount)}</td>
+                  <td className="px-4 py-2.5 tabular-nums">{formatRate(item.errorRate)}</td>
                   <td className="px-4 py-2.5 tabular-nums">
-                    {formatNumber(item.requestCount)}
-                  </td>
-                  <td className="px-4 py-2.5 tabular-nums">
-                    {formatRate(item.errorRate)}
-                  </td>
-                  <td className="px-4 py-2.5 tabular-nums">
-                    {item.latencyP95Ms != null ? `${item.latencyP95Ms} ms` : '—'}
+                    {item.latencyP95Ms != null ? `${item.latencyP95Ms} ms` : "—"}
                   </td>
                 </tr>
               ))}
@@ -91,5 +83,5 @@ export function AnalyticsRankingsTable({
         </div>
       )}
     </div>
-  )
+  );
 }

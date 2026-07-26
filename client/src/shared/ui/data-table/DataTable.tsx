@@ -1,8 +1,8 @@
-import { AppliedFilterChips, toFilterFields } from '../filters'
-import { DataTablePaginationBar } from './components/DataTablePagination'
-import { DataTableTable } from './components/DataTableTable'
-import { DataTableToolbar } from './components/DataTableToolbar'
-import type { DataTableProps } from './types'
+import { AppliedFilterChips, toFilterFields } from "../filters";
+import { DataTablePaginationBar } from "./components/DataTablePagination";
+import { DataTableTable } from "./components/DataTableTable";
+import { DataTableToolbar } from "./components/DataTableToolbar";
+import type { DataTableProps } from "./types";
 
 export const DataTable = <T extends object>({
   columns,
@@ -17,11 +17,10 @@ export const DataTable = <T extends object>({
   isLoading,
   emptyMessage,
 }: DataTableProps<T>) => {
-  const filterFields = toFilterFields(columns)
-  const hasFilterableColumns = filterFields.length > 0
-  const hasSearchableColumns = columns.some((column) => column.searchable)
-  const shouldShowToolbar =
-    hasFilterableColumns || hasSearchableColumns || toolbarActions
+  const filterFields = toFilterFields(columns);
+  const hasFilterableColumns = filterFields.length > 0;
+  const hasSearchableColumns = columns.some((column) => column.searchable);
+  const shouldShowToolbar = hasFilterableColumns || hasSearchableColumns || toolbarActions;
 
   return (
     <div className="flex flex-col gap-3">
@@ -35,10 +34,7 @@ export const DataTable = <T extends object>({
       ) : null}
 
       {hasFilterableColumns && filtersConfig ? (
-        <AppliedFilterChips
-          fields={filterFields}
-          filtersConfig={filtersConfig}
-        />
+        <AppliedFilterChips fields={filterFields} filtersConfig={filtersConfig} />
       ) : null}
 
       <div className="overflow-hidden rounded border border-border">
@@ -55,5 +51,5 @@ export const DataTable = <T extends object>({
         {pagination ? <DataTablePaginationBar pagination={pagination} /> : null}
       </div>
     </div>
-  )
-}
+  );
+};

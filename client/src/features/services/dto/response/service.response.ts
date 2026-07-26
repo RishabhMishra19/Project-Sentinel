@@ -1,15 +1,15 @@
-import type { UserBriefResponse } from '../../../../shared/dto/response'
+import type { UserBriefResponse } from "../../../../shared/dto/response";
 
-export type ServiceStatus = 'ACTIVE' | 'INACTIVE'
+export type ServiceStatus = "ACTIVE" | "INACTIVE";
 
 export interface ServiceResponse {
-  id: string
-  productId: string
-  productName: string
-  name: string
-  status: ServiceStatus
-  createdBy: UserBriefResponse
-  updatedBy: UserBriefResponse
-  createdAt: string
-  updatedAt: string
+  id: string;
+  productId: string;
+  productName: string;
+  name: string;
+  status: ServiceStatus;
+  createdBy: UserBriefResponse;
+  updatedBy: UserBriefResponse;
+  createdAt: string;
+  updatedAt: string;
 }

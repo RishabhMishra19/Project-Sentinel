@@ -1,47 +1,37 @@
-import { useEffect, useId, useMemo, useState } from 'react'
-import { DataTable, useClientDataTable } from '../../../shared/ui/data-table'
-import { primaryButtonClassName } from '../../../shared/ui/data-table/styles'
-import type {
-  RoleResponse,
-  RoleScopeResponse,
-} from '../dto/response/role.response'
-import { useRoleScopesQuery } from '../hooks/useRoles'
-import { DeactivateRoleScopeDialog } from './DeactivateRoleScopeDialog'
-import { RoleScopeCreateModal } from './RoleScopeCreateModal'
-import { RoleScopeEditModal } from './RoleScopeEditModal'
-import {
-  createRoleScopeRowActions,
-  roleScopeColumns,
-} from './roleScopesTableConfig'
+import { useEffect, useId, useMemo, useState } from "react";
+import { DataTable, useClientDataTable } from "../../../shared/ui/data-table";
+import { primaryButtonClassName } from "../../../shared/ui/data-table/styles";
+import type { RoleResponse, RoleScopeResponse } from "../dto/response/role.response";
+import { useRoleScopesQuery } from "../hooks/useRoles";
+import { DeactivateRoleScopeDialog } from "./DeactivateRoleScopeDialog";
+import { RoleScopeCreateModal } from "./RoleScopeCreateModal";
+import { RoleScopeEditModal } from "./RoleScopeEditModal";
+import { createRoleScopeRowActions, roleScopeColumns } from "./roleScopesTableConfig";
 
 type RoleScopesModalProps = {
-  open: boolean
-  role: RoleResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  role: RoleResponse | null;
+  onClose: () => void;
+};
 
-export const RoleScopesModal = ({
-  open,
-  role,
-  onClose,
-}: RoleScopesModalProps) => {
-  const titleId = useId()
-  const [createOpen, setCreateOpen] = useState(false)
-  const [editScope, setEditScope] = useState<RoleScopeResponse | null>(null)
-  const [deactivateScope, setDeactivateScope] =
-    useState<RoleScopeResponse | null>(null)
-  const { data: scopes = [], isFetching, isError } = useRoleScopesQuery(
-    role?.id ?? null,
-    open && role != null,
-  )
+export const RoleScopesModal = ({ open, role, onClose }: RoleScopesModalProps) => {
+  const titleId = useId();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editScope, setEditScope] = useState<RoleScopeResponse | null>(null);
+  const [deactivateScope, setDeactivateScope] = useState<RoleScopeResponse | null>(null);
+  const {
+    data: scopes = [],
+    isFetching,
+    isError,
+  } = useRoleScopesQuery(role?.id ?? null, open && role != null);
 
   useEffect(() => {
     if (!open) {
-      setCreateOpen(false)
-      setEditScope(null)
-      setDeactivateScope(null)
+      setCreateOpen(false);
+      setEditScope(null);
+      setDeactivateScope(null);
     }
-  }, [open])
+  }, [open]);
 
   const rowActions = useMemo(
     () =>
@@ -50,7 +40,7 @@ export const RoleScopesModal = ({
         onDeactivate: setDeactivateScope,
       }),
     [],
-  )
+  );
 
   const { tableProps } = useClientDataTable({
     columns: roleScopeColumns,
@@ -61,21 +51,15 @@ export const RoleScopesModal = ({
     isLoading: isFetching,
     rowActions,
     toolbarActions: (
-      <button
-        type="button"
-        className={primaryButtonClassName}
-        onClick={() => setCreateOpen(true)}
-      >
+      <button type="button" className={primaryButtonClassName} onClick={() => setCreateOpen(true)}>
         Create scope
       </button>
     ),
-    emptyMessage: isError
-      ? 'Could not load scopes'
-      : 'No scopes for this role',
-  })
+    emptyMessage: isError ? "Could not load scopes" : "No scopes for this role",
+  });
 
   if (!open || !role) {
-    return null
+    return null;
   }
 
   return (
@@ -95,15 +79,11 @@ export const RoleScopesModal = ({
         >
           <div className="mb-4 flex shrink-0 items-start justify-between gap-4">
             <div>
-              <h2
-                id={titleId}
-                className="text-xl font-semibold text-foreground"
-              >
+              <h2 id={titleId} className="text-xl font-semibold text-foreground">
                 Scopes
               </h2>
               <p className="mt-1 text-sm text-muted">
-                Scopes for role{' '}
-                <span className="font-medium text-foreground">{role.name}</span>
+                Scopes for role <span className="font-medium text-foreground">{role.name}</span>
               </p>
             </div>
             <button
@@ -121,11 +101,7 @@ export const RoleScopesModal = ({
         </div>
       </div>
 
-      <RoleScopeCreateModal
-        open={createOpen}
-        role={role}
-        onClose={() => setCreateOpen(false)}
-      />
+      <RoleScopeCreateModal open={createOpen} role={role} onClose={() => setCreateOpen(false)} />
 
       <RoleScopeEditModal
         open={editScope != null}
@@ -141,5 +117,5 @@ export const RoleScopesModal = ({
         onClose={() => setDeactivateScope(null)}
       />
     </>
-  )
-}
+  );
+};

@@ -1,5 +1,5 @@
-import type { AxiosRequestConfig } from 'axios'
-import { axiosClient } from './AxiosClient'
+import type { AxiosRequestConfig } from "axios";
+import { axiosClient } from "./AxiosClient";
 
 /**
  * Thin HTTP facade over the current client (Axios).
@@ -7,24 +7,24 @@ import { axiosClient } from './AxiosClient'
  */
 class ApiManager {
   get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    return axiosClient.get<T>(url, config).then((res) => res.data)
+    return axiosClient.get<T>(url, config).then((res) => res.data);
   }
 
   post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    return axiosClient.post<T>(url, data, config).then((res) => res.data)
+    return axiosClient.post<T>(url, data, config).then((res) => res.data);
   }
 
   put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    return axiosClient.put<T>(url, data, config).then((res) => res.data)
+    return axiosClient.put<T>(url, data, config).then((res) => res.data);
   }
 
   patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    return axiosClient.patch<T>(url, data, config).then((res) => res.data)
+    return axiosClient.patch<T>(url, data, config).then((res) => res.data);
   }
 
   delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    return axiosClient.delete<T>(url, config).then((res) => res.data)
+    return axiosClient.delete<T>(url, config).then((res) => res.data);
   }
 }
 
-export const apiManager = new ApiManager()
+export const apiManager = new ApiManager();

@@ -1,29 +1,26 @@
-import { encodeFilters } from './encodeFilters'
-import { buildFilterChips } from './filterUtils'
-import type { FilterField, FiltersConfig } from './types'
+import { encodeFilters } from "./encodeFilters";
+import { buildFilterChips } from "./filterUtils";
+import type { FilterField, FiltersConfig } from "./types";
 
 type AppliedFilterChipsProps = {
-  fields: FilterField[]
-  filtersConfig: FiltersConfig
-}
+  fields: FilterField[];
+  filtersConfig: FiltersConfig;
+};
 
-export const AppliedFilterChips = ({
-  fields,
-  filtersConfig,
-}: AppliedFilterChipsProps) => {
-  const { filters, onFiltersChange } = filtersConfig
-  const chips = buildFilterChips(fields, filters)
+export const AppliedFilterChips = ({ fields, filtersConfig }: AppliedFilterChipsProps) => {
+  const { filters, onFiltersChange } = filtersConfig;
+  const chips = buildFilterChips(fields, filters);
 
   if (chips.length === 0) {
-    return null
+    return null;
   }
 
   const emitFilters = (next: typeof filters) => {
     onFiltersChange({
       filters: next,
       apiFilters: encodeFilters(fields, next),
-    })
-  }
+    });
+  };
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">
@@ -39,8 +36,8 @@ export const AppliedFilterChips = ({
             className="ml-0.5 text-muted hover:text-foreground"
             aria-label={`Remove ${chip.header} filter`}
             onClick={() => {
-              const { [chip.id]: _removed, ...next } = filters
-              emitFilters(next)
+              const { [chip.id]: _removed, ...next } = filters;
+              emitFilters(next);
             }}
           >
             ×
@@ -55,5 +52,5 @@ export const AppliedFilterChips = ({
         Clear all
       </button>
     </div>
-  )
-}
+  );
+};

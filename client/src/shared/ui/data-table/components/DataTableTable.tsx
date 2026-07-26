@@ -1,12 +1,7 @@
 import { renderCell } from "./cells/renderCell";
 import { DataTableRowActions } from "./DataTableRowActions";
 import { tableCellInnerClassName } from "../styles";
-import type {
-  DataTableColumn,
-  DataTableSort,
-  DataTableSortingConfig,
-  RowAction,
-} from "../types";
+import type { DataTableColumn, DataTableSort, DataTableSortingConfig, RowAction } from "../types";
 
 type DataTableTableProps<T extends object> = {
   columns: DataTableColumn<T>[];
@@ -20,13 +15,7 @@ type DataTableTableProps<T extends object> = {
   skeletonRowCount?: number;
 };
 
-const SortIndicator = ({
-  active,
-  desc,
-}: {
-  active: boolean;
-  desc: boolean;
-}) => {
+const SortIndicator = ({ active, desc }: { active: boolean; desc: boolean }) => {
   if (!active) {
     return <span className="text-muted opacity-40">↕</span>;
   }
@@ -46,9 +35,7 @@ const nextSort = (current: DataTableSort, columnId: string): DataTableSort => {
 const SkeletonCell = ({ className }: { className?: string }) => (
   <td className="px-3 py-2 align-middle">
     <div className={tableCellInnerClassName}>
-      <div
-        className={`h-4 animate-pulse rounded bg-chrome ${className ?? "w-full"}`}
-      />
+      <div className={`h-4 animate-pulse rounded bg-chrome ${className ?? "w-full"}`} />
     </div>
   </td>
 );
@@ -87,15 +74,10 @@ export const DataTableTable = <T extends object>({
                     <button
                       type="button"
                       className="inline-flex items-center gap-1.5 text-foreground"
-                      onClick={() =>
-                        onSortingChange(nextSort(sorting ?? null, column.id))
-                      }
+                      onClick={() => onSortingChange(nextSort(sorting ?? null, column.id))}
                     >
                       {column.header}
-                      <SortIndicator
-                        active={Boolean(isSorted)}
-                        desc={Boolean(sorting?.desc)}
-                      />
+                      <SortIndicator active={Boolean(isSorted)} desc={Boolean(sorting?.desc)} />
                     </button>
                   ) : (
                     column.header
@@ -104,10 +86,7 @@ export const DataTableTable = <T extends object>({
               );
             })}
             {showActions ? (
-              <th
-                scope="col"
-                className="border-b border-border px-3 py-2 font-medium"
-              >
+              <th scope="col" className="border-b border-border px-3 py-2 font-medium">
                 Actions
               </th>
             ) : null}
@@ -116,10 +95,7 @@ export const DataTableTable = <T extends object>({
         <tbody>
           {showSkeletons
             ? Array.from({ length: skeletonRowCount }, (_, index) => (
-                <tr
-                  key={`skeleton-${index}`}
-                  className="border-b border-border last:border-b-0"
-                >
+                <tr key={`skeleton-${index}`} className="border-b border-border last:border-b-0">
                   {visibleColumns.map((column) => (
                     <SkeletonCell key={column.id} />
                   ))}
@@ -153,9 +129,7 @@ export const DataTableTable = <T extends object>({
               >
                 {visibleColumns.map((column) => (
                   <td key={column.id} className="px-3 py-2 align-middle">
-                    <div className={tableCellInnerClassName}>
-                      {renderCell(column.cell, row)}
-                    </div>
+                    <div className={tableCellInnerClassName}>{renderCell(column.cell, row)}</div>
                   </td>
                 ))}
                 {showActions && rowActions ? (

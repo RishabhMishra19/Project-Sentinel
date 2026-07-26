@@ -1,43 +1,39 @@
-import { ANALYTICS_API_ROUTES } from '../../../shared/api/api.routes'
-import { apiManager } from '../../../shared/api/ApiManager'
-import { analyticsParamsToListQuery } from '../../../shared/api/toListQueryRequest'
-import type { PageResponse } from '../../../shared/dto/response/PageResponse'
+import { ANALYTICS_API_ROUTES } from "../../../shared/api/api.routes";
+import { apiManager } from "../../../shared/api/ApiManager";
+import { analyticsParamsToListQuery } from "../../../shared/api/toListQueryRequest";
+import type { PageResponse } from "../../../shared/dto/response/PageResponse";
 import type {
   AnalyticsQueryParams,
   AnalyticsRankingsParams,
-} from '../dto/request/analytics.request'
+} from "../dto/request/analytics.request";
 import type {
   AnalyticsRankingItem,
   AnalyticsSummaryResponse,
   AnalyticsTimeseriesResponse,
   ExceptionMetricItem,
   StatusBreakdownItem,
-} from '../dto/response/analytics.response'
+} from "../dto/response/analytics.response";
 
 export class AnalyticsApi {
   static summary(params: AnalyticsQueryParams): Promise<AnalyticsSummaryResponse> {
     return apiManager.post<AnalyticsSummaryResponse>(
       ANALYTICS_API_ROUTES.SUMMARY,
       analyticsParamsToListQuery(params),
-    )
+    );
   }
 
-  static timeseries(
-    params: AnalyticsQueryParams,
-  ): Promise<AnalyticsTimeseriesResponse> {
+  static timeseries(params: AnalyticsQueryParams): Promise<AnalyticsTimeseriesResponse> {
     return apiManager.post<AnalyticsTimeseriesResponse>(
       ANALYTICS_API_ROUTES.TIMESERIES,
       analyticsParamsToListQuery(params),
-    )
+    );
   }
 
-  static rankings(
-    params: AnalyticsRankingsParams,
-  ): Promise<PageResponse<AnalyticsRankingItem>> {
+  static rankings(params: AnalyticsRankingsParams): Promise<PageResponse<AnalyticsRankingItem>> {
     return apiManager.post<PageResponse<AnalyticsRankingItem>>(
       ANALYTICS_API_ROUTES.RANKINGS,
       analyticsParamsToListQuery(params),
-    )
+    );
   }
 
   static statusBreakdown(
@@ -47,16 +43,16 @@ export class AnalyticsApi {
     return apiManager.post<StatusBreakdownItem[]>(
       ANALYTICS_API_ROUTES.STATUS_BREAKDOWN(endpointId),
       { from: params.from, to: params.to },
-    )
+    );
   }
 
   static exceptions(
     endpointId: string,
     params: { from: string; to: string },
   ): Promise<ExceptionMetricItem[]> {
-    return apiManager.post<ExceptionMetricItem[]>(
-      ANALYTICS_API_ROUTES.EXCEPTIONS(endpointId),
-      { from: params.from, to: params.to },
-    )
+    return apiManager.post<ExceptionMetricItem[]>(ANALYTICS_API_ROUTES.EXCEPTIONS(endpointId), {
+      from: params.from,
+      to: params.to,
+    });
   }
 }

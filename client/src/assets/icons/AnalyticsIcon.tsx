@@ -1,6 +1,6 @@
 type IconProps = {
-  className?: string
-}
+  className?: string;
+};
 
 /** Simple bar chart mark for Analytics nav */
 export const AnalyticsIcon = ({ className }: IconProps) => (
@@ -20,4 +20,4 @@ export const AnalyticsIcon = ({ className }: IconProps) => (
     <path d="M16 19v-7" />
     <path d="M22 19V8" />
   </svg>
-)
+);

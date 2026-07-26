@@ -1,94 +1,84 @@
-import { useId, useState, type ReactNode } from 'react'
-import { toast } from '../../../shared/ui/toast'
-import type { RequestLogResponse } from '../dto/response/requestLog.response'
+import { useId, useState, type ReactNode } from "react";
+import { toast } from "../../../shared/ui/toast";
+import type { RequestLogResponse } from "../dto/response/requestLog.response";
 
 type RequestLogDetailPanelProps = {
-  log: RequestLogResponse | undefined
-  loading: boolean
-  onClose: () => void
-}
+  log: RequestLogResponse | undefined;
+  loading: boolean;
+  onClose: () => void;
+};
 
 function formatDateTime(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return date.toLocaleString()
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
 }
 
 function formatBytes(bytes: number | null) {
-  if (bytes == null) return null
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+  if (bytes == null) return null;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
 function statusClasses(code: number) {
-  if (code >= 500) return 'bg-danger/15 text-danger'
-  if (code >= 400) return 'bg-warning/15 text-warning'
-  if (code >= 300) return 'bg-accent-soft text-accent'
-  return 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+  if (code >= 500) return "bg-danger/15 text-danger";
+  if (code >= 400) return "bg-warning/15 text-warning";
+  if (code >= 300) return "bg-accent-soft text-accent";
+  return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300";
 }
 
 function methodClasses(method: string) {
   switch (method.toUpperCase()) {
-    case 'GET':
-      return 'bg-accent-soft text-accent'
-    case 'POST':
-      return 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
-    case 'PUT':
-    case 'PATCH':
-      return 'bg-warning/15 text-warning'
-    case 'DELETE':
-      return 'bg-danger/15 text-danger'
+    case "GET":
+      return "bg-accent-soft text-accent";
+    case "POST":
+      return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300";
+    case "PUT":
+    case "PATCH":
+      return "bg-warning/15 text-warning";
+    case "DELETE":
+      return "bg-danger/15 text-danger";
     default:
-      return 'bg-chrome text-muted'
+      return "bg-chrome text-muted";
   }
 }
 
-function DetailItem({
-  label,
-  children,
-}: {
-  label: string
-  children: ReactNode
-}) {
+function DetailItem({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="min-w-0">
-      <dt className="text-[11px] font-medium uppercase tracking-wide text-muted">
-        {label}
-      </dt>
+      <dt className="text-[11px] font-medium uppercase tracking-wide text-muted">{label}</dt>
       <dd className="mt-1 break-all text-sm text-foreground">{children}</dd>
     </div>
-  )
+  );
 }
 
 function CopyableValue({ value }: { value: string }) {
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState(false);
 
   const onCopy = async () => {
     try {
-      await navigator.clipboard.writeText(value)
-      setCopied(true)
-      toast.success('Copied to clipboard.')
-      window.setTimeout(() => setCopied(false), 1600)
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      toast.success("Copied to clipboard.");
+      window.setTimeout(() => setCopied(false), 1600);
     } catch {
-      toast.error('Could not copy.')
+      toast.error("Could not copy.");
     }
-  }
+  };
 
   return (
     <div className="flex items-start gap-2">
-      <code className="min-w-0 flex-1 font-mono text-xs leading-5 text-foreground">
-        {value}
-      </code>
+      <code className="min-w-0 flex-1 font-mono text-xs leading-5 text-foreground">{value}</code>
       <button
         type="button"
         onClick={() => void onCopy()}
         className="shrink-0 rounded border border-border px-2 py-0.5 text-[11px] text-muted hover:bg-chrome hover:text-foreground"
       >
-        {copied ? 'Copied' : 'Copy'}
+        {copied ? "Copied" : "Copy"}
       </button>
     </div>
-  )
+  );
 }
 
 function LoadingState() {
@@ -101,17 +91,13 @@ function LoadingState() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-export function RequestLogDetailPanel({
-  log,
-  loading,
-  onClose,
-}: RequestLogDetailPanelProps) {
-  const titleId = useId()
-  const requestSize = log ? formatBytes(log.requestSizeBytes) : null
-  const responseSize = log ? formatBytes(log.responseSizeBytes) : null
+export function RequestLogDetailPanel({ log, loading, onClose }: RequestLogDetailPanelProps) {
+  const titleId = useId();
+  const requestSize = log ? formatBytes(log.requestSizeBytes) : null;
+  const responseSize = log ? formatBytes(log.responseSizeBytes) : null;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-foreground/40">
@@ -129,9 +115,7 @@ export function RequestLogDetailPanel({
       >
         <header className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
           <div className="min-w-0">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-muted">
-              Logs
-            </p>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted">Logs</p>
             <h2
               id={titleId}
               className="mt-0.5 text-lg font-semibold tracking-tight text-foreground"
@@ -184,9 +168,7 @@ export function RequestLogDetailPanel({
                   Timing
                 </h3>
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-xl border border-border p-4">
-                  <DetailItem label="Time">
-                    {formatDateTime(log.occurredAt)}
-                  </DetailItem>
+                  <DetailItem label="Time">{formatDateTime(log.occurredAt)}</DetailItem>
                   <DetailItem label="Duration">
                     <span className="tabular-nums">{log.durationMs} ms</span>
                   </DetailItem>
@@ -216,18 +198,10 @@ export function RequestLogDetailPanel({
                 </h3>
                 <dl className="flex flex-col gap-4 rounded-xl border border-border p-4">
                   <DetailItem label="Trace">
-                    {log.traceId ? (
-                      <CopyableValue value={log.traceId} />
-                    ) : (
-                      '—'
-                    )}
+                    {log.traceId ? <CopyableValue value={log.traceId} /> : "—"}
                   </DetailItem>
                   <DetailItem label="Request ID">
-                    {log.requestId ? (
-                      <CopyableValue value={log.requestId} />
-                    ) : (
-                      '—'
-                    )}
+                    {log.requestId ? <CopyableValue value={log.requestId} /> : "—"}
                   </DetailItem>
                 </dl>
               </section>
@@ -238,17 +212,13 @@ export function RequestLogDetailPanel({
                 </h3>
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-xl border border-border p-4">
                   <DetailItem label="User">
-                    {log.userId ? (
-                      <span className="font-mono text-xs">{log.userId}</span>
-                    ) : (
-                      '—'
-                    )}
+                    {log.userId ? <span className="font-mono text-xs">{log.userId}</span> : "—"}
                   </DetailItem>
                   <DetailItem label="IP">
                     {log.endUserIp ? (
                       <span className="font-mono text-xs">{log.endUserIp}</span>
                     ) : (
-                      '—'
+                      "—"
                     )}
                   </DetailItem>
                 </dl>
@@ -260,12 +230,8 @@ export function RequestLogDetailPanel({
                     Payload
                   </h3>
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-xl border border-border p-4">
-                    <DetailItem label="Request size">
-                      {requestSize ?? '—'}
-                    </DetailItem>
-                    <DetailItem label="Response size">
-                      {responseSize ?? '—'}
-                    </DetailItem>
+                    <DetailItem label="Request size">{requestSize ?? "—"}</DetailItem>
+                    <DetailItem label="Response size">{responseSize ?? "—"}</DetailItem>
                   </dl>
                 </section>
               ) : null}
@@ -274,5 +240,5 @@ export function RequestLogDetailPanel({
         </div>
       </aside>
     </div>
-  )
+  );
 }

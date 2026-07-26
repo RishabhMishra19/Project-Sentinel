@@ -60,10 +60,6 @@ const sessionSlice = createSlice({
   },
 });
 
-export const {
-  setAuthSession,
-  setActiveTenant,
-  clearActiveTenant,
-  clearSession,
-} = sessionSlice.actions;
+export const { setAuthSession, setActiveTenant, clearActiveTenant, clearSession } =
+  sessionSlice.actions;
 export default sessionSlice.reducer;

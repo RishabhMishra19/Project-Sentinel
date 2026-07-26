@@ -18,14 +18,9 @@ function resolveCrumb(handle: AppRouteHandle, state: unknown): string | undefine
   return resolved && resolved.length > 0 ? resolved : undefined;
 }
 
-function resolveDescription(
-  handle: AppRouteHandle,
-  state: unknown,
-): string | undefined {
+function resolveDescription(handle: AppRouteHandle, state: unknown): string | undefined {
   const resolved =
-    typeof handle.description === "function"
-      ? handle.description(state)
-      : handle.description;
+    typeof handle.description === "function" ? handle.description(state) : handle.description;
   return resolved && resolved.length > 0 ? resolved : undefined;
 }
 

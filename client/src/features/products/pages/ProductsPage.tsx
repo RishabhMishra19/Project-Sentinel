@@ -24,9 +24,7 @@ export const ProductsPage = () => {
         onCreate={() => setFormState({ open: true, mode: "create" })}
         onView={setViewProduct}
         onEdit={(product) => setFormState({ open: true, mode: "edit", product })}
-        onServices={(product) =>
-          navigate(`/${ROUTE_PATHS.services}?productId=${product.id}`)
-        }
+        onServices={(product) => navigate(`/${ROUTE_PATHS.services}?productId=${product.id}`)}
         onDeactivate={setDeactivateProduct}
       />
 

@@ -1,6 +1,6 @@
-import { configureStore } from '@reduxjs/toolkit'
-import { sessionPersistListener } from './session/sessionPersistListener'
-import sessionReducer from './session/sessionSlice'
+import { configureStore } from "@reduxjs/toolkit";
+import { sessionPersistListener } from "./session/sessionPersistListener";
+import sessionReducer from "./session/sessionSlice";
 
 export const store = configureStore({
   reducer: {
@@ -8,7 +8,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(sessionPersistListener.middleware),
-})
+});
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

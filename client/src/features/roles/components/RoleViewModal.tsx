@@ -1,36 +1,36 @@
-import { useId } from 'react'
-import { useRoleQuery } from '../hooks/useRoles'
+import { useId } from "react";
+import { useRoleQuery } from "../hooks/useRoles";
 
 type RoleViewModalProps = {
-  open: boolean
-  roleId: string | null
-  onClose: () => void
-}
+  open: boolean;
+  roleId: string | null;
+  onClose: () => void;
+};
 
 const formatDateTime = (value: string | null | undefined) => {
   if (!value) {
-    return '—'
+    return "—";
   }
-  const date = new Date(value)
+  const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
-    return value
+    return value;
   }
-  return date.toLocaleString()
-}
+  return date.toLocaleString();
+};
 
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col gap-0.5">
     <dt className="text-xs text-muted">{label}</dt>
     <dd className="text-sm text-foreground">{value}</dd>
   </div>
-)
+);
 
 export const RoleViewModal = ({ open, roleId, onClose }: RoleViewModalProps) => {
-  const titleId = useId()
-  const { data: role, isFetching, isError } = useRoleQuery(roleId, open)
+  const titleId = useId();
+  const { data: role, isFetching, isError } = useRoleQuery(roleId, open);
 
   if (!open || !roleId) {
-    return null
+    return null;
   }
 
   return (
@@ -67,10 +67,7 @@ export const RoleViewModal = ({ open, roleId, onClose }: RoleViewModalProps) => 
         ) : (
           <dl className="flex flex-col gap-3">
             <DetailRow label="Name" value={role.name} />
-            <DetailRow
-              label="Status"
-              value={role.status === 'ACTIVE' ? 'Active' : 'Inactive'}
-            />
+            <DetailRow label="Status" value={role.status === "ACTIVE" ? "Active" : "Inactive"} />
             <DetailRow
               label="Created by"
               value={`${role.createdBy.name} (${role.createdBy.email})`}
@@ -95,5 +92,5 @@ export const RoleViewModal = ({ open, roleId, onClose }: RoleViewModalProps) => 
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

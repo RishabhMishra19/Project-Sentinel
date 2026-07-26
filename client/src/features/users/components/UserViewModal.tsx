@@ -1,35 +1,35 @@
-import { useId } from 'react'
-import type { UserResponse } from '../dto/response/user.response'
+import { useId } from "react";
+import type { UserResponse } from "../dto/response/user.response";
 
 type UserViewModalProps = {
-  open: boolean
-  user: UserResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  user: UserResponse | null;
+  onClose: () => void;
+};
 
 const formatDateTime = (value: string | null) => {
   if (!value) {
-    return '—'
+    return "—";
   }
-  const date = new Date(value)
+  const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
-    return value
+    return value;
   }
-  return date.toLocaleString()
-}
+  return date.toLocaleString();
+};
 
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col gap-0.5">
     <dt className="text-xs text-muted">{label}</dt>
     <dd className="text-sm text-foreground">{value}</dd>
   </div>
-)
+);
 
 export const UserViewModal = ({ open, user, onClose }: UserViewModalProps) => {
-  const titleId = useId()
+  const titleId = useId();
 
   if (!open || !user) {
-    return null
+    return null;
   }
 
   return (
@@ -62,28 +62,15 @@ export const UserViewModal = ({ open, user, onClose }: UserViewModalProps) => {
         <dl className="flex flex-col gap-3">
           <DetailRow label="Display name" value={user.displayName} />
           <DetailRow label="Email" value={user.email} />
-          <DetailRow
-            label="Tenant admin"
-            value={user.tenantAdmin ? 'Yes' : 'No'}
-          />
-          <DetailRow
-            label="Status"
-            value={user.status === 'ACTIVE' ? 'Active' : 'Inactive'}
-          />
+          <DetailRow label="Tenant admin" value={user.tenantAdmin ? "Yes" : "No"} />
+          <DetailRow label="Status" value={user.status === "ACTIVE" ? "Active" : "Inactive"} />
           <DetailRow
             label="Roles"
-            value={
-              user.roles.length > 0
-                ? user.roles.map((role) => role.name).join(', ')
-                : 'None'
-            }
+            value={user.roles.length > 0 ? user.roles.map((role) => role.name).join(", ") : "None"}
           />
           <DetailRow label="Created" value={formatDateTime(user.createdAt)} />
           <DetailRow label="Updated" value={formatDateTime(user.updatedAt)} />
-          <DetailRow
-            label="Last login"
-            value={formatDateTime(user.lastLoginAt)}
-          />
+          <DetailRow label="Last login" value={formatDateTime(user.lastLoginAt)} />
         </dl>
 
         <div className="mt-6 flex justify-end">
@@ -97,5 +84,5 @@ export const UserViewModal = ({ open, user, onClose }: UserViewModalProps) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

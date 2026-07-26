@@ -1,37 +1,31 @@
-import { useEffect, useId } from 'react'
-import { useAppForm } from '../../../shared/forms/useAppForm'
-import { useProductsQuery } from '../../products/hooks/useProducts'
-import { useAllServicesQuery } from '../../services/hooks/useServices'
-import type { RoleResponse } from '../dto/response/role.response'
-import { useCreateRoleScope } from '../hooks/useRoles'
-import {
-  createRoleScopeFormSchema,
-  type CreateRoleScopeFormValues,
-} from '../schemas/role.schema'
+import { useEffect, useId } from "react";
+import { useAppForm } from "../../../shared/forms/useAppForm";
+import { useProductsQuery } from "../../products/hooks/useProducts";
+import { useAllServicesQuery } from "../../services/hooks/useServices";
+import type { RoleResponse } from "../dto/response/role.response";
+import { useCreateRoleScope } from "../hooks/useRoles";
+import { createRoleScopeFormSchema, type CreateRoleScopeFormValues } from "../schemas/role.schema";
 
 const selectClassName =
-  'rounded border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-ring'
+  "rounded border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-ring";
 
 type RoleScopeCreateModalProps = {
-  open: boolean
-  role: RoleResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  role: RoleResponse | null;
+  onClose: () => void;
+};
 
-export const RoleScopeCreateModal = ({
-  open,
-  role,
-  onClose,
-}: RoleScopeCreateModalProps) => {
-  const titleId = useId()
-  const createMutation = useCreateRoleScope(role?.id ?? null)
-  const { reset: resetMutation } = createMutation
+export const RoleScopeCreateModal = ({ open, role, onClose }: RoleScopeCreateModalProps) => {
+  const titleId = useId();
+  const createMutation = useCreateRoleScope(role?.id ?? null);
+  const { reset: resetMutation } = createMutation;
 
   const { data: productsPage, isFetching: productsLoading } = useProductsQuery(
-    open ? { page: 0, size: 100, status: 'ACTIVE' } : null,
-  )
-  const { data: servicesPage, isFetching: servicesLoading } =
-    useAllServicesQuery(open ? { page: 0, size: 100, status: 'ACTIVE' } : null)
+    open ? { page: 0, size: 100, status: "ACTIVE" } : null,
+  );
+  const { data: servicesPage, isFetching: servicesLoading } = useAllServicesQuery(
+    open ? { page: 0, size: 100, status: "ACTIVE" } : null,
+  );
 
   const {
     register,
@@ -43,32 +37,32 @@ export const RoleScopeCreateModal = ({
   } = useAppForm<CreateRoleScopeFormValues>({
     schema: createRoleScopeFormSchema,
     defaultValues: {
-      scopeType: 'PRODUCT',
-      scopeId: '',
-      permission: 'READ',
+      scopeType: "PRODUCT",
+      scopeId: "",
+      permission: "READ",
     },
-  })
+  });
 
-  const scopeType = watch('scopeType')
+  const scopeType = watch("scopeType");
 
   useEffect(() => {
     if (!open) {
-      return
+      return;
     }
-    resetMutation()
+    resetMutation();
     reset({
-      scopeType: 'PRODUCT',
-      scopeId: '',
-      permission: 'READ',
-    })
-  }, [open, reset, resetMutation])
+      scopeType: "PRODUCT",
+      scopeId: "",
+      permission: "READ",
+    });
+  }, [open, reset, resetMutation]);
 
   useEffect(() => {
-    setValue('scopeId', '')
-  }, [scopeType, setValue])
+    setValue("scopeId", "");
+  }, [scopeType, setValue]);
 
   if (!open || !role) {
-    return null
+    return null;
   }
 
   const onSubmit = (data: CreateRoleScopeFormValues) => {
@@ -80,14 +74,14 @@ export const RoleScopeCreateModal = ({
       },
       {
         onSuccess: () => {
-          onClose()
+          onClose();
         },
       },
-    )
-  }
+    );
+  };
 
-  const products = productsPage?.content ?? []
-  const services = servicesPage?.content ?? []
+  const products = productsPage?.content ?? [];
+  const services = servicesPage?.content ?? [];
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-foreground/40 px-4">
@@ -109,8 +103,7 @@ export const RoleScopeCreateModal = ({
               Create scope
             </h2>
             <p className="mt-1 text-sm text-muted">
-              For role{' '}
-              <span className="font-medium text-foreground">{role.name}</span>
+              For role <span className="font-medium text-foreground">{role.name}</span>
             </p>
           </div>
           <button
@@ -125,27 +118,25 @@ export const RoleScopeCreateModal = ({
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm text-foreground">
             Scope type
-            <select className={selectClassName} {...register('scopeType')}>
+            <select className={selectClassName} {...register("scopeType")}>
               <option value="PRODUCT">PRODUCT</option>
               <option value="SERVICE">SERVICE</option>
             </select>
             {errors.scopeType?.message ? (
-              <span className="text-sm text-danger">
-                {errors.scopeType.message}
-              </span>
+              <span className="text-sm text-danger">{errors.scopeType.message}</span>
             ) : null}
           </label>
 
-          {scopeType === 'PRODUCT' ? (
+          {scopeType === "PRODUCT" ? (
             <label className="flex flex-col gap-1 text-sm text-foreground">
               Product
               <select
                 className={selectClassName}
                 disabled={productsLoading || products.length === 0}
-                {...register('scopeId')}
+                {...register("scopeId")}
               >
                 <option value="">
-                  {productsLoading ? 'Loading products…' : 'Select a product'}
+                  {productsLoading ? "Loading products…" : "Select a product"}
                 </option>
                 {products.map((product) => (
                   <option key={product.id} value={product.id}>
@@ -154,23 +145,21 @@ export const RoleScopeCreateModal = ({
                 ))}
               </select>
               {errors.scopeId?.message ? (
-                <span className="text-sm text-danger">
-                  {errors.scopeId.message}
-                </span>
+                <span className="text-sm text-danger">{errors.scopeId.message}</span>
               ) : null}
             </label>
           ) : null}
 
-          {scopeType === 'SERVICE' ? (
+          {scopeType === "SERVICE" ? (
             <label className="flex flex-col gap-1 text-sm text-foreground">
               Service
               <select
                 className={selectClassName}
                 disabled={servicesLoading || services.length === 0}
-                {...register('scopeId')}
+                {...register("scopeId")}
               >
                 <option value="">
-                  {servicesLoading ? 'Loading services…' : 'Select a service'}
+                  {servicesLoading ? "Loading services…" : "Select a service"}
                 </option>
                 {services.map((service) => (
                   <option key={service.id} value={service.id}>
@@ -179,24 +168,20 @@ export const RoleScopeCreateModal = ({
                 ))}
               </select>
               {errors.scopeId?.message ? (
-                <span className="text-sm text-danger">
-                  {errors.scopeId.message}
-                </span>
+                <span className="text-sm text-danger">{errors.scopeId.message}</span>
               ) : null}
             </label>
           ) : null}
 
           <label className="flex flex-col gap-1 text-sm text-foreground">
             Permission
-            <select className={selectClassName} {...register('permission')}>
+            <select className={selectClassName} {...register("permission")}>
               <option value="READ">READ</option>
               <option value="READ_AND_WRITE">READ_AND_WRITE</option>
               <option value="ALL">ALL</option>
             </select>
             {errors.permission?.message ? (
-              <span className="text-sm text-danger">
-                {errors.permission.message}
-              </span>
+              <span className="text-sm text-danger">{errors.permission.message}</span>
             ) : null}
           </label>
 
@@ -213,11 +198,11 @@ export const RoleScopeCreateModal = ({
               disabled={createMutation.isPending}
               className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {createMutation.isPending ? 'Creating…' : 'Create scope'}
+              {createMutation.isPending ? "Creating…" : "Create scope"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};

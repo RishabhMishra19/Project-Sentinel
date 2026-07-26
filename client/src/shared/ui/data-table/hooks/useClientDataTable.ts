@@ -47,29 +47,17 @@ export const useClientDataTable = <T extends object>({
   isLoading,
   emptyMessage,
 }: UseClientDataTableOptions<T>): UseClientDataTableResult<T> => {
-  const {
-    query,
-    setSorting,
-    setSearch,
-    setFilters,
-    setPageIndex,
-    setPageSize,
-  } = useDataTableQueryState({ columns, initialState });
+  const { query, setSorting, setSearch, setFilters, setPageIndex, setPageSize } =
+    useDataTableQueryState({ columns, initialState });
 
   const filteredData = useMemo(
     () => applyClientFilters(data, columns, query.search, query.filters),
     [data, columns, query.search, query.filters],
   );
 
-  const tanstackColumns = useMemo(
-    () => buildTanStackColumns(columns),
-    [columns],
-  );
+  const tanstackColumns = useMemo(() => buildTanStackColumns(columns), [columns]);
 
-  const sortingState = useMemo(
-    () => toTanStackSorting(query.sorting),
-    [query.sorting],
-  );
+  const sortingState = useMemo(() => toTanStackSorting(query.sorting), [query.sorting]);
 
   const paginationState = useMemo<PaginationState>(
     () => ({
@@ -88,13 +76,11 @@ export const useClientDataTable = <T extends object>({
     },
     getRowId: (row) => getRowId(row),
     onSortingChange: (updater: Updater<SortingState>) => {
-      const next =
-        typeof updater === "function" ? updater(sortingState) : updater;
+      const next = typeof updater === "function" ? updater(sortingState) : updater;
       setSorting(fromTanStackSorting(next));
     },
     onPaginationChange: (updater: Updater<PaginationState>) => {
-      const next =
-        typeof updater === "function" ? updater(paginationState) : updater;
+      const next = typeof updater === "function" ? updater(paginationState) : updater;
       if (next.pageSize !== query.pageSize) {
         setPageSize(next.pageSize);
         return;
@@ -103,9 +89,7 @@ export const useClientDataTable = <T extends object>({
     },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: enablePagination
-      ? getPaginationRowModel()
-      : undefined,
+    getPaginationRowModel: enablePagination ? getPaginationRowModel() : undefined,
     manualFiltering: true,
     autoResetPageIndex: false,
   });
@@ -121,9 +105,9 @@ export const useClientDataTable = <T extends object>({
     }
   }, [query.pageIndex, pageCount, setPageIndex]);
 
-  const rows = (
-    enablePagination ? table.getRowModel().rows : table.getSortedRowModel().rows
-  ).map((row) => row.original);
+  const rows = (enablePagination ? table.getRowModel().rows : table.getSortedRowModel().rows).map(
+    (row) => row.original,
+  );
 
   const tableProps = buildDataTableProps({
     columns,

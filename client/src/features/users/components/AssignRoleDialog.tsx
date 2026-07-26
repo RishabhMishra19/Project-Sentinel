@@ -1,28 +1,21 @@
-import { useEffect, useId } from 'react'
-import { useAppForm } from '../../../shared/forms/useAppForm'
-import type { UserResponse } from '../dto/response/user.response'
-import { useAssignRole, useRolesQuery } from '../hooks/useUsers'
-import {
-  assignRoleFormSchema,
-  type AssignRoleFormValues,
-} from '../schemas/user.schema'
+import { useEffect, useId } from "react";
+import { useAppForm } from "../../../shared/forms/useAppForm";
+import type { UserResponse } from "../dto/response/user.response";
+import { useAssignRole, useRolesQuery } from "../hooks/useUsers";
+import { assignRoleFormSchema, type AssignRoleFormValues } from "../schemas/user.schema";
 
 type AssignRoleDialogProps = {
-  open: boolean
-  user: UserResponse | null
-  onClose: () => void
-}
+  open: boolean;
+  user: UserResponse | null;
+  onClose: () => void;
+};
 
-export const AssignRoleDialog = ({
-  open,
-  user,
-  onClose,
-}: AssignRoleDialogProps) => {
-  const titleId = useId()
-  const assignMutation = useAssignRole()
-  const { reset: resetMutation } = assignMutation
-  const { data: roles = [], isLoading: rolesLoading } = useRolesQuery(open)
-  const activeRoles = roles.filter((role) => role.status === 'ACTIVE')
+export const AssignRoleDialog = ({ open, user, onClose }: AssignRoleDialogProps) => {
+  const titleId = useId();
+  const assignMutation = useAssignRole();
+  const { reset: resetMutation } = assignMutation;
+  const { data: roles = [], isLoading: rolesLoading } = useRolesQuery(open);
+  const activeRoles = roles.filter((role) => role.status === "ACTIVE");
 
   const {
     register,
@@ -31,19 +24,19 @@ export const AssignRoleDialog = ({
     formState: { errors },
   } = useAppForm<AssignRoleFormValues>({
     schema: assignRoleFormSchema,
-    defaultValues: { roleId: '' },
-  })
+    defaultValues: { roleId: "" },
+  });
 
   useEffect(() => {
     if (!open) {
-      return
+      return;
     }
-    resetMutation()
-    reset({ roleId: '' })
-  }, [open, reset, resetMutation])
+    resetMutation();
+    reset({ roleId: "" });
+  }, [open, reset, resetMutation]);
 
   if (!open || !user) {
-    return null
+    return null;
   }
 
   const onSubmit = (data: AssignRoleFormValues) => {
@@ -54,11 +47,11 @@ export const AssignRoleDialog = ({
       },
       {
         onSuccess: () => {
-          onClose()
+          onClose();
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
@@ -88,9 +81,7 @@ export const AssignRoleDialog = ({
         </div>
 
         <p className="mb-4 text-sm text-muted">
-          Assign a role to{' '}
-          <span className="font-medium text-foreground">{user.displayName}</span>
-          .
+          Assign a role to <span className="font-medium text-foreground">{user.displayName}</span>.
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -99,11 +90,9 @@ export const AssignRoleDialog = ({
             <select
               className="rounded border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-ring"
               disabled={rolesLoading || activeRoles.length === 0}
-              {...register('roleId')}
+              {...register("roleId")}
             >
-              <option value="">
-                {rolesLoading ? 'Loading roles…' : 'Select a role'}
-              </option>
+              <option value="">{rolesLoading ? "Loading roles…" : "Select a role"}</option>
               {activeRoles.map((role) => (
                 <option key={role.id} value={role.id}>
                   {role.name}
@@ -115,8 +104,8 @@ export const AssignRoleDialog = ({
             ) : null}
             {!rolesLoading && activeRoles.length === 0 ? (
               <span className="text-sm text-muted">
-                No active roles in this tenant. Create a tenant after Admin
-                seeding is available, or seed roles manually.
+                No active roles in this tenant. Create a tenant after Admin seeding is available, or
+                seed roles manually.
               </span>
             ) : null}
           </label>
@@ -134,11 +123,11 @@ export const AssignRoleDialog = ({
               disabled={assignMutation.isPending || activeRoles.length === 0}
               className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {assignMutation.isPending ? 'Assigning…' : 'Assign role'}
+              {assignMutation.isPending ? "Assigning…" : "Assign role"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
