@@ -1,15 +1,8 @@
 import { useState } from "react";
-import { QueryGate } from "../../../shared/ui";
+import { DetailRow, QueryGate } from "../../../shared/ui";
+import { formatDateTime } from "../../../shared/utils/dateUtils";
 import { ChangePasswordModal } from "../components/ChangePasswordModal";
 import { useProfile } from "../hooks/useProfile";
-
-const formatDate = (value: string): string => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return date.toLocaleString();
-};
 
 export const ProfilePage = () => {
   const { data, isLoading, isError } = useProfile();
@@ -38,54 +31,39 @@ export const ProfilePage = () => {
           {data ? (
             <div className="space-y-6">
               <dl className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-muted">
-                    Display name
-                  </dt>
-                  <dd className="mt-1 text-foreground">{data.name}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-muted">Email</dt>
-                  <dd className="mt-1 text-foreground">{data.email}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-muted">Status</dt>
-                  <dd className="mt-1 text-foreground">{data.status}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-muted">
-                    Sentinel admin
-                  </dt>
-                  <dd className="mt-1 text-foreground">{data.sentinelAdmin ? "Yes" : "No"}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-muted">
-                    Tenant admin
-                  </dt>
-                  <dd className="mt-1 text-foreground">{data.tenantAdmin ? "Yes" : "No"}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-muted">Tenant</dt>
-                  <dd className="mt-1 text-foreground">
-                    {data.tenant ? `${data.tenant.name} (${data.tenant.id})` : "No tenant"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-muted">Created</dt>
-                  <dd className="mt-1 text-foreground">{formatDate(data.createdAt)}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-muted">Updated</dt>
-                  <dd className="mt-1 text-foreground">{formatDate(data.updatedAt)}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-muted">
-                    Last login
-                  </dt>
-                  <dd className="mt-1 text-foreground">
-                    {data.lastLoginAt ? formatDate(data.lastLoginAt) : "Never"}
-                  </dd>
-                </div>
+                <DetailRow variant="emphasized" label="Display name" value={data.name} />
+                <DetailRow variant="emphasized" label="Email" value={data.email} />
+                <DetailRow variant="emphasized" label="Status" value={data.status} />
+                <DetailRow
+                  variant="emphasized"
+                  label="Sentinel admin"
+                  value={data.sentinelAdmin ? "Yes" : "No"}
+                />
+                <DetailRow
+                  variant="emphasized"
+                  label="Tenant admin"
+                  value={data.tenantAdmin ? "Yes" : "No"}
+                />
+                <DetailRow
+                  variant="emphasized"
+                  label="Tenant"
+                  value={data.tenant ? `${data.tenant.name} (${data.tenant.id})` : "No tenant"}
+                />
+                <DetailRow
+                  variant="emphasized"
+                  label="Created"
+                  value={formatDateTime(data.createdAt)}
+                />
+                <DetailRow
+                  variant="emphasized"
+                  label="Updated"
+                  value={formatDateTime(data.updatedAt)}
+                />
+                <DetailRow
+                  variant="emphasized"
+                  label="Last login"
+                  value={formatDateTime(data.lastLoginAt, "Never")}
+                />
               </dl>
 
               <div className="space-y-3">

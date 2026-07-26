@@ -1,6 +1,6 @@
-import { useId, useState, type ReactNode } from "react";
-import { QueryGate } from "../../../shared/ui";
-import { toast } from "../../../shared/ui/toast";
+import { useId } from "react";
+import { CopyableValue, DetailRow, QueryGate } from "../../../shared/ui";
+import { formatDateTime } from "../../../shared/utils/dateUtils";
 import type { RequestLogResponse } from "../dto/response/requestLog.response";
 
 type RequestLogDetailPanelProps = {
@@ -8,12 +8,6 @@ type RequestLogDetailPanelProps = {
   loading: boolean;
   isError?: boolean;
   onClose: () => void;
-};
-
-const formatDateTime = (value: string) => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
 };
 
 const formatBytes = (bytes: number | null) => {
@@ -44,43 +38,6 @@ const methodClasses = (method: string) => {
     default:
       return "bg-chrome text-muted";
   }
-};
-
-const DetailItem = ({ label, children }: { label: string; children: ReactNode }) => {
-  return (
-    <div className="min-w-0">
-      <dt className="text-[11px] font-medium uppercase tracking-wide text-muted">{label}</dt>
-      <dd className="mt-1 break-all text-sm text-foreground">{children}</dd>
-    </div>
-  );
-};
-
-const CopyableValue = ({ value }: { value: string }) => {
-  const [copied, setCopied] = useState(false);
-
-  const onCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      toast.success("Copied to clipboard.");
-      window.setTimeout(() => setCopied(false), 1600);
-    } catch {
-      toast.error("Could not copy.");
-    }
-  };
-
-  return (
-    <div className="flex items-start gap-2">
-      <code className="min-w-0 flex-1 font-mono text-xs leading-5 text-foreground">{value}</code>
-      <button
-        type="button"
-        onClick={() => void onCopy()}
-        className="shrink-0 rounded border border-border px-2 py-0.5 text-[11px] text-muted hover:bg-chrome hover:text-foreground"
-      >
-        {copied ? "Copied" : "Copy"}
-      </button>
-    </div>
-  );
 };
 
 export const RequestLogDetailPanel = ({
@@ -165,10 +122,14 @@ export const RequestLogDetailPanel = ({
                     Timing
                   </h3>
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-xl border border-border p-4">
-                    <DetailItem label="Time">{formatDateTime(log.occurredAt)}</DetailItem>
-                    <DetailItem label="Duration">
+                    <DetailRow
+                      variant="emphasized"
+                      label="Time"
+                      value={formatDateTime(log.occurredAt)}
+                    />
+                    <DetailRow variant="emphasized" label="Duration">
                       <span className="tabular-nums">{log.durationMs} ms</span>
-                    </DetailItem>
+                    </DetailRow>
                   </dl>
                 </section>
 
@@ -177,14 +138,14 @@ export const RequestLogDetailPanel = ({
                     Route
                   </h3>
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-xl border border-border p-4">
-                    <DetailItem label="Product">{log.productName}</DetailItem>
-                    <DetailItem label="Service">{log.serviceName}</DetailItem>
+                    <DetailRow variant="emphasized" label="Product" value={log.productName} />
+                    <DetailRow variant="emphasized" label="Service" value={log.serviceName} />
                     <div className="col-span-2">
-                      <DetailItem label="Endpoint">
+                      <DetailRow variant="emphasized" label="Endpoint">
                         <span className="font-mono text-xs">
                           {log.method} {log.pathTemplate}
                         </span>
-                      </DetailItem>
+                      </DetailRow>
                     </div>
                   </dl>
                 </section>
@@ -194,12 +155,12 @@ export const RequestLogDetailPanel = ({
                     Identifiers
                   </h3>
                   <dl className="flex flex-col gap-4 rounded-xl border border-border p-4">
-                    <DetailItem label="Trace">
+                    <DetailRow variant="emphasized" label="Trace">
                       {log.traceId ? <CopyableValue value={log.traceId} /> : "—"}
-                    </DetailItem>
-                    <DetailItem label="Request ID">
+                    </DetailRow>
+                    <DetailRow variant="emphasized" label="Request ID">
                       {log.requestId ? <CopyableValue value={log.requestId} /> : "—"}
-                    </DetailItem>
+                    </DetailRow>
                   </dl>
                 </section>
 
@@ -208,16 +169,16 @@ export const RequestLogDetailPanel = ({
                     Client
                   </h3>
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-xl border border-border p-4">
-                    <DetailItem label="User">
+                    <DetailRow variant="emphasized" label="User">
                       {log.userId ? <span className="font-mono text-xs">{log.userId}</span> : "—"}
-                    </DetailItem>
-                    <DetailItem label="IP">
+                    </DetailRow>
+                    <DetailRow variant="emphasized" label="IP">
                       {log.endUserIp ? (
                         <span className="font-mono text-xs">{log.endUserIp}</span>
                       ) : (
                         "—"
                       )}
-                    </DetailItem>
+                    </DetailRow>
                   </dl>
                 </section>
 
@@ -227,8 +188,16 @@ export const RequestLogDetailPanel = ({
                       Payload
                     </h3>
                     <dl className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-xl border border-border p-4">
-                      <DetailItem label="Request size">{requestSize ?? "—"}</DetailItem>
-                      <DetailItem label="Response size">{responseSize ?? "—"}</DetailItem>
+                      <DetailRow
+                        variant="emphasized"
+                        label="Request size"
+                        value={requestSize ?? "—"}
+                      />
+                      <DetailRow
+                        variant="emphasized"
+                        label="Response size"
+                        value={responseSize ?? "—"}
+                      />
                     </dl>
                   </section>
                 ) : null}
