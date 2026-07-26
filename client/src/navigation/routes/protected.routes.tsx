@@ -21,7 +21,7 @@ import { UsersPage } from "../../features/users/pages/UsersPage";
 import {
   isOnlySentinelAdminView,
   isTenantUserOrSentinelAdminView,
-} from "../../shared/session/sessionUtils";
+} from "../../shared/utils/sessionUtils";
 import { ROUTE_PATHS } from "../constants";
 import type { SentinelRouteObject } from "../types";
 
