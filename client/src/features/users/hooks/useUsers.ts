@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { mapPageQuery } from "../../../shared/api/mapQuery";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
 import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
 import { useRolesQuery } from "../../roles/hooks/useRoles";
@@ -12,12 +13,13 @@ import type {
 export { useRolesQuery };
 export const usersQueryKey = ["users"] as const;
 
-export const useUsersQuery = (params: ListQueryRequest | null) => {
-  return useQuery({
-    queryKey: [...usersQueryKey, "list", params],
-    queryFn: () => UsersApi.list(params!),
-    enabled: params != null,
-  });
+export const useUsersQuery = (params: ListQueryRequest) => {
+  return mapPageQuery(
+    useQuery({
+      queryKey: [...usersQueryKey, "list", params],
+      queryFn: () => UsersApi.list(params),
+    }),
+  );
 };
 
 export const useCreateUser = () => {
