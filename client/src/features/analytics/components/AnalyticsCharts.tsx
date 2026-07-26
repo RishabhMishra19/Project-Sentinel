@@ -19,6 +19,7 @@ const SERIES = {
   p95: '#c2410c',
   p99: '#7c2d12',
 }
+const CHART_MARGIN = { top: 8, right: 12, bottom: 4, left: 4 }
 
 function formatTick(iso: string) {
   const d = new Date(iso)
@@ -32,11 +33,13 @@ function formatTick(iso: string) {
 
 type ChartShellProps = {
   title: string
+  xLabel: string
+  yLabel: string
   children: React.ReactNode
   empty?: boolean
 }
 
-function ChartShell({ title, children, empty }: ChartShellProps) {
+function ChartShell({ title, xLabel, yLabel, children, empty }: ChartShellProps) {
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
       <h3 className="text-sm font-medium text-foreground">{title}</h3>
@@ -45,7 +48,17 @@ function ChartShell({ title, children, empty }: ChartShellProps) {
           No data in this range.
         </p>
       ) : (
-        <div className="h-64 w-full">{children}</div>
+        <div className="flex gap-1">
+          <div className="relative w-6 shrink-0 self-stretch">
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-90 whitespace-nowrap text-xs text-muted-foreground">
+              {yLabel}
+            </span>
+          </div>
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <div className="h-64 w-full">{children}</div>
+            <p className="text-center text-xs text-muted-foreground">{xLabel}</p>
+          </div>
+        </div>
       )}
     </div>
   )
@@ -57,9 +70,14 @@ export function AnalyticsVolumeChart({
   points: AnalyticsTimeseriesPoint[]
 }) {
   return (
-    <ChartShell title="Request volume" empty={points.length === 0}>
+    <ChartShell
+      title="Request volume"
+      xLabel="Time"
+      yLabel="Requests"
+      empty={points.length === 0}
+    >
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={points}>
+        <LineChart data={points} margin={CHART_MARGIN}>
           <CartesianGrid stroke={GRID} strokeDasharray="3 3" />
           <XAxis
             dataKey="bucketStart"
@@ -93,9 +111,14 @@ export function AnalyticsErrorRateChart({
     errorRatePct: Number((p.errorRate * 100).toFixed(3)),
   }))
   return (
-    <ChartShell title="Error rate (%)" empty={points.length === 0}>
+    <ChartShell
+      title="Error rate (%)"
+      xLabel="Time"
+      yLabel="Error rate (%)"
+      empty={points.length === 0}
+    >
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
+        <LineChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid stroke={GRID} strokeDasharray="3 3" />
           <XAxis
             dataKey="bucketStart"
@@ -125,9 +148,14 @@ export function AnalyticsLatencyChart({
   points: AnalyticsTimeseriesPoint[]
 }) {
   return (
-    <ChartShell title="Latency (ms)" empty={points.length === 0}>
+    <ChartShell
+      title="Latency (ms)"
+      xLabel="Time"
+      yLabel="Latency (ms)"
+      empty={points.length === 0}
+    >
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={points}>
+        <LineChart data={points} margin={{ ...CHART_MARGIN, top: 4 }}>
           <CartesianGrid stroke={GRID} strokeDasharray="3 3" />
           <XAxis
             dataKey="bucketStart"
@@ -137,7 +165,7 @@ export function AnalyticsLatencyChart({
           />
           <YAxis tick={AXIS} />
           <Tooltip labelFormatter={(v) => formatTick(String(v))} />
-          <Legend />
+          <Legend verticalAlign="top" height={28} />
           <Line
             type="monotone"
             dataKey="latencyP50Ms"
