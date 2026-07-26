@@ -13,6 +13,8 @@ RUN mvn -pl worker -am -B -q package -DskipTests \
 FROM amazoncorretto:21
 WORKDIR /app
 
+RUN yum install -y curl && yum clean all
+
 COPY --from=build /app/app.jar app.jar
 
 EXPOSE 8082
