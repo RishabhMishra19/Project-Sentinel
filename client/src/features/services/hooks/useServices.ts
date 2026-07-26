@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { mapListQuery, mapPageQuery } from "../../../shared/api/mapQuery";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
 import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
 import { ServicesApi } from "../api/services.api";
@@ -8,30 +9,36 @@ export const servicesQueryKey = (productId?: string) =>
   productId ? (["services", productId] as const) : (["services"] as const);
 
 export const useAllServicesQuery = (params: ListQueryRequest | null) => {
-  return useQuery({
-    queryKey: [...servicesQueryKey(), "list", params],
-    queryFn: () => ServicesApi.listAll(params!),
-    enabled: params != null,
-  });
+  return mapPageQuery(
+    useQuery({
+      queryKey: [...servicesQueryKey(), "list", params],
+      queryFn: () => ServicesApi.listAll(params!),
+      enabled: params != null,
+    }),
+  );
 };
 
 export const useServicesQuery = (
   productId: string | undefined,
   params: ListQueryRequest | null,
 ) => {
-  return useQuery({
-    queryKey: [...servicesQueryKey(productId), "list", params],
-    queryFn: () => ServicesApi.list(productId!, params!),
-    enabled: productId != null && params != null,
-  });
+  return mapPageQuery(
+    useQuery({
+      queryKey: [...servicesQueryKey(productId), "list", params],
+      queryFn: () => ServicesApi.list(productId!, params!),
+      enabled: productId != null && params != null,
+    }),
+  );
 };
 
 export const useServiceEndpointsQuery = (serviceId: string | undefined) => {
-  return useQuery({
-    queryKey: [...servicesQueryKey(), "endpoints", serviceId],
-    queryFn: () => ServicesApi.listEndpoints(serviceId!),
-    enabled: serviceId != null,
-  });
+  return mapListQuery(
+    useQuery({
+      queryKey: [...servicesQueryKey(), "endpoints", serviceId],
+      queryFn: () => ServicesApi.listEndpoints(serviceId!),
+      enabled: serviceId != null,
+    }),
+  );
 };
 
 export const useCreateService = (productId?: string) => {

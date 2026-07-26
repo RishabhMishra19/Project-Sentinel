@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../navigation";
-import type { ProductResponse } from "../../products/dto/response/product.response";
+import { QueryGate } from "../../../shared/ui";
 import type { ServiceResponse } from "../dto/response/service.response";
 import { useProductsQuery } from "../../products/hooks/useProducts";
 import { DeactivateServiceDialog } from "../components/DeactivateServiceDialog";
@@ -9,12 +9,9 @@ import { ServiceFormModal } from "../components/ServiceFormModal";
 import { ServicesTable } from "../components/ServicesTable";
 import { ServiceViewModal } from "../components/ServiceViewModal";
 
-const EMPTY_PRODUCTS: ProductResponse[] = [];
-
 const ACTIVE_PRODUCTS_PARAMS = {
-  page: 0,
-  size: 100,
-  status: "ACTIVE" as const,
+  pageable: { page: 0, size: 100 },
+  filterConfigs: [{ fieldName: "status", filterValues: ["ACTIVE"] }],
 };
 
 type FormState =
@@ -32,7 +29,7 @@ export const ServicesPage = () => {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(productIdFromUrl);
 
   const productsQuery = useProductsQuery(ACTIVE_PRODUCTS_PARAMS);
-  const products = productsQuery.data?.content ?? EMPTY_PRODUCTS;
+  const products = productsQuery.rows;
 
   useEffect(() => {
     if (products.length === 0) {
@@ -68,22 +65,29 @@ export const ServicesPage = () => {
       : (deactivateService?.productId ?? selectedProductId);
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-      <ServicesTable
-        products={products}
-        selectedProductId={selectedProductId}
-        onProductChange={onProductChange}
-        productsLoading={productsQuery.isFetching}
-        onCreate={() => setFormState({ open: true, mode: "create" })}
-        onView={setViewService}
-        onEdit={(service) => setFormState({ open: true, mode: "edit", service })}
-        onViewApiKeys={(service) =>
-          navigate(
-            `/${ROUTE_PATHS.serviceApiKeys.replace(":serviceId", encodeURIComponent(service.id))}?productId=${service.productId}`,
-          )
-        }
-        onDeactivate={setDeactivateService}
-      />
+    <div className="mx-auto flex min-h-64 w-full max-w-6xl flex-col gap-6">
+      <QueryGate
+        isLoading={productsQuery.isLoading}
+        isError={productsQuery.isError}
+        loadingMessage="Loading products…"
+        errorMessage="Could not load products."
+      >
+        <ServicesTable
+          key={selectedProductId ?? "no-product"}
+          products={products}
+          selectedProductId={selectedProductId}
+          onProductChange={onProductChange}
+          onCreate={() => setFormState({ open: true, mode: "create" })}
+          onView={setViewService}
+          onEdit={(service) => setFormState({ open: true, mode: "edit", service })}
+          onViewApiKeys={(service) =>
+            navigate(
+              `/${ROUTE_PATHS.serviceApiKeys.replace(":serviceId", encodeURIComponent(service.id))}?productId=${service.productId}`,
+            )
+          }
+          onDeactivate={setDeactivateService}
+        />
+      </QueryGate>
 
       <ServiceFormModal
         open={formState.open}

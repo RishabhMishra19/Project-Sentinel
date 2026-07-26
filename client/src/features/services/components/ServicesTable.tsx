@@ -1,21 +1,17 @@
-import { useMemo, useState } from "react";
-import {
-  DataTable,
-  useServerDataTable,
-  type DataTableQueryState,
-} from "../../../shared/ui/data-table";
-import { inputClassName, primaryButtonClassName } from "../../../shared/ui/data-table/styles";
+import { useMemo } from "react";
+import { SelectField } from "../../../shared/forms/SelectField";
+import { DataTable, useDataTable } from "../../../shared/ui/data-table";
+import { primaryButtonClassName } from "../../../shared/ui/data-table/styles";
 import type { ProductResponse } from "../../products/dto/response/product.response";
 import type { ServiceResponse } from "../dto/response/service.response";
 import { useServicesQuery } from "../hooks/useServices";
-import { mapServiceListQuery } from "../utils/mapServiceListQuery";
 import { createServiceRowActions, productServiceColumns } from "./servicesTableConfig";
 
+
 type ServicesTableProps = {
-  products?: ProductResponse[];
+  products: ProductResponse[];
   selectedProductId?: string | null;
-  onProductChange?: (productId: string) => void;
-  productsLoading?: boolean;
+  onProductChange: (productId: string) => void;
   onCreate: () => void;
   onView: (service: ServiceResponse) => void;
   onEdit: (service: ServiceResponse) => void;
@@ -27,7 +23,6 @@ export const ServicesTable = ({
   products,
   selectedProductId,
   onProductChange,
-  productsLoading = false,
   onCreate,
   onView,
   onEdit,
@@ -35,61 +30,6 @@ export const ServicesTable = ({
   onDeactivate,
 }: ServicesTableProps) => {
   const effectiveProductId = selectedProductId ?? undefined;
-
-  return (
-    <ServicesTableInner
-      key={effectiveProductId ?? "no-product"}
-      effectiveProductId={effectiveProductId}
-      products={products}
-      selectedProductId={selectedProductId}
-      onProductChange={onProductChange}
-      productsLoading={productsLoading}
-      onCreate={onCreate}
-      onView={onView}
-      onEdit={onEdit}
-      onViewApiKeys={onViewApiKeys}
-      onDeactivate={onDeactivate}
-    />
-  );
-};
-
-type ServicesTableInnerProps = {
-  effectiveProductId?: string;
-  products?: ProductResponse[];
-  selectedProductId?: string | null;
-  onProductChange?: (productId: string) => void;
-  productsLoading: boolean;
-  onCreate: () => void;
-  onView: (service: ServiceResponse) => void;
-  onEdit: (service: ServiceResponse) => void;
-  onViewApiKeys: (service: ServiceResponse) => void;
-  onDeactivate: (service: ServiceResponse) => void;
-};
-
-const ServicesTableInner = ({
-  effectiveProductId,
-  products,
-  selectedProductId,
-  onProductChange,
-  productsLoading,
-  onCreate,
-  onView,
-  onEdit,
-  onViewApiKeys,
-  onDeactivate,
-}: ServicesTableInnerProps) => {
-  const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null);
-  const showProductSelect = products != null && onProductChange != null;
-
-  const listParams = useMemo(
-    () => (fetchQuery ? mapServiceListQuery(fetchQuery) : null),
-    [fetchQuery],
-  );
-
-  const { data, isFetching } = useServicesQuery(
-    effectiveProductId,
-    effectiveProductId ? listParams : null,
-  );
 
   const rowActions = useMemo(
     () =>
@@ -103,44 +43,30 @@ const ServicesTableInner = ({
   );
 
   const emptyMessage = !effectiveProductId
-    ? productsLoading
-      ? "Loading products…"
-      : products && products.length === 0
-        ? "Create a product before managing services"
-        : "Select a product to view its services"
+    ? products.length === 0
+      ? "Create a product before managing services"
+      : "Select a product to view its services"
     : "No services match your filters";
 
-  const { tableProps } = useServerDataTable({
+  const { listQueryRequest, bindPage } = useDataTable({
     columns: productServiceColumns,
-    data: effectiveProductId ? (data?.content ?? []) : [],
     getRowId: (row) => row.id,
-    totalElements: effectiveProductId ? (data?.totalElements ?? 0) : 0,
     initialState: { pageSize: 10 },
     rowActions: effectiveProductId ? rowActions : [],
-    isLoading:
-      productsLoading || (effectiveProductId != null && (isFetching || fetchQuery == null)),
-    onQueryChange: setFetchQuery,
     toolbarActions: (
       <div className="flex flex-wrap items-center gap-2">
-        {showProductSelect ? (
-          <select
-            className={`${inputClassName} min-w-[10rem]`}
-            value={selectedProductId ?? ""}
-            disabled={productsLoading || (products?.length ?? 0) === 0}
-            onChange={(event) => onProductChange(event.target.value)}
-            aria-label="Filter services by product"
-          >
-            {(products?.length ?? 0) === 0 ? (
-              <option value="">No products</option>
-            ) : (
-              products!.map((product) => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))
-            )}
-          </select>
-        ) : null}
+        <SelectField
+          className="min-w-[10rem]"
+          value={selectedProductId ?? ""}
+          onChange={(event) => onProductChange(event.target.value)}
+          aria-label="Filter services by product"
+          emptyPlaceholder="No products"
+          options={products.map((product) => ({
+            value: product.id,
+            label: product.name,
+          }))}
+        />
+
         <button
           type="button"
           className={primaryButtonClassName}
@@ -152,7 +78,18 @@ const ServicesTableInner = ({
       </div>
     ),
     emptyMessage,
+    errorMessage: "Could not load services",
   });
 
-  return <DataTable {...tableProps} />;
+  const page = useServicesQuery(effectiveProductId, effectiveProductId ? listQueryRequest : null);
+
+  return (
+    <DataTable
+      {...bindPage({
+        rows: effectiveProductId ? page.rows : [],
+        totalElements: effectiveProductId ? page.totalElements : 0,
+        isLoading: effectiveProductId != null && page.isLoading,
+      })}
+    />
+  );
 };
