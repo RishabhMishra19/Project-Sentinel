@@ -47,7 +47,11 @@ export const tenantColumns: DataTableColumn<TenantResponse>[] = [
     id: 'createdAt',
     header: 'Created',
     sortable: true,
-    filter: { type: 'dateRange' },
+    filter: {
+      type: 'dateRange',
+      fromKey: 'from',
+      toKey: 'to',
+    },
     cell: { type: 'datetime', getValue: (row) => row.createdAt },
   },
 ]
