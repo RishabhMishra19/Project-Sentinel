@@ -1,4 +1,4 @@
-import { PRODUCTS_API_ROUTES } from '../../../shared/api/ApiRoutes'
+import { PRODUCTS_API_ROUTES } from '../../../shared/api/api.routes'
 import { apiManager } from '../../../shared/api/ApiManager'
 import type { ProductListParams, CreateProductRequest, UpdateProductRequest } from '../dto/request/product.request'
 import type { PageResponse } from '../../../shared/dto/response'

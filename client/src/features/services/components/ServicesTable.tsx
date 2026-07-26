@@ -18,9 +18,6 @@ import {
 } from './servicesTableConfig'
 
 type ServicesTableProps = {
-  /** Fixed product (e.g. nested product services page). */
-  productId?: string
-  /** Products for the toolbar selector on the Services tab. */
   products?: ProductResponse[]
   selectedProductId?: string | null
   onProductChange?: (productId: string) => void
@@ -33,7 +30,6 @@ type ServicesTableProps = {
 }
 
 export const ServicesTable = ({
-  productId,
   products,
   selectedProductId,
   onProductChange,
@@ -44,7 +40,7 @@ export const ServicesTable = ({
   onViewApiKeys,
   onDeactivate,
 }: ServicesTableProps) => {
-  const effectiveProductId = productId ?? selectedProductId ?? undefined
+  const effectiveProductId = selectedProductId ?? undefined
 
   return (
     <ServicesTableInner

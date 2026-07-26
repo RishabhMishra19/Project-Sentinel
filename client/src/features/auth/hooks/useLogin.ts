@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAppDispatch } from '../../../redux/hooks'
 import { setAuthSession } from '../../../redux/session/sessionSlice'
 import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
-import { resolvePostLoginPath } from '../../../shared/session/sessionUtils'
+import { resolvePostLoginPath } from '../../../navigation/utils'
 import { AuthApi } from '../api/AuthApi'
 import type { LoginRequest } from '../dto/request/auth.request'
 

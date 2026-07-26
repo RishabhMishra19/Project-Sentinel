@@ -7,7 +7,7 @@ import { store } from "../../redux/store";
 import { clearSession, setAuthSession } from "../../redux/session/sessionSlice";
 import type { AuthSessionResponse } from "../../features/auth/dto/response/auth.response";
 import type { ApiError } from "../dto/response";
-import { API_BASE, AUTH_API_ROUTES, TENANT_ID_HEADER } from "./ApiRoutes";
+import { API_BASE, AUTH_API_ROUTES, TENANT_ID_HEADER } from "./api.routes";
 
 export const axiosClient = axios.create({
   baseURL: API_BASE,

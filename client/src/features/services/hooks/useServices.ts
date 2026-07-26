@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
-import { ServicesApi } from '../api/ServicesApi'
+import { ServicesApi } from '../api/services.api'
 import type { ServiceListParams, CreateServiceRequest, UpdateServiceRequest } from '../dto/request/service.request'
 
 export const servicesQueryKey = (productId?: string) =>
@@ -22,6 +22,14 @@ export function useServicesQuery(
     queryKey: [...servicesQueryKey(productId), 'list', params],
     queryFn: () => ServicesApi.list(productId!, params!),
     enabled: productId != null && params != null,
+  })
+}
+
+export function useServiceEndpointsQuery(serviceId: string | undefined) {
+  return useQuery({
+    queryKey: [...servicesQueryKey(), 'endpoints', serviceId],
+    queryFn: () => ServicesApi.listEndpoints(serviceId!),
+    enabled: serviceId != null,
   })
 }
 

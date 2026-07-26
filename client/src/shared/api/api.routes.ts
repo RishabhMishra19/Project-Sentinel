@@ -25,6 +25,7 @@ export const SERVICES_API_ROUTES = {
   LIST: (productId: string) => `/products/${productId}/services`,
   BY_ID: (productId: string, id: string) =>
     `/products/${productId}/services/${id}`,
+  ENDPOINTS: (serviceId: string) => `/services/${serviceId}/endpoints`,
 } as const
 
 export const SERVICE_API_KEYS_API_ROUTES = {

@@ -5,7 +5,8 @@ import { ActiveTenantBanner } from "./ActiveTenantBanner";
 import { AppNavbar } from "./AppNavbar";
 import { AppSidebar } from "./AppSidebar";
 
-export function ProtectedLayout() {
+/** Chrome for signed-in pages: sidebar, banner, navbar, and page outlet. */
+export function AuthenticatedLayout() {
   const user = useAppSelector((state) => state.session.user)!;
   const activeTenant = useAppSelector((state) => state.session.activeTenant);
 

@@ -1,6 +1,6 @@
 import {
   USERS_API_ROUTES,
-} from '../../../shared/api/ApiRoutes'
+} from '../../../shared/api/api.routes'
 import { apiManager } from '../../../shared/api/ApiManager'
 import type {
   AssignRoleRequest,

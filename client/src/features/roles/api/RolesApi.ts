@@ -1,4 +1,4 @@
-import { ROLES_API_ROUTES } from '../../../shared/api/ApiRoutes'
+import { ROLES_API_ROUTES } from '../../../shared/api/api.routes'
 import { apiManager } from '../../../shared/api/ApiManager'
 import type {
   CreateRoleRequest,

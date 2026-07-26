@@ -1,4 +1,4 @@
-import type { UserBriefResponse } from '../../../shared/dto/response'
+import type { UserBriefResponse } from '../../../../shared/dto/response'
 
 export type RoleStatus = 'ACTIVE' | 'INACTIVE'
 

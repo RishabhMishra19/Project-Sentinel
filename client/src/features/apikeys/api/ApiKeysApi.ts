@@ -1,4 +1,4 @@
-import { SERVICE_API_KEYS_API_ROUTES } from '../../../shared/api/ApiRoutes'
+import { SERVICE_API_KEYS_API_ROUTES } from '../../../shared/api/api.routes'
 import { apiManager } from '../../../shared/api/ApiManager'
 import type { PageResponse } from '../../../shared/dto/response'
 import type {

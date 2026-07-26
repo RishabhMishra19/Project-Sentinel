@@ -1,39 +1,20 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../redux/hooks";
-import {
-  LogoutIcon,
-  ProductsIcon,
-  ServicesIcon,
-  SettingsIcon,
-  SidebarCloseIcon,
-  SidebarOpenIcon,
-  TenantsIcon,
-  UsersIcon,
-} from "../../assets/icons";
+import { LogoutIcon, SidebarCloseIcon, SidebarOpenIcon } from "../../assets/icons";
 import { useLogout } from "../../features/auth/hooks/useLogout";
-import { SHARED_ROUTES } from "../../routes/paths";
-import { resolveSessionMode } from "../session/sessionUtils";
+import { ROUTE_PATHS } from "../../navigation";
+import { protectedPageRoutes } from "../../navigation/routes/protected.routes";
+import { getSideBarItems } from "../../navigation/utils";
 import { localStorageManager } from "../storage/LocalStorageManager";
 import { LoggedInUserCard } from "./LoggedInUserCard";
-import { ADMIN_SIDE_BAR_ITEMS, TENANT_SIDE_BAR_ITEMS } from "./sidebarConfig";
 import { SidebarItem, type SidebarMode } from "./SidebarItem";
 import { SidebarTray } from "./SidebarTray";
 
 const SIDEBAR_MODE_KEY = "sidebar-mode";
 
-const NAV_ICONS: Record<string, ReactNode> = {
-  tenants: <TenantsIcon className="size-4 shrink-0" />,
-  products: <ProductsIcon className="size-4 shrink-0" />,
-  services: <ServicesIcon className="size-4 shrink-0" />,
-  users: <UsersIcon className="size-4 shrink-0" />,
-  settings: <SettingsIcon className="size-4 shrink-0" />,
-};
-
 function readStoredMode(): SidebarMode {
-  return localStorageManager.get(SIDEBAR_MODE_KEY) === "collapsed"
-    ? "collapsed"
-    : "expanded";
+  return localStorageManager.get(SIDEBAR_MODE_KEY) === "collapsed" ? "collapsed" : "expanded";
 }
 
 export function AppSidebar() {
@@ -45,15 +26,12 @@ export function AppSidebar() {
 
   const user = useAppSelector((state) => state.session.user)!;
   const activeTenant = useAppSelector((state) => state.session.activeTenant);
-  const sessionMode = resolveSessionMode(user, activeTenant);
+  const isLoggedIn = useAppSelector((state) => state.session.isLoggedIn);
 
-  const navItems =
-    sessionMode === "only_admin"
-      ? ADMIN_SIDE_BAR_ITEMS
-      : TENANT_SIDE_BAR_ITEMS;
-
-  const isNavActive = (path: string) =>
-    pathname === path || pathname.startsWith(`${path}/`);
+  const navItems = getSideBarItems(protectedPageRoutes).filter((item) =>
+    item.isAccessibleTo ? item.isAccessibleTo(isLoggedIn, user, activeTenant) : true,
+  );
+  const isNavActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
 
   const toggleMode = () => {
     const next: SidebarMode = isCollapsed ? "expanded" : "collapsed";
@@ -73,18 +51,12 @@ export function AppSidebar() {
         }`}
       >
         <Link
-          to={SHARED_ROUTES.PROFILE}
+          to={`/${ROUTE_PATHS.profile}`}
           className={`flex min-w-0 items-center tracking-tight text-sidebar-foreground hover:text-sidebar-muted ${
             isCollapsed ? "justify-center" : "gap-2.5 text-xl font-semibold"
           }`}
         >
-          <img
-            src="/logo-light.svg"
-            alt=""
-            width={28}
-            height={28}
-            className="shrink-0"
-          />
+          <img src="/logo-light.svg" alt="" width={28} height={28} className="shrink-0" />
           {!isCollapsed ? <span className="truncate">Sentinel</span> : null}
         </Link>
 
@@ -113,16 +85,19 @@ export function AppSidebar() {
 
       <nav className={`flex flex-1 flex-col ${isCollapsed ? "px-2" : "px-3"}`}>
         <SidebarTray mode={mode}>
-          {navItems.map((item) => (
-            <SidebarItem
-              key={item.id}
-              mode={mode}
-              active={isNavActive(item.path)}
-              iconNode={NAV_ICONS[item.id]}
-              textNode={item.label}
-              onClick={() => navigate(item.path)}
-            />
-          ))}
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <SidebarItem
+                key={item.id}
+                mode={mode}
+                active={isNavActive(item.path)}
+                iconNode={Icon ? <Icon className="size-4 shrink-0" /> : undefined}
+                textNode={item.label}
+                onClick={() => navigate(item.path)}
+              />
+            );
+          })}
         </SidebarTray>
       </nav>
 
@@ -130,10 +105,7 @@ export function AppSidebar() {
         <SidebarTray mode={mode}>
           <LoggedInUserCard mode={mode} />
           {!isCollapsed ? (
-            <div
-              role="separator"
-              className="mx-1.5 my-0.5 h-px bg-sidebar-foreground/20"
-            />
+            <div role="separator" className="mx-1.5 my-0.5 h-px bg-sidebar-foreground/20" />
           ) : null}
           <SidebarItem
             mode={mode}

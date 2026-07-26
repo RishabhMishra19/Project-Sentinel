@@ -1,32 +1,32 @@
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useAppSelector } from '../../redux/hooks'
-import { SHARED_ROUTES } from '../../routes/paths'
-import { SidebarItem, type SidebarMode } from './SidebarItem'
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../redux/hooks";
+import { ROUTE_PATHS } from "../../navigation";
+import { SidebarItem, type SidebarMode } from "./SidebarItem";
 
 function getInitials(name?: string | null, email?: string | null) {
-  const source = name?.trim() || email?.trim() || '?'
-  const parts = source.split(/\s+/).filter(Boolean)
+  const source = name?.trim() || email?.trim() || "?";
+  const parts = source.split(/\s+/).filter(Boolean);
   if (parts.length >= 2) {
-    return `${parts[0]![0]!}${parts[1]![0]!}`.toUpperCase()
+    return `${parts[0]![0]!}${parts[1]![0]!}`.toUpperCase();
   }
-  return source.slice(0, 2).toUpperCase()
+  return source.slice(0, 2).toUpperCase();
 }
 
 type LoggedInUserCardProps = {
-  mode?: SidebarMode
-}
+  mode?: SidebarMode;
+};
 
-export function LoggedInUserCard({ mode = 'expanded' }: LoggedInUserCardProps) {
-  const user = useAppSelector((state) => state.session.user)
-  const navigate = useNavigate()
-  const location = useLocation()
-  const isProfileActive = location.pathname === SHARED_ROUTES.PROFILE
+export function LoggedInUserCard({ mode = "expanded" }: LoggedInUserCardProps) {
+  const user = useAppSelector((state) => state.session.user);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isProfileActive = location.pathname === `/${ROUTE_PATHS.profile}`;
 
-  const isLoadingUser = !user
-  const initials = getInitials(user?.name, user?.email)
+  const isLoadingUser = !user;
+  const initials = getInitials(user?.name, user?.email);
 
-  const email = user?.email ?? 'No email'
-  const displayName = user?.name ?? 'Unknown'
+  const email = user?.email ?? "No email";
+  const displayName = user?.name ?? "Unknown";
 
   const textNode = isLoadingUser ? (
     <span className="flex min-w-0 flex-col">
@@ -42,31 +42,29 @@ export function LoggedInUserCard({ mode = 'expanded' }: LoggedInUserCardProps) {
         {email}
       </span>
     </span>
-  )
+  );
 
-  const isCollapsed = mode === 'collapsed'
+  const isCollapsed = mode === "collapsed";
   const avatarClass = `inline-flex shrink-0 items-center justify-center rounded-full font-semibold ${
-    isCollapsed ? 'size-8 text-[11px]' : 'size-9 text-xs'
+    isCollapsed ? "size-8 text-[11px]" : "size-9 text-xs"
   } ${
     isProfileActive
-      ? 'bg-sidebar-item-active-foreground/10 text-sidebar-item-active-foreground'
-      : 'bg-sidebar-item text-sidebar-foreground'
-  }`
+      ? "bg-sidebar-item-active-foreground/10 text-sidebar-item-active-foreground"
+      : "bg-sidebar-item text-sidebar-foreground"
+  }`;
 
   return (
     <SidebarItem
       mode={mode}
       active={isProfileActive}
-      onClick={() => navigate(SHARED_ROUTES.PROFILE)}
-      className={isCollapsed ? undefined : 'gap-2 py-2.5'}
+      onClick={() => navigate(`/${ROUTE_PATHS.profile}`)}
+      className={isCollapsed ? undefined : "gap-2 py-2.5"}
       iconNode={
         <span className={avatarClass} aria-hidden>
-          {isLoadingUser ? '…' : initials}
+          {isLoadingUser ? "…" : initials}
         </span>
       }
-      textNode={
-        isCollapsed ? (isLoadingUser ? 'Loading…' : displayName) : textNode
-      }
+      textNode={isCollapsed ? (isLoadingUser ? "Loading…" : displayName) : textNode}
     />
-  )
+  );
 }

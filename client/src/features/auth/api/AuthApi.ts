@@ -1,4 +1,4 @@
-import { AUTH_API_ROUTES } from '../../../shared/api/ApiRoutes'
+import { AUTH_API_ROUTES } from '../../../shared/api/api.routes'
 import { apiManager } from '../../../shared/api/ApiManager'
 import type { ChangePasswordRequest, LoginRequest } from '../dto/request/auth.request'
 import type { AuthSessionResponse, ProfileResponse } from '../dto/response/auth.response'

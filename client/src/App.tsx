@@ -1,5 +1,5 @@
-import { AppRouter } from './routes/AppRouter'
+import { AppRouter } from "./navigation";
 
 export default function App() {
-  return <AppRouter />
+  return <AppRouter />;
 }

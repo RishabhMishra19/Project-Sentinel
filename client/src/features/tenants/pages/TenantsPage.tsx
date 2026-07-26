@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from '../../../redux/hooks';
-import { setActiveTenant } from '../../../redux/session/sessionSlice';
-import { TENANT_CONTEXT_ROUTES } from '../../../routes/paths';
-import type { CreateTenantResponse, TenantResponse } from '../dto/response/tenant.response'
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { setActiveTenant } from "../../../redux/session/sessionSlice";
+import { resolvePostLoginPath } from "../../../navigation/utils";
+import type { CreateTenantResponse, TenantResponse } from "../dto/response/tenant.response";
 import { DeactivateTenantDialog } from "../components/DeactivateTenantDialog";
 import { TenantFormModal } from "../components/TenantFormModal";
 import { TenantsTable } from "../components/TenantsTable";
@@ -18,10 +18,10 @@ type FormState =
 export const TenantsPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const user = useAppSelector((state) => state.session.user)!;
   const [formState, setFormState] = useState<FormState>({ open: false });
   const [viewTenant, setViewTenant] = useState<TenantResponse | null>(null);
-  const [deactivateTenant, setDeactivateTenant] =
-    useState<TenantResponse | null>(null);
+  const [deactivateTenant, setDeactivateTenant] = useState<TenantResponse | null>(null);
   const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
 
   const onCreated = (created: CreateTenantResponse) => {
@@ -35,8 +35,9 @@ export const TenantsPage = () => {
         onView={setViewTenant}
         onEdit={(tenant) => setFormState({ open: true, mode: "edit", tenant })}
         onStartSession={(tenant) => {
-          dispatch(setActiveTenant({ id: tenant.id, name: tenant.name }));
-          navigate(TENANT_CONTEXT_ROUTES.PRODUCTS);
+          const activeTenant = { id: tenant.id, name: tenant.name };
+          dispatch(setActiveTenant(activeTenant));
+          navigate(resolvePostLoginPath(user, activeTenant));
         }}
         onDeactivate={setDeactivateTenant}
       />
@@ -44,9 +45,7 @@ export const TenantsPage = () => {
       <TenantFormModal
         open={formState.open}
         mode={formState.open ? formState.mode : "create"}
-        tenant={
-          formState.open && formState.mode === "edit" ? formState.tenant : null
-        }
+        tenant={formState.open && formState.mode === "edit" ? formState.tenant : null}
         onClose={() => setFormState({ open: false })}
         onCreated={onCreated}
       />

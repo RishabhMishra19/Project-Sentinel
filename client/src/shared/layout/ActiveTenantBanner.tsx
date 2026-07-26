@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { clearActiveTenant } from "../../redux/session/sessionSlice";
-import { ADMIN_ONLY_ROUTES } from "../../routes/paths";
+import { ROUTE_PATHS } from "../../navigation";
 
 export function ActiveTenantBanner() {
   const dispatch = useAppDispatch();
@@ -12,7 +12,7 @@ export function ActiveTenantBanner() {
 
   const handleEnd = () => {
     dispatch(clearActiveTenant());
-    navigate(ADMIN_ONLY_ROUTES.TENANTS);
+    navigate(`/${ROUTE_PATHS.tenants}`);
   };
 
   return (
@@ -20,9 +20,7 @@ export function ActiveTenantBanner() {
       className="flex shrink-0 items-center gap-3 border-b border-warning/25 bg-warning/15 px-3 py-1.5"
       role="status"
     >
-      <p className="tenant-text-sparkle min-w-0 flex-1 truncate text-sm font-medium">
-        {message}
-      </p>
+      <p className="tenant-text-sparkle min-w-0 flex-1 truncate text-sm font-medium">{message}</p>
       <button
         type="button"
         className="shrink-0 rounded-md bg-danger px-2.5 py-1 text-xs font-medium text-white hover:bg-danger/90"
