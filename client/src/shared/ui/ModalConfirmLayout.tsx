@@ -11,6 +11,7 @@ const confirmDangerClassName =
   "cursor-pointer rounded bg-danger px-4 py-2 text-sm text-white hover:bg-danger/90 disabled:cursor-not-allowed disabled:opacity-60";
 
 type ModalConfirmLayoutProps = {
+  open: boolean;
   title: ReactNode;
   description?: ReactNode;
   onClose: () => void;
@@ -30,6 +31,7 @@ type ModalConfirmLayoutProps = {
  * Modal for confirmations: body + cancel/confirm actions (no `<form>`).
  */
 export const ModalConfirmLayout = ({
+  open,
   title,
   description,
   onClose,
@@ -45,6 +47,7 @@ export const ModalConfirmLayout = ({
 }: ModalConfirmLayoutProps) => {
   return (
     <ModalLayout
+      open={open}
       title={title}
       description={description}
       onClose={onClose}

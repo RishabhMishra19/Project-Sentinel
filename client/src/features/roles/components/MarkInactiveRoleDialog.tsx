@@ -17,6 +17,7 @@ export const MarkInactiveRoleDialog = ({ open, role, onClose }: MarkInactiveRole
 
   return (
     <ModalConfirmLayout
+      open={open}
       title="Deactivate role"
       onClose={onClose}
       onConfirm={() => {

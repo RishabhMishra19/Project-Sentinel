@@ -35,7 +35,7 @@ export const RoleViewModal = ({ open, roleId, onClose }: RoleViewModalProps) => 
   const isLoading = isFetching && !role;
 
   return (
-    <ModalLayout title="Role details" onClose={onClose} className="flex flex-col">
+    <ModalLayout open={open} title="Role details" onClose={onClose} className="flex flex-col">
       <QueryGate
         isLoading={isLoading}
         isError={isError || (!isLoading && !role)}

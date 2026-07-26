@@ -47,6 +47,7 @@ export const RoleScopeEditModal = ({ open, roleId, scope, onClose }: RoleScopeEd
 
   return (
     <ModalForm
+      open={open}
       title="Edit permission"
       description={`${scope.scopeType}: ${scope.scopeName}`}
       onClose={onClose}

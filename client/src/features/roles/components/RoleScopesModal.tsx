@@ -11,7 +11,7 @@ import { createRoleScopeRowActions, roleScopeColumns } from "./roleScopesTableCo
 
 type RoleScopesModalProps = {
   open: boolean;
-  role: RoleResponse;
+  role: RoleResponse | null;
   onClose: () => void;
 };
 
@@ -58,6 +58,10 @@ export const RoleScopesModal = ({ open, role, onClose }: RoleScopesModalProps) =
     emptyMessage: "No scopes for this role",
     errorMessage: "Could not load scopes",
   });
+
+  if (!role) {
+    return null;
+  }
 
   return (
     <>

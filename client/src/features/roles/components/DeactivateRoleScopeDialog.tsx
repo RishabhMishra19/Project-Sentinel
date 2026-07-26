@@ -23,6 +23,7 @@ export const DeactivateRoleScopeDialog = ({
 
   return (
     <ModalConfirmLayout
+      open={open}
       title="Deactivate scope"
       onClose={onClose}
       onConfirm={() => {
