@@ -3,6 +3,7 @@ package com.sentinel.server.product.service;
 import com.sentinel.server.common.exception.BadRequestException;
 import com.sentinel.server.common.exception.ConflictException;
 import com.sentinel.server.common.exception.ResourceNotFoundException;
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.product.dto.request.CreateProductRequest;
 import com.sentinel.server.product.dto.response.ProductResponse;
@@ -16,11 +17,9 @@ import com.sentinel.server.tenant.entity.Tenant;
 import com.sentinel.server.tenant.repository.TenantRepository;
 import com.sentinel.server.user.entity.User;
 import com.sentinel.server.user.repository.UserRepository;
-import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -41,18 +40,11 @@ public class ProductFacadeImpl implements ProductFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<ProductResponse> list(
-            UUID tenantId,
-            Pageable pageable,
-            ProductStatus status,
-            String q,
-            String searchBy,
-            LocalDate from,
-            LocalDate to) {
+    public PageResponse<ProductResponse> list(UUID tenantId, ListQueryRequest query) {
         UUID effectiveTenantId = requireTenantId(tenantId);
-        Pageable effective = withDefaultSort(pageable);
-        Specification<Product> spec = ProductSpecifications.withFilters(
-                effectiveTenantId, status, q, searchBy, from, to);
+        Pageable effective =
+                query.toPageable(ProductSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
+        Specification<Product> spec = ProductSpecifications.withFilters(effectiveTenantId, query);
         Page<Product> page = productService.findAll(spec, effective);
         return PageResponse.from(page.map(productMapper::toResponse));
     }
@@ -126,12 +118,5 @@ public class ProductFacadeImpl implements ProductFacade {
         return productService
                 .findWithAuditByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-    }
-
-    private Pageable withDefaultSort(Pageable pageable) {
-        if (pageable.getSort().isSorted()) {
-            return pageable;
-        }
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), DEFAULT_SORT);
     }
 }

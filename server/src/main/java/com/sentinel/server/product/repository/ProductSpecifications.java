@@ -1,63 +1,34 @@
 package com.sentinel.server.product.repository;
 
+import com.sentinel.server.common.query.ListQueryRequest;
+import com.sentinel.server.common.specification.GenericSpecifications;
+import com.sentinel.server.common.specification.QueryFieldAllowlist;
 import com.sentinel.server.product.entity.Product;
 import com.sentinel.server.product.entity.ProductStatus;
-import jakarta.persistence.criteria.Predicate;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
 
 public final class ProductSpecifications {
 
+    public static final QueryFieldAllowlist FIELDS =
+            QueryFieldAllowlist.builder()
+                    .equal("status", "status", ProductStatus.class)
+                    .search("name", "name")
+                    .defaultSearch("name")
+                    .sortable("createdAt")
+                    .sortable("name")
+                    .sortable("status")
+                    .rangePath("createdAt")
+                    .build();
+
+    public static final Set<String> SORTABLE_FIELDS = FIELDS.sortableFields();
+
     private ProductSpecifications() {}
 
-    public static Specification<Product> withFilters(
-            UUID tenantId,
-            ProductStatus status,
-            String q,
-            String searchBy,
-            LocalDate from,
-            LocalDate to) {
-        return (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.equal(root.get("tenant").get("id"), tenantId));
-
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
-            }
-
-            if (StringUtils.hasText(q)) {
-                String pattern = "%" + q.trim().toLowerCase() + "%";
-                String field = resolveSearchField(searchBy);
-                predicates.add(cb.like(cb.lower(root.get(field)), pattern));
-            }
-
-            if (from != null) {
-                Instant fromInstant = from.atStartOfDay(ZoneOffset.UTC).toInstant();
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), fromInstant));
-            }
-
-            if (to != null) {
-                Instant toInstant = to.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-                predicates.add(cb.lessThan(root.get("createdAt"), toInstant));
-            }
-
-            return cb.and(predicates.toArray(Predicate[]::new));
-        };
-    }
-
-    private static String resolveSearchField(String searchBy) {
-        if (!StringUtils.hasText(searchBy)) {
-            return "name";
-        }
-        return switch (searchBy.trim().toLowerCase()) {
-            case "name" -> "name";
-            default -> "name";
-        };
+    public static Specification<Product> withFilters(UUID tenantId, ListQueryRequest query) {
+        Specification<Product> scoped =
+                (root, q, cb) -> cb.equal(root.get("tenant").get("id"), tenantId);
+        return scoped.and(GenericSpecifications.from(query, FIELDS));
     }
 }
