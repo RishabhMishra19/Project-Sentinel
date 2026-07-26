@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 
 const sizeClassName = {
   md: "max-w-md",
@@ -7,7 +7,27 @@ const sizeClassName = {
   "4xl": "max-w-4xl",
 } as const;
 
+const zIndexClassName = {
+  50: "z-50",
+  60: "z-[60]",
+} as const;
+
 export type ModalSize = keyof typeof sizeClassName;
+export type ModalZIndex = keyof typeof zIndexClassName;
+
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "textarea:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+
+const getFocusableElements = (container: HTMLElement) =>
+  Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+    (el) => !el.hasAttribute("disabled") && el.getAttribute("aria-hidden") !== "true",
+  );
 
 type ModalLayoutProps = {
   open: boolean;
@@ -16,13 +36,14 @@ type ModalLayoutProps = {
   description?: ReactNode;
   children: ReactNode;
   size?: ModalSize;
-  zIndex?: number;
+  zIndex?: ModalZIndex;
   className?: string;
 };
 
 /**
  * Modal shell only: backdrop, dialog panel, title/description, and header close.
  * Use `ModalForm` when you need cancel/submit inside a form.
+ * Use `ModalViewLayout` when you need a single footer dismiss action.
  */
 export const ModalLayout = ({
   open,
@@ -35,6 +56,61 @@ export const ModalLayout = ({
   className,
 }: ModalLayoutProps) => {
   const titleId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const panel = panelRef.current;
+    panel?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        onCloseRef.current();
+        return;
+      }
+
+      if (event.key !== "Tab" || !panel) {
+        return;
+      }
+
+      const focusable = getFocusableElements(panel);
+      if (focusable.length === 0) {
+        event.preventDefault();
+        panel.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey) {
+        if (active === first || active === panel) {
+          event.preventDefault();
+          last.focus();
+        }
+        return;
+      }
+
+      if (active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      previouslyFocused?.focus?.();
+    };
+  }, [open]);
 
   if (!open) {
     return null;
@@ -42,22 +118,23 @@ export const ModalLayout = ({
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center bg-foreground/40 px-4 ${
-        zIndex === 60 ? "z-[60]" : "z-50"
-      }`}
+      className={`fixed inset-0 flex items-center justify-center bg-foreground/40 px-4 ${zIndexClassName[zIndex]}`}
     >
       <button
         type="button"
+        tabIndex={-1}
         aria-label="Close dialog backdrop"
         className="absolute inset-0 cursor-default"
         onClick={onClose}
       />
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        tabIndex={-1}
         className={[
-          "relative z-10 w-full rounded-xl bg-surface p-6 shadow-lg",
+          "relative z-10 w-full rounded-xl bg-surface p-6 shadow-lg outline-none",
           sizeClassName[size],
           className,
         ]

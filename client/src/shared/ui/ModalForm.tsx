@@ -1,5 +1,5 @@
 import type { ReactNode, SubmitEventHandler } from "react";
-import { ModalLayout, type ModalSize } from "./ModalLayout";
+import { ModalLayout, type ModalSize, type ModalZIndex } from "./ModalLayout";
 
 const cancelButtonClassName =
   "cursor-pointer rounded border border-border px-4 py-2 text-sm text-foreground hover:bg-background";
@@ -22,7 +22,7 @@ type ModalFormProps = {
   submitDisabled?: boolean;
   submitVariant?: "accent" | "danger";
   size?: ModalSize;
-  zIndex?: number;
+  zIndex?: ModalZIndex;
   className?: string;
 };
 

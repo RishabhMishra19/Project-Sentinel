@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ModalLayout, type ModalSize } from "./ModalLayout";
+import { ModalLayout, type ModalSize, type ModalZIndex } from "./ModalLayout";
 
 const cancelButtonClassName =
   "cursor-pointer rounded border border-border px-4 py-2 text-sm text-foreground hover:bg-background";
@@ -23,7 +23,7 @@ type ModalConfirmLayoutProps = {
   /** Defaults to `danger` for destructive confirms. */
   confirmVariant?: "accent" | "danger";
   size?: ModalSize;
-  zIndex?: number;
+  zIndex?: ModalZIndex;
   className?: string;
 };
 
