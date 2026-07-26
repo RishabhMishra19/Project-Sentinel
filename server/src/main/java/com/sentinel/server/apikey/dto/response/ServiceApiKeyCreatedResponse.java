@@ -1,6 +1,6 @@
 package com.sentinel.server.apikey.dto.response;
 
-import com.sentinel.server.apikey.entity.ServiceApiKeyStatus;
+import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;
 import com.sentinel.server.common.dto.response.UserBriefResponse;
 import java.time.Instant;
 

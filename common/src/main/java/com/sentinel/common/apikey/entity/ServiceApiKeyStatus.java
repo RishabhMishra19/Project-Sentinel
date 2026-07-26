@@ -1,4 +1,4 @@
-package com.sentinel.server.apikey.entity;
+package com.sentinel.common.apikey.entity;
 
 public enum ServiceApiKeyStatus {
     ACTIVE,

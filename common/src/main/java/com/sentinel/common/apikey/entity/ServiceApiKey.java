@@ -1,17 +1,12 @@
-package com.sentinel.server.apikey.entity;
+package com.sentinel.common.apikey.entity;
 
-import com.sentinel.server.service.entity.Service;
-import com.sentinel.server.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -33,9 +28,8 @@ public class ServiceApiKey {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "service_id", nullable = false)
-    private Service service;
+    @Column(name = "service_id", nullable = false)
+    private UUID serviceId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -47,13 +41,11 @@ public class ServiceApiKey {
     @Column(name = "status", nullable = false)
     private ServiceApiKeyStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "created_by", nullable = false)
-    private User createdBy;
+    @Column(name = "created_by", nullable = false)
+    private UUID createdById;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "updated_by", nullable = false)
-    private User updatedBy;
+    @Column(name = "updated_by", nullable = false)
+    private UUID updatedById;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;

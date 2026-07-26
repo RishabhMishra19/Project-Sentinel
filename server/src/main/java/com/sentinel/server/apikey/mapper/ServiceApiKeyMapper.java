@@ -1,14 +1,14 @@
 package com.sentinel.server.apikey.mapper;
 
+import com.sentinel.common.apikey.entity.ServiceApiKey;
+import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;
+import com.sentinel.common.crypto.Sha256Hasher;
 import com.sentinel.server.apikey.dto.request.CreateServiceApiKeyRequest;
 import com.sentinel.server.apikey.dto.response.ServiceApiKeyCreatedResponse;
 import com.sentinel.server.apikey.dto.response.ServiceApiKeyResponse;
-import com.sentinel.server.apikey.entity.ServiceApiKey;
-import com.sentinel.server.apikey.entity.ServiceApiKeyStatus;
-import com.sentinel.server.common.crypto.Sha256Hasher;
-import com.sentinel.server.service.entity.Service;
 import com.sentinel.server.user.entity.User;
 import com.sentinel.server.user.mapper.UserMapper;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,38 +19,39 @@ public class ServiceApiKeyMapper {
     private final UserMapper userMapper;
 
     public ServiceApiKey toEntity(
-            CreateServiceApiKeyRequest request, Service service, String rawApiKey, User actor) {
+            CreateServiceApiKeyRequest request, UUID serviceId, String rawApiKey, UUID actorId) {
         ServiceApiKey entity = new ServiceApiKey();
-        entity.setService(service);
+        entity.setServiceId(serviceId);
         entity.setName(request.name().trim());
         entity.setKeyHash(Sha256Hasher.hash(rawApiKey));
         entity.setStatus(ServiceApiKeyStatus.ACTIVE);
-        entity.setCreatedBy(actor);
-        entity.setUpdatedBy(actor);
+        entity.setCreatedById(actorId);
+        entity.setUpdatedById(actorId);
         return entity;
     }
 
-    public ServiceApiKeyResponse toResponse(ServiceApiKey key) {
+    public ServiceApiKeyResponse toResponse(ServiceApiKey key, User createdBy, User updatedBy) {
         return new ServiceApiKeyResponse(
                 key.getId().toString(),
-                key.getService().getId().toString(),
+                key.getServiceId().toString(),
                 key.getName(),
                 key.getStatus(),
-                userMapper.toBrief(key.getCreatedBy()),
-                userMapper.toBrief(key.getUpdatedBy()),
+                userMapper.toBrief(createdBy),
+                userMapper.toBrief(updatedBy),
                 key.getCreatedAt(),
                 key.getUpdatedAt(),
                 key.getRevokedAt());
     }
 
-    public ServiceApiKeyCreatedResponse toCreatedResponse(ServiceApiKey key, String rawApiKey) {
+    public ServiceApiKeyCreatedResponse toCreatedResponse(
+            ServiceApiKey key, User createdBy, User updatedBy, String rawApiKey) {
         return new ServiceApiKeyCreatedResponse(
                 key.getId().toString(),
-                key.getService().getId().toString(),
+                key.getServiceId().toString(),
                 key.getName(),
                 key.getStatus(),
-                userMapper.toBrief(key.getCreatedBy()),
-                userMapper.toBrief(key.getUpdatedBy()),
+                userMapper.toBrief(createdBy),
+                userMapper.toBrief(updatedBy),
                 key.getCreatedAt(),
                 key.getUpdatedAt(),
                 key.getRevokedAt(),

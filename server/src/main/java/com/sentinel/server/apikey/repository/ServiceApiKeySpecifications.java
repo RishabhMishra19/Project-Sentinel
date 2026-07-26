@@ -1,7 +1,7 @@
 package com.sentinel.server.apikey.repository;
 
-import com.sentinel.server.apikey.entity.ServiceApiKey;
-import com.sentinel.server.apikey.entity.ServiceApiKeyStatus;
+import com.sentinel.common.apikey.entity.ServiceApiKey;
+import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;
 import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.specification.GenericSpecifications;
 import com.sentinel.server.common.specification.QueryFieldAllowlist;
@@ -25,7 +25,7 @@ public final class ServiceApiKeySpecifications {
 
     public static Specification<ServiceApiKey> forService(UUID serviceId, ListQueryRequest query) {
         Specification<ServiceApiKey> scoped =
-                (root, q, cb) -> cb.equal(root.get("service").get("id"), serviceId);
+                (root, q, cb) -> cb.equal(root.get("serviceId"), serviceId);
         return scoped.and(GenericSpecifications.from(query, FIELDS));
     }
 }

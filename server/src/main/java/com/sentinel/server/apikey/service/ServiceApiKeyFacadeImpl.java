@@ -1,12 +1,12 @@
 package com.sentinel.server.apikey.service;
 
+import com.sentinel.common.apikey.entity.ServiceApiKey;
+import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;
+import com.sentinel.common.apikey.repository.ServiceApiKeyRepository;
 import com.sentinel.server.apikey.dto.request.CreateServiceApiKeyRequest;
 import com.sentinel.server.apikey.dto.response.ServiceApiKeyCreatedResponse;
 import com.sentinel.server.apikey.dto.response.ServiceApiKeyResponse;
-import com.sentinel.server.apikey.entity.ServiceApiKey;
-import com.sentinel.server.apikey.entity.ServiceApiKeyStatus;
 import com.sentinel.server.apikey.mapper.ServiceApiKeyMapper;
-import com.sentinel.server.apikey.repository.ServiceApiKeyRepository;
 import com.sentinel.server.apikey.repository.ServiceApiKeySpecifications;
 import com.sentinel.server.common.exception.BadRequestException;
 import com.sentinel.server.common.exception.ConflictException;
@@ -22,6 +22,11 @@ import com.sentinel.server.user.repository.UserRepository;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -56,7 +61,8 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
         Specification<ServiceApiKey> spec =
                 ServiceApiKeySpecifications.forService(serviceId, query);
         Page<ServiceApiKey> page = serviceApiKeyRepository.findAll(spec, effective);
-        return PageResponse.from(page.map(serviceApiKeyMapper::toResponse));
+        Map<UUID, User> users = loadUsers(page.getContent());
+        return PageResponse.from(page.map(key -> toResponse(key, users)));
     }
 
     @Override
@@ -65,7 +71,9 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
             UUID tenantId, UUID productId, UUID serviceId, UUID id) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         requireServiceInProduct(effectiveTenantId, productId, serviceId);
-        return serviceApiKeyMapper.toResponse(requireKey(serviceId, id));
+        ServiceApiKey key = requireKey(serviceId, id);
+        Map<UUID, User> users = loadUsers(List.of(key));
+        return toResponse(key, users);
     }
 
     @Override
@@ -76,21 +84,25 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
             CreateServiceApiKeyRequest request,
             UUID actorId) {
         UUID effectiveTenantId = requireTenantId(tenantId);
-        Service service = requireServiceInProduct(effectiveTenantId, productId, serviceId);
+        requireServiceInProduct(effectiveTenantId, productId, serviceId);
         if (serviceApiKeyRepository.existsByServiceIdAndStatus(
                 serviceId, ServiceApiKeyStatus.ACTIVE)) {
             throw new ConflictException("An active API key already exists for this service");
         }
-        User actorRef = userRepository.getReferenceById(actorId);
         String rawApiKey = generateRawApiKey();
         ServiceApiKey saved = serviceApiKeyRepository.save(
                 serviceApiKeyMapper.toEntity(
                         new CreateServiceApiKeyRequest(request.name().trim()),
-                        service,
+                        serviceId,
                         rawApiKey,
-                        actorRef));
-        ServiceApiKey withAudit = requireKey(serviceId, saved.getId());
-        return serviceApiKeyMapper.toCreatedResponse(withAudit, rawApiKey);
+                        actorId));
+        ServiceApiKey withIds = requireKey(serviceId, saved.getId());
+        Map<UUID, User> users = loadUsers(List.of(withIds));
+        return serviceApiKeyMapper.toCreatedResponse(
+                withIds,
+                users.get(withIds.getCreatedById()),
+                users.get(withIds.getUpdatedById()),
+                rawApiKey);
     }
 
     @Override
@@ -105,8 +117,32 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
         Instant now = Instant.now();
         key.setStatus(ServiceApiKeyStatus.REVOKED);
         key.setRevokedAt(now);
-        key.setUpdatedBy(userRepository.getReferenceById(actorId));
+        key.setUpdatedById(actorId);
         serviceApiKeyRepository.save(key);
+    }
+
+    private ServiceApiKeyResponse toResponse(ServiceApiKey key, Map<UUID, User> users) {
+        return serviceApiKeyMapper.toResponse(
+                key, users.get(key.getCreatedById()), users.get(key.getUpdatedById()));
+    }
+
+    private Map<UUID, User> loadUsers(List<ServiceApiKey> keys) {
+        Set<UUID> ids = new HashSet<>();
+        for (ServiceApiKey key : keys) {
+            if (key.getCreatedById() != null) {
+                ids.add(key.getCreatedById());
+            }
+            if (key.getUpdatedById() != null) {
+                ids.add(key.getUpdatedById());
+            }
+        }
+        Map<UUID, User> users = new HashMap<>();
+        if (!ids.isEmpty()) {
+            for (User user : userRepository.findAllById(ids)) {
+                users.put(user.getId(), user);
+            }
+        }
+        return users;
     }
 
     private Service requireServiceInProduct(UUID tenantId, UUID productId, UUID serviceId) {
@@ -128,7 +164,7 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
 
     private ServiceApiKey requireKey(UUID serviceId, UUID id) {
         return serviceApiKeyRepository
-                .findWithAuditByIdAndServiceId(id, serviceId)
+                .findByIdAndServiceId(id, serviceId)
                 .orElseThrow(() -> new ResourceNotFoundException("API key not found"));
     }
 
