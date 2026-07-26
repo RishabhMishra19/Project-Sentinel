@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { mapPageQuery } from "../../../shared/api/mapQuery";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
 import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
 import { ApiKeysApi } from "../api/ApiKeysApi";
@@ -10,13 +11,15 @@ export const apiKeysQueryKey = (productId: string, serviceId: string) =>
 export const useServiceApiKeysQuery = (
   productId: string | undefined,
   serviceId: string | undefined,
-  params: ListQueryRequest | null,
+  params: ListQueryRequest,
 ) => {
-  return useQuery({
-    queryKey: [...apiKeysQueryKey(productId ?? "", serviceId ?? ""), "list", params],
-    queryFn: () => ApiKeysApi.list(productId!, serviceId!, params!),
-    enabled: productId != null && serviceId != null && params != null,
-  });
+  return mapPageQuery(
+    useQuery({
+      queryKey: [...apiKeysQueryKey(productId ?? "", serviceId ?? ""), "list", params],
+      queryFn: () => ApiKeysApi.list(productId!, serviceId!, params),
+      enabled: productId != null && serviceId != null,
+    }),
+  );
 };
 
 export const useCreateServiceApiKey = (productId: string, serviceId: string) => {
