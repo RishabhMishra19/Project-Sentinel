@@ -1,13 +1,8 @@
-import { useMemo, useState } from "react";
-import {
-  DataTable,
-  useServerDataTable,
-  type DataTableQueryState,
-} from "../../../shared/ui/data-table";
+import { useMemo } from "react";
+import { DataTable, useDataTable } from "../../../shared/ui/data-table";
 import { primaryButtonClassName } from "../../../shared/ui/data-table/styles";
 import type { TenantResponse } from "../dto/response/tenant.response";
 import { useTenantsQuery } from "../hooks/useTenants";
-import { mapTenantListQuery } from "./mapTenantListQuery";
 import { createTenantRowActions, tenantColumns } from "./tenantsTableConfig";
 
 type TenantsTableProps = {
@@ -25,15 +20,6 @@ export const TenantsTable = ({
   onStartSession,
   onDeactivate,
 }: TenantsTableProps) => {
-  const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null);
-
-  const listParams = useMemo(
-    () => (fetchQuery ? mapTenantListQuery(fetchQuery) : null),
-    [fetchQuery],
-  );
-
-  const { data, isFetching } = useTenantsQuery(listParams);
-
   const rowActions = useMemo(
     () =>
       createTenantRowActions({
@@ -45,22 +31,21 @@ export const TenantsTable = ({
     [onView, onEdit, onStartSession, onDeactivate],
   );
 
-  const { tableProps } = useServerDataTable({
+  const { listQueryRequest, bindPage } = useDataTable({
     columns: tenantColumns,
-    data: data?.content ?? [],
     getRowId: (row) => row.id,
-    totalElements: data?.totalElements ?? 0,
     initialState: { pageSize: 10 },
     rowActions,
-    isLoading: isFetching || fetchQuery == null,
-    onQueryChange: setFetchQuery,
     toolbarActions: (
       <button type="button" className={primaryButtonClassName} onClick={onCreate}>
         Create tenant
       </button>
     ),
     emptyMessage: "No tenants match your filters",
+    errorMessage: "Could not load tenants",
   });
 
-  return <DataTable {...tableProps} />;
+  const page = useTenantsQuery(listQueryRequest);
+
+  return <DataTable {...bindPage(page)} />;
 };

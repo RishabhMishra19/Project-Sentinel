@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { mapPageQuery } from "../../../shared/api/mapQuery";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
 import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
 import { TenantsApi } from "../api/TenantsApi";
@@ -6,12 +7,13 @@ import type { CreateTenantRequest, UpdateTenantRequest } from "../dto/request/te
 
 export const tenantsQueryKey = ["tenants"] as const;
 
-export const useTenantsQuery = (params: ListQueryRequest | null) => {
-  return useQuery({
-    queryKey: [...tenantsQueryKey, "list", params],
-    queryFn: () => TenantsApi.list(params!),
-    enabled: params != null,
-  });
+export const useTenantsQuery = (params: ListQueryRequest) => {
+  return mapPageQuery(
+    useQuery({
+      queryKey: [...tenantsQueryKey, "list", params],
+      queryFn: () => TenantsApi.list(params),
+    }),
+  );
 };
 
 export const useCreateTenant = () => {
