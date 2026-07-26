@@ -15,10 +15,13 @@ import com.sentinel.server.analytics.service.core.AnalyticsScopeHandlerRegistry;
 import com.sentinel.server.analytics.service.core.AnalyticsStatsQueryService;
 import com.sentinel.server.common.exception.BadRequestException;
 import com.sentinel.server.common.exception.ResourceNotFoundException;
+import com.sentinel.server.common.query.ListQueryFilterReader;
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.observability.repository.EndpointRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
+    private static final Set<String> RANKING_SORTABLE = Set.of();
+
     private final AnalyticsScopeHandlerRegistry handlerRegistry;
     private final AnalyticsStatsQueryService queryService;
     private final AnalyticsMapper analyticsMapper;
@@ -37,81 +42,96 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public AnalyticsSummaryResponse summary(
-            UUID tenantId,
-            AnalyticsScope scope,
-            UUID productId,
-            UUID serviceId,
-            UUID endpointId,
-            Instant from,
-            Instant to,
-            AnalyticsBucket bucket) {
-        requireRange(from, to);
-        AnalyticsScopeHandler handler = handlerRegistry.get(scope);
+    public AnalyticsSummaryResponse summary(UUID tenantId, ListQueryRequest query) {
+        AnalyticsQueryParams params = parseParams(query);
+        requireRange(params.from(), params.to());
+        AnalyticsScopeHandler handler = handlerRegistry.get(params.scope());
         AnalyticsMetricsAggregate agg =
-                handler.summary(tenantId, productId, serviceId, endpointId, from, to, bucket);
+                handler.summary(
+                        tenantId,
+                        params.productId(),
+                        params.serviceId(),
+                        params.endpointId(),
+                        params.from(),
+                        params.to(),
+                        params.bucket());
         Long activeEndpoints =
-                scope == AnalyticsScope.TENANT ? queryService.countActiveEndpoints(tenantId, from, to) : null;
+                params.scope() == AnalyticsScope.TENANT
+                        ? queryService.countActiveEndpoints(tenantId, params.from(), params.to())
+                        : null;
         UUID scopeId =
-                switch (scope) {
+                switch (params.scope()) {
                     case TENANT -> tenantId;
-                    case PRODUCT -> productId;
-                    case SERVICE -> serviceId;
-                    case ENDPOINT -> endpointId;
+                    case PRODUCT -> params.productId();
+                    case SERVICE -> params.serviceId();
+                    case ENDPOINT -> params.endpointId();
                 };
-        return analyticsMapper.toSummary(agg, bucket, scopeId, activeEndpoints);
+        return analyticsMapper.toSummary(agg, params.bucket(), scopeId, activeEndpoints);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public AnalyticsTimeseriesResponse timeseries(
-            UUID tenantId,
-            AnalyticsScope scope,
-            UUID productId,
-            UUID serviceId,
-            UUID endpointId,
-            Instant from,
-            Instant to,
-            AnalyticsBucket bucket) {
-        requireRange(from, to);
-        AnalyticsScopeHandler handler = handlerRegistry.get(scope);
+    public AnalyticsTimeseriesResponse timeseries(UUID tenantId, ListQueryRequest query) {
+        AnalyticsQueryParams params = parseParams(query);
+        requireRange(params.from(), params.to());
+        AnalyticsScopeHandler handler = handlerRegistry.get(params.scope());
         List<AnalyticsMetricsAggregate> rows =
-                handler.timeseries(tenantId, productId, serviceId, endpointId, from, to, bucket);
-        return analyticsMapper.toTimeseries(rows, bucket);
+                handler.timeseries(
+                        tenantId,
+                        params.productId(),
+                        params.serviceId(),
+                        params.endpointId(),
+                        params.from(),
+                        params.to(),
+                        params.bucket());
+        return analyticsMapper.toTimeseries(rows, params.bucket());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<AnalyticsRankingItem> rankings(
-            UUID tenantId,
-            AnalyticsScope scope,
-            UUID productId,
-            UUID serviceId,
-            UUID endpointId,
-            Instant from,
-            Instant to,
-            AnalyticsRankingSort sortBy,
-            Pageable pageable,
-            AnalyticsBucket bucket) {
-        if (scope == AnalyticsScope.ENDPOINT) {
+    public PageResponse<AnalyticsRankingItem> rankings(UUID tenantId, ListQueryRequest query) {
+        AnalyticsQueryParams params = parseParams(query);
+        if (params.scope() == AnalyticsScope.ENDPOINT) {
             throw new BadRequestException("Rankings are not available for ENDPOINT scope");
         }
-        requireRange(from, to);
-        AnalyticsScopeHandler handler = handlerRegistry.get(scope);
-        AnalyticsRankingSort sort = sortBy == null ? AnalyticsRankingSort.TRAFFIC : sortBy;
+        requireRange(params.from(), params.to());
+        AnalyticsScopeHandler handler = handlerRegistry.get(params.scope());
+        AnalyticsRankingSort sort =
+                ListQueryFilterReader.optionalEnum(
+                        query, "sortBy", AnalyticsRankingSort.class, AnalyticsRankingSort.TRAFFIC);
+        Pageable pageable = query.toPageable(RANKING_SORTABLE);
         List<AnalyticsRankingItem> content =
-                handler.rankings(tenantId, productId, serviceId, endpointId, from, to, bucket, sort, pageable)
+                handler.rankings(
+                                tenantId,
+                                params.productId(),
+                                params.serviceId(),
+                                params.endpointId(),
+                                params.from(),
+                                params.to(),
+                                params.bucket(),
+                                sort,
+                                pageable)
                         .stream()
                         .map(analyticsMapper::toRankingItem)
                         .toList();
         long total =
-                handler.rankingsCount(tenantId, productId, serviceId, endpointId, from, to, bucket);
+                handler.rankingsCount(
+                        tenantId,
+                        params.productId(),
+                        params.serviceId(),
+                        params.endpointId(),
+                        params.from(),
+                        params.to(),
+                        params.bucket());
         return new PageResponse<>(content, pageable.getPageNumber(), pageable.getPageSize(), total);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<StatusBreakdownItem> statusBreakdown(UUID tenantId, UUID endpointId, Instant from, Instant to) {
+    public List<StatusBreakdownItem> statusBreakdown(
+            UUID tenantId, UUID endpointId, ListQueryRequest query) {
+        Instant from = query != null ? query.getFrom() : null;
+        Instant to = query != null ? query.getTo() : null;
         requireRange(from, to);
         endpointRepository
                 .findByIdAndServiceProductTenantId(endpointId, tenantId)
@@ -123,7 +143,10 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ExceptionMetricItem> exceptions(UUID tenantId, UUID endpointId, Instant from, Instant to) {
+    public List<ExceptionMetricItem> exceptions(
+            UUID tenantId, UUID endpointId, ListQueryRequest query) {
+        Instant from = query != null ? query.getFrom() : null;
+        Instant to = query != null ? query.getTo() : null;
         requireRange(from, to);
         endpointRepository
                 .findByIdAndServiceProductTenantId(endpointId, tenantId)
@@ -133,9 +156,32 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
                 .toList();
     }
 
+    private AnalyticsQueryParams parseParams(ListQueryRequest query) {
+        if (query == null) {
+            throw new BadRequestException("Query body is required");
+        }
+        return new AnalyticsQueryParams(
+                ListQueryFilterReader.requireEnum(query, "scope", AnalyticsScope.class),
+                ListQueryFilterReader.requireEnum(query, "bucket", AnalyticsBucket.class),
+                ListQueryFilterReader.optionalUuid(query, "productId"),
+                ListQueryFilterReader.optionalUuid(query, "serviceId"),
+                ListQueryFilterReader.optionalUuid(query, "endpointId"),
+                query.getFrom(),
+                query.getTo());
+    }
+
     private void requireRange(Instant from, Instant to) {
         if (from == null || to == null || !from.isBefore(to)) {
             throw new BadRequestException("from must be before to");
         }
     }
+
+    private record AnalyticsQueryParams(
+            AnalyticsScope scope,
+            AnalyticsBucket bucket,
+            UUID productId,
+            UUID serviceId,
+            UUID endpointId,
+            Instant from,
+            Instant to) {}
 }

@@ -1,5 +1,6 @@
 import { ANALYTICS_API_ROUTES } from '../../../shared/api/api.routes'
 import { apiManager } from '../../../shared/api/ApiManager'
+import { analyticsParamsToListQuery } from '../../../shared/api/toListQueryRequest'
 import type { PageResponse } from '../../../shared/dto/response/PageResponse'
 import type {
   AnalyticsQueryParams,
@@ -15,26 +16,27 @@ import type {
 
 export class AnalyticsApi {
   static summary(params: AnalyticsQueryParams): Promise<AnalyticsSummaryResponse> {
-    return apiManager.get<AnalyticsSummaryResponse>(ANALYTICS_API_ROUTES.SUMMARY, {
-      params,
-    })
+    return apiManager.post<AnalyticsSummaryResponse>(
+      ANALYTICS_API_ROUTES.SUMMARY,
+      analyticsParamsToListQuery(params),
+    )
   }
 
   static timeseries(
     params: AnalyticsQueryParams,
   ): Promise<AnalyticsTimeseriesResponse> {
-    return apiManager.get<AnalyticsTimeseriesResponse>(
+    return apiManager.post<AnalyticsTimeseriesResponse>(
       ANALYTICS_API_ROUTES.TIMESERIES,
-      { params },
+      analyticsParamsToListQuery(params),
     )
   }
 
   static rankings(
     params: AnalyticsRankingsParams,
   ): Promise<PageResponse<AnalyticsRankingItem>> {
-    return apiManager.get<PageResponse<AnalyticsRankingItem>>(
+    return apiManager.post<PageResponse<AnalyticsRankingItem>>(
       ANALYTICS_API_ROUTES.RANKINGS,
-      { params },
+      analyticsParamsToListQuery(params),
     )
   }
 
@@ -42,9 +44,9 @@ export class AnalyticsApi {
     endpointId: string,
     params: { from: string; to: string },
   ): Promise<StatusBreakdownItem[]> {
-    return apiManager.get<StatusBreakdownItem[]>(
+    return apiManager.post<StatusBreakdownItem[]>(
       ANALYTICS_API_ROUTES.STATUS_BREAKDOWN(endpointId),
-      { params },
+      { from: params.from, to: params.to },
     )
   }
 
@@ -52,9 +54,9 @@ export class AnalyticsApi {
     endpointId: string,
     params: { from: string; to: string },
   ): Promise<ExceptionMetricItem[]> {
-    return apiManager.get<ExceptionMetricItem[]>(
+    return apiManager.post<ExceptionMetricItem[]>(
       ANALYTICS_API_ROUTES.EXCEPTIONS(endpointId),
-      { params },
+      { from: params.from, to: params.to },
     )
   }
 }
