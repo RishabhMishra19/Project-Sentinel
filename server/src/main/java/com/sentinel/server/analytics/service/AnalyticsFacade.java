@@ -5,6 +5,7 @@ import com.sentinel.server.analytics.dto.response.AnalyticsSummaryResponse;
 import com.sentinel.server.analytics.dto.response.AnalyticsTimeseriesResponse;
 import com.sentinel.server.analytics.dto.response.ExceptionMetricItem;
 import com.sentinel.server.analytics.dto.response.StatusBreakdownItem;
+import com.sentinel.server.analytics.service.core.AnalyticsBucket;
 import com.sentinel.server.analytics.service.core.AnalyticsRankingSort;
 import com.sentinel.server.analytics.service.core.AnalyticsScope;
 import com.sentinel.server.common.response.PageResponse;
@@ -22,7 +23,8 @@ public interface AnalyticsFacade {
             UUID serviceId,
             UUID endpointId,
             Instant from,
-            Instant to);
+            Instant to,
+            AnalyticsBucket bucket);
 
     AnalyticsTimeseriesResponse timeseries(
             UUID tenantId,
@@ -31,7 +33,8 @@ public interface AnalyticsFacade {
             UUID serviceId,
             UUID endpointId,
             Instant from,
-            Instant to);
+            Instant to,
+            AnalyticsBucket bucket);
 
     PageResponse<AnalyticsRankingItem> rankings(
             UUID tenantId,
@@ -42,7 +45,8 @@ public interface AnalyticsFacade {
             Instant from,
             Instant to,
             AnalyticsRankingSort sortBy,
-            Pageable pageable);
+            Pageable pageable,
+            AnalyticsBucket bucket);
 
     List<StatusBreakdownItem> statusBreakdown(UUID tenantId, UUID endpointId, Instant from, Instant to);
 

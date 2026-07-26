@@ -69,7 +69,7 @@ public class EndpointAnalyticsHandler implements AnalyticsScopeHandler {
             throw new BadRequestException("endpointId is required for ENDPOINT scope");
         }
         endpointRepository
-                .findByIdAndTenantId(endpointId, tenantId)
+                .findByIdAndServiceProductTenantId(endpointId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
         return endpointId;
     }

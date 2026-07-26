@@ -6,6 +6,7 @@ import com.sentinel.server.analytics.dto.response.AnalyticsTimeseriesResponse;
 import com.sentinel.server.analytics.dto.response.ExceptionMetricItem;
 import com.sentinel.server.analytics.dto.response.StatusBreakdownItem;
 import com.sentinel.server.analytics.service.AnalyticsFacade;
+import com.sentinel.server.analytics.service.core.AnalyticsBucket;
 import com.sentinel.server.analytics.service.core.AnalyticsRankingSort;
 import com.sentinel.server.analytics.service.core.AnalyticsScope;
 import com.sentinel.server.common.response.ApiResponses;
@@ -42,9 +43,10 @@ public class AnalyticsController {
             @RequestParam(required = false) UUID serviceId,
             @RequestParam(required = false) UUID endpointId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to,
+            @RequestParam AnalyticsBucket bucket) {
         return ApiResponses.ok(analyticsFacade.summary(
-                principal.getActiveTenantId(), scope, productId, serviceId, endpointId, from, to));
+                principal.getActiveTenantId(), scope, productId, serviceId, endpointId, from, to, bucket));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
@@ -56,9 +58,10 @@ public class AnalyticsController {
             @RequestParam(required = false) UUID serviceId,
             @RequestParam(required = false) UUID endpointId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to,
+            @RequestParam AnalyticsBucket bucket) {
         return ApiResponses.ok(analyticsFacade.timeseries(
-                principal.getActiveTenantId(), scope, productId, serviceId, endpointId, from, to));
+                principal.getActiveTenantId(), scope, productId, serviceId, endpointId, from, to, bucket));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
@@ -72,6 +75,7 @@ public class AnalyticsController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to,
             @RequestParam(required = false, defaultValue = "TRAFFIC") AnalyticsRankingSort sortBy,
+            @RequestParam AnalyticsBucket bucket,
             Pageable pageable) {
         return ApiResponses.okPage(analyticsFacade.rankings(
                 principal.getActiveTenantId(),
@@ -82,7 +86,8 @@ public class AnalyticsController {
                 from,
                 to,
                 sortBy,
-                pageable));
+                pageable,
+                bucket));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")

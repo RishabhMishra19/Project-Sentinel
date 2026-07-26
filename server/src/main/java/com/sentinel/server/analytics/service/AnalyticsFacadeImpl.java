@@ -7,7 +7,6 @@ import com.sentinel.server.analytics.dto.response.ExceptionMetricItem;
 import com.sentinel.server.analytics.dto.response.StatusBreakdownItem;
 import com.sentinel.server.analytics.mapper.AnalyticsMapper;
 import com.sentinel.server.analytics.service.core.AnalyticsBucket;
-import com.sentinel.server.analytics.service.core.AnalyticsBucketResolver;
 import com.sentinel.server.analytics.service.core.AnalyticsMetricsAggregate;
 import com.sentinel.server.analytics.service.core.AnalyticsRankingSort;
 import com.sentinel.server.analytics.service.core.AnalyticsScope;
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
-    private final AnalyticsBucketResolver bucketResolver;
     private final AnalyticsScopeHandlerRegistry handlerRegistry;
     private final AnalyticsStatsQueryService queryService;
     private final AnalyticsMapper analyticsMapper;
@@ -46,8 +44,9 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
             UUID serviceId,
             UUID endpointId,
             Instant from,
-            Instant to) {
-        AnalyticsBucket bucket = bucketResolver.resolve(from, to);
+            Instant to,
+            AnalyticsBucket bucket) {
+        requireRange(from, to);
         AnalyticsScopeHandler handler = handlerRegistry.get(scope);
         AnalyticsMetricsAggregate agg =
                 handler.summary(tenantId, productId, serviceId, endpointId, from, to, bucket);
@@ -72,8 +71,9 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
             UUID serviceId,
             UUID endpointId,
             Instant from,
-            Instant to) {
-        AnalyticsBucket bucket = bucketResolver.resolve(from, to);
+            Instant to,
+            AnalyticsBucket bucket) {
+        requireRange(from, to);
         AnalyticsScopeHandler handler = handlerRegistry.get(scope);
         List<AnalyticsMetricsAggregate> rows =
                 handler.timeseries(tenantId, productId, serviceId, endpointId, from, to, bucket);
@@ -91,11 +91,12 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
             Instant from,
             Instant to,
             AnalyticsRankingSort sortBy,
-            Pageable pageable) {
+            Pageable pageable,
+            AnalyticsBucket bucket) {
         if (scope == AnalyticsScope.ENDPOINT) {
             throw new BadRequestException("Rankings are not available for ENDPOINT scope");
         }
-        AnalyticsBucket bucket = bucketResolver.resolve(from, to);
+        requireRange(from, to);
         AnalyticsScopeHandler handler = handlerRegistry.get(scope);
         AnalyticsRankingSort sort = sortBy == null ? AnalyticsRankingSort.TRAFFIC : sortBy;
         List<AnalyticsRankingItem> content =
@@ -113,7 +114,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     public List<StatusBreakdownItem> statusBreakdown(UUID tenantId, UUID endpointId, Instant from, Instant to) {
         requireRange(from, to);
         endpointRepository
-                .findByIdAndTenantId(endpointId, tenantId)
+                .findByIdAndServiceProductTenantId(endpointId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
         return queryService.statusBreakdown(endpointId, tenantId, from, to).stream()
                 .map(analyticsMapper::toStatusItem)
@@ -125,7 +126,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     public List<ExceptionMetricItem> exceptions(UUID tenantId, UUID endpointId, Instant from, Instant to) {
         requireRange(from, to);
         endpointRepository
-                .findByIdAndTenantId(endpointId, tenantId)
+                .findByIdAndServiceProductTenantId(endpointId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
         return queryService.exceptionBreakdown(endpointId, tenantId, from, to).stream()
                 .map(analyticsMapper::toExceptionItem)
