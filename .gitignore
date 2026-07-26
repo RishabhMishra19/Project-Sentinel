@@ -3,6 +3,7 @@
 .idea/
 *.iml
 .vscode/
+.cursor/
 *.swp
 
 # Env
