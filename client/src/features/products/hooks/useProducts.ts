@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { mapPageQuery } from "../../../shared/api/mapQuery";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
 import { ProductsApi } from "../api/ProductsApi";
 import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
@@ -7,11 +8,13 @@ import type { CreateProductRequest, UpdateProductRequest } from "../dto/request/
 export const productsQueryKey = ["products"] as const;
 
 export const useProductsQuery = (params: ListQueryRequest | null) => {
-  return useQuery({
-    queryKey: [...productsQueryKey, "list", params],
-    queryFn: () => ProductsApi.list(params!),
-    enabled: params != null,
-  });
+  return mapPageQuery(
+    useQuery({
+      queryKey: [...productsQueryKey, "list", params],
+      queryFn: () => ProductsApi.list(params!),
+      enabled: params != null,
+    }),
+  );
 };
 
 export const useCreateProduct = () => {
