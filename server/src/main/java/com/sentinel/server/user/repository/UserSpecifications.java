@@ -21,8 +21,8 @@ public final class UserSpecifications {
             UserStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo) {
+            LocalDate from,
+            LocalDate to) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("tenant").get("id"), tenantId));
@@ -38,14 +38,14 @@ public final class UserSpecifications {
                 predicates.add(cb.like(cb.lower(root.get(field)), pattern));
             }
 
-            if (createdFrom != null) {
-                Instant from = createdFrom.atStartOfDay(ZoneOffset.UTC).toInstant();
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), from));
+            if (from != null) {
+                Instant fromInstant = from.atStartOfDay(ZoneOffset.UTC).toInstant();
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), fromInstant));
             }
 
-            if (createdTo != null) {
-                Instant to = createdTo.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-                predicates.add(cb.lessThan(root.get("createdAt"), to));
+            if (to != null) {
+                Instant toInstant = to.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+                predicates.add(cb.lessThan(root.get("createdAt"), toInstant));
             }
 
             return cb.and(predicates.toArray(Predicate[]::new));

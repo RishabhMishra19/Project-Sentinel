@@ -22,6 +22,6 @@ export interface UserListParams {
   status?: UserStatus
   q?: string
   searchBy?: UserSearchBy
-  createdFrom?: string
-  createdTo?: string
+  from?: string
+  to?: string
 }

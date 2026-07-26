@@ -57,12 +57,12 @@ public class UserFacadeImpl implements UserFacade {
             UserStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo) {
+            LocalDate from,
+            LocalDate to) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         Pageable effective = withDefaultSort(pageable);
         Specification<User> spec = UserSpecifications.withFilters(
-                effectiveTenantId, status, q, searchBy, createdFrom, createdTo);
+                effectiveTenantId, status, q, searchBy, from, to);
         Page<User> page = userService.findAll(spec, effective);
         return PageResponse.from(page.map(userMapper::toResponse));
     }

@@ -17,6 +17,6 @@ export interface ProductListParams {
   status?: ProductStatus
   q?: string
   searchBy?: ProductSearchBy
-  createdFrom?: string
-  createdTo?: string
+  from?: string
+  to?: string
 }

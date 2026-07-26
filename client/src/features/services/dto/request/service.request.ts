@@ -17,6 +17,6 @@ export interface ServiceListParams {
   status?: ServiceStatus
   q?: string
   searchBy?: ServiceSearchBy
-  createdFrom?: string
-  createdTo?: string
+  from?: string
+  to?: string
 }

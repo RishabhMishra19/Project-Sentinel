@@ -17,8 +17,8 @@ public interface ProductFacade {
             ProductStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo);
+            LocalDate from,
+            LocalDate to);
 
     ProductResponse getById(UUID tenantId, UUID id);
 

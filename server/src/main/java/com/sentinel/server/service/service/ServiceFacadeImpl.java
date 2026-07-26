@@ -47,13 +47,13 @@ public class ServiceFacadeImpl implements ServiceFacade {
             ServiceStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo) {
+            LocalDate from,
+            LocalDate to) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         requireProductInTenant(effectiveTenantId, productId);
         Pageable effective = withDefaultSort(pageable);
         Specification<Service> spec = ServiceSpecifications.withFilters(
-                productId, status, q, searchBy, createdFrom, createdTo);
+                productId, status, q, searchBy, from, to);
         Page<Service> page = serviceService.findAll(spec, effective);
         return PageResponse.from(page.map(serviceMapper::toResponse));
     }
@@ -66,12 +66,12 @@ public class ServiceFacadeImpl implements ServiceFacade {
             ServiceStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo) {
+            LocalDate from,
+            LocalDate to) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         Pageable effective = withDefaultSort(pageable);
         Specification<Service> spec = ServiceSpecifications.forTenant(
-                effectiveTenantId, status, q, searchBy, createdFrom, createdTo);
+                effectiveTenantId, status, q, searchBy, from, to);
         Page<Service> page = serviceService.findAll(spec, effective);
         return PageResponse.from(page.map(serviceMapper::toResponse));
     }

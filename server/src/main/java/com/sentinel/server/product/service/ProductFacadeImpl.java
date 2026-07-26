@@ -47,12 +47,12 @@ public class ProductFacadeImpl implements ProductFacade {
             ProductStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo) {
+            LocalDate from,
+            LocalDate to) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         Pageable effective = withDefaultSort(pageable);
         Specification<Product> spec = ProductSpecifications.withFilters(
-                effectiveTenantId, status, q, searchBy, createdFrom, createdTo);
+                effectiveTenantId, status, q, searchBy, from, to);
         Page<Product> page = productService.findAll(spec, effective);
         return PageResponse.from(page.map(productMapper::toResponse));
     }

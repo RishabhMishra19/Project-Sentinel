@@ -21,6 +21,6 @@ export interface TenantListParams {
   status?: TenantStatus;
   q?: string;
   searchBy?: TenantSearchBy;
-  createdFrom?: string;
-  createdTo?: string;
+  from?: string;
+  to?: string;
 }

@@ -18,8 +18,8 @@ public interface ServiceFacade {
             ServiceStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo);
+            LocalDate from,
+            LocalDate to);
 
     PageResponse<ServiceResponse> listAll(
             UUID tenantId,
@@ -27,8 +27,8 @@ public interface ServiceFacade {
             ServiceStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo);
+            LocalDate from,
+            LocalDate to);
 
     ServiceResponse getById(UUID tenantId, UUID productId, UUID id);
 

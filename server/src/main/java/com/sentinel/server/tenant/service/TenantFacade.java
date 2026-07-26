@@ -17,8 +17,8 @@ public interface TenantFacade {
             TenantStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo);
+            LocalDate from,
+            LocalDate to);
 
     TenantResponse getById(UUID id);
 

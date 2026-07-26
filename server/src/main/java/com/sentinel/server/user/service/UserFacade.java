@@ -19,8 +19,8 @@ public interface UserFacade {
             UserStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo);
+            LocalDate from,
+            LocalDate to);
 
     UserResponse getById(UUID tenantId, UUID id);
 

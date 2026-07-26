@@ -21,9 +21,9 @@ public final class ServiceSpecifications {
             ServiceStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo) {
-        return withFilters(null, productId, status, q, searchBy, createdFrom, createdTo);
+            LocalDate from,
+            LocalDate to) {
+        return withFilters(null, productId, status, q, searchBy, from, to);
     }
 
     public static Specification<Service> forTenant(
@@ -31,9 +31,9 @@ public final class ServiceSpecifications {
             ServiceStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo) {
-        return withFilters(tenantId, null, status, q, searchBy, createdFrom, createdTo);
+            LocalDate from,
+            LocalDate to) {
+        return withFilters(tenantId, null, status, q, searchBy, from, to);
     }
 
     private static Specification<Service> withFilters(
@@ -42,8 +42,8 @@ public final class ServiceSpecifications {
             ServiceStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo) {
+            LocalDate from,
+            LocalDate to) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -64,14 +64,14 @@ public final class ServiceSpecifications {
                 predicates.add(cb.like(cb.lower(root.get(field)), pattern));
             }
 
-            if (createdFrom != null) {
-                Instant from = createdFrom.atStartOfDay(ZoneOffset.UTC).toInstant();
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), from));
+            if (from != null) {
+                Instant fromInstant = from.atStartOfDay(ZoneOffset.UTC).toInstant();
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), fromInstant));
             }
 
-            if (createdTo != null) {
-                Instant to = createdTo.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-                predicates.add(cb.lessThan(root.get("createdAt"), to));
+            if (to != null) {
+                Instant toInstant = to.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+                predicates.add(cb.lessThan(root.get("createdAt"), toInstant));
             }
 
             return cb.and(predicates.toArray(Predicate[]::new));

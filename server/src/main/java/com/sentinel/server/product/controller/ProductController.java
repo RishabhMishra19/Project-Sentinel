@@ -43,17 +43,17 @@ public class ProductController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String searchBy,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate createdFrom,
+                    LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate createdTo) {
+                    LocalDate to) {
         return ApiResponses.okPage(productFacade.list(
                 principal.getActiveTenantId(),
                 pageable,
                 status,
                 q,
                 searchBy,
-                createdFrom,
-                createdTo));
+                from,
+                to));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")

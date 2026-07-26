@@ -56,11 +56,11 @@ public class TenantFacadeImpl implements TenantFacade {
             TenantStatus status,
             String q,
             String searchBy,
-            LocalDate createdFrom,
-            LocalDate createdTo) {
+            LocalDate from,
+            LocalDate to) {
         Pageable effective = withDefaultSort(pageable);
         Specification<Tenant> spec =
-                TenantSpecifications.withFilters(status, q, searchBy, createdFrom, createdTo);
+                TenantSpecifications.withFilters(status, q, searchBy, from, to);
         Page<Tenant> page = tenantRepository.findAll(spec, effective);
         Map<UUID, List<String>> adminEmailsByTenant = adminEmailsByTenantIds(
                 page.getContent().stream().map(Tenant::getId).toList());
