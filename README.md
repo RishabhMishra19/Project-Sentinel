@@ -1,6 +1,6 @@
 # Sentinel
 
-API metadata catalog and request observability for your services. Other apps keep their own auth; they report API metadata and runtime request data to Sentinel, which stores it and presents it in the UI (service, product, and overall views).
+API endpoints and request observability for your services. Other apps keep their own auth; they report API metadata and runtime request data to Sentinel, which stores it and presents it in the UI (service, product, and overall views).
 
 The repo today is a resume/demo stack: Spring Boot API (`server`), React + TypeScript UI (`client`), PostgreSQL, Redis, and Kafka — started together with Docker Compose. Auth in this stack is for signing into the **Sentinel dashboard**, not for authenticating third-party product users.
 
@@ -10,7 +10,7 @@ The repo today is a resume/demo stack: Spring Boot API (`server`), React + TypeS
 
 - Collects **API metadata** (routes, schemas, service info) from apps in any framework
 - Optionally stores **runtime request data** per service for observability
-- Shows a clear catalog in the **Sentinel UI**, sliced by service, by product, or combined for the whole company
+- Shows discovered **endpoints** in the **Sentinel UI**, sliced by service, by product, or combined for the whole company
 
 ### How client apps plug in
 
@@ -23,10 +23,10 @@ Services authenticate to ingest with a **service API key**. Humans use dashboard
 
 ### Hosting
 
-| Mode | Who runs it | Tenants |
-|------|-------------|---------|
+| Mode                | Who runs it       | Tenants        |
+| ------------------- | ----------------- | -------------- |
 | **SaaS (you host)** | Sentinel operator | Many companies |
-| **Self-host** | Customer | One company |
+| **Self-host**       | Customer          | One company    |
 
 Same product and data model either way — only the number of tenants changes.
 
@@ -49,10 +49,10 @@ UI lenses over the same tree: **service-wise**, **product-wise**, or **overall**
 
 ### Dashboard access (people)
 
-| Who | Scope |
-|-----|--------|
+| Who                | Scope                                |
+| ------------------ | ------------------------------------ |
 | **Platform admin** | All tenants (SaaS); manage companies |
-| **Tenant users** | One company only |
+| **Tenant users**   | One company only                     |
 
 **Roles (no separate teams):** a role is a named group of users with shared access.
 
@@ -71,12 +71,12 @@ Client apps ──► Ingest ──► Kafka ──► Workers ──► DB / st
 People ──► UI ──► Control API ┘
 ```
 
-| Deployable | Responsibility |
-|------------|----------------|
-| **Ingest** | Hot path: service-key auth, register/heartbeat instances (sync DB), accept batched request events, publish to Kafka, return fast |
-| **Worker(s)** | Consume Kafka: derive path templates, upsert endpoints, persist `request_logs` (scale with lag) |
-| **Control API** | Dashboard backend: tenants, users, roles, products, services, catalog reads |
-| **UI** | React app for humans |
+| Deployable      | Responsibility                                                                                                                   |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Ingest**      | Hot path: service-key auth, register/heartbeat instances (sync DB), accept batched request events, publish to Kafka, return fast |
+| **Worker(s)**   | Consume Kafka: derive path templates, upsert endpoints, persist `request_logs` (scale with lag)                                  |
+| **Control API** | Dashboard backend: tenants, users, roles, products, services, endpoint and log reads                                             |
+| **UI**          | React app for humans                                                                                                             |
 
 Agents should call ingest (`POST /v1/instances`, `/v1/instances/{id}/heartbeat`, `/v1/events`), not the human control/UI APIs. Early demos may run Control + Ingest in one process; keep the logical split so extracting ingest later is easy.
 
@@ -86,16 +86,16 @@ Agents should **batch** runtime events (interval or N requests) rather than one 
 
 ## Current demo stack
 
-| Service   | URL / port              | How it runs |
-|-----------|-------------------------|-------------|
-| Client    | http://localhost:3000   | Docker Compose |
-| Server    | http://localhost:8080   | Docker Compose (or local Maven) |
-| Ingest    | http://localhost:8081   | Local Maven only (for now) |
-| Worker    | http://localhost:8082   | Local Maven only (for now) |
-| Postgres  | localhost:5432          | Docker Compose |
-| Redis     | localhost:6379          | Docker Compose |
-| Kafka     | localhost:9092          | Docker Compose |
-| Kafka UI  | http://localhost:8090   | Docker Compose |
+| Service  | URL / port            | How it runs                     |
+| -------- | --------------------- | ------------------------------- |
+| Client   | http://localhost:3000 | Docker Compose                  |
+| Server   | http://localhost:8080 | Docker Compose (or local Maven) |
+| Ingest   | http://localhost:8081 | Local Maven only (for now)      |
+| Worker   | http://localhost:8082 | Local Maven only (for now)      |
+| Postgres | localhost:5432        | Docker Compose                  |
+| Redis    | localhost:6379        | Docker Compose                  |
+| Kafka    | localhost:9092        | Docker Compose                  |
+| Kafka UI | http://localhost:8090 | Docker Compose                  |
 
 - **server**: Spring Boot (Amazon Corretto 21), Maven, Postgres + Redis + Kafka, JWT auth (dashboard); owns schema via Liquibase
 - **ingest** (`sentinel-ingest`): Spring Boot — shared Postgres + Kafka; no Liquibase; service-key auth + instance/event APIs (see `docs/plans/ingest.md`); run locally
