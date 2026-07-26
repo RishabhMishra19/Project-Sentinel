@@ -134,11 +134,36 @@ export default function HomePage() {
   }, [seed.ingestUrl, seed.workerUrl]);
 
   useEffect(() => {
-    void refreshCatalog();
-    void refreshRun();
+    void (async () => {
+      try {
+        const res = await fetch("/api/defaults");
+        if (res.ok) {
+          const data = (await res.json()) as Partial<typeof defaultSeed>;
+          setSeed((prev) => ({
+            ...prev,
+            controlUrl: data.controlUrl ?? prev.controlUrl,
+            ingestUrl: data.ingestUrl ?? prev.ingestUrl,
+            workerUrl: data.workerUrl ?? prev.workerUrl,
+            email: data.email ?? prev.email,
+            password: data.password ?? prev.password,
+            tenants: data.tenants ?? prev.tenants,
+            products: data.products ?? prev.products,
+            services: data.services ?? prev.services,
+          }));
+        }
+      } catch {
+        // keep local defaults
+      } finally {
+        void refreshCatalog();
+        void refreshRun();
+      }
+    })();
+  }, [refreshCatalog, refreshRun]);
+
+  useEffect(() => {
     void refreshInventory();
     void refreshMetrics();
-  }, [refreshCatalog, refreshRun, refreshInventory, refreshMetrics]);
+  }, [refreshInventory, refreshMetrics]);
 
   useEffect(() => {
     if (!run?.running) {

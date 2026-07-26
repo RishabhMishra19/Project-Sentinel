@@ -7,11 +7,11 @@ export const RUN_STATE_PATH = path.join(DATA_DIR, "last-run.json");
 export const K6_SCRIPT_PATH = path.join(ROOT_DIR, "k6", "events.js");
 
 export const DEFAULTS = {
-  controlUrl: "http://localhost:8080",
-  ingestUrl: "http://localhost:8081",
-  workerUrl: "http://localhost:8082",
-  email: "rishabhpndt19@gmail.com",
-  password: "Admin@123",
+  controlUrl: process.env.LOADLAB_CONTROL_URL || "http://localhost:8080",
+  ingestUrl: process.env.LOADLAB_INGEST_URL || "http://localhost:8081",
+  workerUrl: process.env.LOADLAB_WORKER_URL || "http://localhost:8082",
+  email: process.env.LOADLAB_EMAIL || "rishabhpndt19@gmail.com",
+  password: process.env.LOADLAB_PASSWORD || "Admin@123",
   tenants: 3,
   products: 2,
   services: 3,

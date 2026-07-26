@@ -1,0 +1,12 @@
+node_modules
+.next
+.data
+.bin
+catalog.json
+.git
+.gitignore
+*.md
+.DS_Store
+.vercel
+coverage
+*.tsbuildinfo

@@ -89,6 +89,7 @@ Agents should **batch** runtime events (interval or N requests) rather than one 
 | Service  | URL / port            | How it runs                              |
 | -------- | --------------------- | ---------------------------------------- |
 | Client   | http://localhost:3000 | Docker Compose                           |
+| Loadlab  | http://localhost:3100 | Docker Compose                           |
 | Server   | http://localhost:8080 | Docker Compose (or local Maven)          |
 | Ingest   | http://localhost:8081 | Docker Compose (or local Maven)          |
 | Worker   | http://localhost:8082 | Docker Compose (or local Maven)          |
