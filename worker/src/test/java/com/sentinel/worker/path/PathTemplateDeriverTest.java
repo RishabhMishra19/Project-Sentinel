@@ -2,6 +2,7 @@ package com.sentinel.worker.path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.sentinel.common.path.PathTemplateDeriver;
 import org.junit.jupiter.api.Test;
 
 class PathTemplateDeriverTest {

@@ -1,11 +1,10 @@
-package com.sentinel.worker.path;
+package com.sentinel.common.path;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
-import org.springframework.stereotype.Component;
 
-@Component
-public class PathTemplateDeriver {
+/** Derives endpoint path templates from raw request paths (UUID/numeric segments → {id}). */
+public final class PathTemplateDeriver {
 
     private static final Pattern UUID_SEGMENT = Pattern.compile(
             "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");

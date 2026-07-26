@@ -8,6 +8,7 @@ public record RequestEventMessage(
         UUID serviceInstanceId,
         String method,
         String path,
+        String pathTemplate,
         Instant occurredAt,
         Instant receivedAt,
         int statusCode,

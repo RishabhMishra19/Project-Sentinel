@@ -1,11 +1,11 @@
 package com.sentinel.worker.kafka;
 
 import com.sentinel.common.kafka.RequestEventMessage;
+import com.sentinel.common.path.PathTemplateDeriver;
 import com.sentinel.worker.analytics.AnalyticsRollupService;
 import com.sentinel.worker.catalog.EndpointResolveService;
 import com.sentinel.worker.logs.RequestLogWriteService;
 import com.sentinel.worker.logs.RequestLogWriteService.ResolvedEvent;
-import com.sentinel.worker.path.PathTemplateDeriver;
 import com.sentinel.worker.support.ServiceHierarchy;
 import com.sentinel.worker.support.ServiceHierarchyResolver;
 import java.util.ArrayList;
@@ -23,19 +23,17 @@ public class RequestEventProcessor {
 
     private static final Logger log = LoggerFactory.getLogger(RequestEventProcessor.class);
 
-    private final PathTemplateDeriver pathTemplateDeriver;
+    private final PathTemplateDeriver pathTemplateDeriver = new PathTemplateDeriver();
     private final EndpointResolveService endpointResolveService;
     private final RequestLogWriteService requestLogWriteService;
     private final AnalyticsRollupService analyticsRollupService;
     private final ServiceHierarchyResolver serviceHierarchyResolver;
 
     public RequestEventProcessor(
-            PathTemplateDeriver pathTemplateDeriver,
             EndpointResolveService endpointResolveService,
             RequestLogWriteService requestLogWriteService,
             AnalyticsRollupService analyticsRollupService,
             ServiceHierarchyResolver serviceHierarchyResolver) {
-        this.pathTemplateDeriver = pathTemplateDeriver;
         this.endpointResolveService = endpointResolveService;
         this.requestLogWriteService = requestLogWriteService;
         this.analyticsRollupService = analyticsRollupService;
@@ -54,8 +52,12 @@ public class RequestEventProcessor {
 
         for (RequestEventMessage message : messages) {
             try {
-                String method = pathTemplateDeriver.normalizeMethod(message.method());
-                String pathTemplate = pathTemplateDeriver.derive(message.path());
+                String method = message.method() != null && !message.method().isBlank()
+                        ? pathTemplateDeriver.normalizeMethod(message.method())
+                        : pathTemplateDeriver.normalizeMethod(null);
+                String pathTemplate = message.pathTemplate() != null && !message.pathTemplate().isBlank()
+                        ? message.pathTemplate()
+                        : pathTemplateDeriver.derive(message.path());
                 EndpointKey key = new EndpointKey(message.serviceId(), method, pathTemplate);
 
                 UUID endpointId = endpointCache.computeIfAbsent(
