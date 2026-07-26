@@ -11,8 +11,8 @@
 .env.local
 
 # Java / Maven
-server/target/
-server/.mvn/wrapper/maven-wrapper.jar
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
 
 # Node / Vite
 node_modules/
