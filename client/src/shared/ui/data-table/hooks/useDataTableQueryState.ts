@@ -1,10 +1,9 @@
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type {
   DataTableColumn,
   DataTableProps,
   DataTableSearchState,
   DataTableSort,
-  RowAction,
 } from "../types";
 import { createInitialQueryState, type DataTableQueryState } from "../utils/queryState";
 import type { FiltersChange } from "../../filters";
@@ -84,95 +83,5 @@ export const useDataTableQueryState = <T extends object>({
     return props;
   }, [query, enablePagination, setSorting, setSearch, setFilters, setPageIndex, setPageSize]);
 
-  return {
-    query,
-    queryProps,
-    setQuery,
-    setSorting,
-    setSearch,
-    setFilters,
-    setPageIndex,
-    setPageSize,
-  };
-};
-
-type BuildTablePropsInput<T extends object> = {
-  columns: DataTableColumn<T>[];
-  rows: T[];
-  getRowId: (row: T) => string;
-  query: DataTableQueryState;
-  totalElements?: number;
-  enablePagination?: boolean;
-  rowActions?: RowAction<T>[];
-  toolbarActions?: ReactNode;
-  isLoading?: boolean;
-  emptyMessage?: string;
-  onSortingChange: (next: DataTableSort) => void;
-  onSearchChange: (next: DataTableSearchState) => void;
-  onFiltersChange: (next: FiltersChange) => void;
-  onPageIndexChange: (pageIndex: number) => void;
-  onPageSizeChange: (pageSize: number) => void;
-};
-
-export const buildDataTableProps = <T extends object>({
-  columns,
-  rows,
-  getRowId,
-  query,
-  totalElements = 0,
-  enablePagination = true,
-  rowActions,
-  toolbarActions,
-  isLoading,
-  emptyMessage,
-  onSortingChange,
-  onSearchChange,
-  onFiltersChange,
-  onPageIndexChange,
-  onPageSizeChange,
-}: BuildTablePropsInput<T>): DataTableProps<T> => {
-  const props: DataTableProps<T> = {
-    columns,
-    rows,
-    getRowId,
-    sortingConfig: {
-      sorting: query.sorting,
-      onSortingChange,
-    },
-    searchConfig: {
-      search: query.search,
-      onSearchChange,
-    },
-    filtersConfig: {
-      filters: query.filters,
-      onFiltersChange,
-    },
-    rowActions,
-    toolbarActions,
-    isLoading,
-    emptyMessage,
-  };
-
-  if (enablePagination) {
-    props.pagination = {
-      pageIndex: query.pageIndex,
-      pageSize: query.pageSize,
-      totalElements,
-      onPageIndexChange,
-      onPageSizeChange,
-    };
-  }
-
-  return props;
-};
-
-export const toTanStackSorting = (sorting: DataTableSort) =>
-  sorting ? [{ id: sorting.id, desc: sorting.desc }] : [];
-
-export const fromTanStackSorting = (sorting: { id: string; desc: boolean }[]): DataTableSort => {
-  const first = sorting[0];
-  if (!first) {
-    return null;
-  }
-  return { id: first.id, desc: first.desc };
+  return { query, queryProps };
 };
