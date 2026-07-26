@@ -1,9 +1,11 @@
 package com.sentinel.server.tenant.service;
 
 import com.sentinel.server.common.exception.ConflictException;
+import com.sentinel.server.common.exception.ForbiddenException;
 import com.sentinel.server.common.exception.ResourceNotFoundException;
 import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.PageResponse;
+import com.sentinel.server.security.AccessSupport;
 import com.sentinel.server.tenant.dto.request.CreateTenantRequest;
 import com.sentinel.server.tenant.dto.request.UpdateTenantRequest;
 import com.sentinel.server.tenant.dto.response.CreateTenantResponse;
@@ -47,6 +49,7 @@ public class TenantFacadeImpl implements TenantFacade {
     private final UserService userService;
     private final TenantMapper tenantMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AccessSupport accessSupport;
 
     @Override
     @Transactional(readOnly = true)
@@ -64,6 +67,7 @@ public class TenantFacadeImpl implements TenantFacade {
     @Override
     @Transactional(readOnly = true)
     public TenantResponse getById(UUID id) {
+        requirePathMatchesActiveTenant(id);
         Tenant tenant = requireTenantWithAudit(id);
         List<String> adminEmails = userRepository
                 .findByTenantIdAndTenantAdminTrueOrderByEmailAsc(id)
@@ -108,6 +112,7 @@ public class TenantFacadeImpl implements TenantFacade {
 
     @Override
     public TenantResponse update(UUID id, UpdateTenantRequest request, UUID actorId) {
+        requirePathMatchesActiveTenant(id);
         Tenant tenant = requireTenant(id);
         if (tenantRepository.existsBySlugIgnoreCaseAndIdNot(request.slug(), id)) {
             throw new ConflictException("Tenant slug already exists");
@@ -143,6 +148,12 @@ public class TenantFacadeImpl implements TenantFacade {
                                         .stream()
                                         .sorted(String.CASE_INSENSITIVE_ORDER)
                                         .toList()))));
+    }
+
+    private void requirePathMatchesActiveTenant(UUID id) {
+        if (!accessSupport.canOperateOnTenant(id)) {
+            throw new ForbiddenException("Access Denied");
+        }
     }
 
     private Tenant requireTenant(UUID id) {

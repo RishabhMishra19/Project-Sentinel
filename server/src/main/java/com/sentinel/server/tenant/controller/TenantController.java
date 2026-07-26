@@ -37,7 +37,7 @@ public class TenantController {
         return ApiResponses.okPage(tenantFacade.list(query));
     }
 
-    @PreAuthorize("@accessSupport.canReadTenant()")
+    @PreAuthorize("@accessSupport.canReadTenant(#id)")
     @GetMapping("/{id}")
     public ResponseEntity<TenantResponse> getById(@PathVariable UUID id) {
         return ApiResponses.ok(tenantFacade.getById(id));
@@ -51,7 +51,7 @@ public class TenantController {
         return ApiResponses.created(tenantFacade.create(request, principal.getId()));
     }
 
-    @PreAuthorize("@accessSupport.canWriteTenant()")
+    @PreAuthorize("@accessSupport.canWriteTenant(#id)")
     @PutMapping("/{id}")
     public ResponseEntity<TenantResponse> update(
             @PathVariable UUID id,

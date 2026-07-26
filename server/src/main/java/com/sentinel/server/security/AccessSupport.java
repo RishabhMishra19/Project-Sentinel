@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -62,6 +63,14 @@ public class AccessSupport {
                 PermissionType.ALL.name());
     }
 
+    /**
+     * Same as {@link #canReadTenant()}, plus path tenant must be the active tenant
+     * (sentinel admins may access any tenant).
+     */
+    public boolean canReadTenant(UUID tenantId) {
+        return canReadTenant() && canOperateOnTenant(tenantId);
+    }
+
     /** Sentinel admin, tenant admin, or active tenant with write-level permission. */
     public boolean canWriteTenant() {
         if (isSentinelAdmin() || isTenantAdmin()) {
@@ -71,6 +80,22 @@ public class AccessSupport {
             return false;
         }
         return hasAnyAuthority(PermissionType.READ_AND_WRITE.name(), PermissionType.ALL.name());
+    }
+
+    /**
+     * Same as {@link #canWriteTenant()}, plus path tenant must be the active tenant
+     * (sentinel admins may access any tenant).
+     */
+    public boolean canWriteTenant(UUID tenantId) {
+        return canWriteTenant() && canOperateOnTenant(tenantId);
+    }
+
+    /** Sentinel admins: any tenant. Everyone else: path id must equal activeTenantId. */
+    public boolean canOperateOnTenant(UUID tenantId) {
+        if (isSentinelAdmin()) {
+            return true;
+        }
+        return Objects.equals(currentPrincipal().getActiveTenantId(), tenantId);
     }
 
     /** Sentinel admin, tenant admin, or active tenant with product/service scope at read level. */
