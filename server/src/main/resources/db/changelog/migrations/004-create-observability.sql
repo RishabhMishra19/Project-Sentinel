@@ -29,11 +29,13 @@ CREATE INDEX idx_endpoints_service_id ON endpoints (service_id);
 CREATE INDEX idx_endpoints_last_seen_at ON endpoints (last_seen_at);
 
 -- changeset sentinel:004-request-events
+-- Retention: 7 days (application-enforced purge; not DB TTL)
 CREATE TABLE request_events (
     id UUID NOT NULL PRIMARY KEY,
     service_instance_id UUID NOT NULL,
     endpoint_id UUID NOT NULL,
     request_id VARCHAR(128) NULL,
+    trace_id VARCHAR(128) NULL,
     occurred_at TIMESTAMP WITH TIME ZONE NOT NULL,
     end_user_ip VARCHAR(64) NULL,
     user_id VARCHAR(128) NULL,
@@ -50,5 +52,6 @@ CREATE INDEX idx_request_events_instance_occurred ON request_events (service_ins
 CREATE INDEX idx_request_events_endpoint_occurred ON request_events (endpoint_id, occurred_at DESC);
 CREATE INDEX idx_request_events_occurred_at ON request_events (occurred_at DESC);
 CREATE INDEX idx_request_events_request_id ON request_events (request_id) WHERE request_id IS NOT NULL;
+CREATE INDEX idx_request_events_trace_id ON request_events (trace_id) WHERE trace_id IS NOT NULL;
 CREATE INDEX idx_request_events_user_id_occurred ON request_events (user_id, occurred_at DESC) WHERE user_id IS NOT NULL;
 CREATE INDEX idx_request_events_status_occurred ON request_events (status_code, occurred_at DESC);
