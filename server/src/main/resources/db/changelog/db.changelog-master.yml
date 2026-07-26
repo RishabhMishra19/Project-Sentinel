@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/migrations/006-product-service-name-uniqueness.sql
   - include:
       file: db/changelog/migrations/007-create-analytics.sql
+  - include:
+      file: db/changelog/migrations/008-request-logs-write-optimize.sql

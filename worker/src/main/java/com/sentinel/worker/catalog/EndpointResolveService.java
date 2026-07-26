@@ -1,8 +1,10 @@
 package com.sentinel.worker.catalog;
 
+import com.sentinel.worker.config.WorkerCacheConfig;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,13 @@ public class EndpointResolveService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Resolves (or creates) an endpoint id. Cached across Kafka batches so hot paths
+     * do not re-upsert on every poll. Cache hits skip last_seen_at updates.
+     */
+    @Cacheable(
+            cacheNames = WorkerCacheConfig.ENDPOINT_CACHE,
+            key = "#serviceId.toString() + ':' + #method + ':' + #pathTemplate")
     public UUID resolve(UUID serviceId, String method, String pathTemplate, Instant seenAt) {
         UUID id = UUID.randomUUID();
         Timestamp seen = Timestamp.from(seenAt);

@@ -5,6 +5,10 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/sentinel}
     username: ${SPRING_DATASOURCE_USERNAME:sentinel}
     password: ${SPRING_DATASOURCE_PASSWORD:sentinel}
+    hikari:
+      maximum-pool-size: ${SENTINEL_WORKER_DB_POOL_SIZE:32}
+      data-source-properties:
+        reWriteBatchedInserts: true
   jpa:
     hibernate:
       ddl-auto: validate
@@ -23,6 +27,7 @@ spring:
       group-id: sentinel-worker
       auto-offset-reset: earliest
       enable-auto-commit: false
+      max-poll-records: 1000
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     listener:

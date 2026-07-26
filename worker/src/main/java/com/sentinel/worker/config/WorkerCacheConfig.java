@@ -13,13 +13,15 @@ import org.springframework.context.annotation.Configuration;
 public class WorkerCacheConfig {
 
     public static final String SERVICE_HIERARCHY_CACHE = "serviceHierarchy";
+    public static final String ENDPOINT_CACHE = "endpoints";
 
     @Bean
     CacheManager cacheManager() {
-        CaffeineCacheManager manager = new CaffeineCacheManager(SERVICE_HIERARCHY_CACHE);
+        CaffeineCacheManager manager =
+                new CaffeineCacheManager(SERVICE_HIERARCHY_CACHE, ENDPOINT_CACHE);
         manager.setCaffeine(Caffeine.newBuilder()
-                .maximumSize(10_000)
-                .expireAfterWrite(60, TimeUnit.SECONDS));
+                .maximumSize(100_000)
+                .expireAfterWrite(1, TimeUnit.HOURS));
         return manager;
     }
 }
