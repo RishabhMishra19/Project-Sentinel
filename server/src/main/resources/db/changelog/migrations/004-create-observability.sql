@@ -28,9 +28,9 @@ CREATE TABLE endpoints (
 CREATE INDEX idx_endpoints_service_id ON endpoints (service_id);
 CREATE INDEX idx_endpoints_last_seen_at ON endpoints (last_seen_at);
 
--- changeset sentinel:004-request-events
+-- changeset sentinel:004-request-logs
 -- Retention: 7 days (application-enforced purge; not DB TTL)
-CREATE TABLE request_events (
+CREATE TABLE request_logs (
     id UUID NOT NULL PRIMARY KEY,
     service_instance_id UUID NOT NULL,
     endpoint_id UUID NOT NULL,
@@ -44,14 +44,14 @@ CREATE TABLE request_events (
     request_size_bytes INTEGER NULL,
     response_size_bytes INTEGER NULL,
     received_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    CONSTRAINT fk_request_events_instance FOREIGN KEY (service_instance_id) REFERENCES service_instances (id) ON DELETE RESTRICT,
-    CONSTRAINT fk_request_events_endpoint FOREIGN KEY (endpoint_id) REFERENCES endpoints (id) ON DELETE RESTRICT
+    CONSTRAINT fk_request_logs_instance FOREIGN KEY (service_instance_id) REFERENCES service_instances (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_request_logs_endpoint FOREIGN KEY (endpoint_id) REFERENCES endpoints (id) ON DELETE RESTRICT
 );
 
-CREATE INDEX idx_request_events_instance_occurred ON request_events (service_instance_id, occurred_at DESC);
-CREATE INDEX idx_request_events_endpoint_occurred ON request_events (endpoint_id, occurred_at DESC);
-CREATE INDEX idx_request_events_occurred_at ON request_events (occurred_at DESC);
-CREATE INDEX idx_request_events_request_id ON request_events (request_id) WHERE request_id IS NOT NULL;
-CREATE INDEX idx_request_events_trace_id ON request_events (trace_id) WHERE trace_id IS NOT NULL;
-CREATE INDEX idx_request_events_user_id_occurred ON request_events (user_id, occurred_at DESC) WHERE user_id IS NOT NULL;
-CREATE INDEX idx_request_events_status_occurred ON request_events (status_code, occurred_at DESC);
+CREATE INDEX idx_request_logs_instance_occurred ON request_logs (service_instance_id, occurred_at DESC);
+CREATE INDEX idx_request_logs_endpoint_occurred ON request_logs (endpoint_id, occurred_at DESC);
+CREATE INDEX idx_request_logs_occurred_at ON request_logs (occurred_at DESC);
+CREATE INDEX idx_request_logs_request_id ON request_logs (request_id) WHERE request_id IS NOT NULL;
+CREATE INDEX idx_request_logs_trace_id ON request_logs (trace_id) WHERE trace_id IS NOT NULL;
+CREATE INDEX idx_request_logs_user_id_occurred ON request_logs (user_id, occurred_at DESC) WHERE user_id IS NOT NULL;
+CREATE INDEX idx_request_logs_status_occurred ON request_logs (status_code, occurred_at DESC);

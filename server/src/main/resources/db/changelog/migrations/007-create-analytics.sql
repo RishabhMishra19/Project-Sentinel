@@ -1,7 +1,7 @@
 -- liquibase formatted sql
 --
 -- Retention policy (application-enforced purge; not DB TTL):
---   request_events                 → 7 days
+--   request_logs                 → 7 days
 --   analytics_*_stats_minute                 → 30 days
 --   analytics_*_stats_hour                   → 1 year
 --   analytics_*_stats_day                    → forever
