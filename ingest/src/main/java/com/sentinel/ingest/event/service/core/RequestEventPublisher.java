@@ -1,6 +1,6 @@
 package com.sentinel.ingest.event.service.core;
 
-import com.sentinel.ingest.event.dto.RequestEventMessage;
+import com.sentinel.common.kafka.RequestEventMessage;
 import java.util.List;
 
 public interface RequestEventPublisher {

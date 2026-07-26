@@ -12,6 +12,9 @@ public interface EndpointRepository extends JpaRepository<Endpoint, UUID> {
 
     Optional<Endpoint> findByIdAndServiceId(UUID id, UUID serviceId);
 
+    Optional<Endpoint> findByServiceIdAndMethodAndPathTemplate(
+            UUID serviceId, String method, String pathTemplate);
+
     List<Endpoint> findByServiceIdOrderByMethodAscPathTemplateAsc(UUID serviceId);
 
     @Query(

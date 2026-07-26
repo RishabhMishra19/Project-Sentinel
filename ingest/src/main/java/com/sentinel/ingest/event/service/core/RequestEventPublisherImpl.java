@@ -1,6 +1,6 @@
 package com.sentinel.ingest.event.service.core;
 
-import com.sentinel.ingest.event.dto.RequestEventMessage;
+import com.sentinel.common.kafka.RequestEventMessage;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;

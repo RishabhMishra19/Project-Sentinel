@@ -1,6 +1,6 @@
 package com.sentinel.ingest.event.service;
 
-import com.sentinel.ingest.event.dto.RequestEventMessage;
+import com.sentinel.common.kafka.RequestEventMessage;
 import com.sentinel.ingest.event.dto.request.IngestEventItem;
 import com.sentinel.ingest.event.dto.request.IngestEventsRequest;
 import com.sentinel.ingest.event.service.core.InstanceOwnershipService;

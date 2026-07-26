@@ -1,4 +1,4 @@
-package com.sentinel.ingest.event.dto;
+package com.sentinel.common.kafka;
 
 import java.time.Instant;
 import java.util.UUID;
