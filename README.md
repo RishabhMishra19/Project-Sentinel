@@ -73,14 +73,14 @@ People ──► UI ──► Control API ┘
 
 | Deployable | Responsibility |
 |------------|----------------|
-| **Ingest** | Hot path: service-key auth, accept catalog + batched request events, publish to Kafka, return fast |
-| **Worker(s)** | Consume Kafka, persist/process request data (scale with lag) |
+| **Ingest** | Hot path: service-key auth, register/heartbeat instances (sync DB), accept batched request events, publish to Kafka, return fast |
+| **Worker(s)** | Consume Kafka: derive path templates, upsert endpoints, persist `request_logs` (scale with lag) |
 | **Control API** | Dashboard backend: tenants, users, roles, products, services, catalog reads |
 | **UI** | React app for humans |
 
-Agents should call ingest endpoints (e.g. `POST /v1/ingest/...`), not the human control/UI APIs. Early demos may run Control + Ingest in one process; keep the logical split so extracting ingest later is easy.
+Agents should call ingest (`POST /v1/instances`, `/v1/instances/{id}/heartbeat`, `/v1/events`), not the human control/UI APIs. Early demos may run Control + Ingest in one process; keep the logical split so extracting ingest later is easy.
 
-Agents should **batch** runtime events (interval or N requests) rather than one HTTP call per request when possible.
+Agents should **batch** runtime events (interval or N requests) rather than one HTTP call per request when possible. Events carry raw request `path`; the worker derives `path_template` and upserts endpoints.
 
 ---
 
@@ -98,7 +98,7 @@ Agents should **batch** runtime events (interval or N requests) rather than one 
 | Kafka UI  | http://localhost:8090   | Docker Compose |
 
 - **server**: Spring Boot (Amazon Corretto 21), Maven, Postgres + Redis + Kafka, JWT auth (dashboard); owns schema via Liquibase
-- **ingest** (`sentinel-ingest`): Spring Boot skeleton — shared Postgres + Kafka; no Liquibase; run locally
+- **ingest** (`sentinel-ingest`): Spring Boot — shared Postgres + Kafka; no Liquibase; service-key auth + instance/event APIs (see `docs/plans/ingest.md`); run locally
 - **worker** (`sentinel-worker`): Spring Boot skeleton — shared Postgres + Kafka; no Liquibase; run locally
 - **client**: React + TypeScript (Vite), Redux, React Query, Tailwind, Axios
 - Postgres data is stored in the Docker volume `postgres_data`
