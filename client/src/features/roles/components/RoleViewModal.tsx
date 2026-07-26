@@ -1,4 +1,4 @@
-import { ModalLayout, QueryGate } from "../../../shared/ui";
+import { ModalViewLayout, QueryGate } from "../../../shared/ui";
 import { useRoleQuery } from "../hooks/useRoles";
 
 type RoleViewModalProps = {
@@ -35,7 +35,7 @@ export const RoleViewModal = ({ open, roleId, onClose }: RoleViewModalProps) => 
   const isLoading = isFetching && !role;
 
   return (
-    <ModalLayout open={open} title="Role details" onClose={onClose} className="flex flex-col">
+    <ModalViewLayout open={open} title="Role details" onClose={onClose} className="flex flex-col">
       <QueryGate
         isLoading={isLoading}
         isError={isError || (!isLoading && !role)}
@@ -59,6 +59,6 @@ export const RoleViewModal = ({ open, roleId, onClose }: RoleViewModalProps) => 
           </dl>
         ) : null}
       </QueryGate>
-    </ModalLayout>
+    </ModalViewLayout>
   );
 };
