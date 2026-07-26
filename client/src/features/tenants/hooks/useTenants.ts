@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
+import type { ListQueryRequest } from '../../../shared/api/listQueryRequest'
 import { TenantsApi } from '../api/TenantsApi'
-import type { CreateTenantRequest, TenantListParams, UpdateTenantRequest } from '../dto/request/tenant.request'
+import type { CreateTenantRequest, UpdateTenantRequest } from '../dto/request/tenant.request'
 
 export const tenantsQueryKey = ['tenants'] as const
 
-export function useTenantsQuery(params: TenantListParams | null) {
+export function useTenantsQuery(params: ListQueryRequest | null) {
   return useQuery({
     queryKey: [...tenantsQueryKey, 'list', params],
     queryFn: () => TenantsApi.list(params!),

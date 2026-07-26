@@ -1,5 +1,6 @@
 package com.sentinel.server.tenant.controller;
 
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.ApiResponses;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.security.UserPrincipal;
@@ -7,14 +8,10 @@ import com.sentinel.server.tenant.dto.request.CreateTenantRequest;
 import com.sentinel.server.tenant.dto.request.UpdateTenantRequest;
 import com.sentinel.server.tenant.dto.response.CreateTenantResponse;
 import com.sentinel.server.tenant.dto.response.TenantResponse;
-import com.sentinel.server.tenant.entity.TenantStatus;
 import com.sentinel.server.tenant.service.TenantFacade;
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,18 +32,9 @@ public class TenantController {
     private final TenantFacade tenantFacade;
 
     @PreAuthorize("@accessSupport.isSentinelAdmin()")
-    @GetMapping
-    public ResponseEntity<PageResponse<TenantResponse>> list(
-            Pageable pageable,
-            @RequestParam(required = false) TenantStatus status,
-            @RequestParam(required = false) String q,
-            @RequestParam(required = false) String searchBy,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate to) {
-        return ApiResponses.okPage(
-                tenantFacade.list(pageable, status, q, searchBy, from, to));
+    @PostMapping("/search")
+    public ResponseEntity<PageResponse<TenantResponse>> search(@RequestBody ListQueryRequest query) {
+        return ApiResponses.okPage(tenantFacade.list(query));
     }
 
     @PreAuthorize("@accessSupport.canReadTenant()")

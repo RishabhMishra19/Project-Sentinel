@@ -1,24 +1,16 @@
 package com.sentinel.server.tenant.service;
 
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.tenant.dto.request.CreateTenantRequest;
 import com.sentinel.server.tenant.dto.request.UpdateTenantRequest;
 import com.sentinel.server.tenant.dto.response.CreateTenantResponse;
 import com.sentinel.server.tenant.dto.response.TenantResponse;
-import com.sentinel.server.tenant.entity.TenantStatus;
-import java.time.LocalDate;
 import java.util.UUID;
-import org.springframework.data.domain.Pageable;
 
 public interface TenantFacade {
 
-    PageResponse<TenantResponse> list(
-            Pageable pageable,
-            TenantStatus status,
-            String q,
-            String searchBy,
-            LocalDate from,
-            LocalDate to);
+    PageResponse<TenantResponse> list(ListQueryRequest query);
 
     TenantResponse getById(UUID id);
 

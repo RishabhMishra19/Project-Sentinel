@@ -1,11 +1,7 @@
-import {
-  mapListQueryMeta,
-  type DataTableQueryState,
-} from '../../../shared/ui/data-table'
-import type {
-  TenantListParams,
-  TenantSearchBy,
-} from '../dto/request/tenant.request'
+import type { ListQueryRequest } from '../../../shared/api/listQueryRequest'
+import { toListQueryRequest } from '../../../shared/api/toListQueryRequest'
+import type { DataTableQueryState } from '../../../shared/ui/data-table'
+import type { TenantSearchBy } from '../dto/request/tenant.request'
 
 const SORTABLE_FIELDS = new Set(['name', 'slug', 'status', 'createdAt'])
 
@@ -14,11 +10,9 @@ const isSearchBy = (value: string): value is TenantSearchBy =>
 
 export const mapTenantListQuery = (
   state: DataTableQueryState,
-): TenantListParams =>
-  ({
-    ...mapListQueryMeta(state, SORTABLE_FIELDS, {
-      isSearchBy,
-      defaultSearchBy: 'name',
-    }),
-    ...state.apiFilters,
-  }) as TenantListParams
+): ListQueryRequest =>
+  toListQueryRequest(state, {
+    sortableFields: SORTABLE_FIELDS,
+    searchBy: { isSearchBy, defaultSearchBy: 'name' },
+    dayBoundRange: true,
+  })

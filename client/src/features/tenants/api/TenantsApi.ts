@@ -1,8 +1,8 @@
 import { TENANTS_API_ROUTES } from '../../../shared/api/api.routes'
 import { apiManager } from '../../../shared/api/ApiManager'
+import type { ListQueryRequest } from '../../../shared/api/listQueryRequest'
 import type {
   CreateTenantRequest,
-  TenantListParams,
   UpdateTenantRequest,
 } from '../dto/request/tenant.request'
 import type { PageResponse } from '../../../shared/dto/response'
@@ -12,10 +12,11 @@ import type {
 } from '../dto/response/tenant.response'
 
 export class TenantsApi {
-  static list(params: TenantListParams): Promise<PageResponse<TenantResponse>> {
-    return apiManager.get<PageResponse<TenantResponse>>(TENANTS_API_ROUTES.LIST, {
-      params,
-    })
+  static list(query: ListQueryRequest): Promise<PageResponse<TenantResponse>> {
+    return apiManager.post<PageResponse<TenantResponse>>(
+      TENANTS_API_ROUTES.SEARCH,
+      query,
+    )
   }
 
   static get(id: string): Promise<TenantResponse> {

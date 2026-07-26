@@ -2,6 +2,7 @@ package com.sentinel.server.tenant.service;
 
 import com.sentinel.server.common.exception.ConflictException;
 import com.sentinel.server.common.exception.ResourceNotFoundException;
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.tenant.dto.request.CreateTenantRequest;
 import com.sentinel.server.tenant.dto.request.UpdateTenantRequest;
@@ -16,7 +17,6 @@ import com.sentinel.server.user.entity.User;
 import com.sentinel.server.user.repository.UserRepository;
 import com.sentinel.server.user.service.core.UserService;
 import java.security.SecureRandom;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -51,16 +50,10 @@ public class TenantFacadeImpl implements TenantFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<TenantResponse> list(
-            Pageable pageable,
-            TenantStatus status,
-            String q,
-            String searchBy,
-            LocalDate from,
-            LocalDate to) {
-        Pageable effective = withDefaultSort(pageable);
-        Specification<Tenant> spec =
-                TenantSpecifications.withFilters(status, q, searchBy, from, to);
+    public PageResponse<TenantResponse> list(ListQueryRequest query) {
+        Pageable effective =
+                query.toPageable(TenantSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
+        Specification<Tenant> spec = TenantSpecifications.withFilters(query);
         Page<Tenant> page = tenantRepository.findAll(spec, effective);
         Map<UUID, List<String>> adminEmailsByTenant = adminEmailsByTenantIds(
                 page.getContent().stream().map(Tenant::getId).toList());
@@ -162,13 +155,6 @@ public class TenantFacadeImpl implements TenantFacade {
         return tenantRepository
                 .findWithAuditById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tenant not found"));
-    }
-
-    private Pageable withDefaultSort(Pageable pageable) {
-        if (pageable.getSort().isSorted()) {
-            return pageable;
-        }
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), DEFAULT_SORT);
     }
 
     private String generateTemporaryPassword() {
