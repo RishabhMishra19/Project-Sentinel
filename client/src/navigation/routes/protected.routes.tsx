@@ -24,6 +24,7 @@ import {
 } from "../../shared/utils/sessionUtils";
 import { ROUTE_PATHS } from "../constants";
 import type { SentinelRouteObject } from "../types";
+import { ApiKeysIcon } from "../../assets/icons/ApiKeysIcon";
 
 const sharedRoutes: SentinelRouteObject[] = [
   {
@@ -146,6 +147,11 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
     Component: ServiceApiKeysPage,
     indexOrder: 6,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
+    navigation: {
+      label: "Api Keys",
+      order: 6,
+      icon: ApiKeysIcon,
+    },
   },
   {
     id: "settings",
@@ -159,7 +165,7 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
     isAccessibleTo: isTenantUserOrSentinelAdminView,
     navigation: {
       label: "Settings",
-      order: 6,
+      order: 7,
       icon: SettingsIcon,
     },
     children: [
