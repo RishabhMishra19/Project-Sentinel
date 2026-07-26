@@ -1,4 +1,4 @@
-package com.sentinel.server.analytics.entity;
+package com.sentinel.common.analytics.entity;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -13,25 +13,25 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnalyticsEndpointStatsId implements Serializable {
+public class AnalyticsTenantStatsId implements Serializable {
 
     private Instant bucketStart;
-    private UUID endpointId;
+    private UUID tenantId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof AnalyticsEndpointStatsId that)) {
+        if (!(o instanceof AnalyticsTenantStatsId that)) {
             return false;
         }
         return Objects.equals(bucketStart, that.bucketStart)
-                && Objects.equals(endpointId, that.endpointId);
+                && Objects.equals(tenantId, that.tenantId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(bucketStart, endpointId);
+        return Objects.hash(bucketStart, tenantId);
     }
 }

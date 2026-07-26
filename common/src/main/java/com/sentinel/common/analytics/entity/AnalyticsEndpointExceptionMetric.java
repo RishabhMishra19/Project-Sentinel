@@ -1,4 +1,4 @@
-package com.sentinel.server.analytics.entity;
+package com.sentinel.common.analytics.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "analytics_endpoint_status_metrics")
-@IdClass(AnalyticsEndpointStatusMetric.Pk.class)
+@Table(name = "analytics_endpoint_exception_metrics")
+@IdClass(AnalyticsEndpointExceptionMetric.Pk.class)
 @Getter
 @Setter
 @NoArgsConstructor
-public class AnalyticsEndpointStatusMetric {
+public class AnalyticsEndpointExceptionMetric {
 
     @Id
     @Column(name = "bucket_start", nullable = false)
@@ -31,11 +31,11 @@ public class AnalyticsEndpointStatusMetric {
     private UUID endpointId;
 
     @Id
-    @Column(name = "status_code", nullable = false)
-    private int statusCode;
+    @Column(name = "exception_type", nullable = false, length = 256)
+    private String exceptionType;
 
-    @Column(name = "request_count", nullable = false)
-    private long requestCount;
+    @Column(name = "exception_count", nullable = false)
+    private long exceptionCount;
 
     @Getter
     @Setter
@@ -44,7 +44,7 @@ public class AnalyticsEndpointStatusMetric {
     public static class Pk implements Serializable {
         private Instant bucketStart;
         private UUID endpointId;
-        private int statusCode;
+        private String exceptionType;
 
         @Override
         public boolean equals(Object o) {
@@ -54,14 +54,14 @@ public class AnalyticsEndpointStatusMetric {
             if (!(o instanceof Pk that)) {
                 return false;
             }
-            return statusCode == that.statusCode
-                    && Objects.equals(bucketStart, that.bucketStart)
-                    && Objects.equals(endpointId, that.endpointId);
+            return Objects.equals(bucketStart, that.bucketStart)
+                    && Objects.equals(endpointId, that.endpointId)
+                    && Objects.equals(exceptionType, that.exceptionType);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(bucketStart, endpointId, statusCode);
+            return Objects.hash(bucketStart, endpointId, exceptionType);
         }
     }
 }

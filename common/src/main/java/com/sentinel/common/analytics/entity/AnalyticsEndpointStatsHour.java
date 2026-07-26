@@ -1,4 +1,4 @@
-package com.sentinel.server.analytics.entity;
+package com.sentinel.common.analytics.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "analytics_tenant_stats_minute")
-@IdClass(AnalyticsTenantStatsId.class)
+@Table(name = "analytics_endpoint_stats_hour")
+@IdClass(AnalyticsEndpointStatsId.class)
 @Getter
 @Setter
 @NoArgsConstructor
-public class AnalyticsTenantStatsMinute extends AnalyticsStatsMetrics {
+public class AnalyticsEndpointStatsHour extends AnalyticsStatsMetrics {
 
     @Id
-    @Column(name = "tenant_id", nullable = false)
-    private UUID tenantId;
+    @Column(name = "endpoint_id", nullable = false)
+    private UUID endpointId;
 }
