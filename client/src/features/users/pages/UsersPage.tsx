@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { SecretRevealDialog } from "../../../shared/ui";
 import type { CreateUserResponse, UserResponse } from "../dto/response/user.response";
 import { AssignRoleDialog } from "../components/AssignRoleDialog";
 import { MarkInactiveUserDialog } from "../components/MarkInactiveUserDialog";
-import { TempPasswordRevealDialog } from "../components/TempPasswordRevealDialog";
 import { UserCreateModal } from "../components/UserCreateModal";
 import { UserEditModal } from "../components/UserEditModal";
 import { UsersTable } from "../components/UsersTable";
@@ -52,10 +52,14 @@ export const UsersPage = () => {
         onClose={() => setInactiveUser(null)}
       />
 
-      <TempPasswordRevealDialog
+      <SecretRevealDialog
         open={revealedPassword != null}
-        temporaryPassword={revealedPassword}
+        value={revealedPassword}
         onClose={() => setRevealedPassword(null)}
+        title="Temporary password"
+        description="Copy this password now and share it securely with the user. It will not be shown again."
+        copySuccessMessage="Temporary password copied to clipboard."
+        copyErrorMessage="Could not copy temporary password."
       />
     </div>
   );

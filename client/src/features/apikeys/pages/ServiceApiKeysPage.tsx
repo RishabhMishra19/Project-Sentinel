@@ -5,8 +5,8 @@ import type {
   ServiceApiKeyCreatedResponse,
   ServiceApiKeyResponse,
 } from "../dto/response/apikey.response";
+import { SecretRevealDialog } from "../../../shared/ui";
 import { ApiKeyFormModal } from "../components/ApiKeyFormModal";
-import { ApiKeyRevealDialog } from "../components/ApiKeyRevealDialog";
 import { ApiKeysTable } from "../components/ApiKeysTable";
 import { RevokeApiKeyDialog } from "../components/RevokeApiKeyDialog";
 
@@ -51,10 +51,14 @@ export const ServiceApiKeysPage = () => {
         onCreated={onCreated}
       />
 
-      <ApiKeyRevealDialog
+      <SecretRevealDialog
         open={revealedKey != null}
-        apiKey={revealedKey}
+        value={revealedKey}
         onClose={() => setRevealedKey(null)}
+        title="Your API key"
+        description="Copy this key now. For security, it will not be shown again."
+        copySuccessMessage="API key copied to clipboard."
+        copyErrorMessage="Could not copy API key."
       />
 
       <RevokeApiKeyDialog
