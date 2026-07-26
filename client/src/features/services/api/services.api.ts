@@ -1,7 +1,7 @@
 import { SERVICES_API_ROUTES } from '../../../shared/api/api.routes'
 import { apiManager } from '../../../shared/api/ApiManager'
+import type { ListQueryRequest } from '../../../shared/api/listQueryRequest'
 import type {
-  ServiceListParams,
   CreateServiceRequest,
   UpdateServiceRequest,
 } from '../dto/request/service.request'
@@ -10,19 +10,20 @@ import type { EndpointResponse } from '../dto/response/endpoint.response'
 import type { ServiceResponse } from '../dto/response/service.response'
 
 export class ServicesApi {
-  static listAll(params: ServiceListParams): Promise<PageResponse<ServiceResponse>> {
-    return apiManager.get<PageResponse<ServiceResponse>>(SERVICES_API_ROUTES.LIST_ALL, {
-      params,
-    })
+  static listAll(query: ListQueryRequest): Promise<PageResponse<ServiceResponse>> {
+    return apiManager.post<PageResponse<ServiceResponse>>(
+      SERVICES_API_ROUTES.SEARCH_ALL,
+      query,
+    )
   }
 
   static list(
     productId: string,
-    params: ServiceListParams,
+    query: ListQueryRequest,
   ): Promise<PageResponse<ServiceResponse>> {
-    return apiManager.get<PageResponse<ServiceResponse>>(
-      SERVICES_API_ROUTES.LIST(productId),
-      { params },
+    return apiManager.post<PageResponse<ServiceResponse>>(
+      SERVICES_API_ROUTES.SEARCH(productId),
+      query,
     )
   }
 

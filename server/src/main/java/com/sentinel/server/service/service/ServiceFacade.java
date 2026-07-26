@@ -1,34 +1,17 @@
 package com.sentinel.server.service.service;
 
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.service.dto.request.CreateServiceRequest;
 import com.sentinel.server.service.dto.response.ServiceResponse;
 import com.sentinel.server.service.dto.request.UpdateServiceRequest;
-import com.sentinel.server.service.entity.ServiceStatus;
-import java.time.LocalDate;
 import java.util.UUID;
-import org.springframework.data.domain.Pageable;
 
 public interface ServiceFacade {
 
-    PageResponse<ServiceResponse> list(
-            UUID tenantId,
-            UUID productId,
-            Pageable pageable,
-            ServiceStatus status,
-            String q,
-            String searchBy,
-            LocalDate from,
-            LocalDate to);
+    PageResponse<ServiceResponse> list(UUID tenantId, UUID productId, ListQueryRequest query);
 
-    PageResponse<ServiceResponse> listAll(
-            UUID tenantId,
-            Pageable pageable,
-            ServiceStatus status,
-            String q,
-            String searchBy,
-            LocalDate from,
-            LocalDate to);
+    PageResponse<ServiceResponse> listAll(UUID tenantId, ListQueryRequest query);
 
     ServiceResponse getById(UUID tenantId, UUID productId, UUID id);
 

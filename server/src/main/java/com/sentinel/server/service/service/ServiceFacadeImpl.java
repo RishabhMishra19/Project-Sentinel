@@ -3,6 +3,7 @@ package com.sentinel.server.service.service;
 import com.sentinel.server.common.exception.BadRequestException;
 import com.sentinel.server.common.exception.ConflictException;
 import com.sentinel.server.common.exception.ResourceNotFoundException;
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.product.entity.Product;
 import com.sentinel.server.product.service.core.ProductService;
@@ -16,11 +17,9 @@ import com.sentinel.server.service.repository.ServiceSpecifications;
 import com.sentinel.server.service.service.core.ServiceService;
 import com.sentinel.server.user.entity.User;
 import com.sentinel.server.user.repository.UserRepository;
-import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -41,37 +40,23 @@ public class ServiceFacadeImpl implements ServiceFacade {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ServiceResponse> list(
-            UUID tenantId,
-            UUID productId,
-            Pageable pageable,
-            ServiceStatus status,
-            String q,
-            String searchBy,
-            LocalDate from,
-            LocalDate to) {
+            UUID tenantId, UUID productId, ListQueryRequest query) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         requireProductInTenant(effectiveTenantId, productId);
-        Pageable effective = withDefaultSort(pageable);
-        Specification<Service> spec = ServiceSpecifications.withFilters(
-                productId, status, q, searchBy, from, to);
+        Pageable effective =
+                query.toPageable(ServiceSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
+        Specification<Service> spec = ServiceSpecifications.withFilters(productId, query);
         Page<Service> page = serviceService.findAll(spec, effective);
         return PageResponse.from(page.map(serviceMapper::toResponse));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<ServiceResponse> listAll(
-            UUID tenantId,
-            Pageable pageable,
-            ServiceStatus status,
-            String q,
-            String searchBy,
-            LocalDate from,
-            LocalDate to) {
+    public PageResponse<ServiceResponse> listAll(UUID tenantId, ListQueryRequest query) {
         UUID effectiveTenantId = requireTenantId(tenantId);
-        Pageable effective = withDefaultSort(pageable);
-        Specification<Service> spec = ServiceSpecifications.forTenant(
-                effectiveTenantId, status, q, searchBy, from, to);
+        Pageable effective =
+                query.toPageable(ServiceSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
+        Specification<Service> spec = ServiceSpecifications.forTenant(effectiveTenantId, query);
         Page<Service> page = serviceService.findAll(spec, effective);
         return PageResponse.from(page.map(serviceMapper::toResponse));
     }
@@ -160,12 +145,5 @@ public class ServiceFacadeImpl implements ServiceFacade {
         return serviceService
                 .findWithAuditByIdAndProductId(id, productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
-    }
-
-    private Pageable withDefaultSort(Pageable pageable) {
-        if (pageable.getSort().isSorted()) {
-            return pageable;
-        }
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), DEFAULT_SORT);
     }
 }
