@@ -13,8 +13,26 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=10000,expireAfterWrite=60s
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: sentinel-worker
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: batch
+      type: batch
+      concurrency: ${SENTINEL_WORKER_CONCURRENCY:6}
+
+sentinel:
+  kafka:
+    request-events-topic: sentinel.request-events
 
 server:
   port: 8082
