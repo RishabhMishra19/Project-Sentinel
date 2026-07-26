@@ -12,13 +12,13 @@ const statusTone = (code: number) => {
   if (code >= 500) return "text-red-700";
   if (code >= 400) return "text-amber-700";
   return "text-foreground";
-}
+};
 
-export const createRequestLogColumns = (=> {
+export const createRequestLogColumns = ({
   productOptions,
   serviceOptions,
   endpointOptions,
-}: CreateRequestLogColumnsOptions): DataTableColumn<RequestLogResponse>[] {
+}: CreateRequestLogColumnsOptions): DataTableColumn<RequestLogResponse>[] => {
   return [
     {
       id: "occurredAt",
@@ -92,7 +92,7 @@ export const createRequestLogColumns = (=> {
       },
     },
   ];
-}
+};
 
 type RequestLogRowActionHandlers = {
   onView: (row: RequestLogResponse) => void;

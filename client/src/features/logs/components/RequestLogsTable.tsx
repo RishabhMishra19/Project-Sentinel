@@ -1,46 +1,91 @@
-import { useMemo, useState } from "react";
-import {
-  DataTable,
-  useServerDataTable,
-  type DataTableQueryState,
-} from "../../../shared/ui/data-table";
+import { useMemo } from "react";
+import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
+import { DataTable, useDataTable } from "../../../shared/ui/data-table";
 import type { FilterValue } from "../../../shared/ui/filters";
+import { dateTimeRangeFromPreset } from "../../../shared/ui/filters";
+import { clampLogsRange } from "../../analytics/utils/timeRange";
 import { useProductsQuery } from "../../products/hooks/useProducts";
 import { useAllServicesQuery, useServiceEndpointsQuery } from "../../services/hooks/useServices";
 import type { RequestLogResponse } from "../dto/response/requestLog.response";
 import { useRequestLogsQuery } from "../hooks/useRequestLogs";
-import { mapRequestLogListQuery } from "../utils/mapRequestLogListQuery";
 import { createRequestLogColumns, createRequestLogRowActions } from "./requestLogsTableConfig";
+
+const OPTIONS_LIST_QUERY: ListQueryRequest = {
+  pageable: { page: 0, size: 100 },
+};
+
+const ACTIVE_SERVICES_LIST_QUERY: ListQueryRequest = {
+  pageable: { page: 0, size: 100 },
+  filterConfigs: [{ fieldName: "status", filterValues: ["ACTIVE"] }],
+};
+
+const datetimeLocalToIso = (local: string): string | null => {
+  const d = new Date(local);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString();
+};
+
+const defaultLogsRange = (): { from: string; to: string } => {
+  const range = dateTimeRangeFromPreset("24h");
+  return {
+    from: datetimeLocalToIso(range.from)!,
+    to: datetimeLocalToIso(range.to)!,
+  };
+};
 
 type RequestLogsTableProps = {
   onView: (log: RequestLogResponse) => void;
   initialFilters?: Record<string, FilterValue>;
 };
 
-export const RequestLogsTable = (=> { onView, initialFilters }: RequestLogsTableProps) {
-  const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null);
+export const RequestLogsTable = ({ onView, initialFilters }: RequestLogsTableProps) => {
+  const productsQuery = useProductsQuery(OPTIONS_LIST_QUERY);
+  const servicesQuery = useAllServicesQuery(ACTIVE_SERVICES_LIST_QUERY);
 
-  const productId =
-    typeof fetchQuery?.filters.productId === "string" ? fetchQuery.filters.productId : undefined;
-  const serviceId =
-    typeof fetchQuery?.filters.serviceId === "string" ? fetchQuery.filters.serviceId : undefined;
-
-  const productsQuery = useProductsQuery({ page: 0, size: 100 });
-  const servicesQuery = useAllServicesQuery({
-    page: 0,
-    size: 100,
-    status: "ACTIVE",
-  });
-  const endpointsQuery = useServiceEndpointsQuery(serviceId);
-
-  const products = productsQuery.data?.content ?? [];
-  const services = servicesQuery.data?.content ?? [];
-  const endpoints = endpointsQuery.data ?? [];
+  const products = productsQuery.rows;
+  const services = servicesQuery.rows;
 
   const productOptions = useMemo(
     () => products.map((p) => ({ label: p.name, value: p.id })),
     [products],
   );
+
+  const initialColumns = useMemo(
+    () =>
+      createRequestLogColumns({
+        productOptions,
+        serviceOptions: [],
+        endpointOptions: [],
+      }),
+    [productOptions],
+  );
+
+  const rowActions = useMemo(() => createRequestLogRowActions({ onView }), [onView]);
+
+  const {
+    query,
+    listQueryRequest: tableListQueryRequest,
+    bindPage,
+  } = useDataTable({
+    columns: initialColumns,
+    getRowId: (row) => row.id,
+    initialState: {
+      pageSize: 20,
+      sorting: { id: "occurredAt", desc: true },
+      filters: initialFilters ?? {},
+    },
+    rowActions,
+    emptyMessage: "No events match your filters",
+    errorMessage: "Could not load events",
+  });
+
+  const productId =
+    typeof query.filters.productId === "string" ? query.filters.productId : undefined;
+  const serviceId =
+    typeof query.filters.serviceId === "string" ? query.filters.serviceId : undefined;
+
+  const endpointsQuery = useServiceEndpointsQuery(serviceId);
+  const endpoints = endpointsQuery.rows;
 
   const serviceOptions = useMemo(() => {
     const scoped = productId ? services.filter((s) => s.productId === productId) : services;
@@ -69,30 +114,20 @@ export const RequestLogsTable = (=> { onView, initialFilters }: RequestLogsTable
     [productOptions, serviceOptions, endpointOptions],
   );
 
-  const listParams = useMemo(
-    () => (fetchQuery ? mapRequestLogListQuery(fetchQuery) : null),
-    [fetchQuery],
-  );
+  const listQueryRequest = useMemo(() => {
+    const fallback = defaultLogsRange();
+    const clamped = clampLogsRange(
+      tableListQueryRequest.from ?? fallback.from,
+      tableListQueryRequest.to ?? fallback.to,
+    );
+    return {
+      ...tableListQueryRequest,
+      from: clamped.from,
+      to: clamped.to,
+    };
+  }, [tableListQueryRequest]);
 
-  const { data, isFetching } = useRequestLogsQuery(listParams);
+  const page = useRequestLogsQuery(listQueryRequest);
 
-  const rowActions = useMemo(() => createRequestLogRowActions({ onView }), [onView]);
-
-  const { tableProps } = useServerDataTable({
-    columns,
-    data: data?.content ?? [],
-    getRowId: (row) => row.id,
-    totalElements: data?.totalElements ?? 0,
-    initialState: {
-      pageSize: 20,
-      sorting: { id: "occurredAt", desc: true },
-      filters: initialFilters ?? {},
-    },
-    rowActions,
-    isLoading: isFetching || fetchQuery == null,
-    onQueryChange: setFetchQuery,
-    emptyMessage: "No events match your filters",
-  });
-
-  return <DataTable {...tableProps} />;
-}
+  return <DataTable {...bindPage(page)} columns={columns} />;
+};
