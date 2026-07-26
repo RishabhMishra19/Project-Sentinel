@@ -6,20 +6,17 @@ import { resolvePostLoginPath } from "../../../navigation/utils";
 import { SecretRevealDialog } from "../../../shared/ui";
 import type { CreateTenantResponse, TenantResponse } from "../dto/response/tenant.response";
 import { DeactivateTenantDialog } from "../components/DeactivateTenantDialog";
-import { TenantFormModal } from "../components/TenantFormModal";
+import { TenantCreateModal } from "../components/TenantCreateModal";
+import { TenantEditModal } from "../components/TenantEditModal";
 import { TenantsTable } from "../components/TenantsTable";
 import { TenantViewModal } from "../components/TenantViewModal";
-
-type FormState =
-  | { open: false }
-  | { open: true; mode: "create" }
-  | { open: true; mode: "edit"; tenant: TenantResponse };
 
 export const TenantsPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.session.user)!;
-  const [formState, setFormState] = useState<FormState>({ open: false });
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editTenant, setEditTenant] = useState<TenantResponse | null>(null);
   const [viewTenant, setViewTenant] = useState<TenantResponse | null>(null);
   const [deactivateTenant, setDeactivateTenant] = useState<TenantResponse | null>(null);
   const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
@@ -31,9 +28,9 @@ export const TenantsPage = () => {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
       <TenantsTable
-        onCreate={() => setFormState({ open: true, mode: "create" })}
+        onCreate={() => setCreateOpen(true)}
         onView={setViewTenant}
-        onEdit={(tenant) => setFormState({ open: true, mode: "edit", tenant })}
+        onEdit={setEditTenant}
         onStartSession={(tenant) => {
           const activeTenant = { id: tenant.id, name: tenant.name };
           dispatch(setActiveTenant(activeTenant));
@@ -42,12 +39,16 @@ export const TenantsPage = () => {
         onDeactivate={setDeactivateTenant}
       />
 
-      <TenantFormModal
-        open={formState.open}
-        mode={formState.open ? formState.mode : "create"}
-        tenant={formState.open && formState.mode === "edit" ? formState.tenant : null}
-        onClose={() => setFormState({ open: false })}
+      <TenantCreateModal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
         onCreated={onCreated}
+      />
+
+      <TenantEditModal
+        open={editTenant != null}
+        tenant={editTenant}
+        onClose={() => setEditTenant(null)}
       />
 
       <SecretRevealDialog
