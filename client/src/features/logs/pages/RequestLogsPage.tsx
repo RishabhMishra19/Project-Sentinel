@@ -67,14 +67,13 @@ export const RequestLogsPage = () => {
 
       <RequestLogsTable initialFilters={initialFilters} onView={(row) => setSelectedId(row.id)} />
 
-      {selectedId ? (
-        <RequestLogDetailPanel
-          log={detailQuery.data}
-          loading={detailQuery.isLoading}
-          isError={detailQuery.isError}
-          onClose={() => setSelectedId(null)}
-        />
-      ) : null}
+      <RequestLogDetailPanel
+        open={selectedId != null}
+        log={detailQuery.data}
+        loading={detailQuery.isLoading}
+        isError={detailQuery.isError}
+        onClose={() => setSelectedId(null)}
+      />
     </div>
   );
 };
