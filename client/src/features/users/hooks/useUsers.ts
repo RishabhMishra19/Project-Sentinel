@@ -11,7 +11,7 @@ import type {
 } from "../dto/request/user.request";
 
 export { useRolesQuery };
-export const usersQueryKey = ["users"] as const;
+const usersQueryKey = ["users"];
 
 export const useUsersQuery = (params: ListQueryRequest) => {
   return mapPageQuery(

@@ -1,24 +1,7 @@
 import type { AnalyticsBucket } from "../dto/request/analytics.request";
 
-export type TimePreset = "1h" | "6h" | "24h" | "7d" | "30d" | "90d";
-
-const PRESET_MS: Record<TimePreset, number> = {
-  "1h": 60 * 60 * 1000,
-  "6h": 6 * 60 * 60 * 1000,
-  "24h": 24 * 60 * 60 * 1000,
-  "7d": 7 * 24 * 60 * 60 * 1000,
-  "30d": 30 * 24 * 60 * 60 * 1000,
-  "90d": 90 * 24 * 60 * 60 * 1000,
-};
-
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-
-export const rangeFromPreset = (preset: TimePreset): { from: string; to: string } => {
-  const to = new Date();
-  const from = new Date(to.getTime() - PRESET_MS[preset]);
-  return { from: from.toISOString(), to: to.toISOString() };
-};
 
 /** Default granularity for a range (also used when presets/custom range are applied). */
 export const suggestedBucket = (fromIso: string, toIso: string): AnalyticsBucket => {
@@ -31,22 +14,6 @@ export const suggestedBucket = (fromIso: string, toIso: string): AnalyticsBucket
 export const parseBucket = (raw: string | null): AnalyticsBucket | null => {
   if (raw === "MINUTE" || raw === "HOUR" || raw === "DAY") return raw;
   return null;
-};
-
-/** ISO → value for <input type="datetime-local"> (local timezone). */
-export const toDatetimeLocalValue = (iso: string): string => {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
-
-/** datetime-local value → ISO string. */
-export const fromDatetimeLocalValue = (local: string): string | null => {
-  if (!local) return null;
-  const d = new Date(local);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toISOString();
 };
 
 export const clampLogsRange = (

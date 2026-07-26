@@ -5,7 +5,7 @@ import { ProductsApi } from "../api/ProductsApi";
 import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
 import type { CreateProductRequest, UpdateProductRequest } from "../dto/request/product.request";
 
-export const productsQueryKey = ["products"] as const;
+const productsQueryKey = ["products"];
 
 export const useProductsQuery = (params: ListQueryRequest | null) => {
   return mapPageQuery(

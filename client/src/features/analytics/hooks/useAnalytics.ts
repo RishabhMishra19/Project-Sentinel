@@ -6,7 +6,7 @@ import type {
   AnalyticsRankingsParams,
 } from "../dto/request/analytics.request";
 
-export const analyticsQueryKey = ["analytics"] as const;
+const analyticsQueryKey = ["analytics"];
 
 export const useAnalyticsSummaryQuery = (params: AnalyticsQueryParams | null) => {
   return useQuery({
