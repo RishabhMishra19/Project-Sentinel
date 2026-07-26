@@ -1,5 +1,4 @@
-import { useCallback, useState, type ReactNode } from "react";
-import type { FiltersChange } from "../../filters";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import type {
   DataTableColumn,
   DataTableProps,
@@ -8,15 +7,24 @@ import type {
   RowAction,
 } from "../types";
 import { createInitialQueryState, type DataTableQueryState } from "../utils/queryState";
+import type { FiltersChange } from "../../filters";
 
 type UseDataTableQueryStateOptions<T extends object> = {
   columns: DataTableColumn<T>[];
   initialState?: Partial<DataTableQueryState>;
+  enablePagination?: boolean;
 };
+
+/** Query-owned slice of DataTable props (values + change handlers). */
+export type DataTableQueryProps<T extends object> = Pick<
+  DataTableProps<T>,
+  "sortingConfig" | "searchConfig" | "filtersConfig" | "pagination"
+>;
 
 export const useDataTableQueryState = <T extends object>({
   columns,
   initialState,
+  enablePagination = true,
 }: UseDataTableQueryStateOptions<T>) => {
   const [query, setQuery] = useState<DataTableQueryState>(() =>
     createInitialQueryState(columns, initialState),
@@ -47,8 +55,38 @@ export const useDataTableQueryState = <T extends object>({
     setQuery((prev) => ({ ...prev, pageSize, pageIndex: 0 }));
   }, []);
 
+  const queryProps = useMemo((): DataTableQueryProps<T> => {
+    const props: DataTableQueryProps<T> = {
+      sortingConfig: {
+        sorting: query.sorting,
+        onSortingChange: setSorting,
+      },
+      searchConfig: {
+        search: query.search,
+        onSearchChange: setSearch,
+      },
+      filtersConfig: {
+        filters: query.filters,
+        onFiltersChange: setFilters,
+      },
+    };
+
+    if (enablePagination) {
+      props.pagination = {
+        pageIndex: query.pageIndex,
+        pageSize: query.pageSize,
+        totalElements: 0,
+        onPageIndexChange: setPageIndex,
+        onPageSizeChange: setPageSize,
+      };
+    }
+
+    return props;
+  }, [query, enablePagination, setSorting, setSearch, setFilters, setPageIndex, setPageSize]);
+
   return {
     query,
+    queryProps,
     setQuery,
     setSorting,
     setSearch,

@@ -99,6 +99,8 @@ export type DataTableSortingConfig = {
 export type DataTableSearchConfig = {
   search: DataTableSearchState;
   onSearchChange: (next: DataTableSearchState) => void;
+  /** Delay before committing typed search. Defaults to 300ms in DataTableSearch. */
+  debounceMs?: number;
 };
 
 export type DataTableProps<T extends object> = {

@@ -1,7 +1,7 @@
 import { isFilterActive } from "../../filters";
 import type { FilterValue } from "../../filters";
 import type { DataTableColumn, DataTableSearchState } from "../types";
-import { getCellComparableValue, getCellSearchText } from "./tanstack";
+import { getCellComparableValue, getCellSearchText } from "./cellValues";
 
 export const matchesSearch = <T extends object>(
   row: T,
