@@ -16,4 +16,12 @@ public class KafkaTopicConfig {
             @Value("${sentinel.kafka.request-events-replicas}") short replicas) {
         return TopicBuilder.name(topic).partitions(partitions).replicas(replicas).build();
     }
+
+    @Bean
+    NewTopic analyticsDeltasTopic(
+            @Value("${sentinel.kafka.analytics-deltas-topic}") String topic,
+            @Value("${sentinel.kafka.analytics-deltas-partitions}") int partitions,
+            @Value("${sentinel.kafka.analytics-deltas-replicas}") short replicas) {
+        return TopicBuilder.name(topic).partitions(partitions).replicas(replicas).build();
+    }
 }

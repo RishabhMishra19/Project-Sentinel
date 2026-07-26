@@ -38,6 +38,7 @@ spring:
 sentinel:
   kafka:
     request-events-topic: sentinel.request-events
+    analytics-deltas-topic: sentinel.analytics-deltas
 
 server:
   port: 8082
@@ -46,10 +47,13 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
   endpoint:
     health:
       show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
   health:
     db:
       enabled: true

@@ -25,27 +25,32 @@ public class InstanceOwnershipService {
 
     public void assertOwnedByService(Collection<UUID> instanceIds, UUID serviceId) {
         Set<UUID> distinct = new HashSet<>(instanceIds);
-        Cache cache = cacheManager.getCache(IngestCacheConfig.INSTANCE_SERVICE_CACHE);
-
         for (UUID instanceId : distinct) {
-            UUID ownerServiceId = null;
-            if (cache != null) {
-                ownerServiceId = cache.get(instanceId, UUID.class);
-            }
-            if (ownerServiceId == null) {
-                ownerServiceId = serviceInstanceRepository
-                        .findById(instanceId)
-                        .map(instance -> {
-                            if (cache != null) {
-                                cache.put(instance.getId(), instance.getServiceId());
-                            }
-                            return instance.getServiceId();
-                        })
-                        .orElse(null);
-            }
+            UUID ownerServiceId = resolveServiceId(instanceId);
             if (ownerServiceId == null || !ownerServiceId.equals(serviceId)) {
                 throw new NotFoundException("Service instance not found: " + instanceId);
             }
         }
+    }
+
+    /** Resolve owning service id for an instance (cache → DB). */
+    public UUID resolveServiceId(UUID instanceId) {
+        Cache cache = cacheManager.getCache(IngestCacheConfig.INSTANCE_SERVICE_CACHE);
+        UUID ownerServiceId = null;
+        if (cache != null) {
+            ownerServiceId = cache.get(instanceId, UUID.class);
+        }
+        if (ownerServiceId != null) {
+            return ownerServiceId;
+        }
+        return serviceInstanceRepository
+                .findById(instanceId)
+                .map(instance -> {
+                    if (cache != null) {
+                        cache.put(instance.getId(), instance.getServiceId());
+                    }
+                    return instance.getServiceId();
+                })
+                .orElse(null);
     }
 }

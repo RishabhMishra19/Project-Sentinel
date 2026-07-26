@@ -32,6 +32,12 @@ sentinel:
     request-events-topic: sentinel.request-events
     request-events-partitions: 24
     request-events-replicas: 1
+    analytics-deltas-topic: sentinel.analytics-deltas
+    analytics-deltas-partitions: 6
+    analytics-deltas-replicas: 1
+  analytics:
+    flush-interval-ms: 5000
+    flush-event-threshold: 2000
 
 server:
   port: 8081
@@ -40,10 +46,13 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
   endpoint:
     health:
       show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
   health:
     db:
       enabled: true
