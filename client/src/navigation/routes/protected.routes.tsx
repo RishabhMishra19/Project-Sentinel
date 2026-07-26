@@ -9,7 +9,6 @@ import {
   UsersIcon,
 } from "../../assets/icons";
 import { AnalyticsPage } from "../../features/analytics/pages/AnalyticsPage";
-import { ServiceApiKeysPage } from "../../features/apikeys/pages/ServiceApiKeysPage";
 import { ProfilePage } from "../../features/auth/pages/ProfilePage";
 import { RequestLogsPage } from "../../features/logs/pages/RequestLogsPage";
 import { ProductsPage } from "../../features/products/pages/ProductsPage";
@@ -25,6 +24,7 @@ import {
 import { ROUTE_PATHS } from "../constants";
 import type { SentinelRouteObject } from "../types";
 import { ApiKeysIcon } from "../../assets/icons/ApiKeysIcon";
+import { ApiKeysPage } from "../../features/apikeys/pages/ApiKeysPage";
 
 const sharedRoutes: SentinelRouteObject[] = [
   {
@@ -138,13 +138,13 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
     },
   },
   {
-    id: "serviceApiKeys",
-    path: ROUTE_PATHS.serviceApiKeys,
+    id: "apiKeys",
+    path: ROUTE_PATHS.apiKeys,
     handle: {
       crumb: "API keys",
-      description: "Issue and revoke keys for this service",
+      description: "Issue and revoke keys for your services",
     },
-    Component: ServiceApiKeysPage,
+    Component: ApiKeysPage,
     indexOrder: 6,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
     navigation: {

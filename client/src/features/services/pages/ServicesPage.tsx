@@ -81,9 +81,7 @@ export const ServicesPage = () => {
           onView={setViewService}
           onEdit={(service) => setFormState({ open: true, mode: "edit", service })}
           onViewApiKeys={(service) =>
-            navigate(
-              `/${ROUTE_PATHS.serviceApiKeys.replace(":serviceId", encodeURIComponent(service.id))}?productId=${service.productId}`,
-            )
+            navigate(`/${ROUTE_PATHS.apiKeys}?serviceId=${service.id}`)
           }
           onDeactivate={setDeactivateService}
         />

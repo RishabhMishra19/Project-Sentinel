@@ -1,19 +1,14 @@
 import type { DataTableColumn, RowAction } from "../../../shared/ui/data-table";
 import type { ServiceResponse } from "../dto/response/service.response";
 
-export const serviceColumns: DataTableColumn<ServiceResponse>[] = [
+/** Columns for product-scoped services table (no product column). */
+export const productServiceColumns: DataTableColumn<ServiceResponse>[] = [
   {
     id: "name",
     header: "Name",
     searchable: true,
     sortable: true,
     cell: { type: "text", getValue: (row) => row.name },
-  },
-  {
-    id: "productName",
-    header: "Product",
-    sortable: false,
-    cell: { type: "text", getValue: (row) => row.productName },
   },
   {
     id: "status",
@@ -45,11 +40,6 @@ export const serviceColumns: DataTableColumn<ServiceResponse>[] = [
     cell: { type: "datetime", getValue: (row) => row.createdAt },
   },
 ];
-
-/** Columns for product-scoped services table (no product column). */
-export const productServiceColumns: DataTableColumn<ServiceResponse>[] = serviceColumns.filter(
-  (column) => column.id !== "productName",
-);
 
 type ServiceRowActionHandlers = {
   onView: (row: ServiceResponse) => void;

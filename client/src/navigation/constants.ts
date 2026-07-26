@@ -11,5 +11,5 @@ export const ROUTE_PATHS = {
   settings: "settings",
   settingsHome: "",
   settingsRoles: "roles",
-  serviceApiKeys: "services/:serviceId/api-keys",
+  apiKeys: "api-keys",
 } as const;
