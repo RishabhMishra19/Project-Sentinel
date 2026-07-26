@@ -60,11 +60,6 @@ export const RequestLogsPage = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Logs</h1>
-        <p className="text-sm text-muted-foreground">Raw request events from the last 7 days.</p>
-      </div>
-
       <RequestLogsTable initialFilters={initialFilters} onView={(row) => setSelectedId(row.id)} />
 
       <RequestLogDetailPanel

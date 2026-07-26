@@ -22,7 +22,7 @@ export const AuthenticatedLayout = ({ crumbs, description }: AuthenticatedLayout
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl bg-surface shadow-sm">
         {isImpersonating(user, activeTenant) ? <ActiveTenantBanner /> : null}
         <AppNavbar crumbs={crumbs} description={description} />
-        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-8">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-4">
           <Outlet />
         </main>
       </div>

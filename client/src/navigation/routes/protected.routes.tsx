@@ -78,7 +78,7 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
     path: ROUTE_PATHS.logs,
     handle: {
       crumb: "Logs",
-      description: "Inspect individual gateway requests and responses",
+      description: "Raw request events from the last 7 days.",
     },
     Component: RequestLogsPage,
     indexOrder: 2,
