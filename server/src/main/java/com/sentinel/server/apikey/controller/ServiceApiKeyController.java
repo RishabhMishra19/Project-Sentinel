@@ -3,15 +3,14 @@ package com.sentinel.server.apikey.controller;
 import com.sentinel.server.apikey.dto.request.CreateServiceApiKeyRequest;
 import com.sentinel.server.apikey.dto.response.ServiceApiKeyCreatedResponse;
 import com.sentinel.server.apikey.dto.response.ServiceApiKeyResponse;
-import com.sentinel.server.apikey.entity.ServiceApiKeyStatus;
 import com.sentinel.server.apikey.service.ServiceApiKeyFacade;
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.ApiResponses;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.security.UserPrincipal;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,15 +29,14 @@ public class ServiceApiKeyController {
     private final ServiceApiKeyFacade serviceApiKeyFacade;
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
-    @GetMapping
-    public ResponseEntity<PageResponse<ServiceApiKeyResponse>> list(
+    @PostMapping("/search")
+    public ResponseEntity<PageResponse<ServiceApiKeyResponse>> search(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable UUID productId,
             @PathVariable UUID serviceId,
-            Pageable pageable,
-            @RequestParam(required = false) ServiceApiKeyStatus status) {
+            @RequestBody ListQueryRequest query) {
         return ApiResponses.okPage(serviceApiKeyFacade.list(
-                principal.getActiveTenantId(), productId, serviceId, pageable, status));
+                principal.getActiveTenantId(), productId, serviceId, query));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")

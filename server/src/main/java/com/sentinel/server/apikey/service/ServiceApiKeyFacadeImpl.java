@@ -11,6 +11,7 @@ import com.sentinel.server.apikey.repository.ServiceApiKeySpecifications;
 import com.sentinel.server.common.exception.BadRequestException;
 import com.sentinel.server.common.exception.ConflictException;
 import com.sentinel.server.common.exception.ResourceNotFoundException;
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.product.entity.Product;
 import com.sentinel.server.product.service.core.ProductService;
@@ -24,7 +25,6 @@ import java.util.Base64;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -48,16 +48,13 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ServiceApiKeyResponse> list(
-            UUID tenantId,
-            UUID productId,
-            UUID serviceId,
-            Pageable pageable,
-            ServiceApiKeyStatus status) {
+            UUID tenantId, UUID productId, UUID serviceId, ListQueryRequest query) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         requireServiceInProduct(effectiveTenantId, productId, serviceId);
-        Pageable effective = withDefaultSort(pageable);
+        Pageable effective =
+                query.toPageable(ServiceApiKeySpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
         Specification<ServiceApiKey> spec =
-                ServiceApiKeySpecifications.forService(serviceId, status);
+                ServiceApiKeySpecifications.forService(serviceId, query);
         Page<ServiceApiKey> page = serviceApiKeyRepository.findAll(spec, effective);
         return PageResponse.from(page.map(serviceApiKeyMapper::toResponse));
     }
@@ -146,12 +143,5 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
         byte[] bytes = new byte[32];
         secureRandom.nextBytes(bytes);
         return KEY_PREFIX + Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-
-    private Pageable withDefaultSort(Pageable pageable) {
-        if (pageable.getSort().isSorted()) {
-            return pageable;
-        }
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), DEFAULT_SORT);
     }
 }

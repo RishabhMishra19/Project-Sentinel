@@ -1,15 +1,12 @@
-import {
-  mapListQueryMeta,
-  type DataTableQueryState,
-} from '../../../shared/ui/data-table'
-import type { ServiceApiKeyListParams } from '../dto/request/apikey.request'
+import type { ListQueryRequest } from '../../../shared/api/listQueryRequest'
+import { toListQueryRequest } from '../../../shared/api/toListQueryRequest'
+import type { DataTableQueryState } from '../../../shared/ui/data-table'
 
 const SORTABLE_FIELDS = new Set(['name', 'status', 'createdAt', 'revokedAt'])
 
 export const mapApiKeyListQuery = (
   state: DataTableQueryState,
-): ServiceApiKeyListParams =>
-  ({
-    ...mapListQueryMeta(state, SORTABLE_FIELDS),
-    ...state.apiFilters,
-  }) as ServiceApiKeyListParams
+): ListQueryRequest =>
+  toListQueryRequest(state, {
+    sortableFields: SORTABLE_FIELDS,
+  })

@@ -1,10 +1,8 @@
 import { SERVICE_API_KEYS_API_ROUTES } from '../../../shared/api/api.routes'
 import { apiManager } from '../../../shared/api/ApiManager'
+import type { ListQueryRequest } from '../../../shared/api/listQueryRequest'
 import type { PageResponse } from '../../../shared/dto/response'
-import type {
-  CreateServiceApiKeyRequest,
-  ServiceApiKeyListParams,
-} from '../dto/request/apikey.request'
+import type { CreateServiceApiKeyRequest } from '../dto/request/apikey.request'
 import type {
   ServiceApiKeyCreatedResponse,
   ServiceApiKeyResponse,
@@ -14,11 +12,11 @@ export class ApiKeysApi {
   static list(
     productId: string,
     serviceId: string,
-    params: ServiceApiKeyListParams,
+    query: ListQueryRequest,
   ): Promise<PageResponse<ServiceApiKeyResponse>> {
-    return apiManager.get<PageResponse<ServiceApiKeyResponse>>(
-      SERVICE_API_KEYS_API_ROUTES.LIST(productId, serviceId),
-      { params },
+    return apiManager.post<PageResponse<ServiceApiKeyResponse>>(
+      SERVICE_API_KEYS_API_ROUTES.SEARCH(productId, serviceId),
+      query,
     )
   }
 

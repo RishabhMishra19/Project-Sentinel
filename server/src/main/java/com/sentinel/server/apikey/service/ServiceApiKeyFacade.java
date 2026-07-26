@@ -3,19 +3,14 @@ package com.sentinel.server.apikey.service;
 import com.sentinel.server.apikey.dto.request.CreateServiceApiKeyRequest;
 import com.sentinel.server.apikey.dto.response.ServiceApiKeyCreatedResponse;
 import com.sentinel.server.apikey.dto.response.ServiceApiKeyResponse;
-import com.sentinel.server.apikey.entity.ServiceApiKeyStatus;
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.PageResponse;
 import java.util.UUID;
-import org.springframework.data.domain.Pageable;
 
 public interface ServiceApiKeyFacade {
 
     PageResponse<ServiceApiKeyResponse> list(
-            UUID tenantId,
-            UUID productId,
-            UUID serviceId,
-            Pageable pageable,
-            ServiceApiKeyStatus status);
+            UUID tenantId, UUID productId, UUID serviceId, ListQueryRequest query);
 
     ServiceApiKeyResponse getById(UUID tenantId, UUID productId, UUID serviceId, UUID id);
 

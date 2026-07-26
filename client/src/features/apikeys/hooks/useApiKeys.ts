@@ -1,10 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
+import type { ListQueryRequest } from '../../../shared/api/listQueryRequest'
 import { ApiKeysApi } from '../api/ApiKeysApi'
-import type {
-  CreateServiceApiKeyRequest,
-  ServiceApiKeyListParams,
-} from '../dto/request/apikey.request'
+import type { CreateServiceApiKeyRequest } from '../dto/request/apikey.request'
 
 export const apiKeysQueryKey = (productId: string, serviceId: string) =>
   ['api-keys', productId, serviceId] as const
@@ -12,7 +10,7 @@ export const apiKeysQueryKey = (productId: string, serviceId: string) =>
 export function useServiceApiKeysQuery(
   productId: string | undefined,
   serviceId: string | undefined,
-  params: ServiceApiKeyListParams | null,
+  params: ListQueryRequest | null,
 ) {
   return useQuery({
     queryKey: [
