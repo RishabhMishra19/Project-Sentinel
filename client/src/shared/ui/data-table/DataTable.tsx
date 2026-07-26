@@ -1,8 +1,7 @@
-import { AppliedFilterChips } from './components/AppliedFilterChips'
+import { AppliedFilterChips, toFilterFields } from '../filters'
 import { DataTablePaginationBar } from './components/DataTablePagination'
 import { DataTableTable } from './components/DataTableTable'
 import { DataTableToolbar } from './components/DataTableToolbar'
-import { toFilterableColumns } from './components/DataTableFilters/filterUtils'
 import type { DataTableProps } from './types'
 
 export const DataTable = <T extends object>({
@@ -18,8 +17,8 @@ export const DataTable = <T extends object>({
   isLoading,
   emptyMessage,
 }: DataTableProps<T>) => {
-  const filterableColumns = toFilterableColumns(columns)
-  const hasFilterableColumns = filterableColumns.length > 0
+  const filterFields = toFilterFields(columns)
+  const hasFilterableColumns = filterFields.length > 0
   const hasSearchableColumns = columns.some((column) => column.searchable)
   const shouldShowToolbar =
     hasFilterableColumns || hasSearchableColumns || toolbarActions
@@ -37,7 +36,7 @@ export const DataTable = <T extends object>({
 
       {hasFilterableColumns && filtersConfig ? (
         <AppliedFilterChips
-          columns={filterableColumns}
+          fields={filterFields}
           filtersConfig={filtersConfig}
         />
       ) : null}

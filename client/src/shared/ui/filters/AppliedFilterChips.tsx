@@ -1,20 +1,17 @@
-import {
-  buildFilterChips,
-  type FilterableColumnOption,
-} from './DataTableFilters/filterUtils'
-import type { DataTableFiltersConfig } from '../types'
+import { buildFilterChips } from './filterUtils'
+import type { FilterField, FiltersConfig } from './types'
 
 type AppliedFilterChipsProps = {
-  columns: FilterableColumnOption[]
-  filtersConfig: DataTableFiltersConfig
+  fields: FilterField[]
+  filtersConfig: FiltersConfig
 }
 
 export const AppliedFilterChips = ({
-  columns,
+  fields,
   filtersConfig,
 }: AppliedFilterChipsProps) => {
   const { filters, onFiltersChange } = filtersConfig
-  const chips = buildFilterChips(columns, filters)
+  const chips = buildFilterChips(fields, filters)
 
   if (chips.length === 0) {
     return null

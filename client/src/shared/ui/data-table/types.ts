@@ -1,39 +1,5 @@
 import type { ReactNode } from "react";
-
-export type DataTableFilterType =
-  | "select"
-  | "multiSelect"
-  | "boolean"
-  | "date"
-  | "dateRange";
-
-export type DataTableFilterOption = { label: string; value: string };
-
-/** Source of truth: filter type → value shape */
-export type DataTableFilterValueByType = {
-  select: string | null;
-  multiSelect: string[];
-  boolean: boolean | null;
-  date: string | null;
-  dateRange: { from: string | null; to: string | null };
-};
-
-/** Source of truth: filter type → column filter config */
-export type DataTableFilterConfigByType = {
-  select: { type: "select"; options: DataTableFilterOption[] };
-  multiSelect: { type: "multiSelect"; options: DataTableFilterOption[] };
-  boolean: { type: "boolean" };
-  date: { type: "date" };
-  dateRange: { type: "dateRange" };
-};
-
-export type DataTableFilterValue<
-  F extends DataTableFilterType = DataTableFilterType,
-> = DataTableFilterValueByType[F];
-
-export type DataTableColumnFilter<
-  F extends DataTableFilterType = DataTableFilterType,
-> = DataTableFilterConfigByType[F];
+import type { FilterFieldConfig, FiltersConfig } from "../filters";
 
 export type DataTableCellType =
   | "text"
@@ -108,7 +74,7 @@ export type DataTableColumn<T extends object> = {
   cell: DataTableCellConfig<T>;
   sortable?: boolean;
   searchable?: boolean;
-  filter?: DataTableColumnFilter;
+  filter?: FilterFieldConfig;
   visible?: boolean;
 };
 
@@ -146,11 +112,6 @@ export type DataTableSearchConfig = {
   onSearchChange: (next: DataTableSearchState) => void;
 };
 
-export type DataTableFiltersConfig = {
-  filters: Record<string, DataTableFilterValue>;
-  onFiltersChange: (next: Record<string, DataTableFilterValue>) => void;
-};
-
 export type DataTableProps<T extends object> = {
   columns: DataTableColumn<T>[];
   rows: T[];
@@ -158,7 +119,7 @@ export type DataTableProps<T extends object> = {
 
   sortingConfig?: DataTableSortingConfig;
   searchConfig?: DataTableSearchConfig;
-  filtersConfig?: DataTableFiltersConfig;
+  filtersConfig?: FiltersConfig;
   pagination?: DataTablePagination;
 
   rowActions?: RowAction<T>[];

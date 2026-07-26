@@ -1,17 +1,13 @@
 import type { ReactNode } from 'react'
-import { DataTableFilters } from './DataTableFilters'
+import { Filters, toFilterFields } from '../../filters'
+import type { FiltersConfig } from '../../filters'
 import { DataTableSearch } from './DataTableSearch'
-import { toFilterableColumns } from './DataTableFilters/filterUtils'
-import type {
-  DataTableColumn,
-  DataTableFiltersConfig,
-  DataTableSearchConfig,
-} from '../types'
+import type { DataTableColumn, DataTableSearchConfig } from '../types'
 
 type DataTableToolbarProps<T extends object> = {
   columns: DataTableColumn<T>[]
   searchConfig?: DataTableSearchConfig
-  filtersConfig?: DataTableFiltersConfig
+  filtersConfig?: FiltersConfig
   toolbarActions?: ReactNode
 }
 
@@ -24,10 +20,10 @@ export const DataTableToolbar = <T extends object>({
   const searchableColumns = columns
     .filter((column) => column.searchable)
     .map((column) => ({ id: column.id, header: column.header }))
-  const filterableColumns = toFilterableColumns(columns)
+  const filterFields = toFilterFields(columns)
 
   const hasSearch = searchableColumns.length > 0 && searchConfig
-  const hasFilters = filterableColumns.length > 0 && filtersConfig
+  const hasFilters = filterFields.length > 0 && filtersConfig
   const hasRight = hasFilters || toolbarActions != null
 
   if (!hasSearch && !hasRight) {
@@ -45,10 +41,7 @@ export const DataTableToolbar = <T extends object>({
       {hasRight ? (
         <div className="ml-auto flex flex-wrap items-center gap-2">
           {hasFilters ? (
-            <DataTableFilters
-              columns={filterableColumns}
-              filtersConfig={filtersConfig}
-            />
+            <Filters fields={filterFields} filtersConfig={filtersConfig} />
           ) : null}
           {toolbarActions}
         </div>

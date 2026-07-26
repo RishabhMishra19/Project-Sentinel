@@ -1,9 +1,9 @@
-import type { DataTableFilterOption, DataTableFilterValue } from '../../../types'
+import type { FilterOption, FilterValue } from '../types'
 
 type MultiSelectFilterProps = {
-  value: DataTableFilterValue<'multiSelect'>
-  options: DataTableFilterOption[]
-  onChange: (value: DataTableFilterValue<'multiSelect'>) => void
+  value: FilterValue<'multiSelect'>
+  options: FilterOption[]
+  onChange: (value: FilterValue<'multiSelect'>) => void
 }
 
 export const MultiSelectFilter = ({

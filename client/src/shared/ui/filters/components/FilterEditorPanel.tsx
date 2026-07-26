@@ -1,11 +1,10 @@
 import { FilterControl } from './FilterControl'
-import type { FilterableColumnOption } from './filterUtils'
-import type { DataTableFilterValue } from '../../types'
+import type { FilterField, FilterValue } from '../types'
 
 type FilterEditorPanelProps = {
-  selected: FilterableColumnOption
-  value: DataTableFilterValue | undefined
-  onChange: (filterId: string, value: DataTableFilterValue) => void
+  selected: FilterField
+  value: FilterValue | undefined
+  onChange: (filterId: string, value: FilterValue) => void
 }
 
 export const FilterEditorPanel = ({

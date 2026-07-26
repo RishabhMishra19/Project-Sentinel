@@ -1,5 +1,5 @@
-import { inputClassName } from '../../../styles'
-import type { DataTableFilterValue } from '../../../types'
+import { inputClassName } from '../styles'
+import type { FilterValue } from '../types'
 
 type DateRangePreset = '1d' | '3d' | '10d' | '1M' | '3M' | '1Y'
 
@@ -51,7 +51,7 @@ const fromDateForPreset = (preset: DateRangePreset, to: Date): Date => {
   return from
 }
 
-const dateRangeFromPreset = (
+export const dateRangeFromPreset = (
   preset: DateRangePreset,
 ): { from: string; to: string } => {
   const to = new Date()
@@ -72,8 +72,8 @@ export const matchDateRangePreset = (value: {
 }
 
 type DateRangeFilterProps = {
-  value: DataTableFilterValue<'dateRange'>
-  onChange: (value: DataTableFilterValue<'dateRange'>) => void
+  value: FilterValue<'dateRange'>
+  onChange: (value: FilterValue<'dateRange'>) => void
 }
 
 const chipClassName = (active: boolean) =>

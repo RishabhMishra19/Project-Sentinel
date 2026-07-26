@@ -1,33 +1,26 @@
 import { useEffect, useState } from 'react'
-import { Popover } from '../../../primitives/Popover'
-import { FilterColumnList } from './FilterColumnList'
-import { FilterEditorPanel } from './FilterEditorPanel'
-import { FilterPopoverActions } from './FilterPopoverActions'
+import { Popover } from '../primitives/Popover'
+import { FilterColumnList } from './components/FilterColumnList'
+import { FilterEditorPanel } from './components/FilterEditorPanel'
+import { FilterPopoverActions } from './components/FilterPopoverActions'
 import {
   collectActiveFilters,
   countActiveFilters,
-  type FilterableColumnOption,
 } from './filterUtils'
-import { buttonClassName } from '../../styles'
-import type {
-  DataTableFilterValue,
-  DataTableFiltersConfig,
-} from '../../types'
+import { buttonClassName } from './styles'
+import type { FilterField, FilterValue, FiltersConfig } from './types'
 
-type DataTableFiltersProps = {
-  columns: FilterableColumnOption[]
-  filtersConfig: DataTableFiltersConfig
+type FiltersProps = {
+  fields: FilterField[]
+  filtersConfig: FiltersConfig
 }
 
-export const DataTableFilters = ({
-  columns,
-  filtersConfig,
-}: DataTableFiltersProps) => {
+export const Filters = ({ fields, filtersConfig }: FiltersProps) => {
   const { filters, onFiltersChange } = filtersConfig
 
   const [open, setOpen] = useState(false)
-  const [draft, setDraft] = useState<Record<string, DataTableFilterValue>>({})
-  const [selectedId, setSelectedId] = useState(() => columns[0]?.id ?? '')
+  const [draft, setDraft] = useState<Record<string, FilterValue>>({})
+  const [selectedId, setSelectedId] = useState(() => fields[0]?.id ?? '')
 
   useEffect(() => {
     if (!open) {
@@ -35,25 +28,21 @@ export const DataTableFilters = ({
     }
     setDraft(filters)
     setSelectedId((prev) =>
-      columns.some((column) => column.id === prev)
+      fields.some((field) => field.id === prev)
         ? prev
-        : (columns[0]?.id ?? ''),
+        : (fields[0]?.id ?? ''),
     )
-  }, [open, filters, columns])
+  }, [open, filters, fields])
 
-  if (columns.length === 0) {
+  if (fields.length === 0) {
     return null
   }
 
-  const selected =
-    columns.find((column) => column.id === selectedId) ?? columns[0]
-  const appliedCount = countActiveFilters(columns, filters)
-  const draftActiveCount = countActiveFilters(columns, draft)
+  const selected = fields.find((field) => field.id === selectedId) ?? fields[0]
+  const appliedCount = countActiveFilters(fields, filters)
+  const draftActiveCount = countActiveFilters(fields, draft)
 
-  const handleDraftChange = (
-    filterId: string,
-    value: DataTableFilterValue,
-  ) => {
+  const handleDraftChange = (filterId: string, value: FilterValue) => {
     setDraft((prev) => ({ ...prev, [filterId]: value }))
   }
 
@@ -77,7 +66,7 @@ export const DataTableFilters = ({
       <div className="flex flex-col">
         <div className="flex">
           <FilterColumnList
-            columns={columns}
+            fields={fields}
             draft={draft}
             selectedId={selected.id}
             onSelect={setSelectedId}
@@ -92,7 +81,7 @@ export const DataTableFilters = ({
           canReset={draftActiveCount > 0}
           onReset={() => setDraft({})}
           onApply={() => {
-            onFiltersChange(collectActiveFilters(columns, draft))
+            onFiltersChange(collectActiveFilters(fields, draft))
             setOpen(false)
           }}
         />

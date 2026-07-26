@@ -1,18 +1,8 @@
-import type {
-  DataTableColumn,
-  DataTableColumnFilter,
-  DataTableFilterValue,
-} from '../../types'
 import {
   PRESET_SUMMARY,
   matchDateRangePreset,
 } from './controls/DateRangeFilter'
-
-export type FilterableColumnOption = {
-  id: string
-  header: string
-  filter: DataTableColumnFilter
-}
+import type { FilterField, FilterFieldConfig, FilterValue } from './types'
 
 export type FilterChip = {
   id: string
@@ -21,8 +11,8 @@ export type FilterChip = {
 }
 
 export const isFilterActive = (
-  filter: DataTableColumnFilter,
-  value: DataTableFilterValue | undefined,
+  filter: FilterFieldConfig,
+  value: FilterValue | undefined,
 ): boolean => {
   if (value === undefined || value === null) {
     return false
@@ -35,15 +25,15 @@ export const isFilterActive = (
     case 'multiSelect':
       return Array.isArray(value) && value.length > 0
     case 'dateRange': {
-      const range = value as DataTableFilterValue<'dateRange'>
+      const range = value as FilterValue<'dateRange'>
       return Boolean(range.from || range.to)
     }
   }
 }
 
 export const formatFilterValue = (
-  filter: DataTableColumnFilter,
-  value: DataTableFilterValue | undefined,
+  filter: FilterFieldConfig,
+  value: FilterValue | undefined,
 ): string | null => {
   if (!isFilterActive(filter, value)) {
     return null
@@ -51,14 +41,14 @@ export const formatFilterValue = (
 
   switch (filter.type) {
     case 'select': {
-      const selected = value as DataTableFilterValue<'select'>
+      const selected = value as FilterValue<'select'>
       return (
         filter.options.find((option) => option.value === selected)?.label ??
         selected
       )
     }
     case 'multiSelect': {
-      const selected = value as DataTableFilterValue<'multiSelect'>
+      const selected = value as FilterValue<'multiSelect'>
       return selected
         .map(
           (item) =>
@@ -68,7 +58,7 @@ export const formatFilterValue = (
         .join(', ')
     }
     case 'boolean': {
-      const bool = value as DataTableFilterValue<'boolean'>
+      const bool = value as FilterValue<'boolean'>
       if (bool === true) {
         return 'Yes'
       }
@@ -78,9 +68,9 @@ export const formatFilterValue = (
       return null
     }
     case 'date':
-      return value as DataTableFilterValue<'date'>
+      return value as FilterValue<'date'>
     case 'dateRange': {
-      const range = value as DataTableFilterValue<'dateRange'>
+      const range = value as FilterValue<'dateRange'>
       const preset = matchDateRangePreset(range)
       if (preset) {
         return PRESET_SUMMARY[preset]
@@ -99,9 +89,11 @@ export const formatFilterValue = (
   }
 }
 
-export const toFilterableColumns = <T extends object>(
-  columns: DataTableColumn<T>[],
-): FilterableColumnOption[] =>
+export const toFilterFields = <
+  T extends { id: string; header: string; filter?: FilterFieldConfig },
+>(
+  columns: T[],
+): FilterField[] =>
   columns.flatMap((column) =>
     column.filter != null
       ? [{ id: column.id, header: column.header, filter: column.filter }]
@@ -109,33 +101,33 @@ export const toFilterableColumns = <T extends object>(
   )
 
 export const countActiveFilters = (
-  columns: FilterableColumnOption[],
-  filters: Record<string, DataTableFilterValue>,
+  fields: FilterField[],
+  filters: Record<string, FilterValue>,
 ): number =>
-  columns.filter((column) => isFilterActive(column.filter, filters[column.id]))
+  fields.filter((field) => isFilterActive(field.filter, filters[field.id]))
     .length
 
 export const collectActiveFilters = (
-  columns: FilterableColumnOption[],
-  draft: Record<string, DataTableFilterValue>,
-): Record<string, DataTableFilterValue> => {
-  const next: Record<string, DataTableFilterValue> = {}
-  for (const column of columns) {
-    if (isFilterActive(column.filter, draft[column.id])) {
-      next[column.id] = draft[column.id]
+  fields: FilterField[],
+  draft: Record<string, FilterValue>,
+): Record<string, FilterValue> => {
+  const next: Record<string, FilterValue> = {}
+  for (const field of fields) {
+    if (isFilterActive(field.filter, draft[field.id])) {
+      next[field.id] = draft[field.id]
     }
   }
   return next
 }
 
 export const buildFilterChips = (
-  columns: FilterableColumnOption[],
-  filters: Record<string, DataTableFilterValue>,
+  fields: FilterField[],
+  filters: Record<string, FilterValue>,
 ): FilterChip[] =>
-  columns.flatMap((column) => {
-    const label = formatFilterValue(column.filter, filters[column.id])
+  fields.flatMap((field) => {
+    const label = formatFilterValue(field.filter, filters[field.id])
     if (!label) {
       return []
     }
-    return [{ id: column.id, header: column.header, label }]
+    return [{ id: field.id, header: field.header, label }]
   })

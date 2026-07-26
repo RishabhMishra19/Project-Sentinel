@@ -1,19 +1,16 @@
-import type {
-  DataTableColumnFilter,
-  DataTableFilterValue,
-} from '../../types'
+import type { FilterFieldConfig, FilterValue } from '../types'
 import {
   BooleanFilter,
   DateFilter,
   DateRangeFilter,
   MultiSelectFilter,
   SelectFilter,
-} from './controls'
+} from '../controls'
 
 type FilterControlProps = {
-  filter: DataTableColumnFilter
-  value: DataTableFilterValue | undefined
-  onChange: (value: DataTableFilterValue) => void
+  filter: FilterFieldConfig
+  value: FilterValue | undefined
+  onChange: (value: FilterValue) => void
 }
 
 export const FilterControl = ({
@@ -26,7 +23,7 @@ export const FilterControl = ({
       return (
         <SelectFilter
           options={filter.options}
-          value={(value as DataTableFilterValue<'select'>) ?? null}
+          value={(value as FilterValue<'select'>) ?? null}
           onChange={onChange}
         />
       )
@@ -34,21 +31,21 @@ export const FilterControl = ({
       return (
         <MultiSelectFilter
           options={filter.options}
-          value={(value as DataTableFilterValue<'multiSelect'>) ?? []}
+          value={(value as FilterValue<'multiSelect'>) ?? []}
           onChange={onChange}
         />
       )
     case 'boolean':
       return (
         <BooleanFilter
-          value={(value as DataTableFilterValue<'boolean'>) ?? null}
+          value={(value as FilterValue<'boolean'>) ?? null}
           onChange={onChange}
         />
       )
     case 'date':
       return (
         <DateFilter
-          value={(value as DataTableFilterValue<'date'>) ?? null}
+          value={(value as FilterValue<'date'>) ?? null}
           onChange={onChange}
         />
       )
@@ -56,7 +53,7 @@ export const FilterControl = ({
       return (
         <DateRangeFilter
           value={
-            (value as DataTableFilterValue<'dateRange'>) ?? {
+            (value as FilterValue<'dateRange'>) ?? {
               from: null,
               to: null,
             }

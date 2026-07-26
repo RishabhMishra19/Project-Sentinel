@@ -1,33 +1,33 @@
-import { isFilterActive } from './filterUtils'
-import type { FilterableColumnOption } from './filterUtils'
-import type { DataTableFilterValue } from '../../types'
+import { isFilterActive } from '../filterUtils'
+import type { FilterField } from '../types'
+import type { FilterValue } from '../types'
 
 type FilterColumnListProps = {
-  columns: FilterableColumnOption[]
-  draft: Record<string, DataTableFilterValue>
+  fields: FilterField[]
+  draft: Record<string, FilterValue>
   selectedId: string
-  onSelect: (columnId: string) => void
+  onSelect: (fieldId: string) => void
 }
 
 export const FilterColumnList = ({
-  columns,
+  fields,
   draft,
   selectedId,
   onSelect,
 }: FilterColumnListProps) => (
   <ul className="min-w-[10rem] border-r border-border p-1">
-    {columns.map((column) => {
-      const active = isFilterActive(column.filter, draft[column.id])
+    {fields.map((field) => {
+      const active = isFilterActive(field.filter, draft[field.id])
       return (
-        <li key={column.id}>
+        <li key={field.id}>
           <button
             type="button"
             className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-sm hover:bg-chrome ${
-              selectedId === column.id ? 'bg-chrome' : ''
+              selectedId === field.id ? 'bg-chrome' : ''
             }`}
-            onClick={() => onSelect(column.id)}
+            onClick={() => onSelect(field.id)}
           >
-            <span>{column.header}</span>
+            <span>{field.header}</span>
             {active ? (
               <span className="h-1.5 w-1.5 rounded-full bg-accent" />
             ) : null}

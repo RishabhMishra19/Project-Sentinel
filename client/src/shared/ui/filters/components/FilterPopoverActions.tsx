@@ -1,4 +1,4 @@
-import { buttonClassName, primaryButtonClassName } from '../../styles'
+import { buttonClassName, primaryButtonClassName } from '../styles'
 
 type FilterPopoverActionsProps = {
   canReset: boolean
@@ -20,11 +20,7 @@ export const FilterPopoverActions = ({
     >
       Reset
     </button>
-    <button
-      type="button"
-      className={primaryButtonClassName}
-      onClick={onApply}
-    >
+    <button type="button" className={primaryButtonClassName} onClick={onApply}>
       Apply
     </button>
   </div>

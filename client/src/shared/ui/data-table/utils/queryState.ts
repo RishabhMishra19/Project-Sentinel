@@ -1,15 +1,12 @@
-import type {
-  DataTableFilterValue,
-  DataTableSearchState,
-  DataTableSort,
-} from '../types'
+import type { FilterValue } from '../../filters'
+import type { DataTableSearchState, DataTableSort } from '../types'
 
 export type DataTableQueryState = {
   pageIndex: number
   pageSize: number
   sorting: DataTableSort
   search: DataTableSearchState
-  filters: Record<string, DataTableFilterValue>
+  filters: Record<string, FilterValue>
 }
 
 export const DEFAULT_PAGE_SIZE = 10
