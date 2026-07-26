@@ -74,7 +74,7 @@ People ──► UI ──► Control API ┘
 | Deployable      | Responsibility                                                                                                                   |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | **Ingest**      | Hot path: service-key auth, register/heartbeat instances (sync DB), accept batched request events, publish to Kafka, return fast |
-| **Worker(s)**   | Consume Kafka: derive path templates, upsert endpoints, persist `request_logs` (scale with lag)                                  |
+| **Worker(s)**   | Consume Kafka: derive path templates, upsert endpoints, persist `request_logs`, upsert analytics (scale with lag)                |
 | **Control API** | Dashboard backend: tenants, users, roles, products, services, endpoint and log reads                                             |
 | **UI**          | React app for humans                                                                                                             |
 
@@ -101,7 +101,7 @@ Maven layout is a **multi-module reactor** at the repo root (`common`, `server`,
 
 - **server**: Spring Boot (Amazon Corretto 21), Postgres + Redis + Kafka, JWT auth (dashboard); owns schema via Liquibase
 - **ingest** (`sentinel-ingest`): Spring Boot — shared Postgres + Kafka; no Liquibase; depends on `common`
-- **worker** (`sentinel-worker`): Spring Boot skeleton — shared Postgres + Kafka; no Liquibase; depends on `common`
+- **worker** (`sentinel-worker`): Spring Boot — shared Postgres + Kafka; no Liquibase; consumes `sentinel.request-events` (see `docs/plans/worker.md`)
 - **common**: shared jar (entities/repos/utilities); not a deployable
 - **client**: React + TypeScript (Vite), Redux, React Query, Tailwind, Axios
 - Postgres data is stored in the Docker volume `postgres_data`
@@ -174,4 +174,4 @@ docker compose down -v
 - Server Docker image uses **Amazon Corretto 21**.
 - Spring Boot **4.1.0**; schema via **server Liquibase** only (ingest/worker use `ddl-auto: validate`, no migrations).
 - Access token (15m) in Redux memory; refresh (2h) in HttpOnly cookie + DB.
-- Ingest / worker apps exist as local skeletons; request-event produce/consume logic comes later.
+- Ingest / worker: ingest accepts agent traffic; worker consumes Kafka and writes endpoints, request logs, and analytics.
