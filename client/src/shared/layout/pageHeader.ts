@@ -1,44 +1,41 @@
-import { useLocation, useMatches, type UIMatch } from "react-router-dom";
-import type { NotWrapperRouteObject } from "../../navigation/types";
-
-type PageHeaderHandle = Pick<NotWrapperRouteObject, "crumb" | "description">;
+import type { UIMatch } from "react-router-dom";
+import type { AppRouteHandle } from "../../navigation/types";
 
 export type Crumb = {
   label: string;
   to?: string;
 };
 
-function hasCrumbHandle(handle: unknown): handle is PageHeaderHandle {
-  return (
-    typeof handle === "object" &&
-    handle !== null &&
-    "crumb" in handle &&
-    (typeof (handle as PageHeaderHandle).crumb === "string" ||
-      typeof (handle as PageHeaderHandle).crumb === "function")
-  );
-}
+export type PageHeader = {
+  crumbs: Crumb[];
+  description?: string;
+};
 
-function resolveCrumb(handle: PageHeaderHandle, state: unknown): string | undefined {
+export type PageMatch = UIMatch<unknown, AppRouteHandle | undefined>;
+
+function resolveCrumb(handle: AppRouteHandle, state: unknown): string | undefined {
   const resolved = typeof handle.crumb === "function" ? handle.crumb(state) : handle.crumb;
   return resolved && resolved.length > 0 ? resolved : undefined;
 }
 
-function resolveDescription(handle: PageHeaderHandle, state: unknown): string | undefined {
+function resolveDescription(
+  handle: AppRouteHandle,
+  state: unknown,
+): string | undefined {
   const resolved =
-    typeof handle.description === "function" ? handle.description(state) : handle.description;
+    typeof handle.description === "function"
+      ? handle.description(state)
+      : handle.description;
   return resolved && resolved.length > 0 ? resolved : undefined;
 }
 
 /**
- * Builds navbar breadcrumbs from matched routes that declare `handle.crumb`.
- * Description comes from the deepest match that resolves a non-empty description.
+ * Builds navbar breadcrumbs/description from typed `match.handle`
+ * (`AppRouteHandle`: crumb + description).
  */
-export function usePageHeader(): { crumbs: Crumb[]; description?: string } {
-  const matches = useMatches();
-  const { state } = useLocation();
-
-  const crumbMatches = matches.filter((m): m is UIMatch<unknown, PageHeaderHandle> =>
-    hasCrumbHandle(m.handle),
+export function resolvePageHeader(matches: PageMatch[], state: unknown): PageHeader {
+  const crumbMatches = matches.filter(
+    (m): m is UIMatch<unknown, AppRouteHandle> => m.handle != null,
   );
 
   const crumbs = crumbMatches.flatMap((m, i, arr) => {

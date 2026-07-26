@@ -25,8 +25,10 @@ const sharedRoutes: SentinelRouteObject[] = [
   {
     id: "profile",
     path: ROUTE_PATHS.profile,
-    crumb: "Profile",
-    description: "Your account details and session settings",
+    handle: {
+      crumb: "Profile",
+      description: "Your account details and session settings",
+    },
     Component: ProfilePage,
   },
 ];
@@ -36,8 +38,10 @@ const sentinelAdminOnlyRoutes: SentinelRouteObject[] = [
     id: "tenants",
     path: ROUTE_PATHS.tenants,
     Component: TenantsPage,
-    crumb: "Tenants",
-    description: "Create and manage tenants across Sentinel",
+    handle: {
+      crumb: "Tenants",
+      description: "Create and manage tenants across Sentinel",
+    },
     indexOrder: 1,
     navigation: {
       label: "Tenants",
@@ -51,8 +55,10 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
   {
     id: "products",
     path: ROUTE_PATHS.products,
-    crumb: "Products",
-    description: "Organize APIs and services under products",
+    handle: {
+      crumb: "Products",
+      description: "Organize APIs and services under products",
+    },
     Component: ProductsPage,
     indexOrder: 1,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
@@ -65,8 +71,10 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
   {
     id: "services",
     path: ROUTE_PATHS.services,
-    crumb: "Services",
-    description: "Register and configure services for this tenant",
+    handle: {
+      crumb: "Services",
+      description: "Register and configure services for this tenant",
+    },
     Component: ServicesPage,
     indexOrder: 2,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
@@ -79,8 +87,10 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
   {
     id: "users",
     path: ROUTE_PATHS.users,
-    crumb: "Users",
-    description: "Invite teammates and manage tenant access",
+    handle: {
+      crumb: "Users",
+      description: "Invite teammates and manage tenant access",
+    },
     Component: UsersPage,
     indexOrder: 3,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
@@ -93,8 +103,10 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
   {
     id: "serviceApiKeys",
     path: ROUTE_PATHS.serviceApiKeys,
-    crumb: "API keys",
-    description: "Issue and revoke keys for this service",
+    handle: {
+      crumb: "API keys",
+      description: "Issue and revoke keys for this service",
+    },
     Component: ServiceApiKeysPage,
     indexOrder: 4,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
@@ -102,8 +114,10 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
   {
     id: "settings",
     path: ROUTE_PATHS.settings,
-    crumb: "Settings",
-    description: "Tenant preferences and access control",
+    handle: {
+      crumb: "Settings",
+      description: "Tenant preferences and access control",
+    },
     Component: Outlet,
     indexOrder: 5,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
@@ -116,8 +130,10 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
       {
         id: "settingsHome",
         path: ROUTE_PATHS.settingsHome,
-        crumb: "",
-        description: "Tenant preferences and access control",
+        handle: {
+          crumb: "",
+          description: "Tenant preferences and access control",
+        },
         Component: SettingsPage,
         indexOrder: 1,
         isAccessibleTo: isTenantUserOrSentinelAdminView,
@@ -125,8 +141,10 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
       {
         id: "settingsRoles",
         path: ROUTE_PATHS.settingsRoles,
-        crumb: "Manage Roles",
-        description: "Define roles and permissions for this tenant",
+        handle: {
+          crumb: "Manage Roles",
+          description: "Define roles and permissions for this tenant",
+        },
         Component: RolesPage,
         indexOrder: 2,
         isAccessibleTo: isTenantUserOrSentinelAdminView,

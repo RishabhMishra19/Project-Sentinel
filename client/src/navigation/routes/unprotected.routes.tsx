@@ -8,7 +8,9 @@ export const unprotectedPageRoutes: SentinelRouteObject[] = [
     path: ROUTE_PATHS.login,
     Component: LoginPage,
     isAccessibleTo: () => true,
-    crumb: "Login",
-    description: "Log in to your account",
+    handle: {
+      crumb: "Login",
+      description: "Log in to your account",
+    },
   },
 ];

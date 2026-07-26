@@ -1,9 +1,14 @@
 import type { RouteObject } from "react-router-dom";
 import type { AuthSessionUser, TenantSummary } from "../features/auth/dto/response/auth.response";
 
-type NotWrapperRouteObjectProperties = {
+/** Typed React Router `handle` for page header (crumb + description). */
+export type AppRouteHandle = {
   crumb: string | ((state: unknown) => string);
   description: string | ((state: unknown) => string);
+};
+
+type NotWrapperRouteObjectProperties = {
+  handle: AppRouteHandle;
   navigation?: {
     label: string;
     icon: React.ComponentType<{ className?: string }>;
@@ -14,7 +19,7 @@ type NotWrapperRouteObjectProperties = {
 type WrapperRouteObject = { isWrapperRoute: true };
 export type NotWrapperRouteObject = { isWrapperRoute?: false } & NotWrapperRouteObjectProperties;
 
-export type SentinelRouteObject = RouteObject & {
+export type SentinelRouteObject = Omit<RouteObject, "handle" | "children"> & {
   id: string;
   path: string;
   Component: React.ComponentType;
