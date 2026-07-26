@@ -6,7 +6,7 @@ import type {
 } from "../../features/auth/dto/response/auth.response";
 import { SessionStorage } from "./SessionStorage";
 
-interface SessionState {
+export interface SessionState {
   isLoading: boolean;
   isLoggedIn: boolean;
   accessToken: string | null;
