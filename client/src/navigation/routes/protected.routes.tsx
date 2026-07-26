@@ -1,13 +1,17 @@
 import { Outlet } from "react-router-dom";
 import {
+  AnalyticsIcon,
+  LogsIcon,
   ProductsIcon,
   ServicesIcon,
   SettingsIcon,
   TenantsIcon,
   UsersIcon,
 } from "../../assets/icons";
+import { AnalyticsPage } from "../../features/analytics/pages/AnalyticsPage";
 import { ServiceApiKeysPage } from "../../features/apikeys/pages/ServiceApiKeysPage";
 import { ProfilePage } from "../../features/auth/pages/ProfilePage";
+import { RequestLogsPage } from "../../features/logs/pages/RequestLogsPage";
 import { ProductsPage } from "../../features/products/pages/ProductsPage";
 import { RolesPage } from "../../features/roles/pages/RolesPage";
 import { ServicesPage } from "../../features/services/pages/ServicesPage";
@@ -53,6 +57,38 @@ const sentinelAdminOnlyRoutes: SentinelRouteObject[] = [
 
 const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
   {
+    id: "analytics",
+    path: ROUTE_PATHS.analytics,
+    handle: {
+      crumb: "Analytics",
+      description: "Request volume, latency, and error rates across your APIs",
+    },
+    Component: AnalyticsPage,
+    indexOrder: 1,
+    isAccessibleTo: isTenantUserOrSentinelAdminView,
+    navigation: {
+      label: "Analytics",
+      order: 1,
+      icon: AnalyticsIcon,
+    },
+  },
+  {
+    id: "logs",
+    path: ROUTE_PATHS.logs,
+    handle: {
+      crumb: "Logs",
+      description: "Inspect individual gateway requests and responses",
+    },
+    Component: RequestLogsPage,
+    indexOrder: 2,
+    isAccessibleTo: isTenantUserOrSentinelAdminView,
+    navigation: {
+      label: "Logs",
+      order: 2,
+      icon: LogsIcon,
+    },
+  },
+  {
     id: "products",
     path: ROUTE_PATHS.products,
     handle: {
@@ -60,11 +96,11 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
       description: "Organize APIs and services under products",
     },
     Component: ProductsPage,
-    indexOrder: 1,
+    indexOrder: 3,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
     navigation: {
       label: "Products",
-      order: 1,
+      order: 3,
       icon: ProductsIcon,
     },
   },
@@ -76,11 +112,11 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
       description: "Register and configure services for this tenant",
     },
     Component: ServicesPage,
-    indexOrder: 2,
+    indexOrder: 4,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
     navigation: {
       label: "Services",
-      order: 2,
+      order: 4,
       icon: ServicesIcon,
     },
   },
@@ -92,11 +128,11 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
       description: "Invite teammates and manage tenant access",
     },
     Component: UsersPage,
-    indexOrder: 3,
+    indexOrder: 5,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
     navigation: {
       label: "Users",
-      order: 3,
+      order: 5,
       icon: UsersIcon,
     },
   },
@@ -108,7 +144,7 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
       description: "Issue and revoke keys for this service",
     },
     Component: ServiceApiKeysPage,
-    indexOrder: 4,
+    indexOrder: 6,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
   },
   {
@@ -119,11 +155,11 @@ const tenantUserOrSentinelAdminViewRoutes: SentinelRouteObject[] = [
       description: "Tenant preferences and access control",
     },
     Component: Outlet,
-    indexOrder: 5,
+    indexOrder: 7,
     isAccessibleTo: isTenantUserOrSentinelAdminView,
     navigation: {
       label: "Settings",
-      order: 4,
+      order: 6,
       icon: SettingsIcon,
     },
     children: [
