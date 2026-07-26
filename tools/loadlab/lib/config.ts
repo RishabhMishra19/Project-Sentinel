@@ -9,6 +9,7 @@ export const K6_SCRIPT_PATH = path.join(ROOT_DIR, "k6", "events.js");
 export const DEFAULTS = {
   controlUrl: "http://localhost:8080",
   ingestUrl: "http://localhost:8081",
+  workerUrl: "http://localhost:8082",
   email: "rishabhpndt19@gmail.com",
   password: "Admin@123",
   tenants: 3,

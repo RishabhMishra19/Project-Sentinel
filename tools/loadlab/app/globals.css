@@ -68,8 +68,27 @@ main {
   margin-bottom: 1rem;
 }
 
+.stats.metrics {
+  grid-template-columns: repeat(4, 1fr) auto;
+}
+
+@media (max-width: 1100px) {
+  .stats.metrics {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .stats.metrics .stats-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+  }
+}
+
 @media (max-width: 900px) {
   .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stats.metrics {
     grid-template-columns: 1fr 1fr;
   }
 }

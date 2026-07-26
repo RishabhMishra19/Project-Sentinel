@@ -27,7 +27,7 @@ Open [http://localhost:3100](http://localhost:3100).
 
 1. **Seed catalog** — creates tenants → products → services → API keys → ingest instances (uses Control + Ingest APIs; defaults to seed admin `rishabhpndt19@gmail.com` / `Admin@123`)
 2. **Start load** — spawns `k6 run k6/events.js` against `POST /v1/events`
-3. Watch the log panel + Kafka UI topic `sentinel.request-events` (`http://localhost:8090`)
+3. Watch the log panel + live pipeline metrics (scraped from ingest/worker `/actuator/prometheus`) + Kafka UI topic `sentinel.request-events` (`http://localhost:8090`)
 
 ## Knobs
 

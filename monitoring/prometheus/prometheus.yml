@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  # Apps running on the host (./mvnw spring-boot:run)
+  - job_name: sentinel-ingest-host
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["host.docker.internal:8081"]
+        labels:
+          app: ingest
+          source: host
+
+  - job_name: sentinel-worker-host
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["host.docker.internal:8082"]
+        labels:
+          app: worker
+          source: host
+
+  # Apps running in docker compose (optional; ignored if containers are down)
+  - job_name: sentinel-ingest-docker
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["ingest:8081"]
+        labels:
+          app: ingest
+          source: docker
+
+  - job_name: sentinel-worker-docker
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["worker:8082"]
+        labels:
+          app: worker
+          source: docker

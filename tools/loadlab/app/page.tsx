@@ -2,17 +2,40 @@
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import type { InventoryCounts } from "@/lib/inventoryTypes";
+import type { PipelineMetrics } from "@/lib/metricsTypes";
 import type { CatalogStatus, RunStatus, SetupResult } from "@/lib/types";
 
 const defaultSeed = {
   controlUrl: "http://localhost:8080",
   ingestUrl: "http://localhost:8081",
+  workerUrl: "http://localhost:8082",
   email: "rishabhpndt19@gmail.com",
   password: "Admin@123",
   tenants: 3,
   products: 2,
   services: 3,
 };
+
+function fmtCount(value: number | null | undefined): string {
+  if (value == null) {
+    return "—";
+  }
+  return Math.round(value).toLocaleString();
+}
+
+function fmtMs(value: number | null | undefined): string {
+  if (value == null) {
+    return "—";
+  }
+  return `${value < 10 ? value.toFixed(2) : value.toFixed(1)} ms`;
+}
+
+function fmtAvg(value: number | null | undefined): string {
+  if (value == null) {
+    return "—";
+  }
+  return value < 10 ? value.toFixed(2) : value.toFixed(1);
+}
 
 const defaultLoad = {
   rps: 100,
@@ -35,6 +58,9 @@ export default function HomePage() {
   const [setupErr, setSetupErr] = useState<string | null>(null);
   const [run, setRun] = useState<RunStatus | null>(null);
   const [runErr, setRunErr] = useState<string | null>(null);
+  const [metrics, setMetrics] = useState<PipelineMetrics | null>(null);
+  const [metricsBusy, setMetricsBusy] = useState(false);
+  const [metricsErr, setMetricsErr] = useState<string | null>(null);
 
   const estDurationSec = useMemo(
     () => Math.max(1, Math.ceil(load.totalRequests / Math.max(1, load.rps))),
@@ -79,11 +105,40 @@ export default function HomePage() {
     setRun(data);
   }, []);
 
+  const refreshMetrics = useCallback(async (opts?: { quiet?: boolean }) => {
+    if (!opts?.quiet) {
+      setMetricsBusy(true);
+    }
+    setMetricsErr(null);
+    try {
+      const res = await fetch("/api/metrics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ingestUrl: seed.ingestUrl,
+          workerUrl: seed.workerUrl,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to load metrics");
+      }
+      setMetrics(data as PipelineMetrics);
+    } catch (err) {
+      setMetricsErr(err instanceof Error ? err.message : "Failed to load metrics");
+    } finally {
+      if (!opts?.quiet) {
+        setMetricsBusy(false);
+      }
+    }
+  }, [seed.ingestUrl, seed.workerUrl]);
+
   useEffect(() => {
     void refreshCatalog();
     void refreshRun();
     void refreshInventory();
-  }, [refreshCatalog, refreshRun, refreshInventory]);
+    void refreshMetrics();
+  }, [refreshCatalog, refreshRun, refreshInventory, refreshMetrics]);
 
   useEffect(() => {
     if (!run?.running) {
@@ -96,10 +151,18 @@ export default function HomePage() {
   }, [run?.running, refreshRun]);
 
   useEffect(() => {
+    const id = setInterval(() => {
+      void refreshMetrics({ quiet: true });
+    }, run?.running ? 1500 : 4000);
+    return () => clearInterval(id);
+  }, [run?.running, refreshMetrics]);
+
+  useEffect(() => {
     if (run?.running === false && run.finishedAt) {
       void refreshInventory();
+      void refreshMetrics({ quiet: true });
     }
-  }, [run?.running, run?.finishedAt, refreshInventory]);
+  }, [run?.running, run?.finishedAt, refreshInventory, refreshMetrics]);
 
   async function onSeed(e: FormEvent) {
     e.preventDefault();
@@ -202,6 +265,81 @@ export default function HomePage() {
         {" "}Endpoints stay 0 until the worker consumes events and creates them.
       </p>
 
+      <section className="stats metrics" aria-label="Pipeline Prometheus metrics">
+        <div className="stat">
+          <span className="label">Ingest published</span>
+          <span className="value">
+            {metricsBusy && !metrics ? "…" : fmtCount(metrics?.ingest.eventsPublished)}
+          </span>
+        </div>
+        <div className="stat">
+          <span className="label">Ingest requests</span>
+          <span className="value">
+            {metricsBusy && !metrics ? "…" : fmtCount(metrics?.ingest.requests)}
+          </span>
+        </div>
+        <div className="stat">
+          <span className="label">Avg publish</span>
+          <span className="value">
+            {metricsBusy && !metrics ? "…" : fmtMs(metrics?.ingest.avgPublishMs)}
+          </span>
+        </div>
+        <div className="stat">
+          <span className="label">Worker processed</span>
+          <span className="value">
+            {metricsBusy && !metrics ? "…" : fmtCount(metrics?.worker.eventsProcessed)}
+          </span>
+        </div>
+        <div className="stat">
+          <span className="label">Batches ok</span>
+          <span className="value">
+            {metricsBusy && !metrics ? "…" : fmtCount(metrics?.worker.batchesProcessed)}
+          </span>
+        </div>
+        <div className="stat">
+          <span className="label">Batches failed</span>
+          <span className="value">
+            {metricsBusy && !metrics ? "…" : fmtCount(metrics?.worker.batchesFailed)}
+          </span>
+        </div>
+        <div className="stat">
+          <span className="label">Avg batch size</span>
+          <span className="value">
+            {metricsBusy && !metrics ? "…" : fmtAvg(metrics?.worker.avgBatchSize)}
+          </span>
+        </div>
+        <div className="stat">
+          <span className="label">Avg batch time</span>
+          <span className="value">
+            {metricsBusy && !metrics ? "…" : fmtMs(metrics?.worker.avgBatchMs)}
+          </span>
+        </div>
+        <div className="stat">
+          <span className="label">Avg per event</span>
+          <span className="value">
+            {metricsBusy && !metrics ? "…" : fmtMs(metrics?.worker.avgPerEventMs)}
+          </span>
+        </div>
+        <div className="stats-actions">
+          <button
+            className="btn secondary"
+            type="button"
+            onClick={() => void refreshMetrics()}
+            disabled={metricsBusy}
+          >
+            {metricsBusy ? "Refreshing…" : "Refresh metrics"}
+          </button>
+        </div>
+      </section>
+      <p className="stats-meta">
+        Custom Micrometer metrics from{" "}
+        <code>/actuator/prometheus</code> on ingest + worker.
+        {metrics?.fetchedAt ? ` Last updated ${metrics.fetchedAt}.` : ""}
+        {metricsErr ? ` Error: ${metricsErr}` : ""}
+        {!metricsErr && metrics?.ingest.error ? ` Ingest: ${metrics.ingest.error}.` : ""}
+        {!metricsErr && metrics?.worker.error ? ` Worker: ${metrics.worker.error}.` : ""}
+      </p>
+
       <div className="grid">
         <section className="panel">
           <h2>1. Seed catalog</h2>
@@ -219,6 +357,13 @@ export default function HomePage() {
                 <input
                   value={seed.ingestUrl}
                   onChange={(e) => setSeed({ ...seed, ingestUrl: e.target.value })}
+                />
+              </label>
+              <label className="full">
+                Worker URL
+                <input
+                  value={seed.workerUrl}
+                  onChange={(e) => setSeed({ ...seed, workerUrl: e.target.value })}
                 />
               </label>
               <label>
