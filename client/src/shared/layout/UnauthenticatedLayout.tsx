@@ -3,7 +3,7 @@ import { AuthBrandPanel } from "../../features/auth/components/AuthBrandPanel";
 import { ThemeToggle } from "../theme";
 
 /** Chrome for guest/auth pages: brand panel and centered content outlet. */
-export function UnauthenticatedLayout() {
+export const UnauthenticatedLayout = () => {
   return (
     <div className="flex min-h-screen flex-col gap-3 bg-chrome p-3 md:flex-row">
       <AuthBrandPanel />
@@ -13,4 +13,4 @@ export function UnauthenticatedLayout() {
       </div>
     </div>
   );
-}
+};

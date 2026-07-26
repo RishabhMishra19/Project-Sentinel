@@ -13,7 +13,7 @@ const isoToDatetimeLocal = (iso: string | null): string | null => {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
-function filtersFromSearchParams(params: URLSearchParams): Record<string, FilterValue> {
+const filtersFromSearchParams = (params: URLSearchParams): Record<string, FilterValue> => {
   const filters: Record<string, FilterValue> = {};
 
   const productId = params.get("productId");
@@ -43,9 +43,9 @@ function filtersFromSearchParams(params: URLSearchParams): Record<string, Filter
   }
 
   return filters;
-}
+};
 
-export function RequestLogsPage() {
+export const RequestLogsPage = () => {
   const [params] = useSearchParams();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -76,4 +76,4 @@ export function RequestLogsPage() {
       ) : null}
     </div>
   );
-}
+};

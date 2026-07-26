@@ -7,7 +7,7 @@ type AppNavbarProps = {
   description?: string;
 };
 
-export function AppNavbar({ crumbs, description }: AppNavbarProps) {
+export const AppNavbar = (=> { crumbs, description }: AppNavbarProps) {
   return (
     <header className="flex min-h-14 shrink-0 items-center justify-between gap-4 border-b border-border px-5 py-3">
       <div className="min-w-0">

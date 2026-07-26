@@ -13,11 +13,11 @@ import { SidebarTray } from "./SidebarTray";
 
 const SIDEBAR_MODE_KEY = "sidebar-mode";
 
-function readStoredMode(): SidebarMode {
+const readStoredMode = (): SidebarMode => {
   return localStorageManager.get(SIDEBAR_MODE_KEY) === "collapsed" ? "collapsed" : "expanded";
-}
+};
 
-export function AppSidebar() {
+export const AppSidebar = () => {
   const logoutMutation = useLogout();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -119,4 +119,4 @@ export function AppSidebar() {
       </div>
     </aside>
   );
-}
+};

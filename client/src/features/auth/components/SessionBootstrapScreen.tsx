@@ -2,7 +2,7 @@
  * Shown while the root session restore is in progress
  * (or waiting for user after a signed-in restore) before routes render.
  */
-export function SessionBootstrapScreen() {
+export const SessionBootstrapScreen = () => {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-chrome p-3">
       <div
@@ -28,4 +28,4 @@ export function SessionBootstrapScreen() {
       </div>
     </div>
   );
-}
+};

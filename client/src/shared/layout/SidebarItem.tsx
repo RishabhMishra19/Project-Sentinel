@@ -6,7 +6,7 @@ type Mode = "collapsed" | "expanded";
 const baseClass =
   "flex w-full items-center rounded-xl text-sm transition-colors disabled:opacity-60";
 
-function getSidebarItemClass(tone: Tone, active: boolean, mode: Mode, className = "") {
+const getSidebarItemClass = (tone: Tone, active: boolean, mode: Mode, className = "") => {
   const layoutClass = mode === "collapsed" ? "justify-center px-2 py-2.5" : "gap-2.5 px-3 py-2.5";
 
   let toneClass: string;
@@ -33,7 +33,7 @@ type SidebarItemProps = {
   className?: string;
 };
 
-export function SidebarItem({
+export const SidebarItem = (=> {
   iconNode,
   textNode,
   mode = "expanded",

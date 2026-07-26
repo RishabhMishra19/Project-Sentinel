@@ -1,7 +1,7 @@
 import type { AnalyticsSummaryResponse } from "../dto/response/analytics.response";
 import { formatNumber, formatRate } from "../utils/timeRange";
 
-function Kpi({ label, value }: { label: string; value: string }) {
+const Kpi = (=> { label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-border bg-background px-4 py-3">
       <p className="text-xs text-muted-foreground">{label}</p>
@@ -10,7 +10,7 @@ function Kpi({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function AnalyticsKpiStrip({ summary }: { summary: AnalyticsSummaryResponse | undefined }) {
+export const AnalyticsKpiStrip = (=> { summary }: { summary: AnalyticsSummaryResponse | undefined }) {
   if (!summary) {
     return (
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

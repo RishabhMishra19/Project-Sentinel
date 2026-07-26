@@ -6,7 +6,7 @@ const GRID = "var(--color-border, #e5e5e5)";
 const BAR = "#0f766e";
 const CHART_MARGIN = { top: 8, right: 12, bottom: 4, left: 4 };
 
-function ChartFrame({
+const ChartFrame = (=> {
   title,
   xLabel,
   yLabel,
@@ -43,7 +43,7 @@ function ChartFrame({
   );
 }
 
-export function EndpointStatusChart({ items }: { items: StatusBreakdownItem[] }) {
+export const EndpointStatusChart = (=> { items }: { items: StatusBreakdownItem[] }) {
   return (
     <ChartFrame
       title="Status codes"
@@ -65,7 +65,7 @@ export function EndpointStatusChart({ items }: { items: StatusBreakdownItem[] })
   );
 }
 
-export function EndpointExceptionsChart({ items }: { items: ExceptionMetricItem[] }) {
+export const EndpointExceptionsChart = (=> { items }: { items: ExceptionMetricItem[] }) {
   return (
     <ChartFrame
       title="Exceptions"

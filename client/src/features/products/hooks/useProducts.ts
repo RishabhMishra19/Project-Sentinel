@@ -6,15 +6,15 @@ import type { CreateProductRequest, UpdateProductRequest } from "../dto/request/
 
 export const productsQueryKey = ["products"] as const;
 
-export function useProductsQuery(params: ListQueryRequest | null) {
+export const useProductsQuery = (params: ListQueryRequest | null) => {
   return useQuery({
     queryKey: [...productsQueryKey, "list", params],
     queryFn: () => ProductsApi.list(params!),
     enabled: params != null,
   });
-}
+};
 
-export function useCreateProduct() {
+export const useCreateProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -30,9 +30,9 @@ export function useCreateProduct() {
       void queryClient.invalidateQueries({ queryKey: productsQueryKey });
     },
   });
-}
+};
 
-export function useUpdateProduct() {
+export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -49,9 +49,9 @@ export function useUpdateProduct() {
       void queryClient.invalidateQueries({ queryKey: productsQueryKey });
     },
   });
-}
+};
 
-export function useDeleteProduct() {
+export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -68,4 +68,4 @@ export function useDeleteProduct() {
       void queryClient.invalidateQueries({ queryKey: productsQueryKey });
     },
   });
-}
+};

@@ -7,7 +7,7 @@ type SidebarTrayProps = {
   className?: string;
 };
 
-export function SidebarTray({ children, mode = "expanded", className = "" }: SidebarTrayProps) {
+export const SidebarTray = (=> { children, mode = "expanded", className = "" }: SidebarTrayProps) {
   const shellClass =
     mode === "collapsed"
       ? "flex flex-col gap-1"

@@ -12,15 +12,15 @@ import type {
 export { useRolesQuery };
 export const usersQueryKey = ["users"] as const;
 
-export function useUsersQuery(params: ListQueryRequest | null) {
+export const useUsersQuery = (params: ListQueryRequest | null) => {
   return useQuery({
     queryKey: [...usersQueryKey, "list", params],
     queryFn: () => UsersApi.list(params!),
     enabled: params != null,
   });
-}
+};
 
-export function useCreateUser() {
+export const useCreateUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -36,9 +36,9 @@ export function useCreateUser() {
       void queryClient.invalidateQueries({ queryKey: usersQueryKey });
     },
   });
-}
+};
 
-export function useUpdateUser() {
+export const useUpdateUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -55,9 +55,9 @@ export function useUpdateUser() {
       void queryClient.invalidateQueries({ queryKey: usersQueryKey });
     },
   });
-}
+};
 
-export function useAssignRole() {
+export const useAssignRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -74,9 +74,9 @@ export function useAssignRole() {
       void queryClient.invalidateQueries({ queryKey: usersQueryKey });
     },
   });
-}
+};
 
-export function useMarkUserInactive() {
+export const useMarkUserInactive = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -93,4 +93,4 @@ export function useMarkUserInactive() {
       void queryClient.invalidateQueries({ queryKey: usersQueryKey });
     },
   });
-}
+};

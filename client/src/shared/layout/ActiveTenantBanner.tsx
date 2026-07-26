@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { clearActiveTenant } from "../../redux/session/sessionSlice";
 import { ROUTE_PATHS } from "../../navigation";
 
-export function ActiveTenantBanner() {
+export const ActiveTenantBanner = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const activeTenant = useAppSelector((state) => state.session.activeTenant)!;
@@ -30,4 +30,4 @@ export function ActiveTenantBanner() {
       </button>
     </div>
   );
-}
+};

@@ -7,31 +7,34 @@ import type { CreateServiceRequest, UpdateServiceRequest } from "../dto/request/
 export const servicesQueryKey = (productId?: string) =>
   productId ? (["services", productId] as const) : (["services"] as const);
 
-export function useAllServicesQuery(params: ListQueryRequest | null) {
+export const useAllServicesQuery = (params: ListQueryRequest | null) => {
   return useQuery({
     queryKey: [...servicesQueryKey(), "list", params],
     queryFn: () => ServicesApi.listAll(params!),
     enabled: params != null,
   });
-}
+};
 
-export function useServicesQuery(productId: string | undefined, params: ListQueryRequest | null) {
+export const useServicesQuery = (
+  productId: string | undefined,
+  params: ListQueryRequest | null,
+) => {
   return useQuery({
     queryKey: [...servicesQueryKey(productId), "list", params],
     queryFn: () => ServicesApi.list(productId!, params!),
     enabled: productId != null && params != null,
   });
-}
+};
 
-export function useServiceEndpointsQuery(serviceId: string | undefined) {
+export const useServiceEndpointsQuery = (serviceId: string | undefined) => {
   return useQuery({
     queryKey: [...servicesQueryKey(), "endpoints", serviceId],
     queryFn: () => ServicesApi.listEndpoints(serviceId!),
     enabled: serviceId != null,
   });
-}
+};
 
-export function useCreateService(productId?: string) {
+export const useCreateService = (productId?: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -61,9 +64,9 @@ export function useCreateService(productId?: string) {
       }
     },
   });
-}
+};
 
-export function useUpdateService(productId: string) {
+export const useUpdateService = (productId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -83,9 +86,9 @@ export function useUpdateService(productId: string) {
       });
     },
   });
-}
+};
 
-export function useDeleteService(productId: string) {
+export const useDeleteService = (productId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -105,4 +108,4 @@ export function useDeleteService(productId: string) {
       });
     },
   });
-}
+};

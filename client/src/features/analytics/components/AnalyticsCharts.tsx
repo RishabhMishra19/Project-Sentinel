@@ -21,7 +21,7 @@ const SERIES = {
 };
 const CHART_MARGIN = { top: 8, right: 12, bottom: 4, left: 4 };
 
-function formatTick(iso: string) {
+const formatTick = (iso: string) => {
   const d = new Date(iso);
   return d.toLocaleString(undefined, {
     month: "short",
@@ -39,7 +39,7 @@ type ChartShellProps = {
   empty?: boolean;
 };
 
-function ChartShell({ title, xLabel, yLabel, children, empty }: ChartShellProps) {
+const ChartShell = (=> { title, xLabel, yLabel, children, empty }: ChartShellProps) {
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
       <h3 className="text-sm font-medium text-foreground">{title}</h3>
@@ -62,7 +62,7 @@ function ChartShell({ title, xLabel, yLabel, children, empty }: ChartShellProps)
   );
 }
 
-export function AnalyticsVolumeChart({ points }: { points: AnalyticsTimeseriesPoint[] }) {
+export const AnalyticsVolumeChart = (=> { points }: { points: AnalyticsTimeseriesPoint[] }) {
   return (
     <ChartShell title="Request volume" xLabel="Time" yLabel="Requests" empty={points.length === 0}>
       <ResponsiveContainer width="100%" height="100%">
@@ -85,7 +85,7 @@ export function AnalyticsVolumeChart({ points }: { points: AnalyticsTimeseriesPo
   );
 }
 
-export function AnalyticsErrorRateChart({ points }: { points: AnalyticsTimeseriesPoint[] }) {
+export const AnalyticsErrorRateChart = (=> { points }: { points: AnalyticsTimeseriesPoint[] }) {
   const data = points.map((p) => ({
     ...p,
     errorRatePct: Number((p.errorRate * 100).toFixed(3)),
@@ -117,7 +117,7 @@ export function AnalyticsErrorRateChart({ points }: { points: AnalyticsTimeserie
   );
 }
 
-export function AnalyticsLatencyChart({ points }: { points: AnalyticsTimeseriesPoint[] }) {
+export const AnalyticsLatencyChart = (=> { points }: { points: AnalyticsTimeseriesPoint[] }) {
   return (
     <ChartShell
       title="Latency (ms)"

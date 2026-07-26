@@ -3,7 +3,7 @@ import { useAppSelector } from "../../../redux/hooks";
 import { ROUTE_PATHS } from "../../../navigation";
 import { resolvePostLoginPath } from "../../../navigation/utils";
 
-export function NotFoundPage() {
+export const NotFoundPage = () => {
   const user = useAppSelector((state) => state.session.user);
   const activeTenant = useAppSelector((state) => state.session.activeTenant);
 
@@ -26,4 +26,4 @@ export function NotFoundPage() {
       </div>
     </div>
   );
-}
+};

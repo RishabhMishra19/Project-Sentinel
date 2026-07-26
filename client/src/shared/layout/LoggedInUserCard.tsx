@@ -3,7 +3,7 @@ import { useAppSelector } from "../../redux/hooks";
 import { ROUTE_PATHS } from "../../navigation";
 import { SidebarItem, type SidebarMode } from "./SidebarItem";
 
-function getInitials(name?: string | null, email?: string | null) {
+const getInitials = (name?: string | null, email?: string | null) => {
   const source = name?.trim() || email?.trim() || "?";
   const parts = source.split(/\s+/).filter(Boolean);
   if (parts.length >= 2) {
@@ -16,7 +16,7 @@ type LoggedInUserCardProps = {
   mode?: SidebarMode;
 };
 
-export function LoggedInUserCard({ mode = "expanded" }: LoggedInUserCardProps) {
+export const LoggedInUserCard = (=> { mode = "expanded" }: LoggedInUserCardProps) {
   const user = useAppSelector((state) => state.session.user);
   const navigate = useNavigate();
   const location = useLocation();

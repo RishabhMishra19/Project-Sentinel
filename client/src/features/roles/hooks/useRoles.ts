@@ -10,31 +10,31 @@ import type {
 
 export const rolesQueryKey = ["roles"] as const;
 
-export function useRolesQuery(enabled = true) {
+export const useRolesQuery = (enabled = true) => {
   return useQuery({
     queryKey: rolesQueryKey,
     queryFn: () => RolesApi.list(),
     enabled,
   });
-}
+};
 
-export function useRoleQuery(roleId: string | null, enabled = true) {
+export const useRoleQuery = (roleId: string | null, enabled = true) => {
   return useQuery({
     queryKey: [...rolesQueryKey, roleId],
     queryFn: () => RolesApi.get(roleId!),
     enabled: enabled && roleId != null,
   });
-}
+};
 
-export function useRoleScopesQuery(roleId: string | null, enabled = true) {
+export const useRoleScopesQuery = (roleId: string | null, enabled = true) => {
   return useQuery({
     queryKey: [...rolesQueryKey, roleId, "scopes"],
     queryFn: () => RolesApi.listScopes(roleId!),
     enabled: enabled && roleId != null,
   });
-}
+};
 
-export function useCreateRole() {
+export const useCreateRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -50,9 +50,9 @@ export function useCreateRole() {
       void queryClient.invalidateQueries({ queryKey: rolesQueryKey });
     },
   });
-}
+};
 
-export function useUpdateRole() {
+export const useUpdateRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -69,9 +69,9 @@ export function useUpdateRole() {
       void queryClient.invalidateQueries({ queryKey: rolesQueryKey });
     },
   });
-}
+};
 
-export function useMarkRoleInactive() {
+export const useMarkRoleInactive = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -87,9 +87,9 @@ export function useMarkRoleInactive() {
       void queryClient.invalidateQueries({ queryKey: rolesQueryKey });
     },
   });
-}
+};
 
-export function useCreateRoleScope(roleId: string | null) {
+export const useCreateRoleScope = (roleId: string | null) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -109,9 +109,9 @@ export function useCreateRoleScope(roleId: string | null) {
       }
     },
   });
-}
+};
 
-export function useUpdateRoleScope(roleId: string | null) {
+export const useUpdateRoleScope = (roleId: string | null) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -132,9 +132,9 @@ export function useUpdateRoleScope(roleId: string | null) {
       }
     },
   });
-}
+};
 
-export function useDeactivateRoleScope(roleId: string | null) {
+export const useDeactivateRoleScope = (roleId: string | null) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -155,4 +155,4 @@ export function useDeactivateRoleScope(roleId: string | null) {
       }
     },
   });
-}
+};

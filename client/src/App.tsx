@@ -1,5 +1,6 @@
 import { AppRouter } from "./navigation";
 
-export default function App() {
+const App = () => {
   return <AppRouter />;
-}
+};
+export default App;

@@ -9,14 +9,14 @@ const TAB_LABEL: Record<AnalyticsScope, string> = {
   ENDPOINT: "—",
 };
 
-function rowLabel(item: AnalyticsRankingItem, scope: AnalyticsScope) {
+const rowLabel = (item: AnalyticsRankingItem, scope: AnalyticsScope) => {
   if (scope === "SERVICE") {
     return `${item.method ?? ""} ${item.pathTemplate ?? ""}`.trim() || item.id;
   }
   return item.name ?? item.id;
 }
 
-export function AnalyticsRankingsTable({
+export const AnalyticsRankingsTable = (=> {
   scope,
   items,
   isLoading,

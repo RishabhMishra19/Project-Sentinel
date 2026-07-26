@@ -8,27 +8,27 @@ type RequestLogDetailPanelProps = {
   onClose: () => void;
 };
 
-function formatDateTime(value: string) {
+const formatDateTime = (value: string) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString();
 }
 
-function formatBytes(bytes: number | null) {
+const formatBytes = (bytes: number | null) => {
   if (bytes == null) return null;
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-function statusClasses(code: number) {
+const statusClasses = (code: number) => {
   if (code >= 500) return "bg-danger/15 text-danger";
   if (code >= 400) return "bg-warning/15 text-warning";
   if (code >= 300) return "bg-accent-soft text-accent";
   return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300";
 }
 
-function methodClasses(method: string) {
+const methodClasses = (method: string) => {
   switch (method.toUpperCase()) {
     case "GET":
       return "bg-accent-soft text-accent";
@@ -44,7 +44,7 @@ function methodClasses(method: string) {
   }
 }
 
-function DetailItem({ label, children }: { label: string; children: ReactNode }) {
+const DetailItem = (=> { label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="min-w-0">
       <dt className="text-[11px] font-medium uppercase tracking-wide text-muted">{label}</dt>
@@ -53,7 +53,7 @@ function DetailItem({ label, children }: { label: string; children: ReactNode })
   );
 }
 
-function CopyableValue({ value }: { value: string }) {
+const CopyableValue = (=> { value }: { value: string }) {
   const [copied, setCopied] = useState(false);
 
   const onCopy = async () => {
@@ -81,7 +81,7 @@ function CopyableValue({ value }: { value: string }) {
   );
 }
 
-function LoadingState() {
+const LoadingState = () => {
   return (
     <div className="flex flex-col gap-4" aria-busy="true">
       <div className="h-24 animate-pulse rounded-xl bg-chrome" />
@@ -94,7 +94,7 @@ function LoadingState() {
   );
 }
 
-export function RequestLogDetailPanel({ log, loading, onClose }: RequestLogDetailPanelProps) {
+export const RequestLogDetailPanel = (=> { log, loading, onClose }: RequestLogDetailPanelProps) {
   const titleId = useId();
   const requestSize = log ? formatBytes(log.requestSizeBytes) : null;
   const responseSize = log ? formatBytes(log.responseSizeBytes) : null;

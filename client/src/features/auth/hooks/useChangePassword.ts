@@ -5,7 +5,7 @@ import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
 import { AuthApi } from "../api/AuthApi";
 import type { ChangePasswordRequest } from "../dto/request/auth.request";
 
-export function useChangePassword() {
+export const useChangePassword = () => {
   const dispatch = useAppDispatch();
 
   return useMutation({
@@ -21,4 +21,4 @@ export function useChangePassword() {
       dispatch(setAuthSession(data));
     },
   });
-}
+};

@@ -17,7 +17,7 @@ type RequestLogsTableProps = {
   initialFilters?: Record<string, FilterValue>;
 };
 
-export function RequestLogsTable({ onView, initialFilters }: RequestLogsTableProps) {
+export const RequestLogsTable = (=> { onView, initialFilters }: RequestLogsTableProps) {
   const [fetchQuery, setFetchQuery] = useState<DataTableQueryState | null>(null);
 
   const productId =

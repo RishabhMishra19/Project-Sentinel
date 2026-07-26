@@ -8,13 +8,13 @@ type CreateRequestLogColumnsOptions = {
   endpointOptions: FilterOption[];
 };
 
-function statusTone(code: number) {
+const statusTone = (code: number) => {
   if (code >= 500) return "text-red-700";
   if (code >= 400) return "text-amber-700";
   return "text-foreground";
 }
 
-export function createRequestLogColumns({
+export const createRequestLogColumns = (=> {
   productOptions,
   serviceOptions,
   endpointOptions,

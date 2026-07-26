@@ -5,7 +5,7 @@ const HIGHLIGHTS = [
 ] as const;
 
 /** Left brand panel for guest/auth screens (login layout). */
-export function AuthBrandPanel() {
+export const AuthBrandPanel = () => {
   return (
     <aside className="flex flex-col justify-between rounded-2xl bg-brand-panel px-8 py-12 text-brand-panel-foreground shadow-sm md:w-1/2 md:px-12 lg:px-16">
       <div className="flex flex-1 flex-col justify-center">
@@ -38,4 +38,4 @@ export function AuthBrandPanel() {
       </footer>
     </aside>
   );
-}
+};

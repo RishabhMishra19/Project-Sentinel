@@ -7,19 +7,19 @@ import type { CreateServiceApiKeyRequest } from "../dto/request/apikey.request";
 export const apiKeysQueryKey = (productId: string, serviceId: string) =>
   ["api-keys", productId, serviceId] as const;
 
-export function useServiceApiKeysQuery(
+export const useServiceApiKeysQuery = (
   productId: string | undefined,
   serviceId: string | undefined,
   params: ListQueryRequest | null,
-) {
+) => {
   return useQuery({
     queryKey: [...apiKeysQueryKey(productId ?? "", serviceId ?? ""), "list", params],
     queryFn: () => ApiKeysApi.list(productId!, serviceId!, params!),
     enabled: productId != null && serviceId != null && params != null,
   });
-}
+};
 
-export function useCreateServiceApiKey(productId: string, serviceId: string) {
+export const useCreateServiceApiKey = (productId: string, serviceId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -38,9 +38,9 @@ export function useCreateServiceApiKey(productId: string, serviceId: string) {
       });
     },
   });
-}
+};
 
-export function useRevokeServiceApiKey(productId: string, serviceId: string) {
+export const useRevokeServiceApiKey = (productId: string, serviceId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -58,4 +58,4 @@ export function useRevokeServiceApiKey(productId: string, serviceId: string) {
       });
     },
   });
-}
+};

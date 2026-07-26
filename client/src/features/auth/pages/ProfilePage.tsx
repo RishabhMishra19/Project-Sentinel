@@ -2,15 +2,15 @@ import { useState } from "react";
 import { ChangePasswordModal } from "../components/ChangePasswordModal";
 import { useProfile } from "../hooks/useProfile";
 
-function formatDate(value: string): string {
+const formatDate = (value: string): string => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
     return value;
   }
   return date.toLocaleString();
-}
+};
 
-export function ProfilePage() {
+export const ProfilePage = () => {
   const { data, isLoading, isError } = useProfile();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
@@ -114,4 +114,4 @@ export function ProfilePage() {
       <ChangePasswordModal open={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
     </>
   );
-}
+};

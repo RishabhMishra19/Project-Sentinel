@@ -12,10 +12,10 @@ type IndexableRoute = {
 };
 
 /** Recursively collect navigable routes, inheriting access from wrapper ancestors. */
-function collectNavigableSidebarItems(
+const collectNavigableSidebarItems = (
   routes: SentinelRouteObject[],
   inheritedAccess?: AccessCheck,
-): SidebarItem[] {
+): SidebarItem[] => {
   return routes
     .map((route) => {
       const isAccessibleTo = route.isAccessibleTo ?? inheritedAccess;
@@ -41,13 +41,13 @@ function collectNavigableSidebarItems(
     })
     .filter((item) => item != null)
     .flat();
-}
+};
 
 /** Recursively collect leaf routes that declare `indexOrder` (landing candidates). */
-function collectIndexOrderedRoutes(
+const collectIndexOrderedRoutes = (
   routes: SentinelRouteObject[],
   inheritedAccess?: AccessCheck,
-): IndexableRoute[] {
+): IndexableRoute[] => {
   return routes
     .map((route) => {
       const isAccessibleTo = route.isAccessibleTo ?? inheritedAccess;
@@ -70,12 +70,12 @@ function collectIndexOrderedRoutes(
     })
     .filter((item) => item != null)
     .flat();
-}
+};
 
-function toAbsolutePath(path: string): string {
+const toAbsolutePath = (path: string): string => {
   if (path === "" || path.startsWith("/")) return path;
   return `/${path}`;
-}
+};
 
 /** Flatten route trees into sidebar entries sorted by `navigation.order`. */
 export const getSideBarItems = (routes: SentinelRouteObject[]): SidebarItem[] => {
@@ -86,26 +86,26 @@ export const getSideBarItems = (routes: SentinelRouteObject[]): SidebarItem[] =>
  * First accessible protected path by ascending `indexOrder`
  * (used after login / when a signed-in user hits a guest route).
  */
-export function getFirstAccessiblePath(
+export const getFirstAccessiblePath = (
   routes: SentinelRouteObject[],
   isLoggedIn: boolean,
   user: AuthSessionUser | null,
   activeTenant: TenantSummary | null,
-): string | undefined {
+): string | undefined => {
   return collectIndexOrderedRoutes(routes)
     .sort((a, b) => a.indexOrder - b.indexOrder)
     .find((route) =>
       route.isAccessibleTo ? route.isAccessibleTo(isLoggedIn, user, activeTenant) : true,
     )?.path;
-}
+};
 
 /** Default landing path for an authenticated session. */
-export function resolvePostLoginPath(
+export const resolvePostLoginPath = (
   user: AuthSessionUser,
   activeTenant: TenantSummary | null = null,
-): string {
+): string => {
   return (
     getFirstAccessiblePath(protectedPageRoutes, true, user, activeTenant) ??
     `/${ROUTE_PATHS.profile}`
   );
-}
+};

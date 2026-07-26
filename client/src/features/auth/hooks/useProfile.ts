@@ -3,9 +3,9 @@ import { AuthApi } from "../api/AuthApi";
 
 export const profileQueryKey = ["auth", "profile"] as const;
 
-export function useProfile() {
+export const useProfile = () => {
   return useQuery({
     queryKey: profileQueryKey,
     queryFn: () => AuthApi.getProfile(),
   });
-}
+};

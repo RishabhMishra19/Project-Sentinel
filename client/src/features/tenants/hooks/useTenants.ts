@@ -6,15 +6,15 @@ import type { CreateTenantRequest, UpdateTenantRequest } from "../dto/request/te
 
 export const tenantsQueryKey = ["tenants"] as const;
 
-export function useTenantsQuery(params: ListQueryRequest | null) {
+export const useTenantsQuery = (params: ListQueryRequest | null) => {
   return useQuery({
     queryKey: [...tenantsQueryKey, "list", params],
     queryFn: () => TenantsApi.list(params!),
     enabled: params != null,
   });
-}
+};
 
-export function useCreateTenant() {
+export const useCreateTenant = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -30,9 +30,9 @@ export function useCreateTenant() {
       void queryClient.invalidateQueries({ queryKey: tenantsQueryKey });
     },
   });
-}
+};
 
-export function useUpdateTenant() {
+export const useUpdateTenant = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -49,9 +49,9 @@ export function useUpdateTenant() {
       void queryClient.invalidateQueries({ queryKey: tenantsQueryKey });
     },
   });
-}
+};
 
-export function useDeleteTenant() {
+export const useDeleteTenant = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -68,4 +68,4 @@ export function useDeleteTenant() {
       void queryClient.invalidateQueries({ queryKey: tenantsQueryKey });
     },
   });
-}
+};

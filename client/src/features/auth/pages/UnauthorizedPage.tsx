@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../navigation";
 
-export function UnauthorizedPage() {
+export const UnauthorizedPage = () => {
   return (
     <div className="mx-auto flex max-w-lg flex-col items-start gap-4 rounded-xl border border-border bg-surface p-8">
       <p className="text-sm font-medium uppercase tracking-wide text-muted">403</p>
@@ -17,4 +17,4 @@ export function UnauthorizedPage() {
       </Link>
     </div>
   );
-}
+};

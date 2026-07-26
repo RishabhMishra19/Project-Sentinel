@@ -7,7 +7,7 @@ import { resolvePostLoginPath } from "../../../navigation/utils";
 import { AuthApi } from "../api/AuthApi";
 import type { LoginRequest } from "../dto/request/auth.request";
 
-export function useLogin() {
+export const useLogin = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -25,4 +25,4 @@ export function useLogin() {
       navigate(resolvePostLoginPath(data.user), { replace: true });
     },
   });
-}
+};

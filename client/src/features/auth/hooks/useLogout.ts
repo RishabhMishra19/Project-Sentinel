@@ -5,7 +5,7 @@ import { ROUTE_PATHS } from "../../../navigation";
 import { clearSession } from "../../../redux/session/sessionSlice";
 import { AuthApi } from "../api/AuthApi";
 
-export function useLogout() {
+export const useLogout = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -19,4 +19,4 @@ export function useLogout() {
       navigate(`/${ROUTE_PATHS.login}`, { replace: true });
     },
   });
-}
+};

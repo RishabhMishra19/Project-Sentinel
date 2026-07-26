@@ -42,14 +42,14 @@ const TABS: { id: AnalyticsScope; label: string }[] = [
   { id: "ENDPOINT", label: "Endpoint" },
 ];
 
-function parseScope(raw: string | null): AnalyticsScope {
+const parseScope = (raw: string | null): AnalyticsScope => {
   if (raw === "PRODUCT" || raw === "SERVICE" || raw === "ENDPOINT") {
     return raw;
   }
   return "TENANT";
-}
+};
 
-export function AnalyticsPage() {
+export const AnalyticsPage = () => {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -418,4 +418,4 @@ export function AnalyticsPage() {
       </p>
     </div>
   );
-}
+};

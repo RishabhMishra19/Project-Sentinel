@@ -13,22 +13,22 @@ export type PageHeader = {
 
 export type PageMatch = UIMatch<unknown, AppRouteHandle | undefined>;
 
-function resolveCrumb(handle: AppRouteHandle, state: unknown): string | undefined {
+const resolveCrumb = (handle: AppRouteHandle, state: unknown): string | undefined => {
   const resolved = typeof handle.crumb === "function" ? handle.crumb(state) : handle.crumb;
   return resolved && resolved.length > 0 ? resolved : undefined;
-}
+};
 
-function resolveDescription(handle: AppRouteHandle, state: unknown): string | undefined {
+const resolveDescription = (handle: AppRouteHandle, state: unknown): string | undefined => {
   const resolved =
     typeof handle.description === "function" ? handle.description(state) : handle.description;
   return resolved && resolved.length > 0 ? resolved : undefined;
-}
+};
 
 /**
  * Builds navbar breadcrumbs/description from typed `match.handle`
  * (`AppRouteHandle`: crumb + description).
  */
-export function resolvePageHeader(matches: PageMatch[], state: unknown): PageHeader {
+export const resolvePageHeader = (matches: PageMatch[], state: unknown): PageHeader => {
   const crumbMatches = matches.filter(
     (m): m is UIMatch<unknown, AppRouteHandle> => m.handle != null,
   );
@@ -50,4 +50,4 @@ export function resolvePageHeader(matches: PageMatch[], state: unknown): PageHea
     .find((value) => value != null);
 
   return { crumbs, description };
-}
+};
