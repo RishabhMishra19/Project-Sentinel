@@ -20,7 +20,7 @@ const getSidebarItemClass = (tone: Tone, active: boolean, mode: Mode, className 
   }
 
   return `${baseClass} ${layoutClass} ${toneClass} ${className}`.trim();
-}
+};
 
 type SidebarItemProps = {
   iconNode?: ReactNode;
@@ -33,7 +33,7 @@ type SidebarItemProps = {
   className?: string;
 };
 
-export const SidebarItem = (=> {
+export const SidebarItem = ({
   iconNode,
   textNode,
   mode = "expanded",
@@ -42,7 +42,7 @@ export const SidebarItem = (=> {
   tone = "default",
   disabled = false,
   className = "",
-}: SidebarItemProps) {
+}: SidebarItemProps) => {
   const label = typeof textNode === "string" ? textNode : undefined;
   const isCollapsed = mode === "collapsed";
   const hasIcon = iconNode != null;
@@ -74,6 +74,6 @@ export const SidebarItem = (=> {
       ) : null}
     </span>
   );
-}
+};
 
 export type { Mode as SidebarMode };

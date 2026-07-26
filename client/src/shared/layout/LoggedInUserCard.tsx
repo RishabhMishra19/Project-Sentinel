@@ -10,13 +10,13 @@ const getInitials = (name?: string | null, email?: string | null) => {
     return `${parts[0]![0]!}${parts[1]![0]!}`.toUpperCase();
   }
   return source.slice(0, 2).toUpperCase();
-}
+};
 
 type LoggedInUserCardProps = {
   mode?: SidebarMode;
 };
 
-export const LoggedInUserCard = (=> { mode = "expanded" }: LoggedInUserCardProps) {
+export const LoggedInUserCard = ({ mode = "expanded" }: LoggedInUserCardProps) => {
   const user = useAppSelector((state) => state.session.user);
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,4 +67,4 @@ export const LoggedInUserCard = (=> { mode = "expanded" }: LoggedInUserCardProps
       textNode={isCollapsed ? (isLoadingUser ? "Loading…" : displayName) : textNode}
     />
   );
-}
+};

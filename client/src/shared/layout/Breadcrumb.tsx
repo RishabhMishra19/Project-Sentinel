@@ -6,7 +6,7 @@ type BreadcrumbProps = {
   items: Crumb[];
 };
 
-export const Breadcrumb = (=> { items }: BreadcrumbProps) {
+export const Breadcrumb = ({ items }: BreadcrumbProps) => {
   return (
     <nav aria-label="Breadcrumb">
       <ol className="flex flex-wrap items-center gap-1.5 text-sm">
@@ -49,4 +49,4 @@ export const Breadcrumb = (=> { items }: BreadcrumbProps) {
       </ol>
     </nav>
   );
-}
+};

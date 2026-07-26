@@ -12,7 +12,7 @@ type AuthenticatedLayoutProps = {
 };
 
 /** Chrome for signed-in pages: sidebar, banner, navbar, and page outlet. */
-export const AuthenticatedLayout = (=> { crumbs, description }: AuthenticatedLayoutProps) {
+export const AuthenticatedLayout = ({ crumbs, description }: AuthenticatedLayoutProps) => {
   const user = useAppSelector((state) => state.session.user)!;
   const activeTenant = useAppSelector((state) => state.session.activeTenant);
 
@@ -28,4 +28,4 @@ export const AuthenticatedLayout = (=> { crumbs, description }: AuthenticatedLay
       </div>
     </div>
   );
-}
+};
