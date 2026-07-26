@@ -2,11 +2,11 @@ import {
   USERS_API_ROUTES,
 } from '../../../shared/api/api.routes'
 import { apiManager } from '../../../shared/api/ApiManager'
+import type { ListQueryRequest } from '../../../shared/api/listQueryRequest'
 import type {
   AssignRoleRequest,
   CreateUserRequest,
   UpdateUserRequest,
-  UserListParams,
 } from '../dto/request/user.request'
 import type { PageResponse } from '../../../shared/dto/response'
 import type {
@@ -15,10 +15,11 @@ import type {
 } from '../dto/response/user.response'
 
 export class UsersApi {
-  static list(params: UserListParams): Promise<PageResponse<UserResponse>> {
-    return apiManager.get<PageResponse<UserResponse>>(USERS_API_ROUTES.LIST, {
-      params,
-    })
+  static list(query: ListQueryRequest): Promise<PageResponse<UserResponse>> {
+    return apiManager.post<PageResponse<UserResponse>>(
+      USERS_API_ROUTES.SEARCH,
+      query,
+    )
   }
 
   static get(id: string): Promise<UserResponse> {

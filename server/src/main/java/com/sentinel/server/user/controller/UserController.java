@@ -1,5 +1,6 @@
 package com.sentinel.server.user.controller;
 
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.ApiResponses;
 import com.sentinel.server.common.response.PageResponse;
 import com.sentinel.server.security.UserPrincipal;
@@ -8,14 +9,10 @@ import com.sentinel.server.user.dto.request.CreateUserRequest;
 import com.sentinel.server.user.dto.request.UpdateUserRequest;
 import com.sentinel.server.user.dto.response.CreateUserResponse;
 import com.sentinel.server.user.dto.response.UserResponse;
-import com.sentinel.server.user.entity.UserStatus;
 import com.sentinel.server.user.service.UserFacade;
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,25 +32,10 @@ public class UserController {
     private final UserFacade userFacade;
 
     @PreAuthorize("@accessSupport.canReadUsers()")
-    @GetMapping
-    public ResponseEntity<PageResponse<UserResponse>> list(
-            @AuthenticationPrincipal UserPrincipal principal,
-            Pageable pageable,
-            @RequestParam(required = false) UserStatus status,
-            @RequestParam(required = false) String q,
-            @RequestParam(required = false) String searchBy,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate to) {
-        return ApiResponses.okPage(userFacade.list(
-                principal.getActiveTenantId(),
-                pageable,
-                status,
-                q,
-                searchBy,
-                from,
-                to));
+    @PostMapping("/search")
+    public ResponseEntity<PageResponse<UserResponse>> search(
+            @AuthenticationPrincipal UserPrincipal principal, @RequestBody ListQueryRequest query) {
+        return ApiResponses.okPage(userFacade.list(principal.getActiveTenantId(), query));
     }
 
     @PreAuthorize("@accessSupport.canReadUsers()")

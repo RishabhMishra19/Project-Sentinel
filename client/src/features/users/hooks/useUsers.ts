@@ -1,18 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getApiErrorMessage } from '../../../shared/forms/getApiErrorMessage'
+import type { ListQueryRequest } from '../../../shared/api/listQueryRequest'
 import { useRolesQuery } from '../../roles/hooks/useRoles'
 import { UsersApi } from '../api/UsersApi'
 import type {
   AssignRoleRequest,
   CreateUserRequest,
   UpdateUserRequest,
-  UserListParams,
 } from '../dto/request/user.request'
 
 export { useRolesQuery }
 export const usersQueryKey = ['users'] as const
 
-export function useUsersQuery(params: UserListParams | null) {
+export function useUsersQuery(params: ListQueryRequest | null) {
   return useQuery({
     queryKey: [...usersQueryKey, 'list', params],
     queryFn: () => UsersApi.list(params!),

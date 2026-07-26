@@ -16,15 +16,14 @@ import com.sentinel.server.user.dto.response.CreateUserResponse;
 import com.sentinel.server.user.dto.response.UserResponse;
 import com.sentinel.server.user.entity.User;
 import com.sentinel.server.user.entity.UserStatus;
+import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.user.mapper.UserMapper;
 import com.sentinel.server.user.repository.UserSpecifications;
 import com.sentinel.server.user.service.core.UserService;
 import java.security.SecureRandom;
-import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -51,18 +50,11 @@ public class UserFacadeImpl implements UserFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<UserResponse> list(
-            UUID tenantId,
-            Pageable pageable,
-            UserStatus status,
-            String q,
-            String searchBy,
-            LocalDate from,
-            LocalDate to) {
+    public PageResponse<UserResponse> list(UUID tenantId, ListQueryRequest query) {
         UUID effectiveTenantId = requireTenantId(tenantId);
-        Pageable effective = withDefaultSort(pageable);
-        Specification<User> spec = UserSpecifications.withFilters(
-                effectiveTenantId, status, q, searchBy, from, to);
+        Pageable effective =
+                query.toPageable(UserSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
+        Specification<User> spec = UserSpecifications.withFilters(effectiveTenantId, query);
         Page<User> page = userService.findAll(spec, effective);
         return PageResponse.from(page.map(userMapper::toResponse));
     }
@@ -137,13 +129,6 @@ public class UserFacadeImpl implements UserFacade {
             throw new BadRequestException("Active tenant is required");
         }
         return tenantId;
-    }
-
-    private Pageable withDefaultSort(Pageable pageable) {
-        if (pageable.getSort().isSorted()) {
-            return pageable;
-        }
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), DEFAULT_SORT);
     }
 
     private String generateTemporaryPassword() {
