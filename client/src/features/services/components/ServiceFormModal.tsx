@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { FormField } from "../../../shared/forms/FormField";
+import { SelectField } from "../../../shared/forms/SelectField";
 import { useAppForm } from "../../../shared/forms/useAppForm";
 import { ModalForm } from "../../../shared/ui";
 import { toast } from "../../../shared/ui/toast";
@@ -37,19 +38,20 @@ export const ServiceFormModal = ({
   const defaultProductId = productId ?? products[0]?.id ?? "";
   const wasOpenRef = useRef(false);
 
+  const productOptions = useMemo(
+    () => products.map((product) => ({ value: product.id, label: product.name })),
+    [products],
+  );
+
   const {
     register,
     handleSubmit,
     reset,
-    watch,
-    setValue,
     formState: { errors },
   } = useAppForm<ServiceFormValues & { productId?: string }>({
     schema: serviceFormSchema,
     defaultValues: { name: "", productId: "" },
   });
-
-  const selectedProductId = watch("productId");
 
   useEffect(() => {
     const justOpened = open && !wasOpenRef.current;
@@ -85,7 +87,7 @@ export const ServiceFormModal = ({
       return;
     }
 
-    const targetProductId = productId ?? data.productId ?? selectedProductId;
+    const targetProductId = productId ?? data.productId;
     if (!targetProductId) {
       toast.error("Select a product for this service.");
       return;
@@ -123,24 +125,13 @@ export const ServiceFormModal = ({
     >
       <div className="flex flex-col gap-4">
         {needsProductSelect ? (
-          <label className="flex flex-col gap-1 text-sm text-foreground">
-            Product
-            <select
-              className="rounded border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-ring"
-              value={selectedProductId ?? ""}
-              onChange={(event) => setValue("productId", event.target.value)}
-            >
-              {products.length === 0 ? (
-                <option value="">No products available</option>
-              ) : (
-                products.map((product) => (
-                  <option key={product.id} value={product.id}>
-                    {product.name}
-                  </option>
-                ))
-              )}
-            </select>
-          </label>
+          <SelectField
+            label="Product"
+            options={productOptions}
+            placeholder="Select a product"
+            emptyPlaceholder="No products available"
+            {...register("productId")}
+          />
         ) : null}
 
         <FormField
