@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { FieldError } from "react-hook-form";
+import { FormError } from "./FormError";
 
 const selectClassName =
   "rounded border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-ring disabled:cursor-not-allowed disabled:opacity-60";
@@ -45,9 +46,7 @@ export const SelectField = ({
     </select>
   );
 
-  const errorMessage = error?.message ? (
-    <span className="text-sm text-danger">{error.message}</span>
-  ) : null;
+  const errorMessage = error?.message ? <FormError>{error.message}</FormError> : null;
 
   if (!label) {
     return (

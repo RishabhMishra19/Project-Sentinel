@@ -1,4 +1,5 @@
 import type { FieldError, UseFormRegisterReturn } from "react-hook-form";
+import { FormError } from "./FormError";
 
 const inputClassName =
   "rounded border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-ring disabled:cursor-not-allowed disabled:opacity-60";
@@ -32,6 +33,6 @@ export const TextField = ({
       className={inputClassName}
       {...registration}
     />
-    {error?.message ? <span className="text-sm text-danger">{error.message}</span> : null}
+    {error?.message ? <FormError>{error.message}</FormError> : null}
   </label>
 );

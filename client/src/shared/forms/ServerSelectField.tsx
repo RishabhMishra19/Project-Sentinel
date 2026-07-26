@@ -1,3 +1,4 @@
+import { FormError } from "./FormError";
 import type { SelectFieldProps, SelectOption } from "./SelectField";
 import { SelectField } from "./SelectField";
 
@@ -53,7 +54,7 @@ export const ServerSelectField = <T,>({
         error={error}
       />
       {isEmpty && emptyMessage ? <span className="text-sm text-muted">{emptyMessage}</span> : null}
-      {isError ? <span className="text-sm text-danger">{errorMessage}</span> : null}
+      {isError ? <FormError>{errorMessage}</FormError> : null}
     </div>
   );
 };
