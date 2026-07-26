@@ -24,3 +24,6 @@ npm-debug.log*
 # Local planning / API collections (not versioned)
 docs/
 postman/
+
+# Local demo seed data
+scripts/seed-demo-analytics.sql
