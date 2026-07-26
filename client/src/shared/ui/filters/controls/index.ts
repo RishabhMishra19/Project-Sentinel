@@ -1,5 +1,6 @@
 export { BooleanFilter } from './BooleanFilter'
 export { DateFilter } from './DateFilter'
 export { DateRangeFilter } from './DateRangeFilter'
+export { DateTimeRangeFilter } from './DateTimeRangeFilter'
 export { MultiSelectFilter } from './MultiSelectFilter'
 export { SelectFilter } from './SelectFilter'

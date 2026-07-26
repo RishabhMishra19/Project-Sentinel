@@ -6,6 +6,11 @@ export {
   PRESET_SUMMARY,
 } from './controls/DateRangeFilter'
 export {
+  dateTimeRangeFromPreset,
+  matchDateTimeRangePreset,
+  DATE_TIME_PRESET_SUMMARY,
+} from './controls/DateTimeRangeFilter'
+export {
   buildFilterChips,
   collectActiveFilters,
   countActiveFilters,

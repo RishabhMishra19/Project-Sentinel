@@ -4,6 +4,7 @@ export type FilterType =
   | 'boolean'
   | 'date'
   | 'dateRange'
+  | 'dateTimeRange'
 
 export type FilterOption = { label: string; value: string }
 
@@ -14,6 +15,7 @@ export type FilterValueByType = {
   boolean: boolean | null
   date: string | null
   dateRange: { from: string | null; to: string | null }
+  dateTimeRange: { from: string | null; to: string | null }
 }
 
 /** Source of truth: filter type → field filter config */
@@ -23,6 +25,7 @@ export type FilterConfigByType = {
   boolean: { type: 'boolean' }
   date: { type: 'date' }
   dateRange: { type: 'dateRange' }
+  dateTimeRange: { type: 'dateTimeRange' }
 }
 
 export type FilterValue<F extends FilterType = FilterType> =

@@ -2,6 +2,10 @@ import {
   PRESET_SUMMARY,
   matchDateRangePreset,
 } from './controls/DateRangeFilter'
+import {
+  DATE_TIME_PRESET_SUMMARY,
+  matchDateTimeRangePreset,
+} from './controls/DateTimeRangeFilter'
 import type { FilterField, FilterFieldConfig, FilterValue } from './types'
 
 export type FilterChip = {
@@ -26,6 +30,10 @@ export const isFilterActive = (
       return Array.isArray(value) && value.length > 0
     case 'dateRange': {
       const range = value as FilterValue<'dateRange'>
+      return Boolean(range.from || range.to)
+    }
+    case 'dateTimeRange': {
+      const range = value as FilterValue<'dateTimeRange'>
       return Boolean(range.from || range.to)
     }
   }
@@ -74,6 +82,23 @@ export const formatFilterValue = (
       const preset = matchDateRangePreset(range)
       if (preset) {
         return PRESET_SUMMARY[preset]
+      }
+      if (range.from && range.to) {
+        return `${range.from} – ${range.to}`
+      }
+      if (range.from) {
+        return `From ${range.from}`
+      }
+      if (range.to) {
+        return `Until ${range.to}`
+      }
+      return null
+    }
+    case 'dateTimeRange': {
+      const range = value as FilterValue<'dateTimeRange'>
+      const preset = matchDateTimeRangePreset(range)
+      if (preset) {
+        return DATE_TIME_PRESET_SUMMARY[preset]
       }
       if (range.from && range.to) {
         return `${range.from} – ${range.to}`

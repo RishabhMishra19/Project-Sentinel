@@ -62,6 +62,30 @@ export const matchesColumnFilter = <T extends object>(
       }
       return true
     }
+    case 'dateTimeRange': {
+      const range = value as FilterValue<'dateTimeRange'>
+      const instant = String(cellValue ?? '')
+      if (!instant) {
+        return false
+      }
+      const ms = new Date(instant).getTime()
+      if (Number.isNaN(ms)) {
+        return false
+      }
+      if (range.from) {
+        const fromMs = new Date(range.from).getTime()
+        if (!Number.isNaN(fromMs) && ms < fromMs) {
+          return false
+        }
+      }
+      if (range.to) {
+        const toMs = new Date(range.to).getTime()
+        if (!Number.isNaN(toMs) && ms > toMs) {
+          return false
+        }
+      }
+      return true
+    }
   }
 }
 

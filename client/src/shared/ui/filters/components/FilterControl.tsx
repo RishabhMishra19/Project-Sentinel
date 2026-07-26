@@ -3,6 +3,7 @@ import {
   BooleanFilter,
   DateFilter,
   DateRangeFilter,
+  DateTimeRangeFilter,
   MultiSelectFilter,
   SelectFilter,
 } from '../controls'
@@ -54,6 +55,18 @@ export const FilterControl = ({
         <DateRangeFilter
           value={
             (value as FilterValue<'dateRange'>) ?? {
+              from: null,
+              to: null,
+            }
+          }
+          onChange={onChange}
+        />
+      )
+    case 'dateTimeRange':
+      return (
+        <DateTimeRangeFilter
+          value={
+            (value as FilterValue<'dateTimeRange'>) ?? {
               from: null,
               to: null,
             }
