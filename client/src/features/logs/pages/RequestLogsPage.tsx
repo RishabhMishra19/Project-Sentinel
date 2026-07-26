@@ -71,6 +71,7 @@ export const RequestLogsPage = () => {
         <RequestLogDetailPanel
           log={detailQuery.data}
           loading={detailQuery.isLoading}
+          isError={detailQuery.isError}
           onClose={() => setSelectedId(null)}
         />
       ) : null}
