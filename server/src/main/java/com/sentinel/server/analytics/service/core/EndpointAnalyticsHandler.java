@@ -2,7 +2,7 @@ package com.sentinel.server.analytics.service.core;
 
 import com.sentinel.server.common.exception.BadRequestException;
 import com.sentinel.server.common.exception.ResourceNotFoundException;
-import com.sentinel.server.observability.repository.EndpointRepository;
+import com.sentinel.common.observability.repository.EndpointRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -69,7 +69,7 @@ public class EndpointAnalyticsHandler implements AnalyticsScopeHandler {
             throw new BadRequestException("endpointId is required for ENDPOINT scope");
         }
         endpointRepository
-                .findByIdAndServiceProductTenantId(endpointId, tenantId)
+                .findByIdAndTenantId(endpointId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
         return endpointId;
     }

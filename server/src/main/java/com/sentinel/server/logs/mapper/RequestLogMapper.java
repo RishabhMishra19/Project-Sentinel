@@ -1,8 +1,8 @@
 package com.sentinel.server.logs.mapper;
 
+import com.sentinel.common.observability.entity.Endpoint;
+import com.sentinel.common.observability.entity.RequestLog;
 import com.sentinel.server.logs.dto.response.RequestLogResponse;
-import com.sentinel.server.observability.entity.Endpoint;
-import com.sentinel.server.observability.entity.RequestLog;
 import com.sentinel.server.product.entity.Product;
 import com.sentinel.server.service.entity.Service;
 import org.springframework.stereotype.Component;
@@ -10,14 +10,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class RequestLogMapper {
 
-    public RequestLogResponse toResponse(RequestLog log) {
-        Endpoint endpoint = log.getEndpoint();
-        Service service = endpoint.getService();
-        Product product = service.getProduct();
+    public RequestLogResponse toResponse(
+            RequestLog log, Endpoint endpoint, Service service, Product product) {
         return new RequestLogResponse(
                 log.getId(),
-                log.getServiceInstance().getId(),
-                endpoint.getId(),
+                log.getServiceInstanceId(),
+                log.getEndpointId(),
                 log.getRequestId(),
                 log.getTraceId(),
                 log.getOccurredAt(),

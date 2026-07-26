@@ -1,7 +1,7 @@
 package com.sentinel.server.logs.service.core;
 
+import com.sentinel.common.observability.entity.RequestLog;
 import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.observability.entity.RequestLog;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;

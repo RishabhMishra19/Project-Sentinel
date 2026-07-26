@@ -18,7 +18,7 @@ import com.sentinel.server.common.exception.ResourceNotFoundException;
 import com.sentinel.server.common.query.ListQueryFilterReader;
 import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.observability.repository.EndpointRepository;
+import com.sentinel.common.observability.repository.EndpointRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
@@ -134,7 +134,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
         Instant to = query != null ? query.getTo() : null;
         requireRange(from, to);
         endpointRepository
-                .findByIdAndServiceProductTenantId(endpointId, tenantId)
+                .findByIdAndTenantId(endpointId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
         return queryService.statusBreakdown(endpointId, tenantId, from, to).stream()
                 .map(analyticsMapper::toStatusItem)
@@ -149,7 +149,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
         Instant to = query != null ? query.getTo() : null;
         requireRange(from, to);
         endpointRepository
-                .findByIdAndServiceProductTenantId(endpointId, tenantId)
+                .findByIdAndTenantId(endpointId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
         return queryService.exceptionBreakdown(endpointId, tenantId, from, to).stream()
                 .map(analyticsMapper::toExceptionItem)

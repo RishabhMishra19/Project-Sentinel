@@ -1,25 +1,25 @@
 package com.sentinel.server.observability.repository;
 
+import com.sentinel.common.observability.entity.Endpoint;
+import com.sentinel.common.observability.entity.RequestLog;
 import com.sentinel.server.common.query.ListQueryRequest;
 import com.sentinel.server.common.specification.GenericSpecifications;
 import com.sentinel.server.common.specification.QueryFieldAllowlist;
-import com.sentinel.server.observability.entity.RequestLog;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
+import com.sentinel.server.product.entity.Product;
+import com.sentinel.server.service.entity.Service;
 import jakarta.persistence.criteria.Predicate;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 public final class RequestLogSpecifications {
 
     public static final QueryFieldAllowlist FIELDS =
             QueryFieldAllowlist.builder()
-                    .equal("productId", "endpoint.service.product.id", UUID.class)
-                    .equal("serviceId", "endpoint.service.id", UUID.class)
-                    .equal("endpointId", "endpoint.id", UUID.class)
+                    .equal("endpointId", "endpointId", UUID.class)
                     .equal("statusCode", "statusCode", Integer.class)
                     .statusClass("statusClass", "statusCode")
                     .gte("minDurationMs", "durationMs", Integer.class)
@@ -41,28 +41,54 @@ public final class RequestLogSpecifications {
     public static Specification<RequestLog> forTenantFilters(UUID tenantId, ListQueryRequest query) {
         Specification<RequestLog> scoped =
                 (root, criteriaQuery, cb) -> {
-                    boolean isCountQuery =
-                            criteriaQuery != null
-                                    && criteriaQuery.getResultType() != null
-                                    && (Long.class.equals(criteriaQuery.getResultType())
-                                            || long.class.equals(criteriaQuery.getResultType()));
-                    if (criteriaQuery != null && !isCountQuery) {
-                        criteriaQuery.distinct(true);
-                        root.fetch("endpoint", JoinType.INNER)
-                                .fetch("service", JoinType.INNER)
-                                .fetch("product", JoinType.INNER);
-                        root.fetch("serviceInstance", JoinType.INNER);
+                    Subquery<UUID> endpointIds = criteriaQuery.subquery(UUID.class);
+                    Root<Endpoint> endpoint = endpointIds.from(Endpoint.class);
+                    Root<Service> service = endpointIds.from(Service.class);
+                    Root<Product> product = endpointIds.from(Product.class);
+
+                    endpointIds
+                            .select(endpoint.get("id"))
+                            .where(
+                                    cb.equal(endpoint.get("serviceId"), service.get("id")),
+                                    cb.equal(service.get("product"), product),
+                                    cb.equal(product.get("tenant").get("id"), tenantId));
+
+                    Predicate tenantScope = root.get("endpointId").in(endpointIds);
+
+                    UUID productIdFilter = readUuid(query, "productId");
+                    UUID serviceIdFilter = readUuid(query, "serviceId");
+
+                    if (productIdFilter != null || serviceIdFilter != null) {
+                        Subquery<UUID> filteredEndpoints = criteriaQuery.subquery(UUID.class);
+                        Root<Endpoint> ep = filteredEndpoints.from(Endpoint.class);
+                        Root<Service> svc = filteredEndpoints.from(Service.class);
+                        filteredEndpoints.select(ep.get("id"));
+                        Predicate join = cb.equal(ep.get("serviceId"), svc.get("id"));
+                        if (serviceIdFilter != null) {
+                            filteredEndpoints.where(
+                                    join, cb.equal(svc.get("id"), serviceIdFilter));
+                        } else {
+                            filteredEndpoints.where(
+                                    join, cb.equal(svc.get("product").get("id"), productIdFilter));
+                        }
+                        return cb.and(tenantScope, root.get("endpointId").in(filteredEndpoints));
                     }
 
-                    Join<?, ?> endpoint = root.join("endpoint", JoinType.INNER);
-                    Join<?, ?> service = endpoint.join("service", JoinType.INNER);
-                    Join<?, ?> product = service.join("product", JoinType.INNER);
-
-                    List<Predicate> preds = new ArrayList<>();
-                    preds.add(cb.equal(product.get("tenant").get("id"), tenantId));
-                    return cb.and(preds.toArray(Predicate[]::new));
+                    return tenantScope;
                 };
 
         return scoped.and(GenericSpecifications.from(query, FIELDS));
+    }
+
+    private static UUID readUuid(ListQueryRequest query, String field) {
+        String raw = query != null ? query.firstFilterValue(field) : null;
+        if (!StringUtils.hasText(raw)) {
+            return null;
+        }
+        try {
+            return UUID.fromString(raw.trim());
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
 }
