@@ -1,6 +1,7 @@
-import { useEffect, useId } from "react";
+import { useEffect } from "react";
 import { FormField } from "../../../shared/forms/FormField";
 import { useAppForm } from "../../../shared/forms/useAppForm";
+import { ModalForm } from "../../../shared/ui";
 import type { ProductResponse } from "../dto/response/product.response";
 import { useCreateProduct, useUpdateProduct } from "../hooks/useProducts";
 import { productFormSchema, type ProductFormValues } from "../schemas/product.schema";
@@ -13,7 +14,6 @@ type ProductFormModalProps = {
 };
 
 export const ProductFormModal = ({ open, mode, product, onClose }: ProductFormModalProps) => {
-  const titleId = useId();
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const { reset: resetCreate } = createMutation;
@@ -43,10 +43,6 @@ export const ProductFormModal = ({ open, mode, product, onClose }: ProductFormMo
     }
   }, [open, mode, product, reset, resetCreate, resetUpdate]);
 
-  if (!open) {
-    return null;
-  }
-
   const onSubmit = (data: ProductFormValues) => {
     if (mode === "edit" && product) {
       updateMutation.mutate(
@@ -68,65 +64,31 @@ export const ProductFormModal = ({ open, mode, product, onClose }: ProductFormMo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
-      <button
-        type="button"
-        aria-label="Close dialog backdrop"
-        className="absolute inset-0 cursor-default"
-        onClick={onClose}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        className="relative z-10 w-full max-w-md rounded-xl bg-surface p-6 shadow-lg"
-      >
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <h2 id={titleId} className="text-xl font-semibold text-foreground">
-            {mode === "edit" ? "Edit product" : "Create product"}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="cursor-pointer rounded border border-border px-2 py-1 text-sm text-foreground hover:bg-background"
-          >
-            Close
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <FormField
-            label="Name"
-            type="text"
-            autoComplete="off"
-            error={errors.name}
-            registration={register("name")}
-          />
-
-          <div className="mt-2 flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="cursor-pointer rounded border border-border px-4 py-2 text-sm text-foreground hover:bg-background"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="cursor-pointer rounded bg-accent px-4 py-2 text-sm text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isPending
-                ? mode === "edit"
-                  ? "Saving…"
-                  : "Creating…"
-                : mode === "edit"
-                  ? "Save changes"
-                  : "Create product"}
-            </button>
-          </div>
-        </form>
+    <ModalForm
+      open={open}
+      onClose={onClose}
+      title={mode === "edit" ? "Edit product" : "Create product"}
+      onSubmit={handleSubmit(onSubmit)}
+      submitLabel={
+        isPending
+          ? mode === "edit"
+            ? "Saving…"
+            : "Creating…"
+          : mode === "edit"
+            ? "Save changes"
+            : "Create product"
+      }
+      submitDisabled={isPending}
+    >
+      <div className="flex flex-col gap-4">
+        <FormField
+          label="Name"
+          type="text"
+          autoComplete="off"
+          error={errors.name}
+          registration={register("name")}
+        />
       </div>
-    </div>
+    </ModalForm>
   );
 };
