@@ -1,5 +1,10 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { QueryGate } from "../../../shared/ui";
 import type { ExceptionMetricItem, StatusBreakdownItem } from "../dto/response/analytics.response";
+import {
+  useEndpointExceptionsQuery,
+  useEndpointStatusBreakdownQuery,
+} from "../hooks/useAnalytics";
 
 const AXIS = { fontSize: 12, fill: "var(--color-muted-foreground, #737373)" };
 const GRID = "var(--color-border, #e5e5e5)";
@@ -43,7 +48,7 @@ const ChartFrame = ({
   );
 };
 
-export const EndpointStatusChart = ({ items }: { items: StatusBreakdownItem[] }) => {
+const StatusChartContent = ({ items }: { items: StatusBreakdownItem[] }) => {
   return (
     <ChartFrame
       title="Status codes"
@@ -65,7 +70,7 @@ export const EndpointStatusChart = ({ items }: { items: StatusBreakdownItem[] })
   );
 };
 
-export const EndpointExceptionsChart = ({ items }: { items: ExceptionMetricItem[] }) => {
+const ExceptionsChartContent = ({ items }: { items: ExceptionMetricItem[] }) => {
   return (
     <ChartFrame
       title="Exceptions"
@@ -91,5 +96,51 @@ export const EndpointExceptionsChart = ({ items }: { items: ExceptionMetricItem[
         </BarChart>
       </ResponsiveContainer>
     </ChartFrame>
+  );
+};
+
+export const EndpointStatusChart = ({
+  endpointId,
+  from,
+  to,
+}: {
+  endpointId: string;
+  from: string;
+  to: string;
+}) => {
+  const statusQuery = useEndpointStatusBreakdownQuery(endpointId, from, to);
+
+  return (
+    <QueryGate
+      isLoading={statusQuery.isLoading}
+      isError={statusQuery.isError}
+      errorMessage="Could not load status breakdown."
+      className="min-h-56 rounded-xl border border-border bg-background"
+    >
+      <StatusChartContent items={statusQuery.data ?? []} />
+    </QueryGate>
+  );
+};
+
+export const EndpointExceptionsChart = ({
+  endpointId,
+  from,
+  to,
+}: {
+  endpointId: string;
+  from: string;
+  to: string;
+}) => {
+  const exceptionsQuery = useEndpointExceptionsQuery(endpointId, from, to);
+
+  return (
+    <QueryGate
+      isLoading={exceptionsQuery.isLoading}
+      isError={exceptionsQuery.isError}
+      errorMessage="Could not load exceptions."
+      className="min-h-56 rounded-xl border border-border bg-background"
+    >
+      <ExceptionsChartContent items={exceptionsQuery.data ?? []} />
+    </QueryGate>
   );
 };

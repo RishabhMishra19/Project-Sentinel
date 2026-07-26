@@ -1,6 +1,7 @@
 import { QueryGate } from "../../../shared/ui";
-import type { AnalyticsScope } from "../dto/request/analytics.request";
+import type { AnalyticsRankingsParams, AnalyticsScope } from "../dto/request/analytics.request";
 import type { AnalyticsRankingItem } from "../dto/response/analytics.response";
+import { useAnalyticsRankingsQuery } from "../hooks/useAnalytics";
 import { formatNumber, formatRate } from "../utils/timeRange";
 
 const TAB_LABEL: Record<AnalyticsScope, string> = {
@@ -18,18 +19,16 @@ const rowLabel = (item: AnalyticsRankingItem, scope: AnalyticsScope) => {
 };
 
 export const AnalyticsRankingsTable = ({
-  scope,
-  items,
-  isLoading,
-  isError,
+  params,
   onRowClick,
 }: {
-  scope: AnalyticsScope;
-  items: AnalyticsRankingItem[];
-  isLoading: boolean;
-  isError: boolean;
+  params: AnalyticsRankingsParams;
   onRowClick?: (item: AnalyticsRankingItem) => void;
 }) => {
+  const rankingsQuery = useAnalyticsRankingsQuery(params);
+  const scope = params.scope;
+  const items = rankingsQuery.rows;
+
   if (scope === "ENDPOINT") {
     return null;
   }
@@ -42,8 +41,8 @@ export const AnalyticsRankingsTable = ({
         </h3>
       </div>
       <QueryGate
-        isLoading={isLoading}
-        isError={isError}
+        isLoading={rankingsQuery.isLoading}
+        isError={rankingsQuery.isError}
         errorMessage="Could not load rankings."
         className="px-4 py-8"
       >

@@ -1,4 +1,6 @@
-import type { AnalyticsSummaryResponse } from "../dto/response/analytics.response";
+import { QueryGate } from "../../../shared/ui";
+import type { AnalyticsQueryParams } from "../dto/request/analytics.request";
+import { useAnalyticsSummaryQuery } from "../hooks/useAnalytics";
 import { formatNumber, formatRate } from "../utils/timeRange";
 
 const Kpi = ({ label, value }: { label: string; value: string }) => {
@@ -10,34 +12,38 @@ const Kpi = ({ label, value }: { label: string; value: string }) => {
   );
 };
 
-export const AnalyticsKpiStrip = ({
-  summary,
-}: {
-  summary: AnalyticsSummaryResponse | undefined;
-}) => {
-  if (!summary) {
-    return (
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-[4.5rem] animate-pulse rounded-xl border border-border bg-muted/40"
-          />
-        ))}
-      </div>
-    );
-  }
+export const AnalyticsKpiStrip = ({ params }: { params: AnalyticsQueryParams }) => {
+  const summaryQuery = useAnalyticsSummaryQuery(params);
+  const summary = summaryQuery.data;
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-      <Kpi label="Requests" value={formatNumber(summary.requestCount)} />
-      <Kpi label="Error rate" value={formatRate(summary.errorRate)} />
-      <Kpi label="p50" value={summary.latencyP50Ms != null ? `${summary.latencyP50Ms} ms` : "—"} />
-      <Kpi label="p95" value={summary.latencyP95Ms != null ? `${summary.latencyP95Ms} ms` : "—"} />
-      <Kpi label="p99" value={summary.latencyP99Ms != null ? `${summary.latencyP99Ms} ms` : "—"} />
-      {summary.activeEndpointCount != null ? (
-        <Kpi label="Active endpoints" value={formatNumber(summary.activeEndpointCount)} />
+    <QueryGate
+      isLoading={summaryQuery.isLoading}
+      isError={summaryQuery.isError || (!summaryQuery.isLoading && !summary)}
+      errorMessage="Could not load summary."
+      className="min-h-[4.5rem]"
+    >
+      {summary ? (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+          <Kpi label="Requests" value={formatNumber(summary.requestCount)} />
+          <Kpi label="Error rate" value={formatRate(summary.errorRate)} />
+          <Kpi
+            label="p50"
+            value={summary.latencyP50Ms != null ? `${summary.latencyP50Ms} ms` : "—"}
+          />
+          <Kpi
+            label="p95"
+            value={summary.latencyP95Ms != null ? `${summary.latencyP95Ms} ms` : "—"}
+          />
+          <Kpi
+            label="p99"
+            value={summary.latencyP99Ms != null ? `${summary.latencyP99Ms} ms` : "—"}
+          />
+          {summary.activeEndpointCount != null ? (
+            <Kpi label="Active endpoints" value={formatNumber(summary.activeEndpointCount)} />
+          ) : null}
+        </div>
       ) : null}
-    </div>
+    </QueryGate>
   );
 };
