@@ -1,12 +1,10 @@
 import type { UserBriefResponse } from "../../../../shared/dto/response";
 
-export type ProductStatus = "ACTIVE" | "INACTIVE";
-
 export interface ProductResponse {
   id: string;
   tenantId: string;
   name: string;
-  status: ProductStatus;
+  status: "ACTIVE" | "INACTIVE";
   createdBy: UserBriefResponse;
   updatedBy: UserBriefResponse;
   createdAt: string;

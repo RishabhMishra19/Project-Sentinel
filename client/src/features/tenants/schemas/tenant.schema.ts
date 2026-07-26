@@ -33,4 +33,3 @@ export const updateTenantFormSchema = z.object(nameSlugFields);
 
 export type CreateTenantFormValues = z.infer<typeof createTenantFormSchema>;
 export type UpdateTenantFormValues = z.infer<typeof updateTenantFormSchema>;
-export type TenantFormValues = CreateTenantFormValues | UpdateTenantFormValues;

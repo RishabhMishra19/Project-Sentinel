@@ -41,11 +41,8 @@ export interface AuthSessionResponse {
   user: AuthSessionUser;
 }
 
-export type UserStatus = "ACTIVE" | "INACTIVE";
-
-/** Session user fields plus account metadata. */
 export type ProfileResponse = AuthSessionUser & {
-  status: UserStatus;
+  status: "ACTIVE" | "INACTIVE";
   createdAt: string;
   updatedAt: string;
   lastLoginAt: string | null;
