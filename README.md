@@ -86,17 +86,16 @@ Agents should **batch** runtime events (interval or N requests) rather than one 
 
 ## Current demo stack
 
-| Service  | URL / port            | How it runs                              |
-| -------- | --------------------- | ---------------------------------------- |
-| Client   | http://localhost:3000 | Docker Compose                           |
-| Loadlab  | http://localhost:3100 | Docker Compose                           |
-| Server   | http://localhost:8080 | Docker Compose (or local Maven)          |
-| Ingest   | http://localhost:8081 | Docker Compose (or local Maven)          |
-| Worker   | http://localhost:8082 | Docker Compose (or local Maven)          |
-| Postgres | localhost:5432        | Docker Compose                           |
-| Redis    | localhost:6379        | Docker Compose                           |
-| Kafka    | localhost:9092        | Docker Compose                           |
-| Kafka UI | http://localhost:8090 | Docker Compose                           |
+| Service  | URL / port            | How it runs                     |
+| -------- | --------------------- | ------------------------------- |
+| Client   | http://localhost:3000 | Docker Compose                  |
+| Loadlab  | http://localhost:3100 | Docker Compose                  |
+| Server   | http://localhost:8080 | Docker Compose (or local Maven) |
+| Ingest   | http://localhost:8081 | Docker Compose (or local Maven) |
+| Worker   | http://localhost:8082 | Docker Compose (or local Maven) |
+| Postgres | localhost:5432        | Docker Compose                  |
+| Redis    | localhost:6379        | Docker Compose                  |
+| Kafka    | localhost:9092        | Docker Compose                  |
 
 Maven layout is a **multi-module reactor** at the repo root (`common`, `server`, `ingest`, `worker`). Shared persistence lives in `common`; Liquibase stays on **server** only.
 
