@@ -1,0 +1,21 @@
+export type RequestLogResponse = {
+  id: string
+  serviceInstanceId: string
+  endpointId: string
+  requestId: string | null
+  traceId: string | null
+  occurredAt: string
+  endUserIp: string | null
+  userId: string | null
+  statusCode: number
+  durationMs: number
+  requestSizeBytes: number | null
+  responseSizeBytes: number | null
+  receivedAt: string
+  method: string
+  pathTemplate: string
+  serviceId: string
+  serviceName: string
+  productId: string
+  productName: string
+}
