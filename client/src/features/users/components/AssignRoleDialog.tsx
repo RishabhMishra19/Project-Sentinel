@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { ServerSelectField } from "../../../shared/forms/ServerSelectField";
 import { useAppForm } from "../../../shared/forms/useAppForm";
 import { ModalForm } from "../../../shared/ui";
 import type { UserResponse } from "../dto/response/user.response";
@@ -14,8 +15,11 @@ type AssignRoleDialogProps = {
 export const AssignRoleDialog = ({ open, user, onClose }: AssignRoleDialogProps) => {
   const assignMutation = useAssignRole();
   const { reset: resetMutation } = assignMutation;
-  const { data: roles = [], isLoading: rolesLoading } = useRolesQuery(open);
-  const activeRoles = roles.filter((role) => role.status === "ACTIVE");
+  const rolesQuery = useRolesQuery(open);
+  const activeRolesQuery = {
+    ...rolesQuery,
+    rows: rolesQuery.rows.filter((role) => role.status === "ACTIVE"),
+  };
 
   const {
     register,
@@ -65,33 +69,21 @@ export const AssignRoleDialog = ({ open, user, onClose }: AssignRoleDialogProps)
       }
       onSubmit={handleSubmit(onSubmit)}
       submitLabel={assignMutation.isPending ? "Assigning…" : "Assign role"}
-      submitDisabled={assignMutation.isPending || activeRoles.length === 0}
+      submitDisabled={assignMutation.isPending || activeRolesQuery.rows.length === 0}
     >
       <div className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm text-foreground">
-          Role
-          <select
-            className="rounded border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-ring"
-            disabled={rolesLoading || activeRoles.length === 0}
-            {...register("roleId")}
-          >
-            <option value="">{rolesLoading ? "Loading roles…" : "Select a role"}</option>
-            {activeRoles.map((role) => (
-              <option key={role.id} value={role.id}>
-                {role.name}
-              </option>
-            ))}
-          </select>
-          {errors.roleId?.message ? (
-            <span className="text-sm text-danger">{errors.roleId.message}</span>
-          ) : null}
-          {!rolesLoading && activeRoles.length === 0 ? (
-            <span className="text-sm text-muted">
-              No active roles in this tenant. Create a tenant after Admin seeding is available, or
-              seed roles manually.
-            </span>
-          ) : null}
-        </label>
+        <ServerSelectField
+          label="Role"
+          query={activeRolesQuery}
+          toOption={(role) => ({ value: role.id, label: role.name })}
+          placeholder="Select a role"
+          loadingPlaceholder="Loading roles…"
+          emptyPlaceholder="No active roles available"
+          emptyMessage="No active roles in this tenant. Create a tenant after Admin seeding is available, or seed roles manually."
+          errorMessage="Could not load roles."
+          error={errors.roleId}
+          {...register("roleId")}
+        />
       </div>
     </ModalForm>
   );
