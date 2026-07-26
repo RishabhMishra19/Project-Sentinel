@@ -2,7 +2,7 @@ import { useEffect, useId } from "react";
 import { FormField } from "../../../shared/forms/FormField";
 import { useAppForm } from "../../../shared/forms/useAppForm";
 import { useCreateRole } from "../hooks/useRoles";
-import { createRoleFormSchema, type CreateRoleFormValues } from "../schemas/role.schema";
+import { roleFormSchema, type RoleFormValues } from "../schemas/role.schema";
 
 type RoleCreateModalProps = {
   open: boolean;
@@ -19,8 +19,8 @@ export const RoleCreateModal = ({ open, onClose }: RoleCreateModalProps) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useAppForm<CreateRoleFormValues>({
-    schema: createRoleFormSchema,
+  } = useAppForm<RoleFormValues>({
+    schema: roleFormSchema,
     defaultValues: { name: "" },
   });
 
@@ -36,7 +36,7 @@ export const RoleCreateModal = ({ open, onClose }: RoleCreateModalProps) => {
     return null;
   }
 
-  const onSubmit = (data: CreateRoleFormValues) => {
+  const onSubmit = (data: RoleFormValues) => {
     createMutation.mutate(data, {
       onSuccess: () => {
         onClose();

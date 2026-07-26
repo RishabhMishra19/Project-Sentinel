@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createRoleFormSchema = z.object({
+export const roleFormSchema = z.object({
   name: z
     .string()
     .trim()
@@ -8,11 +8,7 @@ export const createRoleFormSchema = z.object({
     .max(255, "Name must be at most 255 characters"),
 });
 
-export type CreateRoleFormValues = z.infer<typeof createRoleFormSchema>;
-
-export const updateRoleFormSchema = createRoleFormSchema;
-
-export type UpdateRoleFormValues = z.infer<typeof updateRoleFormSchema>;
+export type RoleFormValues = z.infer<typeof roleFormSchema>;
 
 export const createRoleScopeFormSchema = z.object({
   scopeType: z.enum(["PRODUCT", "SERVICE"]),

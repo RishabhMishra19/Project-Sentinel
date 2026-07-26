@@ -3,7 +3,7 @@ import { FormField } from "../../../shared/forms/FormField";
 import { useAppForm } from "../../../shared/forms/useAppForm";
 import type { RoleResponse } from "../dto/response/role.response";
 import { useUpdateRole } from "../hooks/useRoles";
-import { updateRoleFormSchema, type UpdateRoleFormValues } from "../schemas/role.schema";
+import { roleFormSchema, type RoleFormValues } from "../schemas/role.schema";
 
 type RoleEditModalProps = {
   open: boolean;
@@ -21,8 +21,8 @@ export const RoleEditModal = ({ open, role, onClose }: RoleEditModalProps) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useAppForm<UpdateRoleFormValues>({
-    schema: updateRoleFormSchema,
+  } = useAppForm<RoleFormValues>({
+    schema: roleFormSchema,
     defaultValues: { name: "" },
   });
 
@@ -38,7 +38,7 @@ export const RoleEditModal = ({ open, role, onClose }: RoleEditModalProps) => {
     return null;
   }
 
-  const onSubmit = (data: UpdateRoleFormValues) => {
+  const onSubmit = (data: RoleFormValues) => {
     updateMutation.mutate(
       { id: role.id, payload: data },
       {
