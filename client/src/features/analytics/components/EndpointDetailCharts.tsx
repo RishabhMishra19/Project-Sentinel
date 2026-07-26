@@ -6,7 +6,7 @@ const GRID = "var(--color-border, #e5e5e5)";
 const BAR = "#0f766e";
 const CHART_MARGIN = { top: 8, right: 12, bottom: 4, left: 4 };
 
-const ChartFrame = (=> {
+const ChartFrame = ({
   title,
   xLabel,
   yLabel,
@@ -20,7 +20,7 @@ const ChartFrame = (=> {
   empty: boolean;
   emptyMessage: string;
   children: React.ReactNode;
-}) {
+}) => {
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
       <h3 className="text-sm font-medium text-foreground">{title}</h3>
@@ -41,9 +41,9 @@ const ChartFrame = (=> {
       )}
     </div>
   );
-}
+};
 
-export const EndpointStatusChart = (=> { items }: { items: StatusBreakdownItem[] }) {
+export const EndpointStatusChart = ({ items }: { items: StatusBreakdownItem[] }) => {
   return (
     <ChartFrame
       title="Status codes"
@@ -63,9 +63,9 @@ export const EndpointStatusChart = (=> { items }: { items: StatusBreakdownItem[]
       </ResponsiveContainer>
     </ChartFrame>
   );
-}
+};
 
-export const EndpointExceptionsChart = (=> { items }: { items: ExceptionMetricItem[] }) {
+export const EndpointExceptionsChart = ({ items }: { items: ExceptionMetricItem[] }) => {
   return (
     <ChartFrame
       title="Exceptions"
@@ -92,4 +92,4 @@ export const EndpointExceptionsChart = (=> { items }: { items: ExceptionMetricIt
       </ResponsiveContainer>
     </ChartFrame>
   );
-}
+};

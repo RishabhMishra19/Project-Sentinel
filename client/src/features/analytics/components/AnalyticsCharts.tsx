@@ -29,7 +29,7 @@ const formatTick = (iso: string) => {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
+};
 
 type ChartShellProps = {
   title: string;
@@ -39,7 +39,7 @@ type ChartShellProps = {
   empty?: boolean;
 };
 
-const ChartShell = (=> { title, xLabel, yLabel, children, empty }: ChartShellProps) {
+const ChartShell = ({ title, xLabel, yLabel, children, empty }: ChartShellProps) => {
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
       <h3 className="text-sm font-medium text-foreground">{title}</h3>
@@ -60,9 +60,9 @@ const ChartShell = (=> { title, xLabel, yLabel, children, empty }: ChartShellPro
       )}
     </div>
   );
-}
+};
 
-export const AnalyticsVolumeChart = (=> { points }: { points: AnalyticsTimeseriesPoint[] }) {
+export const AnalyticsVolumeChart = ({ points }: { points: AnalyticsTimeseriesPoint[] }) => {
   return (
     <ChartShell title="Request volume" xLabel="Time" yLabel="Requests" empty={points.length === 0}>
       <ResponsiveContainer width="100%" height="100%">
@@ -83,9 +83,9 @@ export const AnalyticsVolumeChart = (=> { points }: { points: AnalyticsTimeserie
       </ResponsiveContainer>
     </ChartShell>
   );
-}
+};
 
-export const AnalyticsErrorRateChart = (=> { points }: { points: AnalyticsTimeseriesPoint[] }) {
+export const AnalyticsErrorRateChart = ({ points }: { points: AnalyticsTimeseriesPoint[] }) => {
   const data = points.map((p) => ({
     ...p,
     errorRatePct: Number((p.errorRate * 100).toFixed(3)),
@@ -115,9 +115,9 @@ export const AnalyticsErrorRateChart = (=> { points }: { points: AnalyticsTimese
       </ResponsiveContainer>
     </ChartShell>
   );
-}
+};
 
-export const AnalyticsLatencyChart = (=> { points }: { points: AnalyticsTimeseriesPoint[] }) {
+export const AnalyticsLatencyChart = ({ points }: { points: AnalyticsTimeseriesPoint[] }) => {
   return (
     <ChartShell
       title="Latency (ms)"
@@ -160,4 +160,4 @@ export const AnalyticsLatencyChart = (=> { points }: { points: AnalyticsTimeseri
       </ResponsiveContainer>
     </ChartShell>
   );
-}
+};

@@ -14,11 +14,11 @@ const PRESET_MS: Record<TimePreset, number> = {
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
-export const rangeFromPreset = (preset: TimePreset): => { from: string; to: string } {
+export const rangeFromPreset = (preset: TimePreset): { from: string; to: string } => {
   const to = new Date();
   const from = new Date(to.getTime() - PRESET_MS[preset]);
   return { from: from.toISOString(), to: to.toISOString() };
-}
+};
 
 /** Default granularity for a range (also used when presets/custom range are applied). */
 export const suggestedBucket = (fromIso: string, toIso: string): AnalyticsBucket => {
@@ -26,12 +26,12 @@ export const suggestedBucket = (fromIso: string, toIso: string): AnalyticsBucket
   if (span <= SIX_HOURS_MS) return "MINUTE";
   if (span <= THIRTY_DAYS_MS) return "HOUR";
   return "DAY";
-}
+};
 
 export const parseBucket = (raw: string | null): AnalyticsBucket | null => {
   if (raw === "MINUTE" || raw === "HOUR" || raw === "DAY") return raw;
   return null;
-}
+};
 
 /** ISO → value for <input type="datetime-local"> (local timezone). */
 export const toDatetimeLocalValue = (iso: string): string => {
@@ -39,7 +39,7 @@ export const toDatetimeLocalValue = (iso: string): string => {
   if (Number.isNaN(d.getTime())) return "";
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
+};
 
 /** datetime-local value → ISO string. */
 export const fromDatetimeLocalValue = (local: string): string | null => {
@@ -47,15 +47,15 @@ export const fromDatetimeLocalValue = (local: string): string | null => {
   const d = new Date(local);
   if (Number.isNaN(d.getTime())) return null;
   return d.toISOString();
-}
+};
 
 export const clampLogsRange = (
   fromIso: string,
   toIso: string,
-): => {
+): {
   from: string;
   to: string;
-} {
+} => {
   const to = new Date(toIso);
   let from = new Date(fromIso);
   const maxMs = 7 * 24 * 60 * 60 * 1000;
@@ -63,12 +63,12 @@ export const clampLogsRange = (
     from = new Date(to.getTime() - maxMs);
   }
   return { from: from.toISOString(), to: to.toISOString() };
-}
+};
 
 export const formatRate = (rate: number): string => {
   return `${(rate * 100).toFixed(2)}%`;
-}
+};
 
 export const formatNumber = (n: number): string => {
   return new Intl.NumberFormat().format(n);
-}
+};

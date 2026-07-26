@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../navigation";
+import { QueryGate } from "../../../shared/ui";
 import {
   AppliedFilterChips,
   dateRangeFromPreset,
@@ -115,14 +116,21 @@ export const AnalyticsPage = () => {
     patchParams(patch);
   };
 
-  const productsQuery = useProductsQuery(scope === "PRODUCT" ? { page: 0, size: 100 } : null);
-  const servicesQuery = useAllServicesQuery(
-    scope === "SERVICE" || scope === "ENDPOINT" ? { page: 0, size: 100, status: "ACTIVE" } : null,
+  const productsQuery = useProductsQuery(
+    scope === "PRODUCT" ? { pageable: { page: 0, size: 100 } } : null,
   );
-  const services = servicesQuery.data?.content ?? [];
-  const products = productsQuery.data?.content ?? [];
+  const servicesQuery = useAllServicesQuery(
+    scope === "SERVICE" || scope === "ENDPOINT"
+      ? {
+          pageable: { page: 0, size: 100 },
+          filterConfigs: [{ fieldName: "status", filterValues: ["ACTIVE"] }],
+        }
+      : null,
+  );
+  const services = servicesQuery.rows;
+  const products = productsQuery.rows;
   const endpointsQuery = useServiceEndpointsQuery(scope === "ENDPOINT" ? serviceId : undefined);
-  const endpoints = endpointsQuery.data ?? [];
+  const endpoints = endpointsQuery.rows;
 
   const filters = useMemo(() => filtersFromSearchParams(params, scope), [params, scope]);
 
@@ -380,34 +388,37 @@ export const AnalyticsPage = () => {
           {scope === "ENDPOINT" && "Select a service and endpoint to view analytics."}
         </div>
       ) : (
-        <>
-          {summaryQuery.isError || timeseriesQuery.isError ? (
-            <p className="text-sm text-destructive">Could not load analytics for this scope.</p>
-          ) : null}
+        <QueryGate
+          isLoading={summaryQuery.isLoading || timeseriesQuery.isLoading}
+          isError={summaryQuery.isError || timeseriesQuery.isError}
+          errorMessage="Could not load analytics for this scope."
+          className="min-h-64"
+        >
+          <div className="flex flex-col gap-4">
+            <AnalyticsKpiStrip summary={summaryQuery.data} />
 
-          <AnalyticsKpiStrip summary={summaryQuery.data} />
-
-          <div className="grid gap-4 lg:grid-cols-1">
-            <AnalyticsVolumeChart points={points} />
-            <AnalyticsErrorRateChart points={points} />
-            <AnalyticsLatencyChart points={points} />
-          </div>
-
-          {scope === "ENDPOINT" ? (
-            <div className="grid gap-4 lg:grid-cols-2">
-              <EndpointStatusChart items={statusQuery.data ?? []} />
-              <EndpointExceptionsChart items={exceptionsQuery.data ?? []} />
+            <div className="grid gap-4 lg:grid-cols-1">
+              <AnalyticsVolumeChart points={points} />
+              <AnalyticsErrorRateChart points={points} />
+              <AnalyticsLatencyChart points={points} />
             </div>
-          ) : (
-            <AnalyticsRankingsTable
-              scope={scope}
-              items={rankingsQuery.data?.content ?? []}
-              isLoading={rankingsQuery.isLoading}
-              isError={rankingsQuery.isError}
-              onRowClick={onRankingClick}
-            />
-          )}
-        </>
+
+            {scope === "ENDPOINT" ? (
+              <div className="grid gap-4 lg:grid-cols-2">
+                <EndpointStatusChart items={statusQuery.data ?? []} />
+                <EndpointExceptionsChart items={exceptionsQuery.data ?? []} />
+              </div>
+            ) : (
+              <AnalyticsRankingsTable
+                scope={scope}
+                items={rankingsQuery.rows}
+                isLoading={rankingsQuery.isLoading}
+                isError={rankingsQuery.isError}
+                onRowClick={onRankingClick}
+              />
+            )}
+          </div>
+        </QueryGate>
       )}
 
       <p className="text-xs text-muted-foreground">

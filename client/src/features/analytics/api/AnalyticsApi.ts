@@ -1,6 +1,6 @@
 import { ANALYTICS_API_ROUTES } from "../../../shared/api/api.routes";
 import { apiManager } from "../../../shared/api/ApiManager";
-import { analyticsParamsToListQuery } from "../../../shared/api/toListQueryRequest";
+import { analyticsParamsToListQuery } from "../../../shared/utils/queryUtils";
 import type { PageResponse } from "../../../shared/dto/response/PageResponse";
 import type {
   AnalyticsQueryParams,

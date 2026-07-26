@@ -1,16 +1,20 @@
 import type { AnalyticsSummaryResponse } from "../dto/response/analytics.response";
 import { formatNumber, formatRate } from "../utils/timeRange";
 
-const Kpi = (=> { label, value }: { label: string; value: string }) {
+const Kpi = ({ label, value }: { label: string; value: string }) => {
   return (
     <div className="rounded-xl border border-border bg-background px-4 py-3">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">{value}</p>
     </div>
   );
-}
+};
 
-export const AnalyticsKpiStrip = (=> { summary }: { summary: AnalyticsSummaryResponse | undefined }) {
+export const AnalyticsKpiStrip = ({
+  summary,
+}: {
+  summary: AnalyticsSummaryResponse | undefined;
+}) => {
   if (!summary) {
     return (
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -36,4 +40,4 @@ export const AnalyticsKpiStrip = (=> { summary }: { summary: AnalyticsSummaryRes
       ) : null}
     </div>
   );
-}
+};

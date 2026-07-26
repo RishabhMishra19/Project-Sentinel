@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { mapPageQuery } from "../../../shared/api/mapQuery";
 import { AnalyticsApi } from "../api/AnalyticsApi";
 import type {
   AnalyticsQueryParams,
@@ -24,11 +25,13 @@ export const useAnalyticsTimeseriesQuery = (params: AnalyticsQueryParams | null)
 };
 
 export const useAnalyticsRankingsQuery = (params: AnalyticsRankingsParams | null) => {
-  return useQuery({
-    queryKey: [...analyticsQueryKey, "rankings", params],
-    queryFn: () => AnalyticsApi.rankings(params!),
-    enabled: params != null,
-  });
+  return mapPageQuery(
+    useQuery({
+      queryKey: [...analyticsQueryKey, "rankings", params],
+      queryFn: () => AnalyticsApi.rankings(params!),
+      enabled: params != null,
+    }),
+  );
 };
 
 export const useEndpointStatusBreakdownQuery = (
