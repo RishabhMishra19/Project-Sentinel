@@ -13,8 +13,25 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=10000,expireAfterWrite=60s
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: "1"
+      properties:
+        linger.ms: 20
+        batch.size: 65536
+
+sentinel:
+  kafka:
+    request-events-topic: sentinel.request-events
+    request-events-partitions: 24
+    request-events-replicas: 1
 
 server:
   port: 8081
