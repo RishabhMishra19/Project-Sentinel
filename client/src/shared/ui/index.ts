@@ -1,3 +1,5 @@
+export { CopyableValue } from "./CopyableValue";
+export { DetailRow } from "./DetailRow";
 export { ModalConfirmLayout } from "./ModalConfirmLayout";
 export { ModalForm } from "./ModalForm";
 export { ModalLayout } from "./ModalLayout";
