@@ -5,6 +5,8 @@ export const ROUTE_PATHS = {
   tenants: "tenants",
   products: "products",
   services: "services",
+  analytics: "analytics",
+  logs: "logs",
   users: "users",
   settings: "settings",
   settingsHome: "",

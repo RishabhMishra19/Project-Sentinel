@@ -54,3 +54,18 @@ export const ROLES_API_ROUTES = {
   DEACTIVATE_SCOPE: (roleId: string, scopeId: string) =>
     `/roles/${roleId}/scopes/${scopeId}/deactivate`,
 } as const
+
+export const ANALYTICS_API_ROUTES = {
+  SUMMARY: '/analytics/summary',
+  TIMESERIES: '/analytics/timeseries',
+  RANKINGS: '/analytics/rankings',
+  STATUS_BREAKDOWN: (endpointId: string) =>
+    `/analytics/endpoints/${endpointId}/status-breakdown`,
+  EXCEPTIONS: (endpointId: string) =>
+    `/analytics/endpoints/${endpointId}/exceptions`,
+} as const
+
+export const LOGS_API_ROUTES = {
+  LIST: '/logs/requests',
+  BY_ID: (id: string) => `/logs/requests/${id}`,
+} as const
