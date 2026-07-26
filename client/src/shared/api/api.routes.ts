@@ -12,17 +12,21 @@ export const AUTH_API_ROUTES = {
 
 export const TENANTS_API_ROUTES = {
   LIST: '/tenants',
+  SEARCH: '/tenants/search',
   BY_ID: (id: string) => `/tenants/${id}`,
 } as const
 
 export const PRODUCTS_API_ROUTES = {
   LIST: '/products',
+  SEARCH: '/products/search',
   BY_ID: (id: string) => `/products/${id}`,
 } as const
 
 export const SERVICES_API_ROUTES = {
   LIST_ALL: '/services',
+  SEARCH_ALL: '/services/search',
   LIST: (productId: string) => `/products/${productId}/services`,
+  SEARCH: (productId: string) => `/products/${productId}/services/search`,
   BY_ID: (productId: string, id: string) =>
     `/products/${productId}/services/${id}`,
   ENDPOINTS: (serviceId: string) => `/services/${serviceId}/endpoints`,
@@ -31,6 +35,8 @@ export const SERVICES_API_ROUTES = {
 export const SERVICE_API_KEYS_API_ROUTES = {
   LIST: (productId: string, serviceId: string) =>
     `/products/${productId}/services/${serviceId}/api-keys`,
+  SEARCH: (productId: string, serviceId: string) =>
+    `/products/${productId}/services/${serviceId}/api-keys/search`,
   BY_ID: (productId: string, serviceId: string, id: string) =>
     `/products/${productId}/services/${serviceId}/api-keys/${id}`,
   REVOKE: (productId: string, serviceId: string, id: string) =>
@@ -39,6 +45,7 @@ export const SERVICE_API_KEYS_API_ROUTES = {
 
 export const USERS_API_ROUTES = {
   LIST: '/users',
+  SEARCH: '/users/search',
   BY_ID: (id: string) => `/users/${id}`,
   ASSIGN_ROLE: (id: string) => `/users/${id}/roles`,
   MARK_INACTIVE: (id: string) => `/users/${id}/mark-inactive`,
@@ -67,5 +74,6 @@ export const ANALYTICS_API_ROUTES = {
 
 export const LOGS_API_ROUTES = {
   LIST: '/logs/requests',
+  SEARCH: '/logs/requests/search',
   BY_ID: (id: string) => `/logs/requests/${id}`,
 } as const
