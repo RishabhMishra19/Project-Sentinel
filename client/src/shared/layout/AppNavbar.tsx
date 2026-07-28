@@ -1,6 +1,6 @@
+import type { Crumb } from "../../routes/types";
 import { ThemeToggle } from "../theme";
 import { Breadcrumb } from "./Breadcrumb";
-import type { Crumb } from "./pageHeader";
 
 type AppNavbarProps = {
   crumbs: Crumb[];

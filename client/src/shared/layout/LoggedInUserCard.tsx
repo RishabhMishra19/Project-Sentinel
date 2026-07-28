@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../redux/hooks";
-import { ROUTE_PATHS } from "../../navigation";
+import { ROUTE_PATHS } from "../../routes/constants";
 import { SidebarItem, type SidebarMode } from "./SidebarItem";
 
 const getInitials = (name?: string | null, email?: string | null) => {
@@ -17,7 +17,7 @@ type LoggedInUserCardProps = {
 };
 
 export const LoggedInUserCard = ({ mode = "expanded" }: LoggedInUserCardProps) => {
-  const user = useAppSelector((state) => state.session.user);
+  const user = useAppSelector((state) => state.session.auth!.user);
   const navigate = useNavigate();
   const location = useLocation();
   const isProfileActive = location.pathname === `/${ROUTE_PATHS.profile}`;

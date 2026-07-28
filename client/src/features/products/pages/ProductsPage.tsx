@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ROUTE_PATHS } from "../../../navigation";
+import { ROUTE_PATHS } from "../../../routes/constants";
 import type { ProductResponse } from "../dto/response/product.response";
 import { DeactivateProductDialog } from "../components/DeactivateProductDialog";
 import { ProductFormModal } from "../components/ProductFormModal";

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ChevronRightIcon } from "../../assets/icons";
-import type { Crumb } from "./pageHeader";
+import type { Crumb } from "../../routes/types";
 
 type BreadcrumbProps = {
   items: Crumb[];

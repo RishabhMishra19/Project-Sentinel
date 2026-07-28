@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ROUTE_PATHS } from "../../../navigation";
+import { ROUTE_PATHS } from "../../../routes/constants";
 import { primaryButtonClassName } from "../../../shared/ui/data-table/styles";
 
 export const SettingsPage = () => {

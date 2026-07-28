@@ -6,7 +6,7 @@ import type { AnalyticsScope } from "../dto/request/analytics.request";
 const ACTIVE_SERVICES_QUERY = {
   pageable: { page: 0, size: 100 },
   filterConfigs: [{ fieldName: "status", filterValues: ["ACTIVE"] }],
-} as const;
+};
 
 const PRODUCTS_QUERY = {
   pageable: { page: 0, size: 100 },

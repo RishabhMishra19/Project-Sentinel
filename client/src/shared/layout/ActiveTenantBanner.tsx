@@ -1,18 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { clearActiveTenant } from "../../redux/session/sessionSlice";
-import { ROUTE_PATHS } from "../../navigation";
+import { useAppSelector } from "../../redux/hooks";
+import { ROUTE_PATHS } from "../../routes/constants";
+import { AuthUtils } from "../../features/auth/AuthUtils";
 
 export const ActiveTenantBanner = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const activeTenant = useAppSelector((state) => state.session.activeTenant)!;
 
   const message = `Session in tenant: ${activeTenant.name}`;
 
   const handleEnd = () => {
-    dispatch(clearActiveTenant());
-    navigate(`/${ROUTE_PATHS.tenants}`);
+    AuthUtils.clearActiveTenant();
+    navigate(`/admin/${ROUTE_PATHS.tenants}`);
   };
 
   return (

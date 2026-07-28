@@ -1,8 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { setActiveTenant } from "../../../redux/session/sessionSlice";
-import { resolvePostLoginPath } from "../../../navigation/utils";
 import { SecretRevealDialog } from "../../../shared/ui";
 import type { CreateTenantResponse, TenantResponse } from "../dto/response/tenant.response";
 import { DeactivateTenantDialog } from "../components/DeactivateTenantDialog";
@@ -10,11 +7,11 @@ import { TenantCreateModal } from "../components/TenantCreateModal";
 import { TenantEditModal } from "../components/TenantEditModal";
 import { TenantsTable } from "../components/TenantsTable";
 import { TenantViewModal } from "../components/TenantViewModal";
+import { AuthUtils } from "../../auth/AuthUtils";
+import { ROUTE_PATHS } from "../../../routes/constants";
 
 export const TenantsPage = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const user = useAppSelector((state) => state.session.user)!;
   const [createOpen, setCreateOpen] = useState(false);
   const [editTenant, setEditTenant] = useState<TenantResponse | null>(null);
   const [viewTenant, setViewTenant] = useState<TenantResponse | null>(null);
@@ -32,9 +29,9 @@ export const TenantsPage = () => {
         onView={setViewTenant}
         onEdit={setEditTenant}
         onStartSession={(tenant) => {
-          const activeTenant = { id: tenant.id, name: tenant.name };
-          dispatch(setActiveTenant(activeTenant));
-          navigate(resolvePostLoginPath(user, activeTenant));
+          const activeTenant = { id: tenant.id, name: tenant.name } as TenantResponse;
+          AuthUtils.setActiveTenant(activeTenant);
+          navigate(`/${ROUTE_PATHS.analytics}`);
         }}
         onDeactivate={setDeactivateTenant}
       />

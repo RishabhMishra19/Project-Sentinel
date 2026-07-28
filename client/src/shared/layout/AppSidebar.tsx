@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../redux/hooks";
 import { LogoutIcon, SidebarCloseIcon, SidebarOpenIcon } from "../../assets/icons";
 import { useLogout } from "../../features/auth/hooks/useLogout";
-import { ROUTE_PATHS } from "../../navigation";
-import { protectedPageRoutes } from "../../navigation/routes/protected.routes";
-import { getSideBarItems } from "../../navigation/utils";
 import { localStorageManager } from "../storage/LocalStorageManager";
 import { LoggedInUserCard } from "./LoggedInUserCard";
 import { SidebarItem, type SidebarMode } from "./SidebarItem";
 import { SidebarTray } from "./SidebarTray";
+import type { NavigationItem } from "../../routes/types";
+import { ROUTE_PATHS } from "../../routes/constants";
 
 const SIDEBAR_MODE_KEY = "sidebar-mode";
 
@@ -17,21 +15,20 @@ const readStoredMode = (): SidebarMode => {
   return localStorageManager.get(SIDEBAR_MODE_KEY) === "collapsed" ? "collapsed" : "expanded";
 };
 
-export const AppSidebar = () => {
+type AppSidebarProps = {
+  navItems: NavigationItem[];
+};
+
+export const AppSidebar = ({ navItems }: AppSidebarProps) => {
   const logoutMutation = useLogout();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [mode, setMode] = useState<SidebarMode>(readStoredMode);
   const isCollapsed = mode === "collapsed";
 
-  const user = useAppSelector((state) => state.session.user)!;
-  const activeTenant = useAppSelector((state) => state.session.activeTenant);
-  const isLoggedIn = useAppSelector((state) => state.session.isLoggedIn);
-
-  const navItems = getSideBarItems(protectedPageRoutes).filter((item) =>
-    item.isAccessibleTo ? item.isAccessibleTo(isLoggedIn, user, activeTenant) : true,
-  );
-  const isNavActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
+  const isNavActive = (path: string) => {
+    return pathname.startsWith(`/${path}`);
+  };
 
   const toggleMode = () => {
     const next: SidebarMode = isCollapsed ? "expanded" : "collapsed";
@@ -94,7 +91,7 @@ export const AppSidebar = () => {
                 active={isNavActive(item.path)}
                 iconNode={Icon ? <Icon className="size-4 shrink-0" /> : undefined}
                 textNode={item.label}
-                onClick={() => navigate(item.path)}
+                onClick={() => navigate(`/${item.path}`)}
               />
             );
           })}

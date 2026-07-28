@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ROUTE_PATHS } from "../../../navigation";
 import type { FiltersChange, FiltersConfig, FilterField } from "../../../shared/ui/filters";
 import type { AnalyticsScope } from "../dto/request/analytics.request";
 import type { AnalyticsRankingItem } from "../dto/response/analytics.response";
@@ -20,20 +19,12 @@ import {
 import { useAnalyticsCatalog } from "./useAnalyticsCatalog";
 import { useAnalyticsSearchParams } from "./useAnalyticsSearchParams";
 import { useAnalyticsSelectionDefaults } from "./useAnalyticsSelectionDefaults";
+import { ROUTE_PATHS } from "../../../routes/constants";
 
 export const useAnalyticsUrlState = () => {
   const navigate = useNavigate();
-  const {
-    params,
-    scope,
-    productId,
-    serviceId,
-    endpointId,
-    from,
-    to,
-    bucket,
-    patchParams,
-  } = useAnalyticsSearchParams();
+  const { params, scope, productId, serviceId, endpointId, from, to, bucket, patchParams } =
+    useAnalyticsSearchParams();
 
   const catalog = useAnalyticsCatalog(scope, serviceId);
   const ids = useMemo(
@@ -84,10 +75,7 @@ export const useAnalyticsUrlState = () => {
     () => buildAnalyticsQueryParams(scope, ids, { from, to, bucket }),
     [scope, ids, from, to, bucket],
   );
-  const rankingsParams = useMemo(
-    () => buildAnalyticsRankingsParams(queryParams),
-    [queryParams],
-  );
+  const rankingsParams = useMemo(() => buildAnalyticsRankingsParams(queryParams), [queryParams]);
 
   const setTab = useCallback(
     (nextScope: AnalyticsScope) => {

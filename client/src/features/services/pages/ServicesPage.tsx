@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ROUTE_PATHS } from "../../../navigation";
+import { ROUTE_PATHS } from "../../../routes/constants";
 import { QueryGate } from "../../../shared/ui";
 import type { ServiceResponse } from "../dto/response/service.response";
 import { useProductsQuery } from "../../products/hooks/useProducts";
@@ -80,9 +80,7 @@ export const ServicesPage = () => {
           onCreate={() => setFormState({ open: true, mode: "create" })}
           onView={setViewService}
           onEdit={(service) => setFormState({ open: true, mode: "edit", service })}
-          onViewApiKeys={(service) =>
-            navigate(`/${ROUTE_PATHS.apiKeys}?serviceId=${service.id}`)
-          }
+          onViewApiKeys={(service) => navigate(`/${ROUTE_PATHS.apiKeys}?serviceId=${service.id}`)}
           onDeactivate={setDeactivateService}
         />
       </QueryGate>

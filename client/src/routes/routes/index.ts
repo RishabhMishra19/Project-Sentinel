@@ -1,41 +1,37 @@
 import { NotFoundPage } from "../../features/auth/pages/NotFoundPage";
-import type { SentinelRouteObject } from "../types";
-import { unprotectedPageRoutes } from "./unprotected.routes";
-import { protectedPageRoutes } from "./protected.routes";
+import { unprotectedPageRoutes } from "./unprotected/unprotected.routes";
+import { protectedPageRoutes } from "./protected/protected.routes";
 import { SessionRestoreContainer } from "../components/SessionRestoreContainer";
 import { ProtectedRouteContainer } from "../components/ProtectedRouteContainer";
 import { UnprotectedRouteContainer } from "../components/UnprotectedRouteContainer";
+import type { RouteObject } from "react-router-dom";
+import { RedirectAfterLoginRoute } from "../components/RedirectAfterLoginRoute";
 
-export const appRouteTree: SentinelRouteObject[] = [
+export const appRouteTree: RouteObject[] = [
   {
     id: "session-restore-container",
-    path: "",
-    isWrapperRoute: true,
     Component: SessionRestoreContainer,
-    isAccessibleTo: () => true,
     children: [
       {
+        id: "root-route",
+        index: true,
+        Component: RedirectAfterLoginRoute,
+      },
+      {
         id: "unprotected-routes",
-        path: "",
-        isWrapperRoute: true,
         Component: UnprotectedRouteContainer,
-        isAccessibleTo: (isLoggedIn: boolean) => !isLoggedIn,
         children: unprotectedPageRoutes,
       },
       {
         id: "protected-routes",
         path: "",
-        isWrapperRoute: true,
         Component: ProtectedRouteContainer,
-        isAccessibleTo: (isLoggedIn: boolean) => isLoggedIn,
         children: protectedPageRoutes,
       },
       {
         id: "not-found-route",
         path: "*",
         Component: NotFoundPage,
-        isWrapperRoute: true,
-        isAccessibleTo: () => true,
       },
     ],
   },

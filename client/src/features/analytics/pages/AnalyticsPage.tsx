@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ROUTE_PATHS } from "../../../navigation";
+import { ROUTE_PATHS } from "../../../routes/constants";
 import { AnalyticsEmptyState } from "../components/AnalyticsEmptyState";
 import { AnalyticsResults } from "../components/AnalyticsResults";
 import { AnalyticsToolbar } from "../components/AnalyticsToolbar";

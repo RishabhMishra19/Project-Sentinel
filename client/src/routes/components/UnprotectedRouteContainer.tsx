@@ -1,9 +1,15 @@
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAppSelector } from "../../redux/hooks";
 import { AuthBrandPanel } from "../../features/auth/components/AuthBrandPanel";
-import { ThemeToggle } from "../theme";
+import { ThemeToggle } from "../../shared/theme";
 
-/** Chrome for guest/auth pages: brand panel and centered content outlet. */
-export const UnauthenticatedLayout = () => {
+export const UnprotectedRouteContainer = () => {
+  const state = useAppSelector((state) => state.session.state);
+
+  if (state !== "NO_AUTH") {
+    return <Navigate to={"/"} replace />;
+  }
+
   return (
     <div className="flex min-h-screen flex-col gap-3 bg-chrome p-3 md:flex-row">
       <AuthBrandPanel />
