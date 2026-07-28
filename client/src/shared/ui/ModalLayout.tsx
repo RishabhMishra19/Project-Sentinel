@@ -38,6 +38,8 @@ type ModalLayoutProps = {
   size?: ModalSize;
   zIndex?: ModalZIndex;
   className?: string;
+  /** When false, Escape / backdrop / header close are disabled. Defaults to true. */
+  dismissible?: boolean;
 };
 
 /**
@@ -54,6 +56,7 @@ export const ModalLayout = ({
   size = "md",
   zIndex = 50,
   className,
+  dismissible = true,
 }: ModalLayoutProps) => {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -72,7 +75,9 @@ export const ModalLayout = ({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.stopPropagation();
-        onCloseRef.current();
+        if (dismissible) {
+          onCloseRef.current();
+        }
         return;
       }
 
@@ -110,7 +115,7 @@ export const ModalLayout = ({
       document.removeEventListener("keydown", onKeyDown);
       previouslyFocused?.focus?.();
     };
-  }, [open]);
+  }, [open, dismissible]);
 
   if (!open) {
     return null;
@@ -120,13 +125,17 @@ export const ModalLayout = ({
     <div
       className={`fixed inset-0 flex items-center justify-center bg-foreground/40 px-4 ${zIndexClassName[zIndex]}`}
     >
-      <button
-        type="button"
-        tabIndex={-1}
-        aria-label="Close dialog backdrop"
-        className="absolute inset-0 cursor-default"
-        onClick={onClose}
-      />
+      {dismissible ? (
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label="Close dialog backdrop"
+          className="absolute inset-0 cursor-default"
+          onClick={onClose}
+        />
+      ) : (
+        <div className="absolute inset-0" aria-hidden="true" />
+      )}
       <div
         ref={panelRef}
         role="dialog"
@@ -148,13 +157,15 @@ export const ModalLayout = ({
             </h2>
             {description ? <p className="mt-1 text-sm text-muted">{description}</p> : null}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="cursor-pointer rounded border border-border px-2 py-1 text-sm text-foreground hover:bg-background"
-          >
-            Close
-          </button>
+          {dismissible ? (
+            <button
+              type="button"
+              onClick={onClose}
+              className="cursor-pointer rounded border border-border px-2 py-1 text-sm text-foreground hover:bg-background"
+            >
+              Close
+            </button>
+          ) : null}
         </div>
 
         {children}

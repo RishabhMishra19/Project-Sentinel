@@ -1,3 +1,4 @@
+export { ConfirmMutationDialog } from "./ConfirmMutationDialog";
 export { CopyableValue } from "./CopyableValue";
 export { DetailRow } from "./DetailRow";
 export { DetailSection } from "./DetailSection";
