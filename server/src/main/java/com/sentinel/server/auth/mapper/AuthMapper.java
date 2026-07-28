@@ -10,7 +10,11 @@ import com.sentinel.server.role.entity.RoleScopeStatus;
 import com.sentinel.server.role.entity.RoleStatus;
 import com.sentinel.server.tenant.entity.Tenant;
 import com.sentinel.server.user.entity.User;
+
+import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,7 +30,7 @@ public class AuthMapper {
     public AuthSessionResponse toAuthSessionResponse(String accessToken, long expiresIn, User user) {
         return new AuthSessionResponse(
                 accessToken,
-                expiresIn,
+                DateUtils.addSeconds(new Date(), Math.toIntExact(expiresIn)).toInstant(),
                 new AuthSessionResponse.User(
                         user.getId().toString(),
                         user.getEmail(),
