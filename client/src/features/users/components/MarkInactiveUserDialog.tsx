@@ -1,4 +1,4 @@
-import { ModalConfirmLayout } from "../../../shared/ui";
+import { ConfirmMutationDialog } from "../../../shared/ui";
 import type { UserResponse } from "../dto/response/user.response";
 import { useMarkUserInactive } from "../hooks/useUsers";
 
@@ -11,29 +11,22 @@ type MarkInactiveUserDialogProps = {
 export const MarkInactiveUserDialog = ({ open, user, onClose }: MarkInactiveUserDialogProps) => {
   const inactiveMutation = useMarkUserInactive();
 
-  if (!open || !user) {
-    return null;
-  }
-
   return (
-    <ModalConfirmLayout
+    <ConfirmMutationDialog
       open={open}
+      item={user}
       title="Mark user inactive"
       onClose={onClose}
-      onConfirm={() => {
-        inactiveMutation.mutate(user.id, {
-          onSuccess: () => {
-            onClose();
-          },
-        });
-      }}
-      confirmLabel={inactiveMutation.isPending ? "Marking…" : "Mark inactive"}
-      confirmDisabled={inactiveMutation.isPending}
-    >
-      <p className="text-sm text-muted">
-        Mark <span className="font-medium text-foreground">{user.displayName}</span> ({user.email})
-        inactive? They will no longer be able to sign in.
-      </p>
-    </ModalConfirmLayout>
+      mutation={inactiveMutation}
+      getVariables={(item) => item.id}
+      confirmLabel="Mark inactive"
+      confirmingLabel="Marking…"
+      message={(item) => (
+        <>
+          Mark <span className="font-medium text-foreground">{item.displayName}</span> ({item.email})
+          inactive? They will no longer be able to sign in.
+        </>
+      )}
+    />
   );
 };

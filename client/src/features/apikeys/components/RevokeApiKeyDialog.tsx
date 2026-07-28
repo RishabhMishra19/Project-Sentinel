@@ -1,4 +1,4 @@
-import { ModalConfirmLayout } from "../../../shared/ui";
+import { ConfirmMutationDialog } from "../../../shared/ui";
 import type { ServiceApiKeyResponse } from "../dto/response/apikey.response";
 import { useRevokeServiceApiKey } from "../hooks/useApiKeys";
 
@@ -19,29 +19,22 @@ export const RevokeApiKeyDialog = ({
 }: RevokeApiKeyDialogProps) => {
   const revokeMutation = useRevokeServiceApiKey(productId, serviceId);
 
-  if (!open || !apiKey) {
-    return null;
-  }
-
   return (
-    <ModalConfirmLayout
+    <ConfirmMutationDialog
       open={open}
+      item={apiKey}
       title="Revoke API key"
       onClose={onClose}
-      onConfirm={() => {
-        revokeMutation.mutate(apiKey.id, {
-          onSuccess: () => {
-            onClose();
-          },
-        });
-      }}
-      confirmLabel={revokeMutation.isPending ? "Revoking…" : "Revoke"}
-      confirmDisabled={revokeMutation.isPending}
-    >
-      <p className="text-sm text-muted">
-        Revoke <span className="font-medium text-foreground">{apiKey.name}</span>? This cannot be
-        undone. Agents using this key will stop authenticating until you create a new key.
-      </p>
-    </ModalConfirmLayout>
+      mutation={revokeMutation}
+      getVariables={(item) => item.id}
+      confirmLabel="Revoke"
+      confirmingLabel="Revoking…"
+      message={(item) => (
+        <>
+          Revoke <span className="font-medium text-foreground">{item.name}</span>? This cannot be
+          undone. Agents using this key will stop authenticating until you create a new key.
+        </>
+      )}
+    />
   );
 };

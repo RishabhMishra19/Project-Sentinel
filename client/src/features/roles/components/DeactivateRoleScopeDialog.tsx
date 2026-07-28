@@ -1,4 +1,4 @@
-import { ModalConfirmLayout } from "../../../shared/ui";
+import { ConfirmMutationDialog } from "../../../shared/ui";
 import type { RoleScopeResponse } from "../dto/response/role.response";
 import { useDeactivateRoleScope } from "../hooks/useRoles";
 
@@ -17,33 +17,26 @@ export const DeactivateRoleScopeDialog = ({
 }: DeactivateRoleScopeDialogProps) => {
   const deactivateMutation = useDeactivateRoleScope(roleId);
 
-  if (!open || !roleId || !scope) {
-    return null;
-  }
-
   return (
-    <ModalConfirmLayout
-      open={open}
+    <ConfirmMutationDialog
+      open={open && roleId != null}
+      item={scope}
       title="Deactivate scope"
       onClose={onClose}
-      onConfirm={() => {
-        deactivateMutation.mutate(scope.id, {
-          onSuccess: () => {
-            onClose();
-          },
-        });
-      }}
-      confirmLabel={deactivateMutation.isPending ? "Deactivating…" : "Deactivate"}
-      confirmDisabled={deactivateMutation.isPending}
+      mutation={deactivateMutation}
+      getVariables={(item) => item.id}
+      confirmLabel="Deactivate"
+      confirmingLabel="Deactivating…"
       zIndex={60}
-    >
-      <p className="text-sm text-muted">
-        Deactivate{" "}
-        <span className="font-medium text-foreground">
-          {scope.scopeType}: {scope.scopeName}
-        </span>{" "}
-        ({scope.permission})? It will no longer grant access.
-      </p>
-    </ModalConfirmLayout>
+      message={(item) => (
+        <>
+          Deactivate{" "}
+          <span className="font-medium text-foreground">
+            {item.scopeType}: {item.scopeName}
+          </span>{" "}
+          ({item.permission})? It will no longer grant access.
+        </>
+      )}
+    />
   );
 };

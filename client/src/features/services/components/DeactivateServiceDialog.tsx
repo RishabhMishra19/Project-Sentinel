@@ -1,4 +1,4 @@
-import { ModalConfirmLayout } from "../../../shared/ui";
+import { ConfirmMutationDialog } from "../../../shared/ui";
 import type { ServiceResponse } from "../dto/response/service.response";
 import { useDeleteService } from "../hooks/useServices";
 
@@ -17,29 +17,22 @@ export const DeactivateServiceDialog = ({
 }: DeactivateServiceDialogProps) => {
   const deleteMutation = useDeleteService(productId);
 
-  if (!open || !service) {
-    return null;
-  }
-
   return (
-    <ModalConfirmLayout
+    <ConfirmMutationDialog
       open={open}
+      item={service}
       title="Deactivate service"
       onClose={onClose}
-      onConfirm={() => {
-        deleteMutation.mutate(service.id, {
-          onSuccess: () => {
-            onClose();
-          },
-        });
-      }}
-      confirmLabel={deleteMutation.isPending ? "Deactivating…" : "Deactivate"}
-      confirmDisabled={deleteMutation.isPending}
-    >
-      <p className="text-sm text-muted">
-        Deactivate <span className="font-medium text-foreground">{service.name}</span>? The service
-        will be marked inactive.
-      </p>
-    </ModalConfirmLayout>
+      mutation={deleteMutation}
+      getVariables={(item) => item.id}
+      confirmLabel="Deactivate"
+      confirmingLabel="Deactivating…"
+      message={(item) => (
+        <>
+          Deactivate <span className="font-medium text-foreground">{item.name}</span>? The service
+          will be marked inactive.
+        </>
+      )}
+    />
   );
 };
