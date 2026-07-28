@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../routes/constants";
+import { useModalState } from "../../../shared/hooks/useModalState";
+import { useUrlSyncedSelection } from "../../../shared/hooks/useUrlSyncedSelection";
+import { PageContent } from "../../../shared/layout/PageContent";
 import { QueryGate } from "../../../shared/ui";
 import type { ServiceResponse } from "../dto/response/service.response";
 import { useProductsQuery } from "../../products/hooks/useProducts";
@@ -21,51 +24,24 @@ type FormState =
 
 export const ServicesPage = () => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const productIdFromUrl = searchParams.get("productId");
   const [formState, setFormState] = useState<FormState>({ open: false });
-  const [viewService, setViewService] = useState<ServiceResponse | null>(null);
-  const [deactivateService, setDeactivateService] = useState<ServiceResponse | null>(null);
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(productIdFromUrl);
+  const view = useModalState<ServiceResponse>();
+  const deactivate = useModalState<ServiceResponse>();
 
   const productsQuery = useProductsQuery(ACTIVE_PRODUCTS_PARAMS);
   const products = productsQuery.rows;
-
-  useEffect(() => {
-    if (products.length === 0) {
-      setSelectedProductId(null);
-      return;
-    }
-    setSelectedProductId((current) => {
-      if (productIdFromUrl && products.some((p) => p.id === productIdFromUrl)) {
-        return productIdFromUrl;
-      }
-      if (current && products.some((product) => product.id === current)) {
-        return current;
-      }
-      return products[0]!.id;
-    });
-  }, [products, productIdFromUrl]);
-
-  const onProductChange = (productId: string) => {
-    setSelectedProductId(productId);
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        next.set("productId", productId);
-        return next;
-      },
-      { replace: true },
-    );
-  };
+  const { selectedId: selectedProductId, onChange: onProductChange } = useUrlSyncedSelection({
+    paramKey: "productId",
+    items: products,
+  });
 
   const activeProductId =
     formState.open && formState.mode === "edit"
       ? formState.service.productId
-      : (deactivateService?.productId ?? selectedProductId);
+      : (deactivate.item?.productId ?? selectedProductId);
 
   return (
-    <div className="mx-auto flex min-h-64 w-full max-w-6xl flex-col gap-6">
+    <PageContent className="min-h-64">
       <QueryGate
         isLoading={productsQuery.isLoading}
         isError={productsQuery.isError}
@@ -78,10 +54,10 @@ export const ServicesPage = () => {
           selectedProductId={selectedProductId}
           onProductChange={onProductChange}
           onCreate={() => setFormState({ open: true, mode: "create" })}
-          onView={setViewService}
+          onView={view.show}
           onEdit={(service) => setFormState({ open: true, mode: "edit", service })}
           onViewApiKeys={(service) => navigate(`/${ROUTE_PATHS.apiKeys}?serviceId=${service.id}`)}
-          onDeactivate={setDeactivateService}
+          onDeactivate={deactivate.show}
         />
       </QueryGate>
 
@@ -97,18 +73,14 @@ export const ServicesPage = () => {
         onClose={() => setFormState({ open: false })}
       />
 
-      <ServiceViewModal
-        open={viewService != null}
-        service={viewService}
-        onClose={() => setViewService(null)}
-      />
+      <ServiceViewModal open={view.open} service={view.item} onClose={view.close} />
 
       <DeactivateServiceDialog
-        open={deactivateService != null}
+        open={deactivate.open}
         productId={activeProductId ?? ""}
-        service={deactivateService}
-        onClose={() => setDeactivateService(null)}
+        service={deactivate.item}
+        onClose={deactivate.close}
       />
-    </div>
+    </PageContent>
   );
 };

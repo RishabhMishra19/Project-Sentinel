@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../routes/constants";
+import { useModalState } from "../../../shared/hooks/useModalState";
+import { PageContent } from "../../../shared/layout/PageContent";
 import type { ProductResponse } from "../dto/response/product.response";
 import { DeactivateProductDialog } from "../components/DeactivateProductDialog";
 import { ProductFormModal } from "../components/ProductFormModal";
@@ -15,17 +17,17 @@ type FormState =
 export const ProductsPage = () => {
   const navigate = useNavigate();
   const [formState, setFormState] = useState<FormState>({ open: false });
-  const [viewProduct, setViewProduct] = useState<ProductResponse | null>(null);
-  const [deactivateProduct, setDeactivateProduct] = useState<ProductResponse | null>(null);
+  const view = useModalState<ProductResponse>();
+  const deactivate = useModalState<ProductResponse>();
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <PageContent>
       <ProductsTable
         onCreate={() => setFormState({ open: true, mode: "create" })}
-        onView={setViewProduct}
+        onView={view.show}
         onEdit={(product) => setFormState({ open: true, mode: "edit", product })}
         onServices={(product) => navigate(`/${ROUTE_PATHS.services}?productId=${product.id}`)}
-        onDeactivate={setDeactivateProduct}
+        onDeactivate={deactivate.show}
       />
 
       <ProductFormModal
@@ -35,17 +37,13 @@ export const ProductsPage = () => {
         onClose={() => setFormState({ open: false })}
       />
 
-      <ProductViewModal
-        open={viewProduct != null}
-        product={viewProduct}
-        onClose={() => setViewProduct(null)}
-      />
+      <ProductViewModal open={view.open} product={view.item} onClose={view.close} />
 
       <DeactivateProductDialog
-        open={deactivateProduct != null}
-        product={deactivateProduct}
-        onClose={() => setDeactivateProduct(null)}
+        open={deactivate.open}
+        product={deactivate.item}
+        onClose={deactivate.close}
       />
-    </div>
+    </PageContent>
   );
 };

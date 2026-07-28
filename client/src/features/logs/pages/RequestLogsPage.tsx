@@ -1,5 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useModalState } from "../../../shared/hooks/useModalState";
+import { PageContent } from "../../../shared/layout/PageContent";
 import { dateTimeRangeFromPreset, type FilterValue } from "../../../shared/ui/filters";
 import { useRequestLogQuery } from "../hooks/useRequestLogs";
 import { RequestLogDetailPanel } from "../components/RequestLogDetailPanel";
@@ -47,7 +49,7 @@ const filtersFromSearchParams = (params: URLSearchParams): Record<string, Filter
 
 export const RequestLogsPage = () => {
   const [params] = useSearchParams();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = useModalState<string>();
 
   const initialFilters = useMemo(
     () => filtersFromSearchParams(params),
@@ -56,19 +58,19 @@ export const RequestLogsPage = () => {
     [],
   );
 
-  const detailQuery = useRequestLogQuery(selectedId);
+  const detailQuery = useRequestLogQuery(selected.item);
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-      <RequestLogsTable initialFilters={initialFilters} onView={(row) => setSelectedId(row.id)} />
+    <PageContent>
+      <RequestLogsTable initialFilters={initialFilters} onView={(row) => selected.show(row.id)} />
 
       <RequestLogDetailPanel
-        open={selectedId != null}
+        open={selected.open}
         log={detailQuery.data}
         loading={detailQuery.isLoading}
         isError={detailQuery.isError}
-        onClose={() => setSelectedId(null)}
+        onClose={selected.close}
       />
-    </div>
+    </PageContent>
   );
 };

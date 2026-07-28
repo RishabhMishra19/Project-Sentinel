@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../routes/constants";
+import { PageContent } from "../../../shared/layout/PageContent";
 import { AnalyticsEmptyState } from "../components/AnalyticsEmptyState";
 import { AnalyticsResults } from "../components/AnalyticsResults";
 import { AnalyticsToolbar } from "../components/AnalyticsToolbar";
@@ -19,7 +20,7 @@ export const AnalyticsPage = () => {
   } = useAnalyticsUrlState();
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <PageContent>
       <AnalyticsToolbar
         scope={scope}
         scopeReady={scopeReady}
@@ -45,6 +46,6 @@ export const AnalyticsPage = () => {
           Open Logs
         </Link>
       </p>
-    </div>
+    </PageContent>
   );
 };

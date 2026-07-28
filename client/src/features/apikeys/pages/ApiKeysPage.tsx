@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useModalState } from "../../../shared/hooks/useModalState";
+import { useUrlSyncedSelection } from "../../../shared/hooks/useUrlSyncedSelection";
+import { PageContent } from "../../../shared/layout/PageContent";
 import { QueryGate, SecretRevealDialog } from "../../../shared/ui";
 import { useAllServicesQuery } from "../../services/hooks/useServices";
 import type {
@@ -15,55 +17,27 @@ const SERVICES_PARAMS = {
 };
 
 export const ApiKeysPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const serviceIdFromUrl = searchParams.get("serviceId");
-
-  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(serviceIdFromUrl);
   const [createOpen, setCreateOpen] = useState(false);
-  const [revealedKey, setRevealedKey] = useState<string | null>(null);
-  const [revokeKey, setRevokeKey] = useState<ServiceApiKeyResponse | null>(null);
+  const revealedKey = useModalState<string>();
+  const revoke = useModalState<ServiceApiKeyResponse>();
 
   const servicesQuery = useAllServicesQuery(SERVICES_PARAMS);
   const services = servicesQuery.rows;
-
-  useEffect(() => {
-    if (services.length === 0) {
-      setSelectedServiceId(null);
-      return;
-    }
-    setSelectedServiceId((current) => {
-      if (serviceIdFromUrl && services.some((service) => service.id === serviceIdFromUrl)) {
-        return serviceIdFromUrl;
-      }
-      if (current && services.some((service) => service.id === current)) {
-        return current;
-      }
-      return services[0]!.id;
-    });
-  }, [services, serviceIdFromUrl]);
+  const { selectedId: selectedServiceId, onChange: onServiceChange } = useUrlSyncedSelection({
+    paramKey: "serviceId",
+    items: services,
+  });
 
   const selectedService = services.find((service) => service.id === selectedServiceId) ?? null;
   const productId = selectedService?.productId ?? null;
   const serviceId = selectedService?.id ?? null;
 
-  const onServiceChange = (nextServiceId: string) => {
-    setSelectedServiceId(nextServiceId);
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        next.set("serviceId", nextServiceId);
-        return next;
-      },
-      { replace: true },
-    );
-  };
-
   const onCreated = (created: ServiceApiKeyCreatedResponse) => {
-    setRevealedKey(created.apiKey);
+    revealedKey.show(created.apiKey);
   };
 
   return (
-    <div className="mx-auto flex min-h-64 w-full max-w-6xl flex-col gap-6">
+    <PageContent className="min-h-64">
       <QueryGate
         isLoading={servicesQuery.isLoading}
         isError={servicesQuery.isError}
@@ -78,7 +52,7 @@ export const ApiKeysPage = () => {
           productId={productId}
           serviceId={serviceId}
           onCreate={() => setCreateOpen(true)}
-          onRevoke={setRevokeKey}
+          onRevoke={revoke.show}
         />
       </QueryGate>
 
@@ -93,24 +67,24 @@ export const ApiKeysPage = () => {
           />
 
           <RevokeApiKeyDialog
-            open={revokeKey != null}
+            open={revoke.open}
             productId={productId}
             serviceId={serviceId}
-            apiKey={revokeKey}
-            onClose={() => setRevokeKey(null)}
+            apiKey={revoke.item}
+            onClose={revoke.close}
           />
         </>
       ) : null}
 
       <SecretRevealDialog
-        open={revealedKey != null}
-        value={revealedKey}
-        onClose={() => setRevealedKey(null)}
+        open={revealedKey.open}
+        value={revealedKey.item}
+        onClose={revealedKey.close}
         title="Your API key"
         description="Copy this key now. For security, it will not be shown again."
         copySuccessMessage="API key copied to clipboard."
         copyErrorMessage="Could not copy API key."
       />
-    </div>
+    </PageContent>
   );
 };

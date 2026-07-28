@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../routes/constants";
+import { PageContent } from "../../../shared/layout/PageContent";
 import { primaryButtonClassName } from "../../../shared/ui/data-table/styles";
 
 export const SettingsPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <PageContent>
       <div>
         <button
           type="button"
@@ -16,6 +17,6 @@ export const SettingsPage = () => {
           Manage Roles
         </button>
       </div>
-    </div>
+    </PageContent>
   );
 };

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useModalState } from "../../../shared/hooks/useModalState";
+import { PageContent } from "../../../shared/layout/PageContent";
 import { SecretRevealDialog } from "../../../shared/ui";
 import type { CreateUserResponse, UserResponse } from "../dto/response/user.response";
 import { AssignRoleDialog } from "../components/AssignRoleDialog";
@@ -10,24 +12,24 @@ import { UserViewModal } from "../components/UserViewModal";
 
 export const UsersPage = () => {
   const [createOpen, setCreateOpen] = useState(false);
-  const [editUser, setEditUser] = useState<UserResponse | null>(null);
-  const [viewUser, setViewUser] = useState<UserResponse | null>(null);
-  const [assignUser, setAssignUser] = useState<UserResponse | null>(null);
-  const [inactiveUser, setInactiveUser] = useState<UserResponse | null>(null);
-  const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
+  const edit = useModalState<UserResponse>();
+  const view = useModalState<UserResponse>();
+  const assign = useModalState<UserResponse>();
+  const inactive = useModalState<UserResponse>();
+  const revealedPassword = useModalState<string>();
 
   const onCreated = (created: CreateUserResponse) => {
-    setRevealedPassword(created.temporaryPassword);
+    revealedPassword.show(created.temporaryPassword);
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <PageContent>
       <UsersTable
         onCreate={() => setCreateOpen(true)}
-        onView={setViewUser}
-        onEdit={setEditUser}
-        onAssignRole={setAssignUser}
-        onMarkInactive={setInactiveUser}
+        onView={view.show}
+        onEdit={edit.show}
+        onAssignRole={assign.show}
+        onMarkInactive={inactive.show}
       />
 
       <UserCreateModal
@@ -36,31 +38,23 @@ export const UsersPage = () => {
         onCreated={onCreated}
       />
 
-      <UserEditModal open={editUser != null} user={editUser} onClose={() => setEditUser(null)} />
+      <UserEditModal open={edit.open} user={edit.item} onClose={edit.close} />
 
-      <UserViewModal open={viewUser != null} user={viewUser} onClose={() => setViewUser(null)} />
+      <UserViewModal open={view.open} user={view.item} onClose={view.close} />
 
-      <AssignRoleDialog
-        open={assignUser != null}
-        user={assignUser}
-        onClose={() => setAssignUser(null)}
-      />
+      <AssignRoleDialog open={assign.open} user={assign.item} onClose={assign.close} />
 
-      <MarkInactiveUserDialog
-        open={inactiveUser != null}
-        user={inactiveUser}
-        onClose={() => setInactiveUser(null)}
-      />
+      <MarkInactiveUserDialog open={inactive.open} user={inactive.item} onClose={inactive.close} />
 
       <SecretRevealDialog
-        open={revealedPassword != null}
-        value={revealedPassword}
-        onClose={() => setRevealedPassword(null)}
+        open={revealedPassword.open}
+        value={revealedPassword.item}
+        onClose={revealedPassword.close}
         title="Temporary password"
         description="Copy this password now and share it securely with the user. It will not be shown again."
         copySuccessMessage="Temporary password copied to clipboard."
         copyErrorMessage="Could not copy temporary password."
       />
-    </div>
+    </PageContent>
   );
 };

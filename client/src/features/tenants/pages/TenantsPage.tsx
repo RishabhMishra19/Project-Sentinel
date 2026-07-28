@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useModalState } from "../../../shared/hooks/useModalState";
+import { PageContent } from "../../../shared/layout/PageContent";
 import { SecretRevealDialog } from "../../../shared/ui";
 import type { CreateTenantResponse, TenantResponse } from "../dto/response/tenant.response";
 import { DeactivateTenantDialog } from "../components/DeactivateTenantDialog";
@@ -13,27 +15,27 @@ import { ROUTE_PATHS } from "../../../routes/constants";
 export const TenantsPage = () => {
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
-  const [editTenant, setEditTenant] = useState<TenantResponse | null>(null);
-  const [viewTenant, setViewTenant] = useState<TenantResponse | null>(null);
-  const [deactivateTenant, setDeactivateTenant] = useState<TenantResponse | null>(null);
-  const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
+  const edit = useModalState<TenantResponse>();
+  const view = useModalState<TenantResponse>();
+  const deactivate = useModalState<TenantResponse>();
+  const revealedPassword = useModalState<string>();
 
   const onCreated = (created: CreateTenantResponse) => {
-    setRevealedPassword(created.temporaryPassword);
+    revealedPassword.show(created.temporaryPassword);
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <PageContent>
       <TenantsTable
         onCreate={() => setCreateOpen(true)}
-        onView={setViewTenant}
-        onEdit={setEditTenant}
+        onView={view.show}
+        onEdit={edit.show}
         onStartSession={(tenant) => {
           const activeTenant = { id: tenant.id, name: tenant.name } as TenantResponse;
           AuthUtils.setActiveTenant(activeTenant);
           navigate(`/${ROUTE_PATHS.analytics}`);
         }}
-        onDeactivate={setDeactivateTenant}
+        onDeactivate={deactivate.show}
       />
 
       <TenantCreateModal
@@ -42,33 +44,25 @@ export const TenantsPage = () => {
         onCreated={onCreated}
       />
 
-      <TenantEditModal
-        open={editTenant != null}
-        tenant={editTenant}
-        onClose={() => setEditTenant(null)}
-      />
+      <TenantEditModal open={edit.open} tenant={edit.item} onClose={edit.close} />
 
       <SecretRevealDialog
-        open={revealedPassword != null}
-        value={revealedPassword}
-        onClose={() => setRevealedPassword(null)}
+        open={revealedPassword.open}
+        value={revealedPassword.item}
+        onClose={revealedPassword.close}
         title="Tenant admin temporary password"
         description="As Sentinel admin, copy this password now and share it securely with the tenant admin. It will not be shown again."
         copySuccessMessage="Temporary password copied to clipboard."
         copyErrorMessage="Could not copy temporary password."
       />
 
-      <TenantViewModal
-        open={viewTenant != null}
-        tenant={viewTenant}
-        onClose={() => setViewTenant(null)}
-      />
+      <TenantViewModal open={view.open} tenant={view.item} onClose={view.close} />
 
       <DeactivateTenantDialog
-        open={deactivateTenant != null}
-        tenant={deactivateTenant}
-        onClose={() => setDeactivateTenant(null)}
+        open={deactivate.open}
+        tenant={deactivate.item}
+        onClose={deactivate.close}
       />
-    </div>
+    </PageContent>
   );
 };

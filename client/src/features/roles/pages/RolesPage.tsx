@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useModalState } from "../../../shared/hooks/useModalState";
+import { PageContent } from "../../../shared/layout/PageContent";
 import type { RoleResponse } from "../dto/response/role.response";
 import { MarkInactiveRoleDialog } from "../components/MarkInactiveRoleDialog";
 import { RoleCreateModal } from "../components/RoleCreateModal";
@@ -9,42 +11,30 @@ import { RolesTable } from "../components/RolesTable";
 
 export const RolesPage = () => {
   const [createOpen, setCreateOpen] = useState(false);
-  const [viewRoleId, setViewRoleId] = useState<string | null>(null);
-  const [editRole, setEditRole] = useState<RoleResponse | null>(null);
-  const [scopesRole, setScopesRole] = useState<RoleResponse | null>(null);
-  const [inactiveRole, setInactiveRole] = useState<RoleResponse | null>(null);
+  const viewRoleId = useModalState<string>();
+  const edit = useModalState<RoleResponse>();
+  const scopes = useModalState<RoleResponse>();
+  const inactive = useModalState<RoleResponse>();
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <PageContent>
       <RolesTable
         onCreate={() => setCreateOpen(true)}
-        onView={(role) => setViewRoleId(role.id)}
-        onEdit={setEditRole}
-        onShowScopes={setScopesRole}
-        onMarkInactive={setInactiveRole}
+        onView={(role) => viewRoleId.show(role.id)}
+        onEdit={edit.show}
+        onShowScopes={scopes.show}
+        onMarkInactive={inactive.show}
       />
 
       <RoleCreateModal open={createOpen} onClose={() => setCreateOpen(false)} />
 
-      <RoleViewModal
-        open={viewRoleId != null}
-        roleId={viewRoleId}
-        onClose={() => setViewRoleId(null)}
-      />
+      <RoleViewModal open={viewRoleId.open} roleId={viewRoleId.item} onClose={viewRoleId.close} />
 
-      <RoleEditModal open={editRole != null} role={editRole} onClose={() => setEditRole(null)} />
+      <RoleEditModal open={edit.open} role={edit.item} onClose={edit.close} />
 
-      <RoleScopesModal
-        open={scopesRole != null}
-        role={scopesRole}
-        onClose={() => setScopesRole(null)}
-      />
+      <RoleScopesModal open={scopes.open} role={scopes.item} onClose={scopes.close} />
 
-      <MarkInactiveRoleDialog
-        open={inactiveRole != null}
-        role={inactiveRole}
-        onClose={() => setInactiveRole(null)}
-      />
-    </div>
+      <MarkInactiveRoleDialog open={inactive.open} role={inactive.item} onClose={inactive.close} />
+    </PageContent>
   );
 };
