@@ -21,3 +21,8 @@ export interface CreateTenantResponse extends TenantResponse {
   };
   temporaryPassword: string;
 }
+
+export interface TenantSummary {
+  id: string;
+  name: string;
+}

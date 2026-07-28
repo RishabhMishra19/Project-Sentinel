@@ -1,65 +1,65 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type {
-  AuthSessionResponse,
-  AuthSessionUser,
-  TenantSummary,
-} from "../../features/auth/dto/response/auth.response";
-import { SessionStorage } from "./SessionStorage";
+import type { AuthSessionResponse } from "../../features/auth/dto/response/auth.response";
+import type { TenantSummary } from "../../features/tenants/dto/response/tenant.response";
 
-interface SessionState {
-  isLoading: boolean;
-  isLoggedIn: boolean;
-  accessToken: string | null;
-  user: AuthSessionUser | null;
-  activeTenant: TenantSummary | null;
-}
+type Session =
+  | {
+      state: "PENDING" | "NO_AUTH" | "RESTORING_AUTH";
+      auth?: undefined;
+      activeTenant?: undefined;
+    }
+  | {
+      state: "LOGGED_IN";
+      auth: AuthSessionResponse;
+      activeTenant?: TenantSummary;
+    };
 
-const persisted = SessionStorage.loadPersistedSession();
-
-const initialState: SessionState = {
-  isLoading: true,
-  isLoggedIn: persisted.isLoggedIn,
-  accessToken: null,
-  user: null,
-  activeTenant: persisted.activeTenant,
-};
+const initialState = {
+  state: "PENDING",
+} as Session;
 
 const sessionSlice = createSlice({
   name: "session",
   initialState,
   reducers: {
-    /** Login, refresh, change-password — full session + access token. */
-    setAuthSession(state, action: PayloadAction<AuthSessionResponse>) {
-      const { accessToken, user } = action.payload;
-      state.accessToken = accessToken;
-      state.user = user;
-      state.isLoggedIn = true;
-      state.isLoading = false;
-      // Tenant users: activeTenant is always their home tenant.
-      // Sentinel admins: leave as-is (null = platform mode, or login-as override).
-      if (!user.sentinelAdmin) {
-        state.activeTenant = user.tenant;
-      }
+    setAuth(state, action: PayloadAction<AuthSessionResponse>) {
+      return {
+        ...state,
+        state: "LOGGED_IN",
+        auth: action.payload,
+      };
     },
-    /** Admin Login-as-tenant: drive X-Tenant-Id. */
+    setNoAuth() {
+      return {
+        state: "NO_AUTH",
+      } as Session;
+    },
+    setRestoringAuth() {
+      return {
+        state: "RESTORING_AUTH",
+      } as Session;
+    },
     setActiveTenant(state, action: PayloadAction<TenantSummary>) {
-      state.activeTenant = action.payload;
+      if (state.state !== "LOGGED_IN") {
+        return state;
+      }
+      return {
+        ...state,
+        activeTenant: action.payload,
+      };
     },
-    /** Clear admin Login-as-tenant override (back to platform mode). */
     clearActiveTenant(state) {
-      state.activeTenant = null;
-    },
-    /** Full sign-out: wipe in-memory session. */
-    clearSession(state) {
-      state.isLoading = false;
-      state.accessToken = null;
-      state.user = null;
-      state.activeTenant = null;
-      state.isLoggedIn = false;
+      if (state.state !== "LOGGED_IN") {
+        return state;
+      }
+      return {
+        ...state,
+        activeTenant: undefined,
+      };
     },
   },
 });
 
-export const { setAuthSession, setActiveTenant, clearActiveTenant, clearSession } =
+export const { setAuth, setNoAuth, setRestoringAuth, setActiveTenant, clearActiveTenant } =
   sessionSlice.actions;
 export default sessionSlice.reducer;

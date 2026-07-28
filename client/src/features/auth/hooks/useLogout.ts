@@ -1,12 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../../../redux/hooks";
-import { ROUTE_PATHS } from "../../../navigation";
-import { clearSession } from "../../../redux/session/sessionSlice";
+import { ROUTE_PATHS } from "../../../routes/constants";
 import { AuthApi } from "../api/AuthApi";
+import { AuthUtils } from "../AuthUtils";
 
 export const useLogout = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -14,7 +12,7 @@ export const useLogout = () => {
     mutationFn: () => AuthApi.logout(),
     meta: { silent: true },
     onSettled: () => {
-      dispatch(clearSession());
+      AuthUtils.setNoAuth();
       queryClient.clear();
       navigate(`/${ROUTE_PATHS.login}`, { replace: true });
     },

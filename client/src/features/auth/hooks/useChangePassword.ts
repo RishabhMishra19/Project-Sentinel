@@ -1,13 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { useAppDispatch } from "../../../redux/hooks";
-import { setAuthSession } from "../../../redux/session/sessionSlice";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
 import { AuthApi } from "../api/AuthApi";
 import type { ChangePasswordRequest } from "../dto/request/auth.request";
+import { AuthUtils } from "../AuthUtils";
 
 export const useChangePassword = () => {
-  const dispatch = useAppDispatch();
-
   return useMutation({
     mutationFn: (payload: ChangePasswordRequest) => AuthApi.changePassword(payload),
     meta: {
@@ -18,7 +15,7 @@ export const useChangePassword = () => {
       },
     },
     onSuccess: (data) => {
-      dispatch(setAuthSession(data));
+      AuthUtils.setAuth(data);
     },
   });
 };

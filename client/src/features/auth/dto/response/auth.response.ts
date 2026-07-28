@@ -1,3 +1,5 @@
+import type { TenantSummary } from "../../../tenants/dto/response/tenant.response";
+
 export interface RoleSummary {
   id: string;
   name: string;
@@ -9,11 +11,6 @@ export interface RoleSummaryScope {
   scopeType: string;
   scopeId: string | null;
   permission: string;
-}
-
-export interface TenantSummary {
-  id: string;
-  name: string;
 }
 
 type AuthSessionUserBase = {
@@ -37,7 +34,7 @@ export type AuthSessionUser =
 
 export interface AuthSessionResponse {
   accessToken: string;
-  expiresIn: number;
+  expiresAt: Date;
   user: AuthSessionUser;
 }
 

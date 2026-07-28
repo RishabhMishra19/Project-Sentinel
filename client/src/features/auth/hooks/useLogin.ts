@@ -1,14 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../../../redux/hooks";
-import { setAuthSession } from "../../../redux/session/sessionSlice";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
-import { resolvePostLoginPath } from "../../../navigation/utils";
 import { AuthApi } from "../api/AuthApi";
 import type { LoginRequest } from "../dto/request/auth.request";
+import { AuthUtils } from "../AuthUtils";
 
 export const useLogin = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   return useMutation({
@@ -21,8 +18,11 @@ export const useLogin = () => {
       },
     },
     onSuccess: (data) => {
-      dispatch(setAuthSession(data));
-      navigate(resolvePostLoginPath(data.user), { replace: true });
+      AuthUtils.setAuth(data);
+      if (data.user.tenant) {
+        AuthUtils.setActiveTenant(data.user.tenant);
+      }
+      navigate("/", { replace: true });
     },
   });
 };
