@@ -1,6 +1,7 @@
 import type { ChangeEvent } from "react";
 import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
 import { ServerSelectField } from "../../../shared/forms/ServerSelectField";
+import { ModalLayout } from "../../../shared/ui";
 import { useTenantsQuery } from "../hooks/useTenants";
 import { AuthUtils } from "../../auth/AuthUtils";
 
@@ -26,33 +27,25 @@ export const ChooseTenantModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-4">
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="choose-tenant-title"
-        className="relative z-10 w-full max-w-md rounded-xl bg-surface p-6 shadow-lg"
-      >
-        <h2 id="choose-tenant-title" className="text-xl font-semibold text-foreground">
-          Choose a tenant
-        </h2>
-        <p className="mt-1 text-sm text-muted">To visit this page, you need to choose a tenant.</p>
-
-        <div className="mt-4">
-          <ServerSelectField
-            label="Tenant"
-            query={tenantsQuery}
-            toOption={(tenant) => ({ value: tenant.id, label: tenant.name })}
-            placeholder="Select a tenant"
-            loadingPlaceholder="Loading tenants…"
-            emptyPlaceholder="No tenants available"
-            emptyMessage="No active tenants found."
-            errorMessage="Could not load tenants."
-            value=""
-            onChange={handleChange}
-          />
-        </div>
-      </div>
-    </div>
+    <ModalLayout
+      open
+      dismissible={false}
+      onClose={() => undefined}
+      title="Choose a tenant"
+      description="To visit this page, you need to choose a tenant."
+    >
+      <ServerSelectField
+        label="Tenant"
+        query={tenantsQuery}
+        toOption={(tenant) => ({ value: tenant.id, label: tenant.name })}
+        placeholder="Select a tenant"
+        loadingPlaceholder="Loading tenants…"
+        emptyPlaceholder="No tenants available"
+        emptyMessage="No active tenants found."
+        errorMessage="Could not load tenants."
+        value=""
+        onChange={handleChange}
+      />
+    </ModalLayout>
   );
 };
