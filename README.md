@@ -486,6 +486,8 @@ Deferred work to finish later for this project:
 
 6. **Forgot password + email service** — Support forgot password on the frontend, integrated with an email service. Backend needs tables and APIs for reset flow; the email link opens a UI URL for reset. Ship a complete email service: send on user account creation and other important events (email work is send-only; auth/reset logic stays in APIs + UI).
 
+7. **Hide Tenants tab in tenant session** — When a Sentinel admin is operating inside a selected tenant session, the Tenants tab should not be visible (tenants management is platform-admin only outside a tenant context).
+
 ---
 
 ## Notes
