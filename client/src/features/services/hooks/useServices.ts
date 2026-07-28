@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { mapListQuery, mapPageQuery } from "../../../shared/api/mapQuery";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
 import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
-import { ServicesApi } from "../api/services.api";
+import { ServicesApi } from "../api/ServicesApi";
 import type { CreateServiceRequest, UpdateServiceRequest } from "../dto/request/service.request";
 
 export const servicesQueryKey = (productId?: string) =>
