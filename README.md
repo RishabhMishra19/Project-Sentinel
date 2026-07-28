@@ -21,6 +21,7 @@ This repo is a full demo stack: **Control API** (`server`), **Ingest**, **Worker
 9. [Configuration & defaults](#configuration--defaults)
 10. [Monitoring & load testing](#monitoring--load-testing)
 11. [Tech stack](#tech-stack)
+12. [Future work (TODOs)](#future-work-todos)
 
 ---
 
@@ -466,6 +467,24 @@ Also available via Compose on port **3100**.
 | Frontend | React 19, TypeScript, Vite, Redux Toolkit, TanStack Query, Tailwind 4, Recharts |
 | Packaging | Maven multi-module + Docker Compose |
 | Load testing | k6 + Next.js Loadlab |
+
+---
+
+## Future work (TODOs)
+
+Deferred work to finish later for this project:
+
+1. **Admin live dashboard** — Add a Dashboard tab in the Sentinel admin view. Admin login and end-session should navigate there by default. Show how many requests the ingest service is processing, with filters for a particular tenant, product, service, and endpoint. Data should update live over time. Same idea for the consumer/worker: live graphs on the dashboard, filterable by those resources.
+
+2. **Loadlab optional seeding** — On the Loadlab page, seeding data should not always be mandatory. Landing on the page should allow starting load directly without requiring a seed step first.
+
+3. **Frontend authorization by scopes** — Implement proper frontend authorization based on scopes (UI currently does not enforce this well).
+
+4. **Backend scope enforcement** — Ensure all resource-level scopes and normal scopes are used correctly. List, get, and other APIs should only allow fetching or changing resources the caller has scopes for.
+
+5. **Settings page** — Improve the frontend settings page and add more functionality.
+
+6. **Forgot password + email service** — Support forgot password on the frontend, integrated with an email service. Backend needs tables and APIs for reset flow; the email link opens a UI URL for reset. Ship a complete email service: send on user account creation and other important events (email work is send-only; auth/reset logic stays in APIs + UI).
 
 ---
 
