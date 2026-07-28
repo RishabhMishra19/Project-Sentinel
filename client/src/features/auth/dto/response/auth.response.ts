@@ -1,6 +1,6 @@
 import type { TenantSummary } from "../../../tenants/dto/response/tenant.response";
 
-export interface RoleSummary {
+interface RoleSummary {
   id: string;
   name: string;
   scopes: RoleSummaryScope[];
@@ -21,8 +21,7 @@ type AuthSessionUserBase = {
   roles: RoleSummary[];
 };
 
-/** Sentinel admin: no home tenant. Non-admin: tenant is always present. */
-export type AuthSessionUser =
+type AuthSessionUser =
   | (AuthSessionUserBase & {
       sentinelAdmin: true;
       tenant: null;
