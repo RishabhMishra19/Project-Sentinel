@@ -16,7 +16,9 @@ CREATE TABLE IF NOT EXISTS endpoints (
 );
 
 CREATE TABLE IF NOT EXISTS request_logs (
+    tenant_id uuid,
     service_id uuid,
+
     id uuid,
 
     endpoint_id uuid,
@@ -38,7 +40,8 @@ CREATE TABLE IF NOT EXISTS request_logs (
     received_at timestamp,
 
     PRIMARY KEY (
-        service_id,
+        (tenant_id, service_id),
+        occurred_at,
         id
     )
 )

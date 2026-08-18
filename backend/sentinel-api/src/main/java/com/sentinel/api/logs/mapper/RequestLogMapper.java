@@ -17,7 +17,7 @@ public class RequestLogMapper {
                 log.getEndpointId(),
                 log.getRequestId(),
                 log.getTraceId(),
-                log.getOccurredAt(),
+                log.getId().getOccurredAt(),
                 log.getEndUserIp(),
                 log.getUserId(),
                 log.getStatusCode(),

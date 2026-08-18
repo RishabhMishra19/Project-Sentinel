@@ -18,7 +18,8 @@ public interface RequestLogRepository
             UUID serviceId,
             UUID requestLogId);
 
-    Slice<RequestLog> findByIdServiceIdIn(
-            List<UUID> serviceIds,
+    Slice<RequestLog> findByIdTenantIdAndIdServiceId(
+            UUID tenantId,
+            UUID serviceId,
             Pageable pageable);
 }

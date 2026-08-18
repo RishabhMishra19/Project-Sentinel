@@ -33,9 +33,6 @@ public class RequestLog {
     @Column("trace_id")
     private String traceId;
 
-    @Column("occurred_at")
-    private Instant occurredAt;
-
     @Column("end_user_ip")
     private String endUserIp;
 
@@ -65,9 +62,21 @@ public class RequestLog {
     public static class PrimaryKeyComposite {
 
         @PrimaryKeyColumn(
+                name = "tenant_id",
+                type = PrimaryKeyType.PARTITIONED
+        )
+        private UUID tenantId;
+
+        @PrimaryKeyColumn(
                 name = "service_id",
                 type = PrimaryKeyType.PARTITIONED)
         private UUID serviceId;
+
+        @PrimaryKeyColumn(
+                name = "occurred_at",
+                type = PrimaryKeyType.CLUSTERED
+        )
+        private Instant occurredAt;
 
         @PrimaryKeyColumn(
                 name = "id",

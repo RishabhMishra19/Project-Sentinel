@@ -1,12 +1,10 @@
 package com.sentinel.api.logs.service.core;
 
-import com.sentinel.api.service.repository.ServiceRepository;
 import com.sentinel.common.observability.entity.RequestLog;
 import com.sentinel.common.observability.repository.RequestLogRepository;
 import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.observability.repository.RequestLogSpecifications;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class RequestLogServiceImpl implements RequestLogService {
 
     private final RequestLogRepository requestLogRepository;
-    private final ServiceRepository serviceRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -33,11 +30,12 @@ public class RequestLogServiceImpl implements RequestLogService {
         Specification<RequestLog> spec =
                 RequestLogSpecifications.forTenantFilters(tenantId, query);
 
-        List<UUID> serviceIds = serviceRepository.findAllServiceIdsByTenantId(tenantId);
+        UUID serviceId = UUID.fromString(query.getFilterConfigs().getFirst().getFilterValues().getFirst());
 
         Slice<RequestLog> slice =
-                requestLogRepository.findByIdServiceIdIn(
-                        serviceIds,
+                requestLogRepository.findByIdTenantIdAndIdServiceId(
+                        tenantId,
+                        serviceId,
                         CassandraPageRequest.first(50)
                 );
         return new PageImpl<>(
