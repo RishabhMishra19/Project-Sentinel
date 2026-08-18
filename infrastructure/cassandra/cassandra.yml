@@ -19,6 +19,9 @@ services:
       # simple local development setup.
       CASSANDRA_ENDPOINT_SNITCH: SimpleSnitch
 
+      # Enable username/password authentication
+      CASSANDRA_AUTHENTICATOR: PasswordAuthenticator
+
     volumes:
       # Persist Cassandra data.
       - cassandra-data:/var/lib/cassandra
