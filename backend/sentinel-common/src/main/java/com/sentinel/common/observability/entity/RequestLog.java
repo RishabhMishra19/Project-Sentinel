@@ -1,62 +1,77 @@
 package com.sentinel.common.observability.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "request_logs")
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.Column;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.Table;
+
+@Table("request_logs")
 @Getter
 @Setter
 @NoArgsConstructor
 public class RequestLog {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
-    private UUID id;
+    @PrimaryKey
+    private PrimaryKeyComposite id;
 
-    @Column(name = "service_instance_id", nullable = false)
-    private UUID serviceInstanceId;
-
-    @Column(name = "endpoint_id", nullable = false)
+    @Column("endpoint_id")
     private UUID endpointId;
 
-    @Column(name = "request_id", nullable = true, length = 128)
+    @Column("request_id")
     private String requestId;
 
-    @Column(name = "trace_id", nullable = true, length = 128)
+    @Column("trace_id")
     private String traceId;
 
-    @Column(name = "occurred_at", nullable = false)
+    @Column("occurred_at")
     private Instant occurredAt;
 
-    @Column(name = "end_user_ip", nullable = true, length = 64)
+    @Column("end_user_ip")
     private String endUserIp;
 
-    @Column(name = "user_id", nullable = true, length = 128)
+    @Column("user_id")
     private String userId;
 
-    @Column(name = "status_code", nullable = false)
+    @Column("status_code")
     private int statusCode;
 
-    @Column(name = "duration_ms", nullable = false)
+    @Column("duration_ms")
     private int durationMs;
 
-    @Column(name = "request_size_bytes", nullable = true)
+    @Column("request_size_bytes")
     private Integer requestSizeBytes;
 
-    @Column(name = "response_size_bytes", nullable = true)
+    @Column("response_size_bytes")
     private Integer responseSizeBytes;
 
-    @Column(name = "received_at", nullable = false)
+    @Column("received_at")
     private Instant receivedAt;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @PrimaryKeyClass
+    public static class PrimaryKeyComposite {
+
+        @PrimaryKeyColumn(
+                name = "service_id",
+                type = PrimaryKeyType.PARTITIONED)
+        private UUID serviceId;
+
+        @PrimaryKeyColumn(
+                name = "id",
+                type = PrimaryKeyType.CLUSTERED)
+        private UUID requestLogId;
+    }
 }

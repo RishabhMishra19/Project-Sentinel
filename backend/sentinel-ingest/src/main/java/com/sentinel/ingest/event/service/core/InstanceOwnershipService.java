@@ -1,6 +1,5 @@
 package com.sentinel.ingest.event.service.core;
 
-import com.sentinel.common.observability.repository.ServiceInstanceRepository;
 import com.sentinel.ingest.common.exception.NotFoundException;
 import com.sentinel.ingest.config.IngestCacheConfig;
 import java.util.Collection;

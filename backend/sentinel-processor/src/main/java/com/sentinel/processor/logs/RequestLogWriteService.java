@@ -36,17 +36,16 @@ public class RequestLogWriteService {
                 (ps, event) -> {
                     RequestEventMessage message = event.message();
                     ps.setObject(1, UUID.randomUUID());
-                    ps.setObject(2, message.serviceInstanceId());
-                    ps.setObject(3, event.endpointId());
-                    ps.setString(4, message.requestId());
-                    ps.setTimestamp(5, Timestamp.from(message.occurredAt()));
-                    ps.setString(6, message.endUserIp());
-                    ps.setString(7, message.userId());
-                    ps.setInt(8, message.statusCode());
-                    ps.setInt(9, message.durationMs());
-                    ps.setObject(10, message.requestSizeBytes());
-                    ps.setObject(11, message.responseSizeBytes());
-                    ps.setTimestamp(12, Timestamp.from(message.receivedAt()));
+                    ps.setObject(2, event.endpointId());
+                    ps.setString(3, message.requestId());
+                    ps.setTimestamp(4, Timestamp.from(message.occurredAt()));
+                    ps.setString(5, message.endUserIp());
+                    ps.setString(6, message.userId());
+                    ps.setInt(7, message.statusCode());
+                    ps.setInt(8, message.durationMs());
+                    ps.setObject(9, message.requestSizeBytes());
+                    ps.setObject(10, message.responseSizeBytes());
+                    ps.setTimestamp(11, Timestamp.from(message.receivedAt()));
                 });
     }
 
