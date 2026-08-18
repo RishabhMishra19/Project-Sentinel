@@ -1,0 +1,41 @@
+services:
+  postgres:
+    # Official PostgreSQL image.
+    image: postgres:16
+
+    environment:
+      # Database that PostgreSQL creates on first startup.
+      POSTGRES_DB: sentinel
+
+      # Database user.
+      POSTGRES_USER: sentinel
+
+      # Database password.
+      POSTGRES_PASSWORD: sentinel
+
+    ports:
+      # Host:Container
+      #
+      # Allows local tools such as IntelliJ, DBeaver, psql, etc.
+      # to connect using localhost:5432.
+      - "5432:5432"
+
+    volumes:
+      # Persist PostgreSQL data even if the container is recreated.
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      # pg_isready checks whether PostgreSQL is accepting connections.
+      test: ["CMD-SHELL", "pg_isready -U sentinel -d sentinel"]
+
+      # Check every 5 seconds.
+      interval: 5s
+
+      # Give PostgreSQL 5 seconds to respond.
+      timeout: 5s
+
+      # Try 10 times before marking PostgreSQL unhealthy.
+      retries: 10
+
+volumes:
+  postgres_data:

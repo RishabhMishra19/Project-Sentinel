@@ -1,0 +1,28 @@
+services:
+  redis:
+    image: redis:7
+
+    ports:
+      # Host:Container
+      # Allows local tools to connect using localhost:6379
+      - "6379:6379"
+
+    healthcheck:
+      # Redis responds with PONG when it is healthy.
+      test: ["CMD", "redis-cli", "ping"]
+
+      # Run the health check every 5 seconds.
+      interval: 5s
+
+      # Wait up to 5 seconds for Redis to respond.
+      timeout: 5s
+
+      # Mark Redis unhealthy after 10 failed attempts.
+      retries: 10
+
+    volumes:
+      # Persist Redis data across container recreation.
+      - redis-data:/data
+
+volumes:
+  redis-data:

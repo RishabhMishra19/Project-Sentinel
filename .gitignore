@@ -15,8 +15,8 @@
 **/.mvn/wrapper/maven-wrapper.jar
 
 # Node / Vite
-node_modules/
-client/dist/
+**/node_modules/
+**/frontend/dist/
 
 # Logs
 *.log

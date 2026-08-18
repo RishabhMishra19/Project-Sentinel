@@ -1,0 +1,26 @@
+services:
+  memcached:
+    image: memcached:1.6
+
+    ports:
+      # Memcached default port.
+      # Host:Container
+      - "11211:11211"
+
+    command:
+      # Listen on all interfaces inside the container.
+      - memcached
+      - -m
+      - "128"
+      - -p
+      - "11211"
+      - -u
+      - "memcache"
+
+    healthcheck:
+      # Memcached does not provide a simple health command
+      # like Redis, so check that the port is accepting connections.
+      test: ["CMD-SHELL", "nc -z localhost 11211"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

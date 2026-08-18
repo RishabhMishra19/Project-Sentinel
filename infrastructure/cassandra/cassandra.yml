@@ -1,0 +1,40 @@
+services:
+  cassandra:
+    image: cassandra:5.0
+
+    ports:
+      # CQL native protocol
+      # Host:Container
+      - "9042:9042"
+
+    environment:
+      # Name of the Cassandra cluster.
+      CASSANDRA_CLUSTER_NAME: sentinel-cluster
+
+      # Single-node development cluster.
+      CASSANDRA_DC: datacenter1
+      CASSANDRA_RACK: rack1
+
+      # Disable Cassandra's legacy snitch behavior for a
+      # simple local development setup.
+      CASSANDRA_ENDPOINT_SNITCH: SimpleSnitch
+
+    volumes:
+      # Persist Cassandra data.
+      - cassandra-data:/var/lib/cassandra
+
+    healthcheck:
+      # Check whether Cassandra is accepting CQL connections.
+      test:
+        [
+          "CMD-SHELL",
+          "cqlsh -e 'SELECT now() FROM system.local;' 127.0.0.1 9042",
+        ]
+
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 60s
+
+volumes:
+  cassandra-data:

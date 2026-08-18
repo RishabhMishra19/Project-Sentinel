@@ -1,0 +1,12 @@
+services:
+  sentinel-web:
+    build:
+      context: ../..
+      dockerfile: infrastructure/sentinel-web/Dockerfile
+
+    # Nginx is the public entry point,
+    # so sentinel-web doesn't need a host port.
+    expose:
+      - "80"
+
+    restart: unless-stopped

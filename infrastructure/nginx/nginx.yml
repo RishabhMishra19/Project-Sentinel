@@ -1,0 +1,33 @@
+services:
+  nginx:
+    build:
+      # Project root is the Docker build context.
+      context: ../..
+
+      # Nginx Dockerfile.
+      dockerfile: infrastructure/nginx/Dockerfile
+
+    ports:
+      # Host:Container
+      #
+      # Everything enters Sentinel through port 3000.
+      - "3000:80"
+
+    volumes:
+      # Persist nginx logs data.
+      - nginx_logs:/var/log/nginx
+
+    depends_on:
+      sentinel-web:
+        condition: service_started
+
+      sentinel-api:
+        condition: service_healthy
+
+      # sentinel-ingest:
+      #   condition: service_healthy
+
+    restart: unless-stopped
+
+volumes:
+  nginx_logs:
