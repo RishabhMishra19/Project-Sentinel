@@ -23,4 +23,8 @@ public final class ApiResponses {
     public static <T> ResponseEntity<PageResponse<T>> okPage(PageResponse<T> page) {
         return ResponseEntity.ok(page);
     }
+
+    public static <T> ResponseEntity<CursorPaginationResponse<T>> okPage(CursorPaginationResponse<T> page) {
+        return ResponseEntity.ok(page);
+    }
 }

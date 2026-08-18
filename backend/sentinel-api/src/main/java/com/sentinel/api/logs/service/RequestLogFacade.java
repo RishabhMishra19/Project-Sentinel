@@ -1,13 +1,14 @@
 package com.sentinel.api.logs.service;
 
-import com.sentinel.api.common.query.ListQueryRequest;
-import com.sentinel.api.common.response.PageResponse;
-import com.sentinel.api.logs.dto.response.RequestLogResponse;
+import com.sentinel.api.common.response.CursorPaginationResponse;
+import com.sentinel.api.logs.dto.request.RequestLogListRequest;
+import com.sentinel.api.logs.dto.response.RequestLogListResponse;
+
 import java.util.UUID;
 
 public interface RequestLogFacade {
 
-    PageResponse<RequestLogResponse> list(UUID tenantId, ListQueryRequest query);
+    CursorPaginationResponse<RequestLogListResponse> getAll(UUID tenantId, RequestLogListRequest request);
 
-    RequestLogResponse getById(UUID tenantId, UUID id);
+    RequestLogListResponse getById(UUID tenantId, UUID id);
 }

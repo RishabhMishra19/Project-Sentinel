@@ -1,12 +1,12 @@
 package com.sentinel.api.logs.controller;
 
-import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.common.response.ApiResponses;
-import com.sentinel.api.common.response.PageResponse;
-import com.sentinel.api.logs.dto.response.RequestLogResponse;
+import com.sentinel.api.common.response.CursorPaginationResponse;
+import com.sentinel.api.logs.dto.request.RequestLogListRequest;
+import com.sentinel.api.logs.dto.response.RequestLogListResponse;
 import com.sentinel.api.logs.service.RequestLogFacade;
 import com.sentinel.api.security.UserPrincipal;
-import java.util.UUID;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/logs/requests")
 @RequiredArgsConstructor
@@ -26,15 +28,15 @@ public class RequestLogController {
     private final RequestLogFacade requestLogFacade;
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
-    @PostMapping("/search")
-    public ResponseEntity<PageResponse<RequestLogResponse>> search(
-            @AuthenticationPrincipal UserPrincipal principal, @RequestBody ListQueryRequest query) {
-        return ApiResponses.okPage(requestLogFacade.list(principal.getActiveTenantId(), query));
+    @PostMapping("/")
+    public ResponseEntity<CursorPaginationResponse<RequestLogListResponse>> getAll(
+            @AuthenticationPrincipal UserPrincipal principal, @Valid @RequestBody RequestLogListRequest request) {
+        return ApiResponses.okPage(requestLogFacade.getAll(principal.getActiveTenantId(), request));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping("/{id}")
-    public ResponseEntity<RequestLogResponse> getById(
+    public ResponseEntity<RequestLogListResponse> getById(
             @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID id) {
         return ApiResponses.ok(requestLogFacade.getById(principal.getActiveTenantId(), id));
     }

@@ -2,7 +2,7 @@ package com.sentinel.api.logs.mapper;
 
 import com.sentinel.common.observability.entity.Endpoint;
 import com.sentinel.common.observability.entity.RequestLog;
-import com.sentinel.api.logs.dto.response.RequestLogResponse;
+import com.sentinel.api.logs.dto.response.RequestLogListResponse;
 import com.sentinel.api.product.entity.Product;
 import com.sentinel.api.service.entity.Service;
 import org.springframework.stereotype.Component;
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class RequestLogMapper {
 
-    public RequestLogResponse toResponse(
+    public RequestLogListResponse toResponse(
             RequestLog log, Endpoint endpoint, Service service, Product product) {
-        return new RequestLogResponse(
+        return new RequestLogListResponse(
                 log.getId().getRequestLogId(),
                 log.getEndpointId(),
                 log.getRequestId(),

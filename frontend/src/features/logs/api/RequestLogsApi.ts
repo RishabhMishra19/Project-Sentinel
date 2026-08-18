@@ -6,7 +6,7 @@ import type { RequestLogResponse } from "../dto/response/requestLog.response";
 
 export class RequestLogsApi {
   static list(query: ListQueryRequest): Promise<PageResponse<RequestLogResponse>> {
-    return apiManager.post<PageResponse<RequestLogResponse>>(LOGS_API_ROUTES.SEARCH, query);
+    return apiManager.post<PageResponse<RequestLogResponse>>(LOGS_API_ROUTES.LIST, query);
   }
 
   static get(id: string): Promise<RequestLogResponse> {

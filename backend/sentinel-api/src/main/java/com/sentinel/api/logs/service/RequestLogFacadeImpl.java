@@ -1,19 +1,22 @@
 package com.sentinel.api.logs.service;
 
-import com.sentinel.common.observability.entity.Endpoint;
-import com.sentinel.common.observability.entity.RequestLog;
-import com.sentinel.common.observability.repository.EndpointRepository;
 import com.sentinel.api.common.exception.BadRequestException;
 import com.sentinel.api.common.exception.ResourceNotFoundException;
-import com.sentinel.api.common.query.ListQueryRequest;
-import com.sentinel.api.common.response.PageResponse;
-import com.sentinel.api.logs.dto.response.RequestLogResponse;
+import com.sentinel.api.common.response.CursorPaginationResponse;
+import com.sentinel.api.logs.dto.request.RequestLogListRequest;
+import com.sentinel.api.logs.dto.response.RequestLogListResponse;
 import com.sentinel.api.logs.mapper.RequestLogMapper;
 import com.sentinel.api.logs.service.core.RequestLogService;
-import com.sentinel.api.observability.repository.RequestLogSpecifications;
 import com.sentinel.api.product.entity.Product;
 import com.sentinel.api.service.entity.Service;
 import com.sentinel.api.service.service.core.ServiceService;
+import com.sentinel.common.observability.entity.Endpoint;
+import com.sentinel.common.observability.entity.RequestLog;
+import com.sentinel.common.observability.repository.EndpointRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -22,11 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.transaction.annotation.Transactional;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -34,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class RequestLogFacadeImpl implements RequestLogFacade {
 
     private static final Duration MAX_RANGE = Duration.ofDays(7);
-    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "occurredAt");
 
     private final RequestLogService requestLogService;
     private final RequestLogMapper requestLogMapper;
@@ -43,29 +40,17 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<RequestLogResponse> list(UUID tenantId, ListQueryRequest query) {
-        ListQueryRequest effectiveQuery = query != null ? query : new ListQueryRequest();
-        Instant rangeTo = effectiveQuery.getTo() != null ? effectiveQuery.getTo() : Instant.now();
-        Instant rangeFrom =
-                effectiveQuery.getFrom() != null
-                        ? effectiveQuery.getFrom()
-                        : rangeTo.minus(Duration.ofHours(1));
-        validateRange(rangeFrom, rangeTo);
-        effectiveQuery.setFrom(rangeFrom);
-        effectiveQuery.setTo(rangeTo);
-
-        Pageable pageable =
-                effectiveQuery.toPageable(RequestLogSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
-        Page<RequestLog> page = requestLogService.search(tenantId, effectiveQuery, pageable);
-        Map<UUID, Endpoint> endpoints = loadEndpoints(page.getContent());
+    public CursorPaginationResponse<RequestLogListResponse> getAll(UUID tenantId, RequestLogListRequest request) {
+        this.validateRange(request.getFrom(), request.getTo());
+        Slice<RequestLog> slice = requestLogService.findAllPaginated(tenantId, request);
+        Map<UUID, Endpoint> endpoints = loadEndpoints(slice.getContent());
         Map<UUID, Service> services = loadServices(endpoints.values());
-        return PageResponse.from(
-                page.map(log -> toResponse(log, endpoints, services)));
+        return CursorPaginationResponse.from(slice.map(key->toResponse(key, endpoints, services)), request);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public RequestLogResponse getById(UUID tenantId, UUID id) {
+    public RequestLogListResponse getById(UUID tenantId, UUID id) {
         RequestLog log =
                 requestLogService
                         .findByIdForTenant(tenantId, id)
@@ -75,7 +60,7 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
         return toResponse(log, endpoints, services);
     }
 
-    private RequestLogResponse toResponse(
+    private RequestLogListResponse toResponse(
             RequestLog log, Map<UUID, Endpoint> endpoints, Map<UUID, Service> services) {
         Endpoint endpoint = endpoints.get(log.getEndpointId());
         if (endpoint == null) {

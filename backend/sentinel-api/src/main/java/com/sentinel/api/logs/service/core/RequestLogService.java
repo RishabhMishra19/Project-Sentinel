@@ -1,15 +1,15 @@
 package com.sentinel.api.logs.service.core;
 
+import com.sentinel.api.logs.dto.request.RequestLogListRequest;
 import com.sentinel.common.observability.entity.RequestLog;
-import com.sentinel.api.common.query.ListQueryRequest;
+import org.springframework.data.domain.Slice;
+
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 public interface RequestLogService {
 
-    Page<RequestLog> search(UUID tenantId, ListQueryRequest query, Pageable pageable);
+    Slice<RequestLog> findAllPaginated(UUID tenantId, RequestLogListRequest request);
 
     Optional<RequestLog> findByIdForTenant( UUID serviceId, UUID id);
 }
