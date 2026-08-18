@@ -1,4 +1,4 @@
-/** Mirrors `com.sentinel.server.common.response.PageResponse`. */
+/** Mirrors `com.sentinel.api.common.response.PageResponse`. */
 export interface PageResponse<T> {
   content: T[];
   page: number;

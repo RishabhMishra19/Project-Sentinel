@@ -45,7 +45,7 @@ public class RoleScope {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "permission", nullable = false, length = 32)
-    private com.sentinel.server.permission.entity.PermissionType permission;
+    private com.sentinel.api.permission.entity.PermissionType permission;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

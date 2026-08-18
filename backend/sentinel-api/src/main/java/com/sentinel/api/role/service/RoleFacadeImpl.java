@@ -193,7 +193,7 @@ public class RoleFacadeImpl implements RoleFacade {
             return;
         }
         if (scopeType == RoleScopeType.SERVICE) {
-            com.sentinel.server.service.entity.Service service = serviceService
+            com.sentinel.api.service.entity.Service service = serviceService
                     .findWithAuditById(scopeId)
                     .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
             UUID serviceTenantId = service.getProduct().getTenant().getId();
