@@ -9,10 +9,10 @@ include:
   - ./infrastructure/cassandra/cassandra.yml
 
   # Applications
-  - ./infrastructure/sentinel-api/sentinel-api.yml
+  # - ./infrastructure/sentinel-api/sentinel-api.yml
   # - ./infrastructure/sentinel-ingest/sentinel-ingest.yml
   # - ./infrastructure/sentinel-processor/sentinel-processor.yml
-  - ./infrastructure/sentinel-web/sentinel-web.yml
+  # - ./infrastructure/sentinel-web/sentinel-web.yml
 
   # Reverse Proxy
-  - ./infrastructure/nginx/nginx.yml
+  # - ./infrastructure/nginx/nginx.yml

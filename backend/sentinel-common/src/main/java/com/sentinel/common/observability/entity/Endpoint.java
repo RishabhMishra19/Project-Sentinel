@@ -3,6 +3,7 @@ package com.sentinel.common.observability.entity;
 import java.time.Instant;
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,6 +40,7 @@ public class Endpoint {
     @Setter
     @NoArgsConstructor
     @PrimaryKeyClass
+    @AllArgsConstructor
     public static class PrimaryKeyComposite {
 
         @PrimaryKeyColumn(

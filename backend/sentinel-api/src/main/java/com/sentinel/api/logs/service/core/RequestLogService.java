@@ -11,5 +11,5 @@ public interface RequestLogService {
 
     Page<RequestLog> search(UUID tenantId, ListQueryRequest query, Pageable pageable);
 
-    Optional<RequestLog> findByIdForTenant(UUID tenantId, UUID id);
+    Optional<RequestLog> findByIdForTenant( UUID serviceId, UUID id);
 }

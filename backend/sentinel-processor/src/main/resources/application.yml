@@ -18,14 +18,13 @@ spring:
         jdbc:
           time_zone: UTC
 
-  data:
-    cassandra:
-      contact-points: ${SPRING_DATA_CASSANDRA_CONTACT_POINTS:localhost}
-      port: ${SPRING_DATA_CASSANDRA_PORT:9042}
-      keyspace-name: ${SPRING_DATA_CASSANDRA_KEYSPACE:sentinel}
-      username: ${SPRING_DATA_CASSANDRA_USERNAME:cassandra}
-      password: ${SPRING_DATA_CASSANDRA_PASSWORD:cassandra}
-      local-datacenter: ${SPRING_DATA_CASSANDRA_DATACENTER:datacenter1}
+  cassandra:
+    contact-points: ${SPRING_DATA_CASSANDRA_CONTACT_POINTS:localhost}
+    port: ${SPRING_DATA_CASSANDRA_PORT:9042}
+    keyspace-name: ${SPRING_DATA_CASSANDRA_KEYSPACE:sentinel}
+    username: ${SPRING_DATA_CASSANDRA_USERNAME:cassandra}
+    password: ${SPRING_DATA_CASSANDRA_PASSWORD:cassandra}
+    local-datacenter: ${SPRING_DATA_CASSANDRA_DATACENTER:datacenter1}
   cache:
     type: caffeine
     caffeine:

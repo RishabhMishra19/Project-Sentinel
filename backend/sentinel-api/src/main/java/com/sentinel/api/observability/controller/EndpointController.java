@@ -33,12 +33,12 @@ public class EndpointController {
         requireServiceInTenant(serviceId, principal.getActiveTenantId());
         List<EndpointResponse> endpoints =
                 endpointRepository
-                        .findByServiceIdOrderByMethodAscPathTemplateAsc(serviceId)
+                        .findByIdServiceId(serviceId)
                         .stream()
                         .map(
                                 e -> new EndpointResponse(
-                                        e.getId().toString(),
-                                        e.getServiceId().toString(),
+                                        e.getId().getEndpointId().toString(),
+                                        e.getId().getServiceId().toString(),
                                         e.getMethod(),
                                         e.getPathTemplate()))
                         .toList();

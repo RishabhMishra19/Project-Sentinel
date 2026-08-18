@@ -81,7 +81,7 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
         if (endpoint == null) {
             throw new ResourceNotFoundException("Endpoint not found");
         }
-        Service service = services.get(endpoint.getServiceId());
+        Service service = services.get(endpoint.getId().getServiceId());
         if (service == null) {
             throw new ResourceNotFoundException("Service not found");
         }
@@ -90,16 +90,16 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
     }
 
     private Map<UUID, Endpoint> loadEndpoints(List<RequestLog> logs) {
-        Set<UUID> ids = new HashSet<>();
+        Set<Endpoint.PrimaryKeyComposite> ids = new HashSet<>();
         for (RequestLog log : logs) {
             if (log.getEndpointId() != null) {
-                ids.add(log.getEndpointId());
+                ids.add(new Endpoint.PrimaryKeyComposite(log.getId().getServiceId(), log.getEndpointId()));
             }
         }
         Map<UUID, Endpoint> endpoints = new HashMap<>();
         if (!ids.isEmpty()) {
             for (Endpoint endpoint : endpointRepository.findAllById(ids)) {
-                endpoints.put(endpoint.getId(), endpoint);
+                endpoints.put(endpoint.getId().getEndpointId(), endpoint);
             }
         }
         return endpoints;
@@ -108,8 +108,8 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
     private Map<UUID, Service> loadServices(Iterable<Endpoint> endpoints) {
         Set<UUID> ids = new HashSet<>();
         for (Endpoint endpoint : endpoints) {
-            if (endpoint.getServiceId() != null) {
-                ids.add(endpoint.getServiceId());
+            if (endpoint.getId().getServiceId() != null) {
+                ids.add(endpoint.getId().getServiceId());
             }
         }
         Map<UUID, Service> services = new HashMap<>();

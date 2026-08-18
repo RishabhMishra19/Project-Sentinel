@@ -13,7 +13,7 @@ public class RequestLogMapper {
     public RequestLogResponse toResponse(
             RequestLog log, Endpoint endpoint, Service service, Product product) {
         return new RequestLogResponse(
-                log.getId(),
+                log.getId().getRequestLogId(),
                 log.getEndpointId(),
                 log.getRequestId(),
                 log.getTraceId(),

@@ -2,6 +2,7 @@ package com.sentinel.api.analytics.service.core;
 
 import com.sentinel.api.common.exception.BadRequestException;
 import com.sentinel.api.common.exception.ResourceNotFoundException;
+import com.sentinel.common.observability.entity.Endpoint;
 import com.sentinel.common.observability.repository.EndpointRepository;
 import java.time.Instant;
 import java.util.List;
@@ -25,14 +26,14 @@ public class EndpointAnalyticsHandler implements AnalyticsScopeHandler {
     @Override
     public AnalyticsMetricsAggregate summary(
             UUID tenantId, UUID productId, UUID serviceId, UUID endpointId, Instant from, Instant to, AnalyticsBucket bucket) {
-        UUID id = requireEndpoint(tenantId, endpointId);
+        UUID id = requireEndpoint(serviceId, endpointId);
         return queryService.summarize(AnalyticsScope.ENDPOINT, id, from, to, bucket);
     }
 
     @Override
     public List<AnalyticsMetricsAggregate> timeseries(
             UUID tenantId, UUID productId, UUID serviceId, UUID endpointId, Instant from, Instant to, AnalyticsBucket bucket) {
-        UUID id = requireEndpoint(tenantId, endpointId);
+        UUID id = requireEndpoint(serviceId, endpointId);
         return queryService.timeseries(AnalyticsScope.ENDPOINT, id, from, to, bucket);
     }
 
@@ -47,7 +48,7 @@ public class EndpointAnalyticsHandler implements AnalyticsScopeHandler {
             AnalyticsBucket bucket,
             AnalyticsRankingSort sortBy,
             Pageable pageable) {
-        requireEndpoint(tenantId, endpointId);
+        requireEndpoint(serviceId, endpointId);
         return List.of();
     }
 
@@ -60,16 +61,16 @@ public class EndpointAnalyticsHandler implements AnalyticsScopeHandler {
             Instant from,
             Instant to,
             AnalyticsBucket bucket) {
-        requireEndpoint(tenantId, endpointId);
+        requireEndpoint(serviceId, endpointId);
         return 0L;
     }
 
-    private UUID requireEndpoint(UUID tenantId, UUID endpointId) {
+    private UUID requireEndpoint(UUID serviceId, UUID endpointId) {
         if (endpointId == null) {
             throw new BadRequestException("endpointId is required for ENDPOINT scope");
         }
         endpointRepository
-                .findByIdAndTenantId(endpointId, tenantId)
+                .findById(new Endpoint.PrimaryKeyComposite(serviceId, endpointId))
                 .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
         return endpointId;
     }
