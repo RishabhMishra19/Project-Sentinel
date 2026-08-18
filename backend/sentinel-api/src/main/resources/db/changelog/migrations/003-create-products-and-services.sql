@@ -17,6 +17,9 @@ CREATE TABLE products (
 
 CREATE INDEX idx_products_tenant_id ON products (tenant_id);
 
+CREATE UNIQUE INDEX uk_products_tenant_id_lower_name ON products (tenant_id, lower(name));
+
+
 -- changeset sentinel:003-services
 CREATE TABLE services (
     id UUID NOT NULL PRIMARY KEY,
@@ -33,6 +36,9 @@ CREATE TABLE services (
 );
 
 CREATE INDEX idx_services_product_id ON services (product_id);
+
+CREATE UNIQUE INDEX uk_services_product_id_lower_name ON services (product_id, lower(name));
+
 
 -- changeset sentinel:003-service-api-keys
 CREATE TABLE service_api_keys (
@@ -57,3 +63,5 @@ CREATE UNIQUE INDEX uk_service_api_keys_service_active
     WHERE status = 'ACTIVE';
 
 CREATE INDEX idx_service_api_keys_status ON service_api_keys (status);
+
+CREATE UNIQUE INDEX uk_service_api_keys_service_id_lower_name ON service_api_keys (service_id, lower(name));

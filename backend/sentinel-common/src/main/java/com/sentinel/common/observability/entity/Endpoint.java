@@ -38,6 +38,7 @@ public class Endpoint {
     @Getter
     @Setter
     @NoArgsConstructor
+    @PrimaryKeyClass
     public static class PrimaryKeyComposite {
 
         @PrimaryKeyColumn(
