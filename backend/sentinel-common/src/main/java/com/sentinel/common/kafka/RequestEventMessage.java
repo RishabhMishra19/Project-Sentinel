@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public record RequestEventMessage(
         UUID serviceId,
-        UUID serviceInstanceId,
         String method,
         String path,
         String pathTemplate,

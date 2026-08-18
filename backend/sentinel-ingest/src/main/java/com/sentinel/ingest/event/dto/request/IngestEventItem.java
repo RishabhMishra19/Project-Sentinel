@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record IngestEventItem(
-        @NotNull UUID serviceInstanceId,
         @NotBlank @Size(max = 16) String method,
         @NotBlank @Size(max = 2048) String path,
         @NotNull Instant occurredAt,

@@ -56,7 +56,6 @@ export default function () {
   const svc = services[Math.floor(Math.random() * services.length)];
   const events = [
     {
-      serviceInstanceId: svc.instanceId,
       method: pickMethod(),
       path: buildPath(PATH_CARDINALITY),
       occurredAt: new Date().toISOString(),

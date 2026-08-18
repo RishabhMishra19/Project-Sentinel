@@ -14,7 +14,6 @@ public class RequestLogMapper {
             RequestLog log, Endpoint endpoint, Service service, Product product) {
         return new RequestLogResponse(
                 log.getId(),
-                log.getServiceInstanceId(),
                 log.getEndpointId(),
                 log.getRequestId(),
                 log.getTraceId(),

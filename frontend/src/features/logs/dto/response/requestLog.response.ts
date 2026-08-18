@@ -1,6 +1,5 @@
 export type RequestLogResponse = {
   id: string;
-  serviceInstanceId: string;
   endpointId: string;
   requestId: string | null;
   traceId: string | null;

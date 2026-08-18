@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public record RequestLogResponse(
         UUID id,
-        UUID serviceInstanceId,
         UUID endpointId,
         String requestId,
         String traceId,
