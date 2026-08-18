@@ -1,10 +1,10 @@
 package com.sentinel.api.product.service;
 
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.product.dto.request.CreateProductRequest;
-import com.sentinel.server.product.dto.response.ProductResponse;
-import com.sentinel.server.product.dto.request.UpdateProductRequest;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.response.PageResponse;
+import com.sentinel.api.product.dto.request.CreateProductRequest;
+import com.sentinel.api.product.dto.response.ProductResponse;
+import com.sentinel.api.product.dto.request.UpdateProductRequest;
 import java.util.UUID;
 
 public interface ProductFacade {

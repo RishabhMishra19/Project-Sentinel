@@ -1,11 +1,11 @@
 package com.sentinel.api.observability.controller;
 
 import com.sentinel.common.observability.repository.EndpointRepository;
-import com.sentinel.server.common.exception.ResourceNotFoundException;
-import com.sentinel.server.common.response.ApiResponses;
-import com.sentinel.server.observability.dto.response.EndpointResponse;
-import com.sentinel.server.security.UserPrincipal;
-import com.sentinel.server.service.service.core.ServiceService;
+import com.sentinel.api.common.exception.ResourceNotFoundException;
+import com.sentinel.api.common.response.ApiResponses;
+import com.sentinel.api.observability.dto.response.EndpointResponse;
+import com.sentinel.api.security.UserPrincipal;
+import com.sentinel.api.service.service.core.ServiceService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

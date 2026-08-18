@@ -1,13 +1,13 @@
 package com.sentinel.api.security;
 
-import com.sentinel.server.auth.service.core.JwtService;
-import com.sentinel.server.common.exception.AccessTokenExpiredException;
-import com.sentinel.server.common.exception.ErrorCode;
-import com.sentinel.server.permission.entity.PermissionType;
-import com.sentinel.server.role.entity.RoleScopeStatus;
-import com.sentinel.server.role.entity.RoleStatus;
-import com.sentinel.server.user.entity.User;
-import com.sentinel.server.user.service.core.UserService;
+import com.sentinel.api.auth.service.core.JwtService;
+import com.sentinel.api.common.exception.AccessTokenExpiredException;
+import com.sentinel.api.common.exception.ErrorCode;
+import com.sentinel.api.permission.entity.PermissionType;
+import com.sentinel.api.role.entity.RoleScopeStatus;
+import com.sentinel.api.role.entity.RoleStatus;
+import com.sentinel.api.user.entity.User;
+import com.sentinel.api.user.service.core.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

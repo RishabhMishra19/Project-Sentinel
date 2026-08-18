@@ -1,8 +1,8 @@
 package com.sentinel.api.auth.service.core;
 
-import com.sentinel.server.auth.dto.internal.RefreshTokenIssue;
-import com.sentinel.server.auth.entity.RefreshToken;
-import com.sentinel.server.user.entity.User;
+import com.sentinel.api.auth.dto.internal.RefreshTokenIssue;
+import com.sentinel.api.auth.entity.RefreshToken;
+import com.sentinel.api.user.entity.User;
 import java.util.UUID;
 
 public interface RefreshTokenService {

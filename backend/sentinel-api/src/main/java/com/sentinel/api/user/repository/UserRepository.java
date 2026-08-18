@@ -1,6 +1,6 @@
 package com.sentinel.api.user.repository;
 
-import com.sentinel.server.user.entity.User;
+import com.sentinel.api.user.entity.User;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;

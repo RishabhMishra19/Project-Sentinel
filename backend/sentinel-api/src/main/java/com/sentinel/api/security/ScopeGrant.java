@@ -1,7 +1,7 @@
 package com.sentinel.api.security;
 
-import com.sentinel.server.permission.entity.PermissionType;
-import com.sentinel.server.role.entity.RoleScopeType;
+import com.sentinel.api.permission.entity.PermissionType;
+import com.sentinel.api.role.entity.RoleScopeType;
 import java.util.UUID;
 
 /** Active role-scope grant attached to the authenticated principal. */

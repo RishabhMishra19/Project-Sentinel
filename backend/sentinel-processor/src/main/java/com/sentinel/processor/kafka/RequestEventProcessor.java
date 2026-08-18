@@ -2,10 +2,10 @@ package com.sentinel.processor.kafka;
 
 import com.sentinel.common.kafka.RequestEventMessage;
 import com.sentinel.common.path.PathTemplateDeriver;
-import com.sentinel.worker.catalog.EndpointResolveService;
-import com.sentinel.worker.logs.RequestLogWriteService;
-import com.sentinel.worker.logs.RequestLogWriteService.ResolvedEvent;
-import com.sentinel.worker.metrics.WorkerPipelineMetrics;
+import com.sentinel.processor.catalog.EndpointResolveService;
+import com.sentinel.processor.logs.RequestLogWriteService;
+import com.sentinel.processor.logs.RequestLogWriteService.ResolvedEvent;
+import com.sentinel.processor.metrics.WorkerPipelineMetrics;
 import io.micrometer.core.instrument.Timer;
 import java.util.ArrayList;
 import java.util.HashMap;

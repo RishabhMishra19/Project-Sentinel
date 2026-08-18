@@ -1,7 +1,7 @@
 package com.sentinel.api.product.service.core;
 
-import com.sentinel.server.product.entity.Product;
-import com.sentinel.server.product.repository.ProductRepository;
+import com.sentinel.api.product.entity.Product;
+import com.sentinel.api.product.repository.ProductRepository;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

@@ -1,10 +1,10 @@
 package com.sentinel.api.tenant.mapper;
 
-import com.sentinel.server.tenant.dto.response.CreateTenantResponse;
-import com.sentinel.server.tenant.dto.response.TenantResponse;
-import com.sentinel.server.tenant.entity.Tenant;
-import com.sentinel.server.user.entity.User;
-import com.sentinel.server.user.mapper.UserMapper;
+import com.sentinel.api.tenant.dto.response.CreateTenantResponse;
+import com.sentinel.api.tenant.dto.response.TenantResponse;
+import com.sentinel.api.tenant.entity.Tenant;
+import com.sentinel.api.user.entity.User;
+import com.sentinel.api.user.mapper.UserMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

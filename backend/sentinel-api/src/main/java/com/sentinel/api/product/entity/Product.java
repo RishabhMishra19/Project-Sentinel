@@ -1,7 +1,7 @@
 package com.sentinel.api.product.entity;
 
-import com.sentinel.server.tenant.entity.Tenant;
-import com.sentinel.server.user.entity.User;
+import com.sentinel.api.tenant.entity.Tenant;
+import com.sentinel.api.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

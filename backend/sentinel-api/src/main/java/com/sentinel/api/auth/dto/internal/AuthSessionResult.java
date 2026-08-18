@@ -1,6 +1,6 @@
 package com.sentinel.api.auth.dto.internal;
 
-import com.sentinel.server.auth.dto.response.AuthSessionResponse;
+import com.sentinel.api.auth.dto.response.AuthSessionResponse;
 
 /**
  * Internal auth result: API session body plus raw refresh token for the HttpOnly cookie.

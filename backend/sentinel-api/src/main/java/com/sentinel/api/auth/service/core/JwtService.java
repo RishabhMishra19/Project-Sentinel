@@ -1,6 +1,6 @@
 package com.sentinel.api.auth.service.core;
 
-import com.sentinel.server.user.entity.User;
+import com.sentinel.api.user.entity.User;
 import java.util.UUID;
 
 public interface JwtService {

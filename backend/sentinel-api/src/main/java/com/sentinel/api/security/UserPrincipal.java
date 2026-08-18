@@ -1,6 +1,6 @@
 package com.sentinel.api.security;
 
-import com.sentinel.server.user.entity.UserStatus;
+import com.sentinel.api.user.entity.UserStatus;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;

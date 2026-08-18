@@ -1,12 +1,12 @@
 package com.sentinel.api.product.mapper;
 
-import com.sentinel.server.product.dto.request.CreateProductRequest;
-import com.sentinel.server.product.dto.response.ProductResponse;
-import com.sentinel.server.product.entity.Product;
-import com.sentinel.server.product.entity.ProductStatus;
-import com.sentinel.server.tenant.entity.Tenant;
-import com.sentinel.server.user.entity.User;
-import com.sentinel.server.user.mapper.UserMapper;
+import com.sentinel.api.product.dto.request.CreateProductRequest;
+import com.sentinel.api.product.dto.response.ProductResponse;
+import com.sentinel.api.product.entity.Product;
+import com.sentinel.api.product.entity.ProductStatus;
+import com.sentinel.api.tenant.entity.Tenant;
+import com.sentinel.api.user.entity.User;
+import com.sentinel.api.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

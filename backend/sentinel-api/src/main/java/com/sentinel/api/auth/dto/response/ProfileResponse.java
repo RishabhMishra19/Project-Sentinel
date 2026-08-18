@@ -1,8 +1,8 @@
 package com.sentinel.api.auth.dto.response;
 
-import com.sentinel.server.auth.dto.response.common.RoleSummaryResponse;
-import com.sentinel.server.auth.dto.response.common.TenantSummaryResponse;
-import com.sentinel.server.user.entity.UserStatus;
+import com.sentinel.api.auth.dto.response.common.RoleSummaryResponse;
+import com.sentinel.api.auth.dto.response.common.TenantSummaryResponse;
+import com.sentinel.api.user.entity.UserStatus;
 import java.time.Instant;
 import java.util.List;
 

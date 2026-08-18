@@ -1,6 +1,6 @@
 package com.sentinel.api.product.repository;
 
-import com.sentinel.server.product.entity.Product;
+import com.sentinel.api.product.entity.Product;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;

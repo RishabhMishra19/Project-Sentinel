@@ -1,15 +1,15 @@
 package com.sentinel.api.analytics.controller;
 
-import com.sentinel.server.analytics.dto.response.AnalyticsRankingItem;
-import com.sentinel.server.analytics.dto.response.AnalyticsSummaryResponse;
-import com.sentinel.server.analytics.dto.response.AnalyticsTimeseriesResponse;
-import com.sentinel.server.analytics.dto.response.ExceptionMetricItem;
-import com.sentinel.server.analytics.dto.response.StatusBreakdownItem;
-import com.sentinel.server.analytics.service.AnalyticsFacade;
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.response.ApiResponses;
-import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.security.UserPrincipal;
+import com.sentinel.api.analytics.dto.response.AnalyticsRankingItem;
+import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
+import com.sentinel.api.analytics.dto.response.AnalyticsTimeseriesResponse;
+import com.sentinel.api.analytics.dto.response.ExceptionMetricItem;
+import com.sentinel.api.analytics.dto.response.StatusBreakdownItem;
+import com.sentinel.api.analytics.service.AnalyticsFacade;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.response.ApiResponses;
+import com.sentinel.api.common.response.PageResponse;
+import com.sentinel.api.security.UserPrincipal;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

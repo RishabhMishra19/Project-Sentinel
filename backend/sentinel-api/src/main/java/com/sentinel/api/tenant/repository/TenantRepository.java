@@ -1,6 +1,6 @@
 package com.sentinel.api.tenant.repository;
 
-import com.sentinel.server.tenant.entity.Tenant;
+import com.sentinel.api.tenant.entity.Tenant;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;

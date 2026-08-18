@@ -1,12 +1,12 @@
 package com.sentinel.processor.kafka;
 
 import com.sentinel.common.kafka.AnalyticsDeltaMessage;
-import com.sentinel.worker.analytics.AnalyticsRollupService;
-import com.sentinel.worker.analytics.AnalyticsRollupService.Batch;
-import com.sentinel.worker.catalog.EndpointResolveService;
-import com.sentinel.worker.metrics.WorkerPipelineMetrics;
-import com.sentinel.worker.support.ServiceHierarchy;
-import com.sentinel.worker.support.ServiceHierarchyResolver;
+import com.sentinel.processor.analytics.AnalyticsRollupService;
+import com.sentinel.processor.analytics.AnalyticsRollupService.Batch;
+import com.sentinel.processor.catalog.EndpointResolveService;
+import com.sentinel.processor.metrics.WorkerPipelineMetrics;
+import com.sentinel.processor.support.ServiceHierarchy;
+import com.sentinel.processor.support.ServiceHierarchyResolver;
 import io.micrometer.core.instrument.Timer;
 import java.util.HashMap;
 import java.util.List;

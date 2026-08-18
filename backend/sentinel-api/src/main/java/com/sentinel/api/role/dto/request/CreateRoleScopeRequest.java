@@ -1,7 +1,7 @@
 package com.sentinel.api.role.dto.request;
 
-import com.sentinel.server.permission.entity.PermissionType;
-import com.sentinel.server.role.entity.RoleScopeType;
+import com.sentinel.api.permission.entity.PermissionType;
+import com.sentinel.api.role.entity.RoleScopeType;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 

@@ -1,6 +1,6 @@
 package com.sentinel.api.common.query;
 
-import com.sentinel.server.common.exception.BadRequestException;
+import com.sentinel.api.common.exception.BadRequestException;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.util.StringUtils;

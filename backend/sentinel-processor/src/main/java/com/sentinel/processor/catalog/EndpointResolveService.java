@@ -1,6 +1,6 @@
 package com.sentinel.processor.catalog;
 
-import com.sentinel.worker.config.WorkerCacheConfig;
+import com.sentinel.processor.config.WorkerCacheConfig;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package com.sentinel.api.user.dto.response;
 
-import com.sentinel.server.role.dto.response.RoleBriefResponse;
-import com.sentinel.server.user.entity.UserStatus;
+import com.sentinel.api.role.dto.response.RoleBriefResponse;
+import com.sentinel.api.user.entity.UserStatus;
 import java.time.Instant;
 import java.util.List;
 

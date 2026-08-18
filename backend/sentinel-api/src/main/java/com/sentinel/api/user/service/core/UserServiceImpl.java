@@ -1,12 +1,12 @@
 package com.sentinel.api.user.service.core;
 
-import com.sentinel.server.common.exception.ResourceNotFoundException;
-import com.sentinel.server.common.exception.UnauthorizedException;
-import com.sentinel.server.role.entity.Role;
-import com.sentinel.server.tenant.entity.Tenant;
-import com.sentinel.server.user.entity.User;
-import com.sentinel.server.user.entity.UserStatus;
-import com.sentinel.server.user.repository.UserRepository;
+import com.sentinel.api.common.exception.ResourceNotFoundException;
+import com.sentinel.api.common.exception.UnauthorizedException;
+import com.sentinel.api.role.entity.Role;
+import com.sentinel.api.tenant.entity.Tenant;
+import com.sentinel.api.user.entity.User;
+import com.sentinel.api.user.entity.UserStatus;
+import com.sentinel.api.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

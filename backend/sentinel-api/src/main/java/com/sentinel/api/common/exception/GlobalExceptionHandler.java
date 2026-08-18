@@ -1,6 +1,6 @@
 package com.sentinel.api.common.exception;
 
-import com.sentinel.server.common.dto.response.ApiError;
+import com.sentinel.api.common.dto.response.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;

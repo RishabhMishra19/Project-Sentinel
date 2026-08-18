@@ -1,11 +1,11 @@
 package com.sentinel.api.role.service;
 
-import com.sentinel.server.role.dto.request.CreateRoleRequest;
-import com.sentinel.server.role.dto.request.CreateRoleScopeRequest;
-import com.sentinel.server.role.dto.request.UpdateRoleRequest;
-import com.sentinel.server.role.dto.request.UpdateRoleScopeRequest;
-import com.sentinel.server.role.dto.response.RoleResponse;
-import com.sentinel.server.role.dto.response.RoleScopeResponse;
+import com.sentinel.api.role.dto.request.CreateRoleRequest;
+import com.sentinel.api.role.dto.request.CreateRoleScopeRequest;
+import com.sentinel.api.role.dto.request.UpdateRoleRequest;
+import com.sentinel.api.role.dto.request.UpdateRoleScopeRequest;
+import com.sentinel.api.role.dto.response.RoleResponse;
+import com.sentinel.api.role.dto.response.RoleScopeResponse;
 import java.util.List;
 import java.util.UUID;
 

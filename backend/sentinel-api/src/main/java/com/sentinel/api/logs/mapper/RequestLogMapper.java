@@ -2,9 +2,9 @@ package com.sentinel.api.logs.mapper;
 
 import com.sentinel.common.observability.entity.Endpoint;
 import com.sentinel.common.observability.entity.RequestLog;
-import com.sentinel.server.logs.dto.response.RequestLogResponse;
-import com.sentinel.server.product.entity.Product;
-import com.sentinel.server.service.entity.Service;
+import com.sentinel.api.logs.dto.response.RequestLogResponse;
+import com.sentinel.api.product.entity.Product;
+import com.sentinel.api.service.entity.Service;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,7 +1,7 @@
 package com.sentinel.api.auth.repository;
 
-import com.sentinel.server.auth.entity.RefreshToken;
-import com.sentinel.server.auth.entity.RefreshTokenStatus;
+import com.sentinel.api.auth.entity.RefreshToken;
+import com.sentinel.api.auth.entity.RefreshTokenStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

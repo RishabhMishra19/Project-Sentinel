@@ -1,7 +1,7 @@
 package com.sentinel.api.service.dto.response;
 
-import com.sentinel.server.common.dto.response.UserBriefResponse;
-import com.sentinel.server.service.entity.ServiceStatus;
+import com.sentinel.api.common.dto.response.UserBriefResponse;
+import com.sentinel.api.service.entity.ServiceStatus;
 import java.time.Instant;
 
 public record ServiceResponse(

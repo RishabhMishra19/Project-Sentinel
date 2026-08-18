@@ -1,12 +1,12 @@
 package com.sentinel.api.role.mapper;
 
-import com.sentinel.server.common.dto.response.UserBriefResponse;
-import com.sentinel.server.role.dto.response.RoleBriefResponse;
-import com.sentinel.server.role.dto.response.RoleResponse;
-import com.sentinel.server.role.dto.response.RoleScopeResponse;
-import com.sentinel.server.role.entity.Role;
-import com.sentinel.server.role.entity.RoleScope;
-import com.sentinel.server.user.entity.User;
+import com.sentinel.api.common.dto.response.UserBriefResponse;
+import com.sentinel.api.role.dto.response.RoleBriefResponse;
+import com.sentinel.api.role.dto.response.RoleResponse;
+import com.sentinel.api.role.dto.response.RoleScopeResponse;
+import com.sentinel.api.role.entity.Role;
+import com.sentinel.api.role.entity.RoleScope;
+import com.sentinel.api.user.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component

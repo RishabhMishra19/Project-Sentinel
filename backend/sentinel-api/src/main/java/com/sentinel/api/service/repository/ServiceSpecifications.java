@@ -1,10 +1,10 @@
 package com.sentinel.api.service.repository;
 
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.specification.GenericSpecifications;
-import com.sentinel.server.common.specification.QueryFieldAllowlist;
-import com.sentinel.server.service.entity.Service;
-import com.sentinel.server.service.entity.ServiceStatus;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.specification.GenericSpecifications;
+import com.sentinel.api.common.specification.QueryFieldAllowlist;
+import com.sentinel.api.service.entity.Service;
+import com.sentinel.api.service.entity.ServiceStatus;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;

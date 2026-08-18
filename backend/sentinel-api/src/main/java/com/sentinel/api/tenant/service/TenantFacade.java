@@ -1,11 +1,11 @@
 package com.sentinel.api.tenant.service;
 
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.tenant.dto.request.CreateTenantRequest;
-import com.sentinel.server.tenant.dto.request.UpdateTenantRequest;
-import com.sentinel.server.tenant.dto.response.CreateTenantResponse;
-import com.sentinel.server.tenant.dto.response.TenantResponse;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.response.PageResponse;
+import com.sentinel.api.tenant.dto.request.CreateTenantRequest;
+import com.sentinel.api.tenant.dto.request.UpdateTenantRequest;
+import com.sentinel.api.tenant.dto.response.CreateTenantResponse;
+import com.sentinel.api.tenant.dto.response.TenantResponse;
 import java.util.UUID;
 
 public interface TenantFacade {

@@ -1,6 +1,6 @@
 package com.sentinel.api.role.repository;
 
-import com.sentinel.server.role.entity.Role;
+import com.sentinel.api.role.entity.Role;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

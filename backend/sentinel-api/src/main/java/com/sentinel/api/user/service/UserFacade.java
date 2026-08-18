@@ -1,12 +1,12 @@
 package com.sentinel.api.user.service;
 
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.user.dto.request.AssignRoleRequest;
-import com.sentinel.server.user.dto.request.CreateUserRequest;
-import com.sentinel.server.user.dto.request.UpdateUserRequest;
-import com.sentinel.server.user.dto.response.CreateUserResponse;
-import com.sentinel.server.user.dto.response.UserResponse;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.response.PageResponse;
+import com.sentinel.api.user.dto.request.AssignRoleRequest;
+import com.sentinel.api.user.dto.request.CreateUserRequest;
+import com.sentinel.api.user.dto.request.UpdateUserRequest;
+import com.sentinel.api.user.dto.response.CreateUserResponse;
+import com.sentinel.api.user.dto.response.UserResponse;
 import java.util.UUID;
 
 public interface UserFacade {

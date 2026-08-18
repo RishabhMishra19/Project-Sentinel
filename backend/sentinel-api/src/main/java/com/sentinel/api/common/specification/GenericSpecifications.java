@@ -1,10 +1,10 @@
 package com.sentinel.api.common.specification;
 
-import com.sentinel.server.common.exception.BadRequestException;
-import com.sentinel.server.common.query.ListQueryFilterConfig;
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.query.ListQuerySearchConfig;
-import com.sentinel.server.common.specification.QueryFieldAllowlist.FilterDef;
+import com.sentinel.api.common.exception.BadRequestException;
+import com.sentinel.api.common.query.ListQueryFilterConfig;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.query.ListQuerySearchConfig;
+import com.sentinel.api.common.specification.QueryFieldAllowlist.FilterDef;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;

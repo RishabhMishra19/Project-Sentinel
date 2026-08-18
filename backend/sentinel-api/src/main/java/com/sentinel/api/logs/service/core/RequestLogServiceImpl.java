@@ -2,8 +2,8 @@ package com.sentinel.api.logs.service.core;
 
 import com.sentinel.common.observability.entity.RequestLog;
 import com.sentinel.common.observability.repository.RequestLogRepository;
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.observability.repository.RequestLogSpecifications;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.observability.repository.RequestLogSpecifications;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

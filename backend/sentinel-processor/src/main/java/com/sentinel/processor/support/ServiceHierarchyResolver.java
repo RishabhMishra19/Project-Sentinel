@@ -1,6 +1,6 @@
 package com.sentinel.processor.support;
 
-import com.sentinel.worker.config.WorkerCacheConfig;
+import com.sentinel.processor.config.WorkerCacheConfig;
 import java.util.UUID;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;

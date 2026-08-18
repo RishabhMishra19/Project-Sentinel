@@ -1,13 +1,13 @@
 package com.sentinel.api.role.service.core;
 
-import com.sentinel.server.common.exception.ResourceNotFoundException;
-import com.sentinel.server.permission.entity.PermissionType;
-import com.sentinel.server.role.entity.Role;
-import com.sentinel.server.role.entity.RoleScope;
-import com.sentinel.server.role.entity.RoleScopeStatus;
-import com.sentinel.server.role.entity.RoleScopeType;
-import com.sentinel.server.role.repository.RoleScopeRepository;
-import com.sentinel.server.user.entity.User;
+import com.sentinel.api.common.exception.ResourceNotFoundException;
+import com.sentinel.api.permission.entity.PermissionType;
+import com.sentinel.api.role.entity.Role;
+import com.sentinel.api.role.entity.RoleScope;
+import com.sentinel.api.role.entity.RoleScopeStatus;
+import com.sentinel.api.role.entity.RoleScopeType;
+import com.sentinel.api.role.repository.RoleScopeRepository;
+import com.sentinel.api.user.entity.User;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

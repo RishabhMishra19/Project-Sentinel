@@ -1,14 +1,14 @@
 package com.sentinel.api.role.controller;
 
-import com.sentinel.server.common.response.ApiResponses;
-import com.sentinel.server.role.dto.request.CreateRoleRequest;
-import com.sentinel.server.role.dto.request.CreateRoleScopeRequest;
-import com.sentinel.server.role.dto.request.UpdateRoleRequest;
-import com.sentinel.server.role.dto.request.UpdateRoleScopeRequest;
-import com.sentinel.server.role.dto.response.RoleResponse;
-import com.sentinel.server.role.dto.response.RoleScopeResponse;
-import com.sentinel.server.role.service.RoleFacade;
-import com.sentinel.server.security.UserPrincipal;
+import com.sentinel.api.common.response.ApiResponses;
+import com.sentinel.api.role.dto.request.CreateRoleRequest;
+import com.sentinel.api.role.dto.request.CreateRoleScopeRequest;
+import com.sentinel.api.role.dto.request.UpdateRoleRequest;
+import com.sentinel.api.role.dto.request.UpdateRoleScopeRequest;
+import com.sentinel.api.role.dto.response.RoleResponse;
+import com.sentinel.api.role.dto.response.RoleScopeResponse;
+import com.sentinel.api.role.service.RoleFacade;
+import com.sentinel.api.security.UserPrincipal;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;

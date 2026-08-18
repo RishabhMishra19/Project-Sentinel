@@ -2,7 +2,7 @@ package com.sentinel.processor.analytics;
 
 import com.sentinel.common.kafka.AnalyticsDeltaMessage;
 import com.sentinel.common.kafka.AnalyticsDeltaMessage.StatusCount;
-import com.sentinel.worker.support.ServiceHierarchy;
+import com.sentinel.processor.support.ServiceHierarchy;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;

@@ -1,8 +1,8 @@
 package com.sentinel.api.logs.service;
 
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.logs.dto.response.RequestLogResponse;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.response.PageResponse;
+import com.sentinel.api.logs.dto.response.RequestLogResponse;
 import java.util.UUID;
 
 public interface RequestLogFacade {

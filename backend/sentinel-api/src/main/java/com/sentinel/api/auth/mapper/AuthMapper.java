@@ -1,15 +1,15 @@
 package com.sentinel.api.auth.mapper;
 
-import com.sentinel.server.auth.dto.response.AuthSessionResponse;
-import com.sentinel.server.auth.dto.response.ProfileResponse;
-import com.sentinel.server.auth.dto.response.common.RoleSummaryResponse;
-import com.sentinel.server.auth.dto.response.common.TenantSummaryResponse;
-import com.sentinel.server.role.entity.Role;
-import com.sentinel.server.role.entity.RoleScope;
-import com.sentinel.server.role.entity.RoleScopeStatus;
-import com.sentinel.server.role.entity.RoleStatus;
-import com.sentinel.server.tenant.entity.Tenant;
-import com.sentinel.server.user.entity.User;
+import com.sentinel.api.auth.dto.response.AuthSessionResponse;
+import com.sentinel.api.auth.dto.response.ProfileResponse;
+import com.sentinel.api.auth.dto.response.common.RoleSummaryResponse;
+import com.sentinel.api.auth.dto.response.common.TenantSummaryResponse;
+import com.sentinel.api.role.entity.Role;
+import com.sentinel.api.role.entity.RoleScope;
+import com.sentinel.api.role.entity.RoleScopeStatus;
+import com.sentinel.api.role.entity.RoleStatus;
+import com.sentinel.api.tenant.entity.Tenant;
+import com.sentinel.api.user.entity.User;
 
 import java.util.Date;
 import java.util.List;

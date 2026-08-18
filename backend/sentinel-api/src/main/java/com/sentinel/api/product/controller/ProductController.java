@@ -1,13 +1,13 @@
 package com.sentinel.api.product.controller;
 
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.response.ApiResponses;
-import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.product.dto.request.CreateProductRequest;
-import com.sentinel.server.product.dto.response.ProductResponse;
-import com.sentinel.server.product.dto.request.UpdateProductRequest;
-import com.sentinel.server.product.service.ProductFacade;
-import com.sentinel.server.security.UserPrincipal;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.response.ApiResponses;
+import com.sentinel.api.common.response.PageResponse;
+import com.sentinel.api.product.dto.request.CreateProductRequest;
+import com.sentinel.api.product.dto.response.ProductResponse;
+import com.sentinel.api.product.dto.request.UpdateProductRequest;
+import com.sentinel.api.product.service.ProductFacade;
+import com.sentinel.api.security.UserPrincipal;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

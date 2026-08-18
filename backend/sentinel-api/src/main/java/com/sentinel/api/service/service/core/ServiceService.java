@@ -1,6 +1,6 @@
 package com.sentinel.api.service.service.core;
 
-import com.sentinel.server.service.entity.Service;
+import com.sentinel.api.service.entity.Service;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;

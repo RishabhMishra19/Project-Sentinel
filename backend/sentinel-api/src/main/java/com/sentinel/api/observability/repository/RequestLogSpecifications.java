@@ -2,11 +2,11 @@ package com.sentinel.api.observability.repository;
 
 import com.sentinel.common.observability.entity.Endpoint;
 import com.sentinel.common.observability.entity.RequestLog;
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.specification.GenericSpecifications;
-import com.sentinel.server.common.specification.QueryFieldAllowlist;
-import com.sentinel.server.product.entity.Product;
-import com.sentinel.server.service.entity.Service;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.specification.GenericSpecifications;
+import com.sentinel.api.common.specification.QueryFieldAllowlist;
+import com.sentinel.api.product.entity.Product;
+import com.sentinel.api.service.entity.Service;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;

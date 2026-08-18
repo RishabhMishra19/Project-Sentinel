@@ -1,7 +1,7 @@
 package com.sentinel.api.analytics.service.core;
 
-import com.sentinel.server.common.exception.BadRequestException;
-import com.sentinel.server.common.exception.ResourceNotFoundException;
+import com.sentinel.api.common.exception.BadRequestException;
+import com.sentinel.api.common.exception.ResourceNotFoundException;
 import com.sentinel.common.observability.repository.EndpointRepository;
 import java.time.Instant;
 import java.util.List;

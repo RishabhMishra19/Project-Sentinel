@@ -1,6 +1,6 @@
 package com.sentinel.api.tenant.entity;
 
-import com.sentinel.server.user.entity.User;
+import com.sentinel.api.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

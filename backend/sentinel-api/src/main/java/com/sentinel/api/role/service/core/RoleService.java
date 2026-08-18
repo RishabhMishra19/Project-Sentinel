@@ -1,8 +1,8 @@
 package com.sentinel.api.role.service.core;
 
-import com.sentinel.server.role.entity.Role;
-import com.sentinel.server.tenant.entity.Tenant;
-import com.sentinel.server.user.entity.User;
+import com.sentinel.api.role.entity.Role;
+import com.sentinel.api.tenant.entity.Tenant;
+import com.sentinel.api.user.entity.User;
 import java.util.List;
 import java.util.UUID;
 

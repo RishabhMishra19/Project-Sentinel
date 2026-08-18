@@ -1,13 +1,13 @@
 package com.sentinel.api.auth.service.core;
 
-import com.sentinel.server.auth.dto.internal.RefreshTokenIssue;
-import com.sentinel.server.auth.entity.RefreshToken;
-import com.sentinel.server.auth.entity.RefreshTokenStatus;
-import com.sentinel.server.auth.repository.RefreshTokenRepository;
+import com.sentinel.api.auth.dto.internal.RefreshTokenIssue;
+import com.sentinel.api.auth.entity.RefreshToken;
+import com.sentinel.api.auth.entity.RefreshTokenStatus;
+import com.sentinel.api.auth.repository.RefreshTokenRepository;
 import com.sentinel.common.crypto.Sha256Hasher;
-import com.sentinel.server.common.exception.UnauthorizedException;
-import com.sentinel.server.security.JwtProperties;
-import com.sentinel.server.user.entity.User;
+import com.sentinel.api.common.exception.UnauthorizedException;
+import com.sentinel.api.security.JwtProperties;
+import com.sentinel.api.user.entity.User;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;

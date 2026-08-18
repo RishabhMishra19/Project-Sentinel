@@ -1,15 +1,15 @@
 package com.sentinel.api.auth.controller;
 
-import com.sentinel.server.auth.dto.response.AuthSessionResponse;
-import com.sentinel.server.auth.dto.internal.AuthSessionResult;
-import com.sentinel.server.auth.dto.request.ChangePasswordRequest;
-import com.sentinel.server.auth.dto.request.LoginRequest;
-import com.sentinel.server.auth.dto.response.ProfileResponse;
-import com.sentinel.server.auth.service.AuthFacade;
-import com.sentinel.server.common.response.ApiResponses;
-import com.sentinel.server.security.CookieAuthSupport;
-import com.sentinel.server.security.JwtProperties;
-import com.sentinel.server.security.UserPrincipal;
+import com.sentinel.api.auth.dto.response.AuthSessionResponse;
+import com.sentinel.api.auth.dto.internal.AuthSessionResult;
+import com.sentinel.api.auth.dto.request.ChangePasswordRequest;
+import com.sentinel.api.auth.dto.request.LoginRequest;
+import com.sentinel.api.auth.dto.response.ProfileResponse;
+import com.sentinel.api.auth.service.AuthFacade;
+import com.sentinel.api.common.response.ApiResponses;
+import com.sentinel.api.security.CookieAuthSupport;
+import com.sentinel.api.security.JwtProperties;
+import com.sentinel.api.security.UserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

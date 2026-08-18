@@ -1,14 +1,14 @@
 package com.sentinel.api.tenant.controller;
 
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.response.ApiResponses;
-import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.security.UserPrincipal;
-import com.sentinel.server.tenant.dto.request.CreateTenantRequest;
-import com.sentinel.server.tenant.dto.request.UpdateTenantRequest;
-import com.sentinel.server.tenant.dto.response.CreateTenantResponse;
-import com.sentinel.server.tenant.dto.response.TenantResponse;
-import com.sentinel.server.tenant.service.TenantFacade;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.response.ApiResponses;
+import com.sentinel.api.common.response.PageResponse;
+import com.sentinel.api.security.UserPrincipal;
+import com.sentinel.api.tenant.dto.request.CreateTenantRequest;
+import com.sentinel.api.tenant.dto.request.UpdateTenantRequest;
+import com.sentinel.api.tenant.dto.response.CreateTenantResponse;
+import com.sentinel.api.tenant.dto.response.TenantResponse;
+import com.sentinel.api.tenant.service.TenantFacade;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

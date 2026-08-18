@@ -1,10 +1,10 @@
 package com.sentinel.api.service.service;
 
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.service.dto.request.CreateServiceRequest;
-import com.sentinel.server.service.dto.response.ServiceResponse;
-import com.sentinel.server.service.dto.request.UpdateServiceRequest;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.response.PageResponse;
+import com.sentinel.api.service.dto.request.CreateServiceRequest;
+import com.sentinel.api.service.dto.response.ServiceResponse;
+import com.sentinel.api.service.dto.request.UpdateServiceRequest;
 import java.util.UUID;
 
 public interface ServiceFacade {

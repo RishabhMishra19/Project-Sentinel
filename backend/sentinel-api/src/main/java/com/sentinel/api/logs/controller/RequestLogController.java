@@ -1,11 +1,11 @@
 package com.sentinel.api.logs.controller;
 
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.response.ApiResponses;
-import com.sentinel.server.common.response.PageResponse;
-import com.sentinel.server.logs.dto.response.RequestLogResponse;
-import com.sentinel.server.logs.service.RequestLogFacade;
-import com.sentinel.server.security.UserPrincipal;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.response.ApiResponses;
+import com.sentinel.api.common.response.PageResponse;
+import com.sentinel.api.logs.dto.response.RequestLogResponse;
+import com.sentinel.api.logs.service.RequestLogFacade;
+import com.sentinel.api.security.UserPrincipal;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

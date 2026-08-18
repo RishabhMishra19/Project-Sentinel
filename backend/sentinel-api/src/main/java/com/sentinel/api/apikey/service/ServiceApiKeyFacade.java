@@ -1,10 +1,10 @@
 package com.sentinel.api.apikey.service;
 
-import com.sentinel.server.apikey.dto.request.CreateServiceApiKeyRequest;
-import com.sentinel.server.apikey.dto.response.ServiceApiKeyCreatedResponse;
-import com.sentinel.server.apikey.dto.response.ServiceApiKeyResponse;
-import com.sentinel.server.common.query.ListQueryRequest;
-import com.sentinel.server.common.response.PageResponse;
+import com.sentinel.api.apikey.dto.request.CreateServiceApiKeyRequest;
+import com.sentinel.api.apikey.dto.response.ServiceApiKeyCreatedResponse;
+import com.sentinel.api.apikey.dto.response.ServiceApiKeyResponse;
+import com.sentinel.api.common.query.ListQueryRequest;
+import com.sentinel.api.common.response.PageResponse;
 import java.util.UUID;
 
 public interface ServiceApiKeyFacade {

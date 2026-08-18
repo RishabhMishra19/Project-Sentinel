@@ -1,6 +1,6 @@
 package com.sentinel.api.analytics.service.core;
 
-import com.sentinel.server.common.exception.BadRequestException;
+import com.sentinel.api.common.exception.BadRequestException;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
