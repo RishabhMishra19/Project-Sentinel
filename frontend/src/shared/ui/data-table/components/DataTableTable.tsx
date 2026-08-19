@@ -2,6 +2,7 @@ import { renderCell } from "./cells/renderCell";
 import { DataTableRowActions } from "./DataTableRowActions";
 import { tableCellInnerClassName } from "../styles";
 import type { DataTableColumn, DataTableSort, DataTableSortingConfig, RowAction } from "../types";
+import { useRef } from "react";
 
 type DataTableTableProps<T extends object> = {
   columns: DataTableColumn<T>[];
@@ -13,6 +14,7 @@ type DataTableTableProps<T extends object> = {
   emptyMessage?: string;
   /** Used for skeleton rows when loading with no data yet */
   skeletonRowCount?: number;
+  onScrollEnd?: () => void;
 };
 
 const SortIndicator = ({ active, desc }: { active: boolean; desc: boolean }) => {
@@ -49,7 +51,9 @@ export const DataTableTable = <T extends object>({
   isLoading,
   emptyMessage = "No results",
   skeletonRowCount = 10,
+  onScrollEnd,
 }: DataTableTableProps<T>) => {
+  const hasCalledRef = useRef(false);
   const visibleColumns = columns.filter((column) => column.visible !== false);
   const showActions = Boolean(rowActions && rowActions.length > 0);
   const colSpan = visibleColumns.length + (showActions ? 1 : 0);
@@ -57,9 +61,19 @@ export const DataTableTable = <T extends object>({
   const { sorting, onSortingChange } = sortingConfig ?? {};
 
   return (
-    <div className="relative overflow-x-auto">
+    <div
+      className="flex-1 overflow-y-auto"
+      onScroll={(e) => {
+        const totalScrollableHeight = e.currentTarget.scrollHeight - e.currentTarget.clientHeight;
+        const remainingScrollHeight = totalScrollableHeight - e.currentTarget.scrollTop;
+        if (remainingScrollHeight < 100 && !hasCalledRef.current) {
+          hasCalledRef.current = true;
+          onScrollEnd?.();
+        }
+      }}
+    >
       <table className="w-full border-collapse text-left text-sm">
-        <thead className="bg-chrome/60 text-muted dark:bg-white/8">
+        <thead className="bg-chrome/100 text-muted dark:bg-white/8 sticky top-0">
           <tr>
             {visibleColumns.map((column) => {
               const isSorted = sorting?.id === column.id;

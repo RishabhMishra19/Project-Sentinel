@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
+import type { ListQueryRequest } from "../../../shared/dto/request/listQueryRequest";
 import { SelectField } from "../../../shared/forms/SelectField";
 import { ServerSelectField } from "../../../shared/forms/ServerSelectField";
 import { useAppForm } from "../../../shared/forms/useAppForm";
@@ -139,7 +139,6 @@ export const RoleScopeCreateModal = ({ open, role, onClose }: RoleScopeCreateMod
           error={errors.permission}
           {...register("permission")}
         />
-
       </div>
     </ModalForm>
   );

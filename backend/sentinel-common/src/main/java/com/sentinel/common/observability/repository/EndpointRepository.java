@@ -6,15 +6,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.cassandra.repository.CassandraRepository;
+import org.springframework.data.cassandra.repository.Query;
 
 public interface EndpointRepository
         extends CassandraRepository<
         Endpoint,
         Endpoint.PrimaryKeyComposite> {
 
-    Optional<Endpoint> findByIdServiceIdAndIdEndpointId(
+    Optional<Endpoint> findById_ServiceIdAndId_EndpointId(
             UUID serviceId,
             UUID endpointId);
 
-    List<Endpoint> findByIdServiceId(UUID serviceId);
+    List<Endpoint> findById_ServiceId(UUID serviceId);
+
+    @Query("""
+        SELECT *
+        FROM endpoints
+        WHERE service_id = ?0
+          AND id IN ?1
+    """)
+    List<Endpoint> findByServiceIdAndEndpointIdIn(
+            UUID serviceId,
+            List<UUID> endpointIds);
 }

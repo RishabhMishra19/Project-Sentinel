@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface RequestLogService {
 
-    Slice<RequestLog> findAllPaginated(UUID tenantId, RequestLogListRequest request);
+    Slice<RequestLog> findAllPaginated(UUID tenantId, UUID serviceId, RequestLogListRequest request);
 
-    Optional<RequestLog> findByIdForTenant( UUID serviceId, UUID id);
+    Optional<RequestLog> findByTenantServiceAndId(UUID tenantId, UUID serviceId, UUID id);
 }

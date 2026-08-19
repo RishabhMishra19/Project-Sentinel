@@ -25,7 +25,7 @@ export const TenantsPage = () => {
   };
 
   return (
-    <PageContent>
+    <>
       <TenantsTable
         onCreate={() => setCreateOpen(true)}
         onView={view.show}
@@ -63,6 +63,6 @@ export const TenantsPage = () => {
         tenant={deactivate.item}
         onClose={deactivate.close}
       />
-    </PageContent>
+    </>
   );
 };

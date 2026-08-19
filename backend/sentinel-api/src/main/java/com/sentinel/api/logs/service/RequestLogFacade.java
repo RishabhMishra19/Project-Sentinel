@@ -8,7 +8,8 @@ import java.util.UUID;
 
 public interface RequestLogFacade {
 
-    CursorPaginationResponse<RequestLogListResponse> getAll(UUID tenantId, RequestLogListRequest request);
+    CursorPaginationResponse<RequestLogListResponse> getAll(UUID tenantId, UUID serviceId, RequestLogListRequest request);
 
-    RequestLogListResponse getById(UUID tenantId, UUID id);
+    RequestLogListResponse getById(UUID tenantId, UUID serviceId, UUID id);
+
 }

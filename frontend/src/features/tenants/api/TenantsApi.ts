@@ -1,6 +1,6 @@
 import { TENANTS_API_ROUTES } from "../../../shared/api/api.routes";
 import { apiManager } from "../../../shared/api/ApiManager";
-import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
+import type { ListQueryRequest } from "../../../shared/dto/request/listQueryRequest";
 import type { CreateTenantRequest, UpdateTenantRequest } from "../dto/request/tenant.request";
 import type { PageResponse } from "../../../shared/dto/response";
 import type { CreateTenantResponse, TenantResponse } from "../dto/response/tenant.response";

@@ -1,23 +1,17 @@
 import { useMemo } from "react";
-import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
 import { DataTable, useDataTable } from "../../../shared/ui/data-table";
 import type { FilterValue } from "../../../shared/ui/filters";
 import { dateTimeRangeFromPreset } from "../../../shared/ui/filters";
 import { clampLogsRange } from "../../analytics/utils/timeRange";
-import { useProductsQuery } from "../../products/hooks/useProducts";
-import { useAllServicesQuery, useServiceEndpointsQuery } from "../../services/hooks/useServices";
+import { useServiceEndpointsQuery } from "../../services/hooks/useServices";
 import type { RequestLogResponse } from "../dto/response/requestLog.response";
 import { useRequestLogsQuery } from "../hooks/useRequestLogs";
 import { createRequestLogColumns, createRequestLogRowActions } from "./requestLogsTableConfig";
-
-const OPTIONS_LIST_QUERY: ListQueryRequest = {
-  pageable: { page: 0, size: 100 },
-};
-
-const ACTIVE_SERVICES_LIST_QUERY: ListQueryRequest = {
-  pageable: { page: 0, size: 100 },
-  filterConfigs: [{ fieldName: "status", filterValues: ["ACTIVE"] }],
-};
+import { SelectField } from "../../../shared/forms/SelectField";
+import { useUrlSyncedSelection } from "../../../shared/hooks/useUrlSyncedSelection";
+import type { ProductResponse } from "../../products/dto/response/product.response";
+import type { ServiceResponse } from "../../services/dto/response/service.response";
+import type { ListRequestLogRequest } from "../dto/request/ListRequestLog.request";
 
 const datetimeLocalToIso = (local: string): string | null => {
   const d = new Date(local);
@@ -36,28 +30,39 @@ const defaultLogsRange = (): { from: string; to: string } => {
 type RequestLogsTableProps = {
   onView: (log: RequestLogResponse) => void;
   initialFilters?: Record<string, FilterValue>;
+  products: ProductResponse[];
+  services: ServiceResponse[];
 };
 
-export const RequestLogsTable = ({ onView, initialFilters }: RequestLogsTableProps) => {
-  const productsQuery = useProductsQuery(OPTIONS_LIST_QUERY);
-  const servicesQuery = useAllServicesQuery(ACTIVE_SERVICES_LIST_QUERY);
+export const RequestLogsTable = ({
+  onView,
+  initialFilters,
+  products,
+  services,
+}: RequestLogsTableProps) => {
+  const { selectedId: selectedProductId, onChange: onProductChange } = useUrlSyncedSelection({
+    paramKey: "productId",
+    items: products,
+  });
 
-  const products = productsQuery.rows;
-  const services = servicesQuery.rows;
-
-  const productOptions = useMemo(
-    () => products.map((p) => ({ label: p.name, value: p.id })),
-    [products],
+  const relevantServices = useMemo(
+    () => services.filter((v) => v.productId === selectedProductId),
+    [services, selectedProductId],
   );
+
+  const { selectedId: selectedServiceId, onChange: onServiceChange } = useUrlSyncedSelection({
+    paramKey: "serviceId",
+    items: relevantServices,
+  });
+
+  console.log({ selectedProductId, selectedServiceId });
 
   const initialColumns = useMemo(
     () =>
       createRequestLogColumns({
-        productOptions,
-        serviceOptions: [],
         endpointOptions: [],
       }),
-    [productOptions],
+    [],
   );
 
   const rowActions = useMemo(() => createRequestLogRowActions({ onView }), [onView]);
@@ -75,25 +80,43 @@ export const RequestLogsTable = ({ onView, initialFilters }: RequestLogsTablePro
       filters: initialFilters ?? {},
     },
     rowActions,
+    toolbarActions: (
+      <div className="flex flex-wrap items-center gap-2">
+        <SelectField
+          className="min-w-[12rem]"
+          value={selectedProductId ?? ""}
+          onChange={(event) => {
+            onProductChange(event.target.value);
+            onServiceChange(null);
+          }}
+          aria-label="Filter Request Logs by product"
+          emptyPlaceholder="No products"
+          options={products.map((product) => ({
+            value: product.id,
+            label: product.name,
+          }))}
+        />
+
+        <SelectField
+          className="min-w-[12rem]"
+          value={selectedServiceId ?? ""}
+          onChange={(event) => onServiceChange(event.target.value)}
+          aria-label="Filter Request Logs by service"
+          emptyPlaceholder="No services"
+          options={relevantServices.map((service) => ({
+            value: service.id,
+            label: service.name,
+          }))}
+        />
+      </div>
+    ),
     emptyMessage: "No events match your filters",
     errorMessage: "Could not load events",
+    enablePagination: false,
   });
 
-  const productId =
-    typeof query.filters.productId === "string" ? query.filters.productId : undefined;
-  const serviceId =
-    typeof query.filters.serviceId === "string" ? query.filters.serviceId : undefined;
-
-  const endpointsQuery = useServiceEndpointsQuery(serviceId);
+  const endpointsQuery = useServiceEndpointsQuery(selectedServiceId ?? undefined);
   const endpoints = endpointsQuery.rows;
-
-  const serviceOptions = useMemo(() => {
-    const scoped = productId ? services.filter((s) => s.productId === productId) : services;
-    return scoped.map((s) => ({
-      label: productId ? s.name : `${s.productName} / ${s.name}`,
-      value: s.id,
-    }));
-  }, [services, productId]);
 
   const endpointOptions = useMemo(
     () =>
@@ -107,27 +130,27 @@ export const RequestLogsTable = ({ onView, initialFilters }: RequestLogsTablePro
   const columns = useMemo(
     () =>
       createRequestLogColumns({
-        productOptions,
-        serviceOptions,
         endpointOptions,
       }),
-    [productOptions, serviceOptions, endpointOptions],
+    [endpointOptions],
   );
 
-  const listQueryRequest = useMemo(() => {
+  const listQueryRequest: ListRequestLogRequest | undefined = useMemo(() => {
+    if (selectedServiceId == null) return undefined;
     const fallback = defaultLogsRange();
     const clamped = clampLogsRange(
       tableListQueryRequest.from ?? fallback.from,
       tableListQueryRequest.to ?? fallback.to,
     );
     return {
-      ...tableListQueryRequest,
+      // ...tableListQueryRequest,
       from: clamped.from,
       to: clamped.to,
+      limit: 10,
     };
   }, [tableListQueryRequest]);
 
-  const page = useRequestLogsQuery(listQueryRequest);
+  const page = useRequestLogsQuery(selectedServiceId, listQueryRequest);
 
   return <DataTable {...bindPage(page)} columns={columns} />;
 };

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { mapListQuery, mapPageQuery } from "../../../shared/api/mapQuery";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
-import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
+import type { ListQueryRequest } from "../../../shared/dto/request/listQueryRequest";
 import { ServicesApi } from "../api/ServicesApi";
 import type { CreateServiceRequest, UpdateServiceRequest } from "../dto/request/service.request";
 

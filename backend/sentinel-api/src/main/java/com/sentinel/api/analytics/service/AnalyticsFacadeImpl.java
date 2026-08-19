@@ -134,7 +134,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
         Instant to = query != null ? query.getTo() : null;
         requireRange(from, to);
         endpointRepository
-                .findByIdServiceIdAndIdEndpointId(tenantId, endpointId)
+                .findById_ServiceIdAndId_EndpointId(tenantId, endpointId)
                 .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
         return queryService.statusBreakdown(endpointId, tenantId, from, to).stream()
                 .map(analyticsMapper::toStatusItem)
@@ -149,7 +149,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
         Instant to = query != null ? query.getTo() : null;
         requireRange(from, to);
         endpointRepository
-                .findByIdServiceIdAndIdEndpointId(tenantId, endpointId)
+                .findById_ServiceIdAndId_EndpointId(tenantId, endpointId)
                 .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
         return queryService.exceptionBreakdown(endpointId, tenantId, from, to).stream()
                 .map(analyticsMapper::toExceptionItem)

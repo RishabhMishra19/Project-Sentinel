@@ -2,7 +2,13 @@ import type { ReactNode } from "react";
 import type { FilterFieldConfig, FiltersConfig } from "../filters";
 
 export type DataTableCellType =
-  "text" | "number" | "date" | "datetime" | "boolean" | "badge" | "custom";
+  | "text"
+  | "number"
+  | "date"
+  | "datetime"
+  | "boolean"
+  | "badge"
+  | "custom";
 
 export type DataTableCellValueByType = {
   text: string | null | undefined;
@@ -91,6 +97,13 @@ export type DataTablePagination = {
   onPageSizeChange: (pageSize: number) => void;
 };
 
+export type DataTableInfiniteScroll = {
+  pageSize: number;
+  hasNext: boolean;
+  nextCursor?: string;
+  onNextPage: (limit: number, nextCursor?: string) => void;
+};
+
 export type DataTableSortingConfig = {
   sorting: DataTableSort;
   onSortingChange: (next: DataTableSort) => void;
@@ -112,6 +125,7 @@ export type DataTableProps<T extends object> = {
   searchConfig?: DataTableSearchConfig;
   filtersConfig?: FiltersConfig;
   pagination?: DataTablePagination;
+  infiniteScroll?: DataTableInfiniteScroll;
 
   rowActions?: RowAction<T>[];
   toolbarActions?: ReactNode;

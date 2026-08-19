@@ -31,7 +31,7 @@ export const DataTableToolbar = <T extends object>({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="shrink-0 flex flex-wrap items-center gap-2">
       {hasSearch ? (
         <DataTableSearch columns={searchableColumns} searchConfig={searchConfig} />
       ) : null}

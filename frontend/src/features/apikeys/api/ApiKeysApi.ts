@@ -1,6 +1,6 @@
 import { SERVICE_API_KEYS_API_ROUTES } from "../../../shared/api/api.routes";
 import { apiManager } from "../../../shared/api/ApiManager";
-import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
+import type { ListQueryRequest } from "../../../shared/dto/request/listQueryRequest";
 import type { PageResponse } from "../../../shared/dto/response";
 import type { CreateServiceApiKeyRequest } from "../dto/request/apikey.request";
 import type {

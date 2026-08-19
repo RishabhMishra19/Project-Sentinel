@@ -23,7 +23,7 @@ export const AppliedFilterChips = ({ fields, filtersConfig }: AppliedFilterChips
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
+    <div className="shrink-0 flex flex-wrap items-center gap-1.5">
       {chips.map((chip) => (
         <span
           key={chip.id}

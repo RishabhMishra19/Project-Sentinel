@@ -1,4 +1,4 @@
-import type { ListQueryRequest } from "../api/listQueryRequest";
+import type { ListQueryRequest } from "../dto/request/listQueryRequest";
 import type { DataTableColumn, DataTableQueryState } from "../ui/data-table";
 import { applyClientFilters } from "../ui/data-table/utils/clientFiltering";
 import { paginateClientRows, sortClientRows } from "../ui/data-table/utils/clientRows";

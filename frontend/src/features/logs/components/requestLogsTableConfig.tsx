@@ -3,8 +3,6 @@ import type { FilterOption } from "../../../shared/ui/filters";
 import type { RequestLogResponse } from "../dto/response/requestLog.response";
 
 type CreateRequestLogColumnsOptions = {
-  productOptions: FilterOption[];
-  serviceOptions: FilterOption[];
   endpointOptions: FilterOption[];
 };
 
@@ -15,8 +13,6 @@ const statusTone = (code: number) => {
 };
 
 export const createRequestLogColumns = ({
-  productOptions,
-  serviceOptions,
   endpointOptions,
 }: CreateRequestLogColumnsOptions): DataTableColumn<RequestLogResponse>[] => {
   return [
@@ -30,13 +26,11 @@ export const createRequestLogColumns = ({
     {
       id: "productId",
       header: "Product",
-      filter: { type: "select", options: productOptions },
       cell: { type: "text", getValue: (row) => row.productName },
     },
     {
       id: "serviceId",
       header: "Service",
-      filter: { type: "select", options: serviceOptions },
       cell: { type: "text", getValue: (row) => row.serviceName },
     },
     {

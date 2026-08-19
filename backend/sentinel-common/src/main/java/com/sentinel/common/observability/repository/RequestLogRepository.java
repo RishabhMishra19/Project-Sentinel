@@ -18,6 +18,11 @@ public interface RequestLogRepository
             UUID serviceId,
             UUID requestLogId);
 
+    Optional<RequestLog> findByIdTenantIdAndIdServiceIdAndIdRequestLogId(
+            UUID tenantId,
+            UUID serviceId,
+            UUID requestLogId);
+
     Slice<RequestLog> findByIdTenantIdAndIdServiceId(
             UUID tenantId,
             UUID serviceId,

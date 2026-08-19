@@ -13,7 +13,7 @@ export const DataTablePaginationBar = ({ pagination }: DataTablePaginationProps)
   const canNext = pageIndex + 1 < pageCount;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-chrome/60 px-3 py-2 text-sm text-muted dark:bg-white/8">
+    <div className="shrink-0 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-chrome/100 px-3 py-2 text-sm text-muted dark:bg-white/8">
       <div className="flex items-center gap-2">
         <label className="flex items-center gap-2">
           <span>Rows</span>

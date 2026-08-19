@@ -6,13 +6,19 @@ import { dateTimeRangeFromPreset, type FilterValue } from "../../../shared/ui/fi
 import { useRequestLogQuery } from "../hooks/useRequestLogs";
 import { RequestLogDetailPanel } from "../components/RequestLogDetailPanel";
 import { RequestLogsTable } from "../components/RequestLogsTable";
+import { useProductsQuery } from "../../products/hooks/useProducts";
+import { useAllServicesQuery } from "../../services/hooks/useServices";
+import { isoToDatetimeLocal } from "../../../shared/utils/dateUtils";
+import type { ListQueryRequest } from "../../../shared/dto/request/listQueryRequest";
+import { QueryGate } from "../../../shared/ui";
 
-const isoToDatetimeLocal = (iso: string | null): string | null => {
-  if (!iso) return null;
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return null;
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const OPTIONS_LIST_QUERY: ListQueryRequest = {
+  pageable: { page: 0, size: 100 },
+};
+
+const ACTIVE_SERVICES_LIST_QUERY: ListQueryRequest = {
+  pageable: { page: 0, size: 100 },
+  filterConfigs: [{ fieldName: "status", filterValues: ["ACTIVE"] }],
 };
 
 const filtersFromSearchParams = (params: URLSearchParams): Record<string, FilterValue> => {
@@ -49,7 +55,13 @@ const filtersFromSearchParams = (params: URLSearchParams): Record<string, Filter
 
 export const RequestLogsPage = () => {
   const [params] = useSearchParams();
-  const selected = useModalState<string>();
+  const selected = useModalState<{ serviceId: string; id: string }>();
+
+  const productsQuery = useProductsQuery(OPTIONS_LIST_QUERY);
+  const servicesQuery = useAllServicesQuery(ACTIVE_SERVICES_LIST_QUERY);
+
+  const products = productsQuery.rows;
+  const services = servicesQuery.rows;
 
   const initialFilters = useMemo(
     () => filtersFromSearchParams(params),
@@ -58,11 +70,26 @@ export const RequestLogsPage = () => {
     [],
   );
 
-  const detailQuery = useRequestLogQuery(selected.item);
+  const detailQuery = useRequestLogQuery(
+    selected.item?.serviceId ?? null,
+    selected.item?.id ?? null,
+  );
 
   return (
     <PageContent>
-      <RequestLogsTable initialFilters={initialFilters} onView={(row) => selected.show(row.id)} />
+      <QueryGate
+        isLoading={productsQuery.isLoading || servicesQuery.isLoading}
+        isError={productsQuery.isError || servicesQuery.isError}
+        loadingMessage="Loading products & services..."
+        errorMessage="Could not load products & services."
+      >
+        <RequestLogsTable
+          initialFilters={initialFilters}
+          onView={(row) => selected.show({ id: row.id, serviceId: row.serviceId })}
+          products={products}
+          services={services}
+        />
+      </QueryGate>
 
       <RequestLogDetailPanel
         open={selected.open}

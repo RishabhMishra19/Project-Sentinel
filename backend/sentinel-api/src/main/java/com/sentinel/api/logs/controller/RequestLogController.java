@@ -21,23 +21,23 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/logs/requests")
+@RequestMapping("/api/services/{serviceId}/logs/requests")
 @RequiredArgsConstructor
 public class RequestLogController {
 
     private final RequestLogFacade requestLogFacade;
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<CursorPaginationResponse<RequestLogListResponse>> getAll(
-            @AuthenticationPrincipal UserPrincipal principal, @Valid @RequestBody RequestLogListRequest request) {
-        return ApiResponses.okPage(requestLogFacade.getAll(principal.getActiveTenantId(), request));
+            @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID serviceId, @Valid @RequestBody RequestLogListRequest request) {
+        return ApiResponses.okPage(requestLogFacade.getAll(principal.getActiveTenantId(), serviceId, request));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping("/{id}")
     public ResponseEntity<RequestLogListResponse> getById(
-            @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID id) {
-        return ApiResponses.ok(requestLogFacade.getById(principal.getActiveTenantId(), id));
+            @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID serviceId, @PathVariable UUID id) {
+        return ApiResponses.ok(requestLogFacade.getById(principal.getActiveTenantId(), serviceId, id));
     }
 }

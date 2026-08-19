@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { mapPageQuery } from "../../../shared/api/mapQuery";
 import { getApiErrorMessage } from "../../../shared/forms/getApiErrorMessage";
 import { ProductsApi } from "../api/ProductsApi";
-import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
+import type { ListQueryRequest } from "../../../shared/dto/request/listQueryRequest";
 import type { CreateProductRequest, UpdateProductRequest } from "../dto/request/product.request";
 
 const productsQueryKey = ["products"];

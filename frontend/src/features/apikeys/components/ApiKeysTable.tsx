@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
+import type { ListQueryRequest } from "../../../shared/dto/request/listQueryRequest";
 import { SelectField } from "../../../shared/forms/SelectField";
 import { DataTable, useDataTable } from "../../../shared/ui/data-table";
 import { primaryButtonClassName } from "../../../shared/ui/data-table/styles";
@@ -84,11 +84,7 @@ export const ApiKeysTable = ({
     errorMessage: "Could not load API keys",
   });
 
-  const page = useServiceApiKeysQuery(
-    effectiveProductId,
-    effectiveServiceId,
-    listQueryRequest,
-  );
+  const page = useServiceApiKeysQuery(effectiveProductId, effectiveServiceId, listQueryRequest);
 
   return (
     <DataTable

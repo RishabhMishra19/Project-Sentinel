@@ -20,18 +20,17 @@ public class RequestLogServiceImpl implements RequestLogService {
 
     @Override
     @Transactional(readOnly = true)
-    public Slice<RequestLog> findAllPaginated(UUID tenantId, RequestLogListRequest request) {
+    public Slice<RequestLog> findAllPaginated(UUID tenantId, UUID serviceId, RequestLogListRequest request) {
         return requestLogRepository.findByIdTenantIdAndIdServiceId(
                         tenantId,
-                        request.getServiceId(),
+                        serviceId,
                         request.toPageRequest()
                 );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<RequestLog> findByIdForTenant(UUID serviceId, UUID id) {
-
-        return requestLogRepository.findByIdServiceIdAndIdRequestLogId(serviceId, id);
+    public Optional<RequestLog> findByTenantServiceAndId(UUID tenantId, UUID serviceId, UUID id) {
+        return requestLogRepository.findByIdTenantIdAndIdServiceIdAndIdRequestLogId(tenantId, serviceId, id);
     }
 }

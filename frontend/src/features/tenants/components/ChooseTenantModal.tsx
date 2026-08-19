@@ -1,5 +1,5 @@
 import type { ChangeEvent } from "react";
-import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
+import type { ListQueryRequest } from "../../../shared/dto/request/listQueryRequest";
 import { ServerSelectField } from "../../../shared/forms/ServerSelectField";
 import { ModalLayout } from "../../../shared/ui";
 import { useTenantsQuery } from "../hooks/useTenants";

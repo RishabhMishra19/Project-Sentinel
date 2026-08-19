@@ -69,7 +69,6 @@ export const ANALYTICS_API_ROUTES = {
 } as const;
 
 export const LOGS_API_ROUTES = {
-  LIST: "/logs/requests",
-  SEARCH: "/logs/requests/search",
-  BY_ID: (id: string) => `/logs/requests/${id}`,
+  LIST: (serviceId: string) => `/services/${serviceId}/logs/requests`,
+  BY_ID: (serviceId: string, id: string) => `/services/${serviceId}/logs/requests/${id}`,
 } as const;

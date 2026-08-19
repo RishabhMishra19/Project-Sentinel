@@ -12,6 +12,7 @@ export const DataTable = <T extends object>({
   searchConfig,
   filtersConfig,
   pagination,
+  infiniteScroll,
   rowActions,
   toolbarActions,
   isLoading,
@@ -23,7 +24,7 @@ export const DataTable = <T extends object>({
   const shouldShowToolbar = hasFilterableColumns || hasSearchableColumns || toolbarActions;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex-1 min-h-0 flex flex-col gap-3 overflow-hidden">
       {shouldShowToolbar ? (
         <DataTableToolbar
           columns={columns}
@@ -37,7 +38,7 @@ export const DataTable = <T extends object>({
         <AppliedFilterChips fields={filterFields} filtersConfig={filtersConfig} />
       ) : null}
 
-      <div className="overflow-hidden rounded border border-border">
+      <div className="rounded border border-border flex-1 min-h-0 flex flex-col">
         <DataTableTable
           columns={columns}
           rows={rows}
@@ -47,6 +48,14 @@ export const DataTable = <T extends object>({
           isLoading={isLoading}
           emptyMessage={emptyMessage}
           skeletonRowCount={pagination?.pageSize}
+          onScrollEnd={() => {
+            if (infiniteScroll) {
+              const { hasNext, nextCursor, onNextPage, pageSize } = infiniteScroll;
+              if (hasNext) {
+                onNextPage(pageSize, nextCursor);
+              }
+            }
+          }}
         />
         {pagination ? <DataTablePaginationBar pagination={pagination} /> : null}
       </div>

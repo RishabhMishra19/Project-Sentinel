@@ -1,23 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
-import { mapPageQuery } from "../../../shared/api/mapQuery";
-import type { ListQueryRequest } from "../../../shared/api/listQueryRequest";
+import { mapCursorPageQuery } from "../../../shared/api/mapQuery";
 import { RequestLogsApi } from "../api/RequestLogsApi";
+import type { ListRequestLogRequest } from "../dto/request/ListRequestLog.request";
 
 export const requestLogsQueryKey = ["logs", "requests"] as const;
 
-export const useRequestLogsQuery = (params: ListQueryRequest) => {
-  return mapPageQuery(
+export const useRequestLogsQuery = (serviceId: string | null, params?: ListRequestLogRequest) => {
+  return mapCursorPageQuery(
     useQuery({
       queryKey: [...requestLogsQueryKey, "list", params],
-      queryFn: () => RequestLogsApi.list(params),
+      queryFn: () => RequestLogsApi.list(serviceId!, params!),
+      enabled: params !== undefined && serviceId !== null,
     }),
   );
 };
 
-export const useRequestLogQuery = (id: string | null) => {
+export const useRequestLogQuery = (serviceId: string | null, id: string | null) => {
   return useQuery({
     queryKey: [...requestLogsQueryKey, "detail", id],
-    queryFn: () => RequestLogsApi.get(id!),
-    enabled: id != null,
+    queryFn: () => RequestLogsApi.get(serviceId!, id!),
+    enabled: id !== null && serviceId !== null,
   });
 };

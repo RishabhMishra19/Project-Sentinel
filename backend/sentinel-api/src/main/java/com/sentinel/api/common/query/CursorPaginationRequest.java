@@ -26,7 +26,6 @@ public abstract class CursorPaginationRequest {
     @NotNull(message = "limit parameter is required")
     private Integer limit;
 
-    @NotNull(message = "cursor parameter is required")
     private String cursor;
 
     public CassandraPageRequest toPageRequest() {

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, type ReactNode } from "react";
-import type { ListQueryRequest } from "../../../api/listQueryRequest";
+import type { ListQueryRequest } from "../../../dto/request/listQueryRequest";
 import { applyQueryOnData, toListQueryRequest } from "../../../utils/queryUtils";
 import type { DataTableColumn, DataTableProps, RowAction } from "../types";
 import type { DataTableQueryState } from "../utils/queryState";
@@ -25,7 +25,7 @@ type LocalPage<T extends object> = {
 
 type BindPageInput<T extends object> = {
   rows: T[];
-  totalElements: number;
+  totalElements?: number;
   isLoading?: boolean;
   isError?: boolean;
 };
@@ -80,7 +80,7 @@ export const useDataTable = <T extends object>({
       rowActions,
       toolbarActions,
       pagination: queryProps.pagination
-        ? { ...queryProps.pagination, totalElements: page.totalElements }
+        ? { ...queryProps.pagination, totalElements: page.totalElements! }
         : undefined,
     }),
     [

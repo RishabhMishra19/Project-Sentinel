@@ -40,22 +40,22 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public CursorPaginationResponse<RequestLogListResponse> getAll(UUID tenantId, RequestLogListRequest request) {
+    public CursorPaginationResponse<RequestLogListResponse> getAll(UUID tenantId, UUID serviceId, RequestLogListRequest request) {
         this.validateRange(request.getFrom(), request.getTo());
-        Slice<RequestLog> slice = requestLogService.findAllPaginated(tenantId, request);
-        Map<UUID, Endpoint> endpoints = loadEndpoints(slice.getContent());
+        Slice<RequestLog> slice = requestLogService.findAllPaginated(tenantId, serviceId, request);
+        Map<UUID, Endpoint> endpoints = loadEndpoints(slice.getContent(), serviceId);
         Map<UUID, Service> services = loadServices(endpoints.values());
         return CursorPaginationResponse.from(slice.map(key->toResponse(key, endpoints, services)), request);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public RequestLogListResponse getById(UUID tenantId, UUID id) {
+    public RequestLogListResponse getById(UUID tenantId, UUID serviceId, UUID id) {
         RequestLog log =
                 requestLogService
-                        .findByIdForTenant(tenantId, id)
+                        .findByTenantServiceAndId(tenantId, serviceId, id)
                         .orElseThrow(() -> new ResourceNotFoundException("Request log not found"));
-        Map<UUID, Endpoint> endpoints = loadEndpoints(List.of(log));
+        Map<UUID, Endpoint> endpoints = loadEndpoints(List.of(log), serviceId);
         Map<UUID, Service> services = loadServices(endpoints.values());
         return toResponse(log, endpoints, services);
     }
@@ -74,16 +74,16 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
         return requestLogMapper.toResponse(log, endpoint, service, product);
     }
 
-    private Map<UUID, Endpoint> loadEndpoints(List<RequestLog> logs) {
-        Set<Endpoint.PrimaryKeyComposite> ids = new HashSet<>();
+    private Map<UUID, Endpoint> loadEndpoints(List<RequestLog> logs, UUID serviceId) {
+        Set<UUID> ids = new HashSet<>();
         for (RequestLog log : logs) {
             if (log.getEndpointId() != null) {
-                ids.add(new Endpoint.PrimaryKeyComposite(log.getId().getServiceId(), log.getEndpointId()));
+                ids.add(log.getEndpointId());
             }
         }
         Map<UUID, Endpoint> endpoints = new HashMap<>();
         if (!ids.isEmpty()) {
-            for (Endpoint endpoint : endpointRepository.findAllById(ids)) {
+            for (Endpoint endpoint : endpointRepository.findByServiceIdAndEndpointIdIn(serviceId, ids.stream().toList())) {
                 endpoints.put(endpoint.getId().getEndpointId(), endpoint);
             }
         }
