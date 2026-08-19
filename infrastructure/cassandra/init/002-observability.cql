@@ -15,37 +15,27 @@ CREATE TABLE IF NOT EXISTS endpoints (
     )
 );
 
-CREATE TABLE IF NOT EXISTS request_logs (
+-- 1. Main table for time-range queries and cursor-based pagination
+CREATE TABLE request_logs (
     tenant_id uuid,
     service_id uuid,
-
+    occurred_at timestamp,
     id uuid,
-
     endpoint_id uuid,
-
     request_id text,
     trace_id text,
-
-    occurred_at timestamp,
-
     end_user_ip text,
     user_id text,
-
     status_code int,
     duration_ms int,
-
     request_size_bytes int,
     response_size_bytes int,
+    PRIMARY KEY ((tenant_id, service_id), occurred_at, id)
+) WITH CLUSTERING ORDER BY (occurred_at DESC, id DESC);
 
-    received_at timestamp,
-
-    PRIMARY KEY (
-        (tenant_id, service_id),
-        occurred_at,
-        id
-    )
-)
-WITH CLUSTERING ORDER BY (
-    occurred_at DESC,
-    id DESC
+-- 2. Lookup table for O(1) direct fetching by request_log_id alone
+CREATE TABLE request_logs_lookup_by_id (
+    id uuid,
+    occurred_at timestamp,
+    PRIMARY KEY (id)
 );

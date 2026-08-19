@@ -15,7 +15,6 @@ public record RequestLogListResponse(
         int durationMs,
         Integer requestSizeBytes,
         Integer responseSizeBytes,
-        Instant receivedAt,
         String method,
         String pathTemplate,
         UUID serviceId,

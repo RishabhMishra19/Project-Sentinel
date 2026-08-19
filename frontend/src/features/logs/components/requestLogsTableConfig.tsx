@@ -1,10 +1,5 @@
 import type { DataTableColumn, RowAction } from "../../../shared/ui/data-table";
-import type { FilterOption } from "../../../shared/ui/filters";
 import type { RequestLogResponse } from "../dto/response/requestLog.response";
-
-type CreateRequestLogColumnsOptions = {
-  endpointOptions: FilterOption[];
-};
 
 const statusTone = (code: number) => {
   if (code >= 500) return "text-red-700";
@@ -12,15 +7,13 @@ const statusTone = (code: number) => {
   return "text-foreground";
 };
 
-export const createRequestLogColumns = ({
-  endpointOptions,
-}: CreateRequestLogColumnsOptions): DataTableColumn<RequestLogResponse>[] => {
+export const createRequestLogColumns = (): DataTableColumn<RequestLogResponse>[] => {
   return [
     {
       id: "occurredAt",
       header: "Time",
       sortable: true,
-      filter: { type: "dateTimeRange" },
+      filter: { type: "date" },
       cell: { type: "datetime", getValue: (row) => row.occurredAt },
     },
     {
@@ -36,7 +29,6 @@ export const createRequestLogColumns = ({
     {
       id: "endpointId",
       header: "Endpoint",
-      filter: { type: "select", options: endpointOptions },
       cell: {
         type: "custom",
         render: (row) => (
@@ -49,15 +41,6 @@ export const createRequestLogColumns = ({
     {
       id: "statusClass",
       header: "Status",
-      filter: {
-        type: "multiSelect",
-        options: [
-          { label: "2xx", value: "2xx" },
-          { label: "3xx", value: "3xx" },
-          { label: "4xx", value: "4xx" },
-          { label: "5xx", value: "5xx" },
-        ],
-      },
       cell: {
         type: "custom",
         render: (row) => (
@@ -68,7 +51,6 @@ export const createRequestLogColumns = ({
     {
       id: "durationMs",
       header: "Latency",
-      sortable: true,
       cell: {
         type: "custom",
         render: (row) => <span className="tabular-nums">{row.durationMs} ms</span>,
@@ -77,7 +59,6 @@ export const createRequestLogColumns = ({
     {
       id: "traceId",
       header: "Trace",
-      searchable: true,
       cell: {
         type: "custom",
         render: (row) => (

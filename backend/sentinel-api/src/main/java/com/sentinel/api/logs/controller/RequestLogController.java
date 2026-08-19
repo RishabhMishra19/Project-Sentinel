@@ -1,11 +1,12 @@
 package com.sentinel.api.logs.controller;
 
 import com.sentinel.api.common.response.ApiResponses;
-import com.sentinel.api.common.response.CursorPaginationResponse;
-import com.sentinel.api.logs.dto.request.RequestLogListRequest;
+import com.sentinel.api.logs.dto.request.GetRequestLogsListRequest;
 import com.sentinel.api.logs.dto.response.RequestLogListResponse;
 import com.sentinel.api.logs.service.RequestLogFacade;
 import com.sentinel.api.security.UserPrincipal;
+import com.sentinel.common.cassandra.dto.CursorPaginationRequest;
+import com.sentinel.common.cassandra.dto.CursorPaginationResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,17 @@ public class RequestLogController {
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @PostMapping("")
     public ResponseEntity<CursorPaginationResponse<RequestLogListResponse>> getAll(
-            @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID serviceId, @Valid @RequestBody RequestLogListRequest request) {
-        return ApiResponses.okPage(requestLogFacade.getAll(principal.getActiveTenantId(), serviceId, request));
+            @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID serviceId, @Valid @RequestBody CursorPaginationRequest request) {
+
+        return ApiResponses.okPage(requestLogFacade.getAll(
+                GetRequestLogsListRequest.builder()
+                        .tenantId(principal.getActiveTenantId())
+                        .serviceId(serviceId)
+                        .cursor(request.getCursor())
+                        .pageSize(request.getPageSize())
+                        .direction(request.getDirection())
+                        .build()
+        ));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")

@@ -1,9 +1,5 @@
 import { useMemo } from "react";
 import { DataTable, useDataTable } from "../../../shared/ui/data-table";
-import type { FilterValue } from "../../../shared/ui/filters";
-import { dateTimeRangeFromPreset } from "../../../shared/ui/filters";
-import { clampLogsRange } from "../../analytics/utils/timeRange";
-import { useServiceEndpointsQuery } from "../../services/hooks/useServices";
 import type { RequestLogResponse } from "../dto/response/requestLog.response";
 import { useRequestLogsQuery } from "../hooks/useRequestLogs";
 import { createRequestLogColumns, createRequestLogRowActions } from "./requestLogsTableConfig";
@@ -11,35 +7,15 @@ import { SelectField } from "../../../shared/forms/SelectField";
 import { useUrlSyncedSelection } from "../../../shared/hooks/useUrlSyncedSelection";
 import type { ProductResponse } from "../../products/dto/response/product.response";
 import type { ServiceResponse } from "../../services/dto/response/service.response";
-import type { ListRequestLogRequest } from "../dto/request/ListRequestLog.request";
-
-const datetimeLocalToIso = (local: string): string | null => {
-  const d = new Date(local);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toISOString();
-};
-
-const defaultLogsRange = (): { from: string; to: string } => {
-  const range = dateTimeRangeFromPreset("24h");
-  return {
-    from: datetimeLocalToIso(range.from)!,
-    to: datetimeLocalToIso(range.to)!,
-  };
-};
+import type { CursorPageRequest } from "../../../shared/dto/request/CursorPageRequest";
 
 type RequestLogsTableProps = {
   onView: (log: RequestLogResponse) => void;
-  initialFilters?: Record<string, FilterValue>;
   products: ProductResponse[];
   services: ServiceResponse[];
 };
 
-export const RequestLogsTable = ({
-  onView,
-  initialFilters,
-  products,
-  services,
-}: RequestLogsTableProps) => {
+export const RequestLogsTable = ({ onView, products, services }: RequestLogsTableProps) => {
   const { selectedId: selectedProductId, onChange: onProductChange } = useUrlSyncedSelection({
     paramKey: "productId",
     items: products,
@@ -55,30 +31,14 @@ export const RequestLogsTable = ({
     items: relevantServices,
   });
 
-  console.log({ selectedProductId, selectedServiceId });
-
-  const initialColumns = useMemo(
-    () =>
-      createRequestLogColumns({
-        endpointOptions: [],
-      }),
-    [],
-  );
+  const columns = useMemo(() => createRequestLogColumns(), []);
 
   const rowActions = useMemo(() => createRequestLogRowActions({ onView }), [onView]);
 
-  const {
-    query,
-    listQueryRequest: tableListQueryRequest,
-    bindPage,
-  } = useDataTable({
-    columns: initialColumns,
+  const { query, bindPage } = useDataTable({
+    columns,
     getRowId: (row) => row.id,
-    initialState: {
-      pageSize: 20,
-      sorting: { id: "occurredAt", desc: true },
-      filters: initialFilters ?? {},
-    },
+    initialState: { pageSize: 10 },
     rowActions,
     toolbarActions: (
       <div className="flex flex-wrap items-center gap-2">
@@ -112,45 +72,21 @@ export const RequestLogsTable = ({
     ),
     emptyMessage: "No events match your filters",
     errorMessage: "Could not load events",
-    enablePagination: false,
+    enablePagination: true,
   });
 
-  const endpointsQuery = useServiceEndpointsQuery(selectedServiceId ?? undefined);
-  const endpoints = endpointsQuery.rows;
-
-  const endpointOptions = useMemo(
-    () =>
-      endpoints.map((ep) => ({
-        label: `${ep.method} ${ep.pathTemplate}`,
-        value: ep.id,
-      })),
-    [endpoints],
-  );
-
-  const columns = useMemo(
-    () =>
-      createRequestLogColumns({
-        endpointOptions,
-      }),
-    [endpointOptions],
-  );
-
-  const listQueryRequest: ListRequestLogRequest | undefined = useMemo(() => {
+  const listQueryRequest: CursorPageRequest | undefined = useMemo(() => {
     if (selectedServiceId == null) return undefined;
-    const fallback = defaultLogsRange();
-    const clamped = clampLogsRange(
-      tableListQueryRequest.from ?? fallback.from,
-      tableListQueryRequest.to ?? fallback.to,
-    );
     return {
-      // ...tableListQueryRequest,
-      from: clamped.from,
-      to: clamped.to,
-      limit: 10,
+      pageSize: query.pageSize,
+      cursor: query.cursor,
+      direction: query.cursorType ?? "FORWARD",
     };
-  }, [tableListQueryRequest]);
+  }, [query]);
 
   const page = useRequestLogsQuery(selectedServiceId, listQueryRequest);
 
-  return <DataTable {...bindPage(page)} columns={columns} />;
+  console.log({ page, as: bindPage(page) });
+
+  return <DataTable {...bindPage(page)} />;
 };

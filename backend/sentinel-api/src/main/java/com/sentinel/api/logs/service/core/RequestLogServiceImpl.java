@@ -1,13 +1,16 @@
 package com.sentinel.api.logs.service.core;
 
-import com.sentinel.api.logs.dto.request.RequestLogListRequest;
+import com.sentinel.api.logs.dto.RequestLogCursorEncoder;
+import com.sentinel.api.logs.dto.request.GetRequestLogsListRequest;
 import com.sentinel.common.observability.entity.RequestLog;
+import com.sentinel.common.observability.entity.RequestLogLookup;
+import com.sentinel.common.observability.repository.RequestLogLookupRepository;
 import com.sentinel.common.observability.repository.RequestLogRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,20 +20,52 @@ import java.util.UUID;
 public class RequestLogServiceImpl implements RequestLogService {
 
     private final RequestLogRepository requestLogRepository;
+    private final RequestLogLookupRepository requestLogLookupRepository;
+
 
     @Override
-    @Transactional(readOnly = true)
-    public Slice<RequestLog> findAllPaginated(UUID tenantId, UUID serviceId, RequestLogListRequest request) {
-        return requestLogRepository.findByIdTenantIdAndIdServiceId(
-                        tenantId,
-                        serviceId,
-                        request.toPageRequest()
-                );
+    public Optional<RequestLog> getLogById(UUID tenantId, UUID serviceId, UUID requestLogId) {
+        Optional<RequestLogLookup> lookupOpt = requestLogLookupRepository.findById(requestLogId);
+        if (lookupOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        RequestLogLookup lookup = lookupOpt.get();
+        return requestLogRepository.findByFullKey(
+                tenantId,
+                serviceId,
+                lookup.getOccurredAt(),
+                lookup.getRequestLogId()
+        );
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<RequestLog> findByTenantServiceAndId(UUID tenantId, UUID serviceId, UUID id) {
-        return requestLogRepository.findByIdTenantIdAndIdServiceIdAndIdRequestLogId(tenantId, serviceId, id);
+    public List<RequestLog> getFirstPage(GetRequestLogsListRequest request) {
+        return requestLogRepository.findFirstPage(
+                request.getTenantId(),
+                request.getServiceId(),
+                request.getPageSize()
+        );
+    }
+
+    @Override
+    public List<RequestLog> getNextPage(GetRequestLogsListRequest request, RequestLogCursorEncoder.RequestLogCursor decodedCursor) {
+        return requestLogRepository.findNextPage(
+                request.getTenantId(),
+                request.getServiceId(),
+                decodedCursor.getOccurredAt(),
+                decodedCursor.getRequestLogId(),
+                request.getPageSize()
+        );
+    }
+
+    @Override
+    public List<RequestLog> getPrevPage(GetRequestLogsListRequest request, RequestLogCursorEncoder.RequestLogCursor decodedCursor) {
+        return requestLogRepository.findPrevPage(
+                request.getTenantId(),
+                request.getServiceId(),
+                decodedCursor.getOccurredAt(),
+                decodedCursor.getRequestLogId(),
+                request.getPageSize()
+        );
     }
 }

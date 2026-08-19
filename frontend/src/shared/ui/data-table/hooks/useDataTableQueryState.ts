@@ -17,7 +17,7 @@ type UseDataTableQueryStateOptions<T extends object> = {
 /** Query-owned slice of DataTable props (values + change handlers). */
 export type DataTableQueryProps<T extends object> = Pick<
   DataTableProps<T>,
-  "sortingConfig" | "searchConfig" | "filtersConfig" | "pagination"
+  "sortingConfig" | "searchConfig" | "filtersConfig" | "pagination" | "cursorPagination"
 >;
 
 export const useDataTableQueryState = <T extends object>({
@@ -51,7 +51,21 @@ export const useDataTableQueryState = <T extends object>({
   }, []);
 
   const setPageSize = useCallback((pageSize: number) => {
-    setQuery((prev) => ({ ...prev, pageSize, pageIndex: 0 }));
+    setQuery((prev) => ({
+      ...prev,
+      pageSize,
+      pageIndex: 0,
+      cursor: undefined,
+      cursorType: "FORWARD",
+    }));
+  }, []);
+
+  const onNextPage = useCallback((afterCursor: string) => {
+    setQuery((prev) => ({ ...prev, cursor: afterCursor, cursorType: "FORWARD" }));
+  }, []);
+
+  const onPrevPage = useCallback((beforeCursor: string) => {
+    setQuery((prev) => ({ ...prev, cursor: beforeCursor, cursorType: "BACKWARD" }));
   }, []);
 
   const queryProps = useMemo((): DataTableQueryProps<T> => {
@@ -76,6 +90,16 @@ export const useDataTableQueryState = <T extends object>({
         pageSize: query.pageSize,
         totalElements: 0,
         onPageIndexChange: setPageIndex,
+        onPageSizeChange: setPageSize,
+      };
+      props.cursorPagination = {
+        pageSize: query.pageSize,
+        startCursor: undefined,
+        endCursor: undefined,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        onNextPage,
+        onPrevPage,
         onPageSizeChange: setPageSize,
       };
     }

@@ -1,5 +1,6 @@
 package com.sentinel.api.common.response;
 
+import com.sentinel.common.cassandra.dto.CursorPaginationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -27,4 +28,5 @@ public final class ApiResponses {
     public static <T> ResponseEntity<CursorPaginationResponse<T>> okPage(CursorPaginationResponse<T> page) {
         return ResponseEntity.ok(page);
     }
+
 }

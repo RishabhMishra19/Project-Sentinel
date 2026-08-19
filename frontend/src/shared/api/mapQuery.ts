@@ -14,10 +14,15 @@ export const mapPageQuery = <T>(query: UseQueryResult<PageResponse<T>>) => ({
 export const mapCursorPageQuery = <T>(query: UseQueryResult<CursorPageResponse<T>>) => ({
   ...query,
   rows: query.data?.content ?? [],
-  size: query.data?.size ?? 0,
-  hasNext: query.data?.hasNext ?? false,
-  nextCursor: query.data?.nextCursor,
   isLoading: query.isFetching,
+  serverCursorProps: !!query.data
+    ? {
+        startCursor: query.data.startCursor,
+        endCursor: query.data.endCursor,
+        hasNextPage: query.data.hasNextPage,
+        hasPreviousPage: query.data.hasPreviousPage,
+      }
+    : undefined,
 });
 
 /** Normalize an array list query: `rows` from `data`, `isLoading` from `isFetching`. */

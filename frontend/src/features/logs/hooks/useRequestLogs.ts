@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { mapCursorPageQuery } from "../../../shared/api/mapQuery";
 import { RequestLogsApi } from "../api/RequestLogsApi";
-import type { ListRequestLogRequest } from "../dto/request/ListRequestLog.request";
+import type { CursorPageRequest } from "../../../shared/dto/request/CursorPageRequest";
 
 export const requestLogsQueryKey = ["logs", "requests"] as const;
 
-export const useRequestLogsQuery = (serviceId: string | null, params?: ListRequestLogRequest) => {
+export const useRequestLogsQuery = (serviceId: string | null, params?: CursorPageRequest) => {
   return mapCursorPageQuery(
     useQuery({
       queryKey: [...requestLogsQueryKey, "list", params],

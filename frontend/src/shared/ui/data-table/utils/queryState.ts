@@ -5,6 +5,8 @@ import type { DataTableSearchState, DataTableSort } from "../types";
 export type DataTableQueryState = {
   pageIndex: number;
   pageSize: number;
+  cursor?: string;
+  cursorType?: "FORWARD" | "BACKWARD";
   sorting: DataTableSort;
   search: DataTableSearchState;
   filters: Record<string, FilterValue>;

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { FilterFieldConfig, FiltersConfig } from "../filters";
+import type { CursorPageResponse } from "../../dto/response/CursorPageResponse";
 
 export type DataTableCellType =
   | "text"
@@ -89,19 +90,23 @@ export type RowAction<T extends object> = {
   disabled?: (row: T) => boolean;
 };
 
+export type ServerCursorPagination = {
+  startCursor?: string;
+  endCursor?: string;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  pageSize: number;
+  onPageSizeChange: (pageSize: number) => void;
+  onNextPage: (afterCursor: string) => void;
+  onPrevPage: (beforeCursor: string) => void;
+};
+
 export type DataTablePagination = {
   pageIndex: number;
   pageSize: number;
   totalElements: number;
   onPageIndexChange: (pageIndex: number) => void;
   onPageSizeChange: (pageSize: number) => void;
-};
-
-export type DataTableInfiniteScroll = {
-  pageSize: number;
-  hasNext: boolean;
-  nextCursor?: string;
-  onNextPage: (limit: number, nextCursor?: string) => void;
 };
 
 export type DataTableSortingConfig = {
@@ -125,7 +130,8 @@ export type DataTableProps<T extends object> = {
   searchConfig?: DataTableSearchConfig;
   filtersConfig?: FiltersConfig;
   pagination?: DataTablePagination;
-  infiniteScroll?: DataTableInfiniteScroll;
+  cursorPagination?: ServerCursorPagination;
+  onScrollEnd?: () => void;
 
   rowActions?: RowAction<T>[];
   toolbarActions?: ReactNode;

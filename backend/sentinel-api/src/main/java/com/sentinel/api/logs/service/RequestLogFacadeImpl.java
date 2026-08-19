@@ -1,24 +1,20 @@
 package com.sentinel.api.logs.service;
 
-import com.sentinel.api.common.exception.BadRequestException;
 import com.sentinel.api.common.exception.ResourceNotFoundException;
-import com.sentinel.api.common.response.CursorPaginationResponse;
-import com.sentinel.api.logs.dto.request.RequestLogListRequest;
+import com.sentinel.api.logs.dto.request.GetRequestLogsListRequest;
 import com.sentinel.api.logs.dto.response.RequestLogListResponse;
 import com.sentinel.api.logs.mapper.RequestLogMapper;
 import com.sentinel.api.logs.service.core.RequestLogService;
 import com.sentinel.api.product.entity.Product;
 import com.sentinel.api.service.entity.Service;
 import com.sentinel.api.service.service.core.ServiceService;
+import com.sentinel.common.cassandra.dto.CursorPaginationResponse;
 import com.sentinel.common.observability.entity.Endpoint;
 import com.sentinel.common.observability.entity.RequestLog;
 import com.sentinel.common.observability.repository.EndpointRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,21 +27,27 @@ import java.util.UUID;
 @Transactional
 public class RequestLogFacadeImpl implements RequestLogFacade {
 
-    private static final Duration MAX_RANGE = Duration.ofDays(7);
-
     private final RequestLogService requestLogService;
     private final RequestLogMapper requestLogMapper;
     private final EndpointRepository endpointRepository;
     private final ServiceService serviceService;
+    private final RequestLogCassandraPaginator  requestLogCassandraPaginator;
 
     @Override
     @Transactional(readOnly = true)
-    public CursorPaginationResponse<RequestLogListResponse> getAll(UUID tenantId, UUID serviceId, RequestLogListRequest request) {
-        this.validateRange(request.getFrom(), request.getTo());
-        Slice<RequestLog> slice = requestLogService.findAllPaginated(tenantId, serviceId, request);
-        Map<UUID, Endpoint> endpoints = loadEndpoints(slice.getContent(), serviceId);
+    public CursorPaginationResponse<RequestLogListResponse> getAll(GetRequestLogsListRequest request) {
+        CursorPaginationResponse<RequestLog> response = requestLogCassandraPaginator.getPage(request);
+
+        Map<UUID, Endpoint> endpoints = loadEndpoints(response.getContent(), request.getServiceId());
         Map<UUID, Service> services = loadServices(endpoints.values());
-        return CursorPaginationResponse.from(slice.map(key->toResponse(key, endpoints, services)), request);
+
+        List<RequestLogListResponse> apiResult = response
+                .getContent()
+                .stream()
+                .map(v->this.toResponse(v, endpoints, services))
+                .toList();
+
+        return response.getApiResponse(apiResult);
     }
 
     @Override
@@ -53,7 +55,7 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
     public RequestLogListResponse getById(UUID tenantId, UUID serviceId, UUID id) {
         RequestLog log =
                 requestLogService
-                        .findByTenantServiceAndId(tenantId, serviceId, id)
+                        .getLogById(tenantId, serviceId, id)
                         .orElseThrow(() -> new ResourceNotFoundException("Request log not found"));
         Map<UUID, Endpoint> endpoints = loadEndpoints(List.of(log), serviceId);
         Map<UUID, Service> services = loadServices(endpoints.values());
@@ -106,12 +108,4 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
         return services;
     }
 
-    private void validateRange(Instant from, Instant to) {
-        if (!from.isBefore(to)) {
-            throw new BadRequestException("from must be before to");
-        }
-        if (Duration.between(from, to).compareTo(MAX_RANGE) > 0) {
-            throw new BadRequestException("Logs time range cannot exceed 7 days");
-        }
-    }
 }

@@ -1,15 +1,15 @@
 package com.sentinel.api.logs.service.core;
 
-import com.sentinel.api.logs.dto.request.RequestLogListRequest;
+import com.sentinel.api.logs.dto.RequestLogCursorEncoder;
+import com.sentinel.api.logs.dto.request.GetRequestLogsListRequest;
+import com.sentinel.common.cassandra.CassandraService;
 import com.sentinel.common.observability.entity.RequestLog;
-import org.springframework.data.domain.Slice;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface RequestLogService {
+public interface RequestLogService extends CassandraService<RequestLog, GetRequestLogsListRequest, RequestLogCursorEncoder.RequestLogCursor> {
 
-    Slice<RequestLog> findAllPaginated(UUID tenantId, UUID serviceId, RequestLogListRequest request);
+    Optional<RequestLog> getLogById(UUID tenantId, UUID serviceId, UUID requestLogId);
 
-    Optional<RequestLog> findByTenantServiceAndId(UUID tenantId, UUID serviceId, UUID id);
 }

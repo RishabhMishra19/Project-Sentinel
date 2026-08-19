@@ -24,7 +24,6 @@ public class RequestLogMapper {
                 log.getDurationMs(),
                 log.getRequestSizeBytes(),
                 log.getResponseSizeBytes(),
-                log.getReceivedAt(),
                 endpoint.getMethod(),
                 endpoint.getPathTemplate(),
                 service.getId(),

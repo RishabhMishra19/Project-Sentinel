@@ -1,4 +1,5 @@
 import { AppliedFilterChips, toFilterFields } from "../filters";
+import { DataTableCursorPaginationBar } from "./components/DataTableCursorPagination";
 import { DataTablePaginationBar } from "./components/DataTablePagination";
 import { DataTableTable } from "./components/DataTableTable";
 import { DataTableToolbar } from "./components/DataTableToolbar";
@@ -12,7 +13,8 @@ export const DataTable = <T extends object>({
   searchConfig,
   filtersConfig,
   pagination,
-  infiniteScroll,
+  cursorPagination,
+  onScrollEnd,
   rowActions,
   toolbarActions,
   isLoading,
@@ -49,15 +51,15 @@ export const DataTable = <T extends object>({
           emptyMessage={emptyMessage}
           skeletonRowCount={pagination?.pageSize}
           onScrollEnd={() => {
-            if (infiniteScroll) {
-              const { hasNext, nextCursor, onNextPage, pageSize } = infiniteScroll;
-              if (hasNext) {
-                onNextPage(pageSize, nextCursor);
-              }
-            }
+            console.log("on scroll end");
+            onScrollEnd?.();
           }}
         />
-        {pagination ? <DataTablePaginationBar pagination={pagination} /> : null}
+        {cursorPagination ? (
+          <DataTableCursorPaginationBar cursorPagination={cursorPagination} />
+        ) : pagination ? (
+          <DataTablePaginationBar pagination={pagination} />
+        ) : null}
       </div>
     </div>
   );

@@ -26,6 +26,12 @@ type LocalPage<T extends object> = {
 type BindPageInput<T extends object> = {
   rows: T[];
   totalElements?: number;
+  serverCursorProps?: {
+    startCursor: string;
+    endCursor: string;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
   isLoading?: boolean;
   isError?: boolean;
 };
@@ -82,6 +88,16 @@ export const useDataTable = <T extends object>({
       pagination: queryProps.pagination
         ? { ...queryProps.pagination, totalElements: page.totalElements! }
         : undefined,
+      cursorPagination:
+        queryProps.cursorPagination && page.serverCursorProps
+          ? {
+              ...queryProps.cursorPagination,
+              startCursor: page.serverCursorProps.startCursor,
+              endCursor: page.serverCursorProps.endCursor,
+              hasNextPage: page.serverCursorProps.hasNextPage,
+              hasPreviousPage: page.serverCursorProps.hasPreviousPage,
+            }
+          : undefined,
     }),
     [
       columns,
