@@ -4,14 +4,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.io.Serializable;
 import java.util.UUID;
 
 @Repository
 @AllArgsConstructor
 public class ServiceIdentityResolverRepository {
 
-    public record ServiceIdentity(UUID serviceId, UUID productId, UUID tenantId){}
+    public record ServiceIdentity(UUID serviceId, UUID productId, UUID tenantId) implements Serializable {}
 
     private final JdbcTemplate jdbcTemplate;
 
