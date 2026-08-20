@@ -29,7 +29,7 @@ public class RequestLogWriteService {
                                 item.tenantId(),
                                 item.serviceId(),
                                 item.occurredAt(),
-                                UUID.randomUUID()
+                                item.requestLogId()
                         ))
                         .endpointId(item.endpointId())
                         .requestId(item.requestId())

@@ -73,6 +73,7 @@ public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
         return new RequestLogKafkaMessage(this.requests.stream().map(log->
               RequestLogKafkaMessage.RequestLogKafkaMessageItem
                       .builder()
+                      .requestLogId(UUID.randomUUID())
                       .tenantId(serviceIdentity.tenantId())
                       .productId(serviceIdentity.productId())
                       .serviceId(serviceId)

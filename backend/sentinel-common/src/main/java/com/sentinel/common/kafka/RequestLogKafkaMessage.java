@@ -8,6 +8,7 @@ import java.util.UUID;
 public record RequestLogKafkaMessage(List<RequestLogKafkaMessageItem> requestLogKafkaMessageItems) {
     @Builder
     public record RequestLogKafkaMessageItem(
+            UUID requestLogId,
             UUID tenantId,
             UUID productId,
             UUID serviceId,
