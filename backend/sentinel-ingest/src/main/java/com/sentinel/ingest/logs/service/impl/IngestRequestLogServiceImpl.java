@@ -111,7 +111,7 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
             String pathTemplate = pathTemplateDeriver.derive(requestLogRequest.getPath());
             EndpointLookup.PrimaryKeyComposite id = new  EndpointLookup.PrimaryKeyComposite(
                     request.serviceId(),
-                    requestLogRequest.getMethod().name(),
+                    requestLogRequest.getMethod(),
                     pathTemplate
             );
             UUID endpointId = this.getEndpointId(id);

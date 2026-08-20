@@ -12,7 +12,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.http.HttpMethod;
 
 import java.time.Instant;
 import java.util.List;
@@ -25,7 +24,7 @@ public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
     public static class RequestLogRequest {
         @NotBlank
         @Size(max = 16)
-        HttpMethod method;
+        String method;
 
         @NotBlank
         @Size(max = 2048)
