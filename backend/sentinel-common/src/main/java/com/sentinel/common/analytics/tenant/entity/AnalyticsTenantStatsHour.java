@@ -19,6 +19,12 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AnalyticsTenantStatsHour extends AnalyticsStatsMetrics {
 
+    public AnalyticsTenantStatsHour(AnalyticsStatsMetrics statsMetrics, UUID tenantId, Instant bucketStart) {
+        super(statsMetrics);
+        this.id.tenantId = tenantId;
+        this.id.bucketStart = bucketStart;
+    }
+
     @PrimaryKey
     private PrimaryKeyComposite id;
 

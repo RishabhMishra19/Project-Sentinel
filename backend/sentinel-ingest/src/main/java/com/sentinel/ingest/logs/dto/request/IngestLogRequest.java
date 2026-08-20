@@ -1,8 +1,7 @@
 package com.sentinel.ingest.logs.dto.request;
 
-import com.sentinel.common.kafka.RequestLogKafkaMessage;
+import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.ingest.logs.repository.ServiceIdentityResolverRepository;
-import com.sentinel.ingest.utils.PathTemplateDeriver;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -13,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpMethod;
 
 import java.time.Instant;
 import java.util.List;
@@ -25,7 +25,7 @@ public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
     public static class RequestLogRequest {
         @NotBlank
         @Size(max = 16)
-        String method;
+        HttpMethod method;
 
         @NotBlank
         @Size(max = 2048)
@@ -69,18 +69,16 @@ public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
         UUID endpointId;  // this field I will fill
     }
 
-    public RequestLogKafkaMessage toRequestEventMessages(PathTemplateDeriver pathTemplateDeriver, ServiceIdentityResolverRepository.ServiceIdentity serviceIdentity) {
-        return new RequestLogKafkaMessage(this.requests.stream().map(log->
-              RequestLogKafkaMessage.RequestLogKafkaMessageItem
+    public List<KafkaMessage.ReqLog> toReqLogKafkaMessage(ServiceIdentityResolverRepository.ServiceIdentity serviceIdentity) {
+        return this.requests.stream().map(log->
+                  KafkaMessage.ReqLog
                       .builder()
                       .requestLogId(UUID.randomUUID())
                       .tenantId(serviceIdentity.tenantId())
                       .productId(serviceIdentity.productId())
                       .serviceId(serviceId)
                       .endpointId(log.endpointId)
-                      .method(log.method)
                       .path(log.path)
-                      .pathTemplate(log.pathTemplate)
                       .occurredAt(log.occurredAt)
                       .statusCode(log.statusCode)
                       .durationMs(log.durationMs)
@@ -91,6 +89,6 @@ public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
                       .traceId(log.traceId)
                       .userId(log.userId)
                       .build()
-        ).toList());
+        ).toList();
     }
 }

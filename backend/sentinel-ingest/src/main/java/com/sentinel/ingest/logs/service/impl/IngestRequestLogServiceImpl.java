@@ -3,7 +3,8 @@ package com.sentinel.ingest.logs.service.impl;
 import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;
 import com.sentinel.common.apikey.repository.ServiceApiKeyRepository;
 import com.sentinel.common.crypto.Sha256Hasher;
-import com.sentinel.common.kafka.RequestLogKafkaMessage;
+import com.sentinel.common.kafka.KafkaMessage;
+import com.sentinel.common.kafka.KafkaTopics;
 import com.sentinel.common.observability.entity.Endpoint;
 import com.sentinel.common.observability.entity.EndpointLookup;
 import com.sentinel.common.observability.repository.EndpointLookupRepository;
@@ -19,7 +20,6 @@ import com.sentinel.ingest.utils.PathTemplateDeriver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.cassandra.core.CassandraBatchOperations;
 import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.data.cassandra.core.query.Criteria;
@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -42,8 +43,6 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
     private static final String ENDPOINT_TEMPLATE = "endpoint_template_";
     private static final int TTL_IN_MS = 300;
 
-    @Value("${sentinel.kafka.request-logs-topic}")
-    private String requestLogsTopic;
     private final ServiceApiKeyRepository serviceApiKeyRepository;
     private final PathTemplateDeriver pathTemplateDeriver;
     private final KafkaTemplate<String, String> kafkaTemplate;
@@ -63,15 +62,18 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
         this.upsertEndpointsAndUpdateRequest(request);
 
         try {
-            RequestLogKafkaMessage kafkaMessage = request.toRequestEventMessages(pathTemplateDeriver,
-                                                                                           serviceIdentity);
-            String value = objectMapper.writeValueAsString(kafkaMessage);
-            ProducerRecord<String, String> record = new ProducerRecord<>(requestLogsTopic,
-                                                                         null,
-                                                                         System.currentTimeMillis(),
-                                                                         request.serviceId().toString(),
-                                                                         value);
-            kafkaTemplate.send(record).get();
+            List<KafkaMessage.ReqLog> reqLogs = request.toReqLogKafkaMessage(serviceIdentity);
+            for(KafkaMessage.ReqLog reqLog : reqLogs) {
+                String value = objectMapper.writeValueAsString(reqLog);
+                ProducerRecord<String, String> record = new ProducerRecord<>(
+                        KafkaTopics.request_logs,
+                        null,
+                        System.currentTimeMillis(),
+                        reqLog.getKey(),
+                        value
+                );
+                kafkaTemplate.send(record).get();
+            }
             return new IngestLogResponse("Successfully ingested", true);
         } catch (BadRequestException e) {
             throw new BadRequestException(e.getMessage());
@@ -109,7 +111,7 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
             String pathTemplate = pathTemplateDeriver.derive(requestLogRequest.getPath());
             EndpointLookup.PrimaryKeyComposite id = new  EndpointLookup.PrimaryKeyComposite(
                     request.serviceId(),
-                    requestLogRequest.getMethod(),
+                    requestLogRequest.getMethod().name(),
                     pathTemplate
             );
             UUID endpointId = this.getEndpointId(id);

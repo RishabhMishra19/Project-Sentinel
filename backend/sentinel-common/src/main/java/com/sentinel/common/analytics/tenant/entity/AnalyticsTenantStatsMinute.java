@@ -20,6 +20,13 @@ import org.springframework.data.cassandra.core.mapping.Table;
 @NoArgsConstructor
 public class AnalyticsTenantStatsMinute extends AnalyticsStatsMetrics {
 
+    public AnalyticsTenantStatsMinute(AnalyticsStatsMetrics statsMetrics, UUID tenantId, Instant bucketStart){
+        super(statsMetrics);
+        this.id = new PrimaryKeyComposite();
+        this.id.tenantId = tenantId;
+        this.id.bucketStart = bucketStart;
+    }
+
     @PrimaryKey
     private PrimaryKeyComposite id;
 

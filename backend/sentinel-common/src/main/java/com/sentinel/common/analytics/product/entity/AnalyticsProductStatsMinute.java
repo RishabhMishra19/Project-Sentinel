@@ -22,6 +22,13 @@ public class AnalyticsProductStatsMinute extends AnalyticsStatsMetrics {
     @PrimaryKey
     private PrimaryKeyComposite id;
 
+    public AnalyticsProductStatsMinute(AnalyticsStatsMetrics statsMetrics, UUID productId, Instant bucketStart) {
+        super(statsMetrics);
+        this.id = new PrimaryKeyComposite();
+        this.id.productId = productId;
+        this.id.bucketStart = bucketStart;
+    }
+
     @Getter
     @Setter
     @NoArgsConstructor

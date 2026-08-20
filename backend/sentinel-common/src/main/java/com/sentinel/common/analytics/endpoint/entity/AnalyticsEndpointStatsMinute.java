@@ -22,6 +22,13 @@ public class AnalyticsEndpointStatsMinute extends AnalyticsStatsMetrics {
     @PrimaryKey
     private PrimaryKeyComposite id;
 
+    public AnalyticsEndpointStatsMinute(AnalyticsStatsMetrics statsMetrics, UUID endpointId, Instant bucketStart) {
+        super(statsMetrics);
+        this.id = new PrimaryKeyComposite();
+        this.id.endpointId = endpointId;
+        this.id.bucketStart = bucketStart;
+    }
+
     @Getter
     @Setter
     @NoArgsConstructor
