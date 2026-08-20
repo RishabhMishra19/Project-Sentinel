@@ -1,53 +1,55 @@
 package com.sentinel.processor.logs;
 
 import com.sentinel.common.kafka.RequestLogKafkaMessage;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.UUID;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.sentinel.common.observability.entity.RequestLog;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
+@RequiredArgsConstructor
 public class RequestLogWriteService {
+    private final CassandraTemplate cassandraTemplate;
 
-    private static final String INSERT_SQL =
-            """
-            INSERT INTO request_logs (
-                id, service_instance_id, endpoint_id, request_id, trace_id,
-                occurred_at, end_user_ip, user_id, status_code, duration_ms,
-                request_size_bytes, response_size_bytes, received_at
-            ) VALUES (?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
 
-    private final JdbcTemplate jdbcTemplate;
-
-    public RequestLogWriteService(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    public void saveAll(List<ResolvedEvent> events) {
-        if (events.isEmpty()) {
+    public void saveAll(List<RequestLogKafkaMessage> requestLogMessages) {
+        if (requestLogMessages.isEmpty()) {
             return;
         }
-        jdbcTemplate.batchUpdate(
-                INSERT_SQL,
-                events,
-                events.size(),
-                (ps, event) -> {
-                    RequestLogKafkaMessage message = event.message();
-                    ps.setObject(1, UUID.randomUUID());
-                    ps.setObject(2, event.endpointId());
-                    ps.setString(3, message.requestId());
-                    ps.setTimestamp(4, Timestamp.from(message.occurredAt()));
-                    ps.setString(5, message.endUserIp());
-                    ps.setString(6, message.userId());
-                    ps.setInt(7, message.statusCode());
-                    ps.setInt(8, message.durationMs());
-                    ps.setObject(9, message.requestSizeBytes());
-                    ps.setObject(10, message.responseSizeBytes());
-                    ps.setTimestamp(11, Timestamp.from(message.receivedAt()));
-                });
+
+        var batch = cassandraTemplate.batchOps();
+
+        for (RequestLogKafkaMessage message : requestLogMessages) {
+            for(RequestLogKafkaMessage.RequestLogKafkaMessageItem item: message.requestLogKafkaMessageItems()){
+                RequestLog requestLog = RequestLog.builder()
+                        .id(new RequestLog.PrimaryKeyComposite(
+                                item.tenantId(),
+                                item.serviceId(),
+                                item.occurredAt(),
+                                UUID.randomUUID()
+                        ))
+                        .endpointId(item.endpointId())
+                        .requestId(item.requestId())
+                        .traceId(item.traceId())
+                        .endUserIp(item.endUserIp())
+                        .userId(item.userId())
+                        .statusCode(item.statusCode())
+                        .durationMs(item.durationMs())
+                        .requestSizeBytes(item.requestSizeBytes())
+                        .responseSizeBytes(item.responseSizeBytes())
+                        .build();
+
+                batch.insert(requestLog);
+            }
+        }
+        batch.execute();
     }
 
-    public record ResolvedEvent(RequestLogKafkaMessage message, UUID endpointId) {}
+    public record ResolvedEvent(
+            RequestLogKafkaMessage message,
+            UUID endpointId
+    ) {}
 }

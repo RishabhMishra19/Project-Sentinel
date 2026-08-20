@@ -59,6 +59,9 @@ public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
         String requestId;
 
         @Size(max = 128)
+        String traceId;
+
+        @Size(max = 128)
         String userId;
 
         String pathTemplate; // this field I will fill
@@ -66,9 +69,9 @@ public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
         UUID endpointId;  // this field I will fill
     }
 
-    public List<RequestLogKafkaMessage> toRequestEventMessages(PathTemplateDeriver pathTemplateDeriver, ServiceIdentityResolverRepository.ServiceIdentity serviceIdentity) {
-        return this.requests.stream().map(log->
-              RequestLogKafkaMessage
+    public RequestLogKafkaMessage toRequestEventMessages(PathTemplateDeriver pathTemplateDeriver, ServiceIdentityResolverRepository.ServiceIdentity serviceIdentity) {
+        return new RequestLogKafkaMessage(this.requests.stream().map(log->
+              RequestLogKafkaMessage.RequestLogKafkaMessageItem
                       .builder()
                       .tenantId(serviceIdentity.tenantId())
                       .productId(serviceIdentity.productId())
@@ -84,8 +87,9 @@ public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
                       .requestSizeBytes(log.requestSizeBytes)
                       .responseSizeBytes(log.responseSizeBytes)
                       .requestId(log.requestId)
+                      .traceId(log.traceId)
                       .userId(log.userId)
                       .build()
-        ).toList();
+        ).toList());
     }
 }

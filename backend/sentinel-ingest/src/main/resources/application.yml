@@ -18,7 +18,7 @@ spring:
     caffeine:
       spec: maximumSize=10000,expireAfterWrite=60s
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093,localhost:9094}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -36,7 +36,7 @@ spring:
 sentinel:
   kafka:
     request-logs-topic: sentinel.request-logs
-    request-logs-partitions: 24
+    request-logs-partitions: 1
     request-logs-replicas: 1
   memcached:
     host: ${MEMCACHED_HOST:localhost}

@@ -8,7 +8,7 @@ COPY ingest ./ingest
 COPY worker ./worker
 
 RUN mvn -pl worker -am -B -q package -DskipTests \
-    && cp worker/target/sentinel-worker-0.0.1-SNAPSHOT.jar /app/app.jar
+    && cp worker/target/sentinel-processor-0.0.1-SNAPSHOT.jar /app/app.jar
 
 FROM amazoncorretto:21
 WORKDIR /app

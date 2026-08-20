@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -64,9 +63,9 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
         this.upsertEndpointsAndUpdateRequest(request);
 
         try {
-            List<RequestLogKafkaMessage> kafkaMessageList = request.toRequestEventMessages(pathTemplateDeriver,
+            RequestLogKafkaMessage kafkaMessage = request.toRequestEventMessages(pathTemplateDeriver,
                                                                                            serviceIdentity);
-            String value = objectMapper.writeValueAsString(kafkaMessageList);
+            String value = objectMapper.writeValueAsString(kafkaMessage);
             ProducerRecord<String, String> record = new ProducerRecord<>(requestLogsTopic,
                                                                          null,
                                                                          System.currentTimeMillis(),
