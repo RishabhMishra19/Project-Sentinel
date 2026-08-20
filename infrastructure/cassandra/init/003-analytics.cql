@@ -101,29 +101,6 @@ WITH CLUSTERING ORDER BY (
 
 
 -- ============================================================
--- Endpoint status metrics
--- ============================================================
-
-CREATE TABLE IF NOT EXISTS analytics_endpoint_status_metrics (
-    endpoint_id uuid,
-    bucket_start timestamp,
-    status_code int,
-
-    request_count bigint,
-
-    PRIMARY KEY (
-        endpoint_id,
-        bucket_start,
-        status_code
-    )
-)
-WITH CLUSTERING ORDER BY (
-    bucket_start DESC,
-    status_code ASC
-);
-
-
--- ============================================================
 -- Product statistics
 -- ============================================================
 

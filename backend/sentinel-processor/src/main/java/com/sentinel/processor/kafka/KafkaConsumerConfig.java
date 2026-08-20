@@ -2,7 +2,7 @@ package com.sentinel.processor.kafka;
 
 import com.sentinel.common.kafka.KafkaConstants;
 import com.sentinel.common.kafka.KafkaConsumerGroups;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class KafkaConsumerConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
