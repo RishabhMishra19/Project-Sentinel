@@ -2,7 +2,6 @@ package com.sentinel.processor.kafka;
 
 import com.sentinel.common.kafka.KafkaConstants;
 import com.sentinel.common.kafka.KafkaConsumerGroups;
-import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,11 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@RequiredArgsConstructor
 public class KafkaConsumerConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
-    private final String bootstrapServers;
+    private String bootstrapServers;
 
     @Bean
     public ConsumerFactory<String, String> requestLogConsumerFactory() {

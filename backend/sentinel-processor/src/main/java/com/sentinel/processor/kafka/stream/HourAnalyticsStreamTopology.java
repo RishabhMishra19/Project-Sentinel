@@ -21,15 +21,6 @@ import java.util.UUID;
 @Configuration
 @RequiredArgsConstructor
 public class HourAnalyticsStreamTopology {
-    public static class AnalyticsTimestampExtractor implements TimestampExtractor {
-        private final ObjectMapper objectMapper = new ObjectMapper();
-        @Override
-        public long extract(ConsumerRecord<Object, Object> record, long partitionTime) {
-            KafkaMessage.Analytics analytics = objectMapper.readValue((String) record.value(), KafkaMessage.Analytics.class);
-            return analytics.getStartBucket().toEpochMilli();
-        }
-    }
-
     private final ObjectMapper objectMapper;
 
     @Bean
