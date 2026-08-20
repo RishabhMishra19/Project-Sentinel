@@ -8,7 +8,7 @@ services:
 
     ports:
       # Host:Container
-      - "9095:9092"
+      - "9094:9092"
 
     environment:
       # Unique ID for this broker/controller.
@@ -24,14 +24,14 @@ services:
 
       # 9092 -> Kafka broker/client traffic
       # 9093 -> KRaft controller traffic
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
 
       # Other Docker containers use kafka-3:9092.
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:29092,EXTERNAL://localhost:9094
 
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
 
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
 
       # Internal Kafka topics.
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3

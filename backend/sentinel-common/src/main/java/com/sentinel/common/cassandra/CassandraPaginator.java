@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 @AllArgsConstructor
 public class CassandraPaginator<T, R extends CursorPaginationRequest, P> {
 

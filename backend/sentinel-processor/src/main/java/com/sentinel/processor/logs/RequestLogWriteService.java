@@ -1,6 +1,6 @@
 package com.sentinel.processor.logs;
 
-import com.sentinel.common.kafka.RequestEventMessage;
+import com.sentinel.common.kafka.RequestLogKafkaMessage;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +34,7 @@ public class RequestLogWriteService {
                 events,
                 events.size(),
                 (ps, event) -> {
-                    RequestEventMessage message = event.message();
+                    RequestLogKafkaMessage message = event.message();
                     ps.setObject(1, UUID.randomUUID());
                     ps.setObject(2, event.endpointId());
                     ps.setString(3, message.requestId());
@@ -49,5 +49,5 @@ public class RequestLogWriteService {
                 });
     }
 
-    public record ResolvedEvent(RequestEventMessage message, UUID endpointId) {}
+    public record ResolvedEvent(RequestLogKafkaMessage message, UUID endpointId) {}
 }

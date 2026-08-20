@@ -1,9 +1,14 @@
 package com.sentinel.common.kafka;
 
+import lombok.Builder;
+
 import java.time.Instant;
 import java.util.UUID;
 
-public record RequestEventMessage(
+@Builder
+public record RequestLogKafkaMessage(
+        UUID tenantId,
+        UUID productId,
         UUID serviceId,
         String method,
         String path,

@@ -1,6 +1,6 @@
 package com.sentinel.processor.kafka;
 
-import com.sentinel.common.kafka.RequestEventMessage;
+import com.sentinel.common.kafka.RequestLogKafkaMessage;
 import com.sentinel.common.path.PathTemplateDeriver;
 import com.sentinel.processor.catalog.EndpointResolveService;
 import com.sentinel.processor.logs.RequestLogWriteService;
@@ -37,7 +37,7 @@ public class RequestEventProcessor {
     }
 
     @Transactional
-    public void process(List<RequestEventMessage> messages) {
+    public void process(List<RequestLogKafkaMessage> messages) {
         if (messages.isEmpty()) {
             return;
         }
@@ -48,7 +48,7 @@ public class RequestEventProcessor {
             Map<EndpointKey, UUID> endpointCache = new HashMap<>();
             List<ResolvedEvent> resolved = new ArrayList<>(messages.size());
 
-            for (RequestEventMessage message : messages) {
+            for (RequestLogKafkaMessage message : messages) {
                 try {
                     String method = message.method() != null && !message.method().isBlank()
                             ? pathTemplateDeriver.normalizeMethod(message.method())

@@ -11,17 +11,10 @@ public class KafkaTopicConfig {
 
     @Bean
     NewTopic requestEventsTopic(
-            @Value("${sentinel.kafka.request-events-topic}") String topic,
-            @Value("${sentinel.kafka.request-events-partitions}") int partitions,
-            @Value("${sentinel.kafka.request-events-replicas}") short replicas) {
+            @Value("${sentinel.kafka.request-logs-topic}") String topic,
+            @Value("${sentinel.kafka.request-logs-partitions}") int partitions,
+            @Value("${sentinel.kafka.request-logs-replicas}") short replicas) {
         return TopicBuilder.name(topic).partitions(partitions).replicas(replicas).build();
     }
 
-    @Bean
-    NewTopic analyticsDeltasTopic(
-            @Value("${sentinel.kafka.analytics-deltas-topic}") String topic,
-            @Value("${sentinel.kafka.analytics-deltas-partitions}") int partitions,
-            @Value("${sentinel.kafka.analytics-deltas-replicas}") short replicas) {
-        return TopicBuilder.name(topic).partitions(partitions).replicas(replicas).build();
-    }
 }

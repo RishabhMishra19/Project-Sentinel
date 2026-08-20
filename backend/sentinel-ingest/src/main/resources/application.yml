@@ -18,7 +18,7 @@ spring:
     caffeine:
       spec: maximumSize=10000,expireAfterWrite=60s
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -26,18 +26,21 @@ spring:
       properties:
         linger.ms: 20
         batch.size: 65536
-
+  cassandra:
+    contact-points: ${SPRING_DATA_CASSANDRA_CONTACT_POINTS:localhost}
+    port: ${SPRING_DATA_CASSANDRA_PORT:9042}
+    keyspace-name: ${SPRING_DATA_CASSANDRA_KEYSPACE:sentinel}
+    username: ${SPRING_DATA_CASSANDRA_USERNAME:cassandra}
+    password: ${SPRING_DATA_CASSANDRA_PASSWORD:cassandra}
+    local-datacenter: ${SPRING_DATA_CASSANDRA_DATACENTER:datacenter1}
 sentinel:
   kafka:
-    request-events-topic: sentinel.request-events
-    request-events-partitions: 24
-    request-events-replicas: 1
-    analytics-deltas-topic: sentinel.analytics-deltas
-    analytics-deltas-partitions: 6
-    analytics-deltas-replicas: 1
-  analytics:
-    flush-interval-ms: 5000
-    flush-event-threshold: 2000
+    request-logs-topic: sentinel.request-logs
+    request-logs-partitions: 24
+    request-logs-replicas: 1
+  memcached:
+    host: ${MEMCACHED_HOST:localhost}
+    port: ${MEMCACHED_PORT:11211}
 
 server:
   port: 8081

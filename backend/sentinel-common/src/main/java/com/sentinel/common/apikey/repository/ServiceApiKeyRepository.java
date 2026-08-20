@@ -15,4 +15,6 @@ public interface ServiceApiKeyRepository
     Optional<ServiceApiKey> findByIdAndServiceId(UUID id, UUID serviceId);
 
     Optional<ServiceApiKey> findByKeyHashAndStatus(String keyHash, ServiceApiKeyStatus status);
+
+    boolean existsByKeyHashAndServiceIdAndStatus(String keyHash, UUID serviceId, ServiceApiKeyStatus status);
 }

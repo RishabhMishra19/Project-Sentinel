@@ -1,6 +1,6 @@
 package com.sentinel.processor.kafka;
 
-import com.sentinel.common.kafka.RequestEventMessage;
+import com.sentinel.common.kafka.RequestLogKafkaMessage;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -34,9 +34,9 @@ public class RequestEventListener {
             return;
         }
 
-        List<RequestEventMessage> messages = new ArrayList<>(payloads.size());
+        List<RequestLogKafkaMessage> messages = new ArrayList<>(payloads.size());
         for (String payload : payloads) {
-            messages.add(objectMapper.readValue(payload, RequestEventMessage.class));
+            messages.add(objectMapper.readValue(payload, RequestLogKafkaMessage.class));
         }
 
         log.debug("Consumed {} messages from {}", messages.size(), topic);

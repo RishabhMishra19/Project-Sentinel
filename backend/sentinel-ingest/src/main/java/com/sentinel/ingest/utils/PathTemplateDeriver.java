@@ -1,9 +1,10 @@
-package com.sentinel.common.path;
+package com.sentinel.ingest.utils;
 
-import java.util.Locale;
+import org.springframework.stereotype.Component;
+
 import java.util.regex.Pattern;
 
-/** Derives endpoint path templates from raw request paths (UUID/numeric segments → {id}). */
+@Component
 public final class PathTemplateDeriver {
 
     private static final Pattern UUID_SEGMENT = Pattern.compile(
@@ -57,12 +58,5 @@ public final class PathTemplateDeriver {
             template = template.substring(0, MAX_LENGTH);
         }
         return template;
-    }
-
-    public String normalizeMethod(String method) {
-        if (method == null || method.isBlank()) {
-            return "GET";
-        }
-        return method.trim().toUpperCase(Locale.ROOT);
     }
 }
