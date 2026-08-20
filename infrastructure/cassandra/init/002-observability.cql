@@ -1,5 +1,6 @@
 USE sentinel;
 
+-- 1. Main table for fetch by service queries and cursor-based pagination
 CREATE TABLE IF NOT EXISTS endpoints (
     service_id uuid,
     id uuid,
@@ -13,6 +14,16 @@ CREATE TABLE IF NOT EXISTS endpoints (
         service_id,
         id
     )
+);
+
+-- 2. Lookup table for O(1) direct fetching by serviceId, method and path_template alone
+CREATE TABLE endpoint_lookup (
+    service_id uuid,
+    method text,
+    path_template text,
+    endpoint_id uuid,
+
+    PRIMARY KEY ((service_id), method, path_template)
 );
 
 -- 1. Main table for time-range queries and cursor-based pagination

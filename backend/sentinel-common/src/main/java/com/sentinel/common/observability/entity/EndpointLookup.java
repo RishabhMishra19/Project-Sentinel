@@ -1,13 +1,9 @@
 package com.sentinel.common.observability.entity;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
@@ -15,33 +11,24 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table("endpoints")
+import java.util.UUID;
+
+@Table("endpoint_lookup")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Endpoint {
-
+public class EndpointLookup {
     @PrimaryKey
     private PrimaryKeyComposite id;
 
-    @Column("method")
-    private String method;
-
-    @Column("path_template")
-    private String pathTemplate;
-
-    @Column("first_seen_at")
-    private Instant firstSeenAt;
-
-    @Column("last_seen_at")
-    private Instant lastSeenAt;
+    @Column("endpoint_id")
+    private UUID endpointId;
 
     @Getter
     @Setter
     @NoArgsConstructor
-    @PrimaryKeyClass
     @AllArgsConstructor
+    @PrimaryKeyClass
     public static class PrimaryKeyComposite {
 
         @PrimaryKeyColumn(
@@ -51,9 +38,15 @@ public class Endpoint {
         private UUID serviceId;
 
         @PrimaryKeyColumn(
-                name = "id",
+                name = "method",
                 type = PrimaryKeyType.CLUSTERED
         )
-        private UUID endpointId;
+        private String method;
+
+        @PrimaryKeyColumn(
+                name = "path_template",
+                type = PrimaryKeyType.CLUSTERED
+        )
+        private String pathTemplate;
     }
 }

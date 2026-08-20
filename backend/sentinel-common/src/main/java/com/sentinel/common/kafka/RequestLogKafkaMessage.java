@@ -10,6 +10,7 @@ public record RequestLogKafkaMessage(
         UUID tenantId,
         UUID productId,
         UUID serviceId,
+        UUID endpointId,
         String method,
         String path,
         String pathTemplate,
