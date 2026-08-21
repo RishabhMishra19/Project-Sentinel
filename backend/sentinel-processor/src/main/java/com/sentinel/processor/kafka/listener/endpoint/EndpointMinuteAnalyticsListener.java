@@ -24,7 +24,7 @@ public class EndpointMinuteAnalyticsListener {
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-    @KafkaListener(topics = KafkaTopics.endpoint_minute_analytics, containerFactory = "requestLogKafkaListenerContainerFactory")
+    @KafkaListener(topics = KafkaTopics.endpoint_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.endpoint_minute_analytics+"_group")
     public void onEndpointMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;

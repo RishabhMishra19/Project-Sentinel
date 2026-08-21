@@ -25,7 +25,7 @@ public class ReqLogListener {
     private final CassandraTemplate cassandraTemplate;
 
 
-    @KafkaListener(topics = KafkaTopics.request_logs, containerFactory = "requestLogKafkaListenerContainerFactory")
+    @KafkaListener(topics = KafkaTopics.request_logs, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.request_logs+"_group")
     public void onReqLogsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;

@@ -57,7 +57,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
 
       # We will explicitly create topics while learning.
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
     volumes:
       # Persist Kafka data for this broker.

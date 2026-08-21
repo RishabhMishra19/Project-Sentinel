@@ -35,11 +35,6 @@ spring:
       group-id: sentinel-processor
       auto-offset-reset: earliest
       enable-auto-commit: false
-      max-poll-records: 2
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      properties:
-        fetch.max.wait.ms: 100
     listener:
       ack-mode: batch
       type: batch

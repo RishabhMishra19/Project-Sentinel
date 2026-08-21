@@ -24,7 +24,7 @@ public class ServiceHourAnalyticsListener {
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-    @KafkaListener(topics = KafkaTopics.service_hour_analytics, containerFactory = "requestLogKafkaListenerContainerFactory")
+    @KafkaListener(topics = KafkaTopics.service_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.service_hour_analytics+"_group")
     public void onServiceHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;

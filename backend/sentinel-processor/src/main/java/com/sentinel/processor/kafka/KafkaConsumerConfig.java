@@ -1,8 +1,8 @@
 package com.sentinel.processor.kafka;
 
 import com.sentinel.common.kafka.KafkaConstants;
-import com.sentinel.common.kafka.KafkaConsumerGroups;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,22 +20,19 @@ public class KafkaConsumerConfig {
     private String bootstrapServers;
 
     @Bean
-    public ConsumerFactory<String, String> requestLogConsumerFactory() {
+    public ConsumerFactory<String, String> sentinelConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConsumerGroups.request_log_consumer.name());
-        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, KafkaConstants.REQUEST_LOG_BATCH_SIZE); props.put(
-                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                org.apache.kafka.common.serialization.StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                  org.apache.kafka.common.serialization.StringDeserializer.class);
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, KafkaConstants.REQUEST_LOG_BATCH_SIZE);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> requestLogKafkaListenerContainerFactory(ConsumerFactory<String, String> requestLogConsumerFactory) {
+    public ConcurrentKafkaListenerContainerFactory<String, String> sentinelKafkaListenerContainerFactory(ConsumerFactory<String, String> sentinelConsumerFactory) {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(requestLogConsumerFactory);
+        factory.setConsumerFactory(sentinelConsumerFactory);
         factory.setBatchListener(true);
         return factory;
     }

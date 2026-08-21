@@ -7,7 +7,9 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DayAnalyticsStreamTopology {
     private final ObjectMapper objectMapper;
+    private final AnalyticsSerde analyticsSerde;
 
     @Bean
     public KStream<String, String> tenantDayAnalyticsStream(StreamsBuilder builder, AnalyticsTimestampExtractor analyticsTimestampExtractor){
@@ -33,12 +36,20 @@ public class DayAnalyticsStreamTopology {
 
         tenantDayAnalyticsStream
                 .selectKey((key, item) -> item.getId().toString())
-                .groupByKey()
+                .groupByKey(
+                        Grouped.with(
+                                Serdes.String(),
+                                analyticsSerde
+                        )
+                )
                 .windowedBy(TimeWindows.ofSizeAndGrace(Duration.ofDays(1), Duration.ofMinutes(10)))
                 .aggregate(KafkaMessage.Analytics::new, (tenantId, reqLog, analyticsKafkaMessage) -> {
                     analyticsKafkaMessage.accumulate(reqLog);
                     return analyticsKafkaMessage;
-                })
+                }, Materialized.with(
+                        Serdes.String(),
+                        analyticsSerde
+                ))
                 .toStream()
                 .map((windowedKey, analytics) ->{
                          analytics.setId(UUID.fromString(windowedKey.key()));
@@ -67,12 +78,20 @@ public class DayAnalyticsStreamTopology {
 
         tenantDayAnalyticsStream
                 .selectKey((key, item) -> item.getId().toString())
-                .groupByKey()
+                .groupByKey(
+                        Grouped.with(
+                                Serdes.String(),
+                                analyticsSerde
+                        )
+                )
                 .windowedBy(TimeWindows.ofSizeAndGrace(Duration.ofDays(1), Duration.ofMinutes(10)))
                 .aggregate(KafkaMessage.Analytics::new, (tenantId, reqLog, analyticsKafkaMessage) -> {
                     analyticsKafkaMessage.accumulate(reqLog);
                     return analyticsKafkaMessage;
-                })
+                }, Materialized.with(
+                        Serdes.String(),
+                        analyticsSerde
+                ))
                 .toStream()
                 .map((windowedKey, analytics) ->{
                          analytics.setId(UUID.fromString(windowedKey.key()));
@@ -101,12 +120,20 @@ public class DayAnalyticsStreamTopology {
 
         tenantDayAnalyticsStream
                 .selectKey((key, item) -> item.getId().toString())
-                .groupByKey()
+                .groupByKey(
+                        Grouped.with(
+                                Serdes.String(),
+                                analyticsSerde
+                        )
+                )
                 .windowedBy(TimeWindows.ofSizeAndGrace(Duration.ofDays(1), Duration.ofMinutes(10)))
                 .aggregate(KafkaMessage.Analytics::new, (tenantId, reqLog, analyticsKafkaMessage) -> {
                     analyticsKafkaMessage.accumulate(reqLog);
                     return analyticsKafkaMessage;
-                })
+                }, Materialized.with(
+                        Serdes.String(),
+                        analyticsSerde
+                ))
                 .toStream()
                 .map((windowedKey, analytics) ->{
                          analytics.setId(UUID.fromString(windowedKey.key()));
@@ -135,12 +162,20 @@ public class DayAnalyticsStreamTopology {
 
         tenantDayAnalyticsStream
                 .selectKey((key, item) -> item.getId().toString())
-                .groupByKey()
+                .groupByKey(
+                        Grouped.with(
+                                Serdes.String(),
+                                analyticsSerde
+                        )
+                )
                 .windowedBy(TimeWindows.ofSizeAndGrace(Duration.ofDays(1), Duration.ofMinutes(10)))
                 .aggregate(KafkaMessage.Analytics::new, (tenantId, reqLog, analyticsKafkaMessage) -> {
                     analyticsKafkaMessage.accumulate(reqLog);
                     return analyticsKafkaMessage;
-                })
+                }, Materialized.with(
+                        Serdes.String(),
+                        analyticsSerde
+                ))
                 .toStream()
                 .map((windowedKey, analytics) ->{
                          analytics.setId(UUID.fromString(windowedKey.key()));

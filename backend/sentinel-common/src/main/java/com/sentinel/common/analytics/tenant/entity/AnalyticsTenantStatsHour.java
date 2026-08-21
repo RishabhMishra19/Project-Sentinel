@@ -21,6 +21,7 @@ public class AnalyticsTenantStatsHour extends AnalyticsStatsMetrics {
 
     public AnalyticsTenantStatsHour(AnalyticsStatsMetrics statsMetrics, UUID tenantId, Instant bucketStart) {
         super(statsMetrics);
+        this.id = new PrimaryKeyComposite();
         this.id.tenantId = tenantId;
         this.id.bucketStart = bucketStart;
     }
