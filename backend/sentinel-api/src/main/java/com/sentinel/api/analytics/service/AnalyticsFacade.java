@@ -21,5 +21,4 @@ public interface AnalyticsFacade {
 
     List<StatusBreakdownItem> statusBreakdown(UUID tenantId, UUID endpointId, ListQueryRequest query);
 
-    List<ExceptionMetricItem> exceptions(UUID tenantId, UUID endpointId, ListQueryRequest query);
 }

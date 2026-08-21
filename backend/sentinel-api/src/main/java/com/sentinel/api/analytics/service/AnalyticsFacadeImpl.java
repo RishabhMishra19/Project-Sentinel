@@ -110,22 +110,6 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
                 .toList();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<ExceptionMetricItem> exceptions(UUID tenantId, UUID endpointId, ListQueryRequest query) {
-        Instant from = query != null ? query.getFrom() : null;
-        Instant to = query != null ? query.getTo() : null;
-        requireRange(from, to);
-        endpointRepository
-                .findById_ServiceIdAndId_EndpointId(tenantId, endpointId)
-                .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
-        return queryService
-                .exceptionBreakdown(endpointId, tenantId, from, to)
-                .stream()
-                .map(analyticsMapper::toExceptionItem)
-                .toList();
-    }
-
     private AnalyticsQueryParams parseParams(ListQueryRequest query) {
         if (query == null) {
             throw new BadRequestException("Query body is required");
