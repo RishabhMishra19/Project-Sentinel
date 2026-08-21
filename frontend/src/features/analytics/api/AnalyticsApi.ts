@@ -45,14 +45,4 @@ export class AnalyticsApi {
       { from: params.from, to: params.to },
     );
   }
-
-  static exceptions(
-    endpointId: string,
-    params: { from: string; to: string },
-  ): Promise<ExceptionMetricItem[]> {
-    return apiManager.post<ExceptionMetricItem[]>(ANALYTICS_API_ROUTES.EXCEPTIONS(endpointId), {
-      from: params.from,
-      to: params.to,
-    });
-  }
 }

@@ -1,10 +1,7 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { QueryGate } from "../../../shared/ui";
 import type { ExceptionMetricItem, StatusBreakdownItem } from "../dto/response/analytics.response";
-import {
-  useEndpointExceptionsQuery,
-  useEndpointStatusBreakdownQuery,
-} from "../hooks/useAnalytics";
+import { useEndpointStatusBreakdownQuery } from "../hooks/useAnalytics";
 import { ChartShell } from "./ChartShell";
 
 const AXIS = { fontSize: 12, fill: "var(--color-muted-foreground, #737373)" };
@@ -35,36 +32,6 @@ const StatusChartContent = ({ items }: { items: StatusBreakdownItem[] }) => {
   );
 };
 
-const ExceptionsChartContent = ({ items }: { items: ExceptionMetricItem[] }) => {
-  return (
-    <ChartShell
-      title="Exceptions"
-      xLabel="Exception type"
-      yLabel="Count"
-      empty={items.length === 0}
-      emptyMessage="No exception data."
-      heightClassName="h-56"
-    >
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={items} margin={{ ...CHART_MARGIN, bottom: 48 }}>
-          <CartesianGrid stroke={GRID} strokeDasharray="3 3" />
-          <XAxis
-            dataKey="exceptionType"
-            tick={AXIS}
-            interval={0}
-            angle={-25}
-            textAnchor="end"
-            height={60}
-          />
-          <YAxis tick={AXIS} allowDecimals={false} />
-          <Tooltip />
-          <Bar dataKey="exceptionCount" name="Count" fill="#b91c1c" />
-        </BarChart>
-      </ResponsiveContainer>
-    </ChartShell>
-  );
-};
-
 export const EndpointStatusChart = ({
   endpointId,
   from,
@@ -84,29 +51,6 @@ export const EndpointStatusChart = ({
       className="min-h-56 rounded-xl border border-border bg-background"
     >
       <StatusChartContent items={statusQuery.data ?? []} />
-    </QueryGate>
-  );
-};
-
-export const EndpointExceptionsChart = ({
-  endpointId,
-  from,
-  to,
-}: {
-  endpointId: string;
-  from: string;
-  to: string;
-}) => {
-  const exceptionsQuery = useEndpointExceptionsQuery(endpointId, from, to);
-
-  return (
-    <QueryGate
-      isLoading={exceptionsQuery.isLoading}
-      isError={exceptionsQuery.isError}
-      errorMessage="Could not load exceptions."
-      className="min-h-56 rounded-xl border border-border bg-background"
-    >
-      <ExceptionsChartContent items={exceptionsQuery.data ?? []} />
     </QueryGate>
   );
 };

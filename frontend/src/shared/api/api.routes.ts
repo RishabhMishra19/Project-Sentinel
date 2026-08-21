@@ -65,7 +65,6 @@ export const ANALYTICS_API_ROUTES = {
   TIMESERIES: "/analytics/timeseries",
   RANKINGS: "/analytics/rankings",
   STATUS_BREAKDOWN: (endpointId: string) => `/analytics/endpoints/${endpointId}/status-breakdown`,
-  EXCEPTIONS: (endpointId: string) => `/analytics/endpoints/${endpointId}/exceptions`,
 } as const;
 
 export const LOGS_API_ROUTES = {

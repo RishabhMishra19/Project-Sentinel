@@ -6,7 +6,7 @@ import type { AnalyticsRankingItem } from "../dto/response/analytics.response";
 import { AnalyticsKpiStrip } from "./AnalyticsKpiStrip";
 import { AnalyticsRankingsTable } from "./AnalyticsRankingsTable";
 import { AnalyticsTimeseriesCharts } from "./AnalyticsTimeseriesCharts";
-import { EndpointExceptionsChart, EndpointStatusChart } from "./EndpointDetailCharts";
+import { EndpointStatusChart } from "./EndpointDetailCharts";
 
 type AnalyticsResultsProps = {
   queryParams: AnalyticsQueryParams;
@@ -30,11 +30,6 @@ export const AnalyticsResults = ({
       {isEndpoint && endpointId ? (
         <div className="grid gap-4 lg:grid-cols-2">
           <EndpointStatusChart
-            endpointId={endpointId}
-            from={queryParams.from}
-            to={queryParams.to}
-          />
-          <EndpointExceptionsChart
             endpointId={endpointId}
             from={queryParams.from}
             to={queryParams.to}

@@ -46,11 +46,3 @@ export const useEndpointStatusBreakdownQuery = (
     enabled: endpointId != null,
   });
 };
-
-export const useEndpointExceptionsQuery = (endpointId: string | null, from: string, to: string) => {
-  return useQuery({
-    queryKey: [...analyticsQueryKey, "exceptions", endpointId, from, to],
-    queryFn: () => AnalyticsApi.exceptions(endpointId!, { from, to }),
-    enabled: endpointId != null,
-  });
-};
