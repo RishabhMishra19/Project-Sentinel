@@ -1,46 +1,43 @@
-import { useAppSelector } from "../../../redux/hooks";
 import { QueryGate } from "../../../shared/ui";
 import type {
   AnalyticsEntityAggregatedRequestParams,
-  AnalyticsQueryParams,
   AnalyticsScope,
 } from "../dto/request/analytics.request";
-import type { AnalyticsEntityAggregatedResponse } from "../dto/response/analytics.response";
 import { useAnalyticsEntityAggregatedQuery } from "../hooks/useAnalytics";
-import { getEntityAggregatedRequestParams } from "../utils/analyticsUrl";
+import { useAnalyticsSearchParams } from "../hooks/useAnalyticsSearchParams";
 import { formatNumber, formatRate } from "../utils/timeRange";
 
 const TAB_LABEL: Record<AnalyticsScope, string> = {
-  TENANT: "Tenants",
-  PRODUCT: "Products",
-  SERVICE: "Services",
-  ENDPOINT: "Endpoints",
+  TENANT: "Products",
+  PRODUCT: "Services",
+  SERVICE: "Endpoints",
+  ENDPOINT: "",
 };
 
-const rowLabel = (item: AnalyticsEntityAggregatedResponse["items"][0], scope: AnalyticsScope) => {
-  // if (scope === "SERVICE") {
-  //   return `${item.method ?? ""} ${item.pathTemplate ?? ""}`.trim() || item.id;
-  // }
-  return item.scopeId;
-};
+export const AnalyticsRankingsTable = () => {
+  const { tenantId, productId, serviceId, scope, from, to, mergeParams } =
+    useAnalyticsSearchParams();
+  let params: AnalyticsEntityAggregatedRequestParams | null = null;
+  if (from && to && scope) {
+    params = { from, to, scope: scope as any, tenantId, productId, serviceId };
+  }
+  const entityAggregatedQuery = useAnalyticsEntityAggregatedQuery(params);
 
-export const AnalyticsRankingsTable = ({
-  params,
-  onRowClick,
-}: {
-  params: AnalyticsQueryParams;
-  onRowClick?: (item: AnalyticsEntityAggregatedResponse["items"][0]) => void;
-}) => {
-  const tenantId = useAppSelector((state) => state.session.activeTenant?.id!);
-  const entityAggregatedQuery = useAnalyticsEntityAggregatedQuery(
-    getEntityAggregatedRequestParams(params, tenantId),
-  );
+  const onRowClick = (scopeId: string) => {
+    if (scope === "TENANT") {
+      mergeParams({ scope: "PRODUCT", productId: scopeId });
+    } else if (scope === "PRODUCT") {
+      mergeParams({ scope: "SERVICE", serviceId: scopeId });
+    } else if (scope === "SERVICE") {
+      mergeParams({ scope: "ENDPOINT", endpoint: scopeId });
+    }
+  };
 
   return (
     <div className="flex min-h-48 flex-col gap-3 rounded-xl border border-border bg-background">
       <div className="shrink-0 border-b border-border px-4 py-3">
         <h3 className="text-sm font-medium text-foreground">
-          Ranked {TAB_LABEL[params.scope].toLowerCase()}
+          Ranked {scope ? TAB_LABEL[scope as AnalyticsScope].toLowerCase() : ""}
         </h3>
       </div>
       <QueryGate
@@ -65,17 +62,15 @@ export const AnalyticsRankingsTable = ({
               <tbody>
                 {(entityAggregatedQuery.data?.items ?? []).map((item) => (
                   <tr
-                    key={item.scopeId}
+                    key={item.id}
                     className={
-                      onRowClick
+                      scope !== "PRODUCTS"
                         ? "cursor-pointer border-b border-border/60 hover:bg-muted/40"
                         : "border-b border-border/60"
                     }
-                    onClick={() => onRowClick?.(item)}
+                    onClick={() => scope !== "PRODUCTS" && onRowClick(item.id)}
                   >
-                    <td className="px-4 py-2.5 font-medium text-foreground">
-                      {rowLabel(item, params.scope)}
-                    </td>
+                    <td className="px-4 py-2.5 font-medium text-foreground">{item.id}</td>
                     <td className="px-4 py-2.5 tabular-nums">{formatNumber(item.requestCount)}</td>
                     <td className="px-4 py-2.5 tabular-nums">{formatRate(item.errorRate)}</td>
                     <td className="px-4 py-2.5 tabular-nums">

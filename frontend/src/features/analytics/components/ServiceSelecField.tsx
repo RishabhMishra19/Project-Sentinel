@@ -1,6 +1,7 @@
-import { SelectField } from "../../../shared/forms/SelectField";
+import { SelectFilter } from "../../../shared/ui/filters/controls";
 import { useServicesQuery } from "../../services/hooks/useServices";
 import { useAnalyticsSearchParams } from "../hooks/useAnalyticsSearchParams";
+import { FilterSelectWrapper } from "./FilterSelectWrapper";
 
 export const ServiceSelecField = () => {
   const { serviceId, productId, mergeParams } = useAnalyticsSearchParams();
@@ -12,14 +13,13 @@ export const ServiceSelecField = () => {
   }));
 
   return (
-    <SelectField
-      value={serviceId ?? undefined}
-      onChange={(event) => mergeParams({ serviceId: event.target.value })}
-      aria-label="Filter by service"
-      placeholder="Select Service"
-      emptyPlaceholder="No Services"
-      disabled={isFetching}
-      options={serviceOptions}
-    />
+    <FilterSelectWrapper label="Service">
+      <SelectFilter
+        value={serviceId}
+        options={serviceOptions}
+        onChange={(val) => mergeParams({ serviceId: val })}
+        disabled={isFetching}
+      />
+    </FilterSelectWrapper>
   );
 };

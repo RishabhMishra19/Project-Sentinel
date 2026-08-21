@@ -25,7 +25,7 @@ export type AnalyticsTimeseriesPoint = Omit<AnalyticsSummaryResponse, "bucket" |
 };
 
 export type AnalyticsEntityAggregatedResponse = {
-  items: Omit<AnalyticsSummaryResponse, "bucket">[];
+  items: (Omit<AnalyticsSummaryResponse, "bucket" | "scopeId"> & { id: string })[];
 };
 
 export type AnalyticsTimeseriesResponse = {

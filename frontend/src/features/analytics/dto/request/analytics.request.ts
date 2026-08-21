@@ -23,9 +23,9 @@ export type AnalyticsEntityAggregatedRequestParams = {
   scope: AnalyticsScope;
   from: string;
   to: string;
-  tenantId?: string;
-  productId?: string;
-  serviceId?: string;
+  tenantId?: string | null;
+  productId?: string | null;
+  serviceId?: string | null;
 };
 
 export type AnalyticsQueryParams = {

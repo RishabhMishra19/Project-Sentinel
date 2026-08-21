@@ -45,7 +45,7 @@ export const ProtectedRouteContainer = () => {
           <ActiveTenantBanner />
         ) : null}
         <AppNavbar crumbs={crumbs} description={description} />
-        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-4 flex flex-col">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-2 flex flex-col">
           <Outlet />
         </main>
       </div>

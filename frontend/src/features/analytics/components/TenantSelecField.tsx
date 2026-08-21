@@ -1,6 +1,7 @@
-import { SelectField } from "../../../shared/forms/SelectField";
+import { SelectFilter } from "../../../shared/ui/filters/controls";
 import { useTenantsQuery } from "../../tenants/hooks/useTenants";
 import { useAnalyticsSearchParams } from "../hooks/useAnalyticsSearchParams";
+import { FilterSelectWrapper } from "./FilterSelectWrapper";
 
 export const TenantSelecField = () => {
   const { tenantId, mergeParams } = useAnalyticsSearchParams();
@@ -11,17 +12,14 @@ export const TenantSelecField = () => {
     value: tenant.id,
   }));
 
-  console.log({ tenantId });
-
   return (
-    <SelectField
-      value={tenantId ?? undefined}
-      onChange={(event) => mergeParams({ tenantId: event.target.value })}
-      aria-label="Filter by tenant"
-      placeholder="Select Tenant"
-      emptyPlaceholder="No Tenants"
-      disabled={isFetching}
-      options={tenantOptions}
-    />
+    <FilterSelectWrapper label="Tenant">
+      <SelectFilter
+        value={tenantId}
+        options={tenantOptions}
+        onChange={(val) => mergeParams({ tenantId: val })}
+        disabled={isFetching}
+      />
+    </FilterSelectWrapper>
   );
 };

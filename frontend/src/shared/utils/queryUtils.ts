@@ -2,24 +2,7 @@ import type { ListQueryRequest } from "../dto/request/listQueryRequest";
 import type { DataTableColumn, DataTableQueryState } from "../ui/data-table";
 import { applyClientFilters } from "../ui/data-table/utils/clientFiltering";
 import { paginateClientRows, sortClientRows } from "../ui/data-table/utils/clientRows";
-
-const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
-
-const toDayStartIso = (value: string): string => {
-  if (DATE_ONLY.test(value)) {
-    return new Date(`${value}T00:00:00.000Z`).toISOString();
-  }
-  return value;
-};
-
-const toExclusiveDayEndIso = (value: string): string => {
-  if (DATE_ONLY.test(value)) {
-    const d = new Date(`${value}T00:00:00.000Z`);
-    d.setUTCDate(d.getUTCDate() + 1);
-    return d.toISOString();
-  }
-  return value;
-};
+import { toDayStartIso, toExclusiveDayEndIso } from "./dateUtils";
 
 const splitValues = (raw: string): string[] =>
   raw

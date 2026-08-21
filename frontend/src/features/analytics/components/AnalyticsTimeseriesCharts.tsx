@@ -1,17 +1,20 @@
-import { useAppSelector } from "../../../redux/hooks";
 import { QueryGate } from "../../../shared/ui";
-import type { AnalyticsQueryParams } from "../dto/request/analytics.request";
+import type { AnalyticsTimeSeriesRequestParams } from "../dto/request/analytics.request";
 import { useAnalyticsTimeseriesQuery } from "../hooks/useAnalytics";
-import { getTimeSeriesRequestParams } from "../utils/analyticsUrl";
+import { useAnalyticsSearchParams } from "../hooks/useAnalyticsSearchParams";
 import {
   AnalyticsErrorRateChart,
   AnalyticsLatencyChart,
   AnalyticsVolumeChart,
 } from "./AnalyticsCharts";
 
-export const AnalyticsTimeseriesCharts = ({ params }: { params: AnalyticsQueryParams }) => {
-  const tenantId = useAppSelector((state) => state.session.activeTenant?.id!);
-  const timeseriesQuery = useAnalyticsTimeseriesQuery(getTimeSeriesRequestParams(params, tenantId));
+export const AnalyticsTimeseriesCharts = () => {
+  const { entityId, scope, from, to, bucket } = useAnalyticsSearchParams();
+  let params: AnalyticsTimeSeriesRequestParams | null = null;
+  if (from && to && scope && entityId && bucket) {
+    params = { from, to, scope: scope as any, entityId, bucket: bucket as any };
+  }
+  const timeseriesQuery = useAnalyticsTimeseriesQuery(params);
   const points = timeseriesQuery.data?.points ?? [];
 
   return (

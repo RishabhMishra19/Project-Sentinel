@@ -1,6 +1,7 @@
-import { SelectField } from "../../../shared/forms/SelectField";
+import { SelectFilter } from "../../../shared/ui/filters/controls";
 import { useProductsQuery } from "../../products/hooks/useProducts";
 import { useAnalyticsSearchParams } from "../hooks/useAnalyticsSearchParams";
+import { FilterSelectWrapper } from "./FilterSelectWrapper";
 
 export const ProductSelecField = () => {
   const { productId, mergeParams } = useAnalyticsSearchParams();
@@ -11,15 +12,16 @@ export const ProductSelecField = () => {
     value: product.id,
   }));
 
+  console.log("rishabh", { productId });
+
   return (
-    <SelectField
-      value={productId ?? undefined}
-      onChange={(event) => mergeParams({ productId: event.target.value })}
-      aria-label="Filter by product"
-      placeholder="Select Product"
-      emptyPlaceholder="No Products"
-      disabled={isFetching}
-      options={productOptions}
-    />
+    <FilterSelectWrapper label="Product">
+      <SelectFilter
+        value={productId}
+        options={productOptions}
+        onChange={(val) => mergeParams({ productId: val })}
+        disabled={isFetching}
+      />
+    </FilterSelectWrapper>
   );
 };

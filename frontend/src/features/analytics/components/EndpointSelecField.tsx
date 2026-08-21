@@ -1,6 +1,7 @@
-import { SelectField } from "../../../shared/forms/SelectField";
-import { useServiceEndpointsQuery, useServicesQuery } from "../../services/hooks/useServices";
+import { SelectFilter } from "../../../shared/ui/filters/controls";
+import { useServiceEndpointsQuery } from "../../services/hooks/useServices";
 import { useAnalyticsSearchParams } from "../hooks/useAnalyticsSearchParams";
+import { FilterSelectWrapper } from "./FilterSelectWrapper";
 
 export const EndpointSelecField = () => {
   const { serviceId, endpointId, mergeParams } = useAnalyticsSearchParams();
@@ -12,14 +13,13 @@ export const EndpointSelecField = () => {
   }));
 
   return (
-    <SelectField
-      value={endpointId ?? undefined}
-      onChange={(event) => mergeParams({ endpoint: event.target.value })}
-      aria-label="Filter by endpoint"
-      placeholder="Select Endpoint"
-      emptyPlaceholder="No Endpoints"
-      disabled={isFetching}
-      options={endpointOptions}
-    />
+    <FilterSelectWrapper label="Endpoint">
+      <SelectFilter
+        value={endpointId}
+        options={endpointOptions}
+        onChange={(val) => mergeParams({ endpointId: val })}
+        disabled={isFetching}
+      />
+    </FilterSelectWrapper>
   );
 };

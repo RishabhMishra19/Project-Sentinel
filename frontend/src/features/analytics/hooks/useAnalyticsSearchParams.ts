@@ -1,6 +1,9 @@
+import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useAppSelector } from "../../../redux/hooks";
 
 export const useAnalyticsSearchParams = () => {
+  const activeTenant = useAppSelector((state) => state.session.activeTenant!);
   const [params, setParams] = useSearchParams();
 
   const scope = params.get("scope");
@@ -31,8 +34,34 @@ export const useAnalyticsSearchParams = () => {
     );
   };
 
+  console.log({ scope, tenantId, productId, serviceId, endpointId });
+
+  useEffect(() => {
+    if (params.size === 0) {
+      const now = new Date();
+      const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      mergeParams({
+        scope: "TENANT",
+        tenantId: activeTenant.id,
+        from: twentyFourHoursAgo.toISOString(),
+        to: now.toISOString(),
+        bucket: "MINUTE",
+      });
+    }
+  }, []);
+
+  const entityId = !scope
+    ? null
+    : {
+        TENANT: tenantId,
+        PRODUCT: productId,
+        SERVICE: serviceId,
+        ENDPOINT: endpointId,
+      }[scope];
+
   return {
     scope,
+    entityId,
     tenantId,
     productId,
     serviceId,
