@@ -1,26 +1,25 @@
 package com.sentinel.api.analytics.service;
 
-import com.sentinel.api.analytics.dto.request.GetAnalyticsSummaryRequestParams;
-import com.sentinel.api.analytics.dto.response.AnalyticsRankingItem;
-import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
+import com.sentinel.api.analytics.dto.request.AnalyticsQueryRequestParams;
+import com.sentinel.api.analytics.dto.response.AnalyticsRankingQueryResponse;
+import com.sentinel.api.analytics.dto.response.AnalyticsSummaryQueryResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsTimeseriesResponse;
-import com.sentinel.api.analytics.dto.response.ExceptionMetricItem;
 import com.sentinel.api.analytics.dto.response.StatusBreakdownItem;
-import com.sentinel.api.analytics.mapper.AnalyticsMapper;
-import com.sentinel.api.analytics.service.core.AnalyticsBucket;
-import com.sentinel.api.analytics.service.core.AnalyticsMetricsAggregate;
+import com.sentinel.common.analytics.AnalyticsBucket;
+import com.sentinel.api.analytics.service.core.AnalyticsMetrics;
 import com.sentinel.api.analytics.service.core.AnalyticsRankingSort;
-import com.sentinel.api.analytics.service.core.AnalyticsScope;
+import com.sentinel.common.analytics.AnalyticsRepository;
+import com.sentinel.common.analytics.AnalyticsScope;
 import com.sentinel.api.analytics.service.core.AnalyticsScopeHandler;
 import com.sentinel.api.analytics.service.core.AnalyticsScopeHandlerRegistry;
-import com.sentinel.api.analytics.service.core.AnalyticsService;
-import com.sentinel.api.analytics.service.core.AnalyticsStatsQueryService;
 import com.sentinel.api.analytics.service.core.EndpointService;
+import com.sentinel.api.analytics.utils.AnalyticsUtils;
 import com.sentinel.api.common.exception.BadRequestException;
 import com.sentinel.api.common.exception.ResourceNotFoundException;
 import com.sentinel.api.common.query.ListQueryFilterReader;
 import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.common.response.PageResponse;
+import com.sentinel.common.analytics.AnalyticsStatsMetrics;
 import com.sentinel.common.observability.repository.EndpointRepository;
 
 import java.time.Instant;
@@ -41,19 +40,17 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     private static final Set<String> RANKING_SORTABLE = Set.of();
     private final AnalyticsScopeHandlerRegistry handlerRegistry;
-    private final AnalyticsStatsQueryService queryService;
-    private final AnalyticsMapper analyticsMapper;
     private final EndpointRepository endpointRepository;
     private final EndpointService endpointService;
-    private final AnalyticsServiceFactory analyticsServiceFactory;
+    private final AnalyticsRepository  analyticsRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public AnalyticsSummaryResponse summary(UUID entityId, GetAnalyticsSummaryRequestParams params) {
-        AnalyticsService analyticsService = analyticsServiceFactory.getAnalyticsService(params.scope(), params.bucket());
-        AnalyticsMetricsAggregate agg = analyticsService.summary(entityId, params.from(), params.to(), params.bucket());
-        Long activeEndpoints = endpointService.countEndPoints(entityId, params.scope());
-        return analyticsMapper.toSummary(agg, params.bucket(), entityId, activeEndpoints);
+    public AnalyticsSummaryQueryResponse summary(AnalyticsQueryRequestParams params) {
+        AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
+        AnalyticsStatsMetrics metrics = analyticsRepository.findStats(params.entityId(), params.from(), params.to(), params.scope(), bucket);
+        long activeEndpoints = endpointService.countEndPoints(params.entityId(), params.scope());
+        return new AnalyticsSummaryQueryResponse(bucket, params.entityId(), metrics, activeEndpoints);
     }
 
     @Override
@@ -62,52 +59,56 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
         AnalyticsQueryParams params = parseParams(query);
         requireRange(params.from(), params.to());
         AnalyticsScopeHandler handler = handlerRegistry.get(params.scope());
-        List<AnalyticsMetricsAggregate> rows = handler.timeseries(
+        List<AnalyticsMetrics> rows = handler.timeseries(
                 tenantId, params.productId(), params.serviceId(), params.endpointId(), params.from(), params.to(),
                 params.bucket()
         );
-        return analyticsMapper.toTimeseries(rows, params.bucket());
+//        return analyticsMapper.toTimeseries(rows, params.bucket());
+        return null;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<AnalyticsRankingItem> rankings(UUID tenantId, ListQueryRequest query) {
-        AnalyticsQueryParams params = parseParams(query);
-        if (params.scope() == AnalyticsScope.ENDPOINT) {
-            throw new BadRequestException("Rankings are not available for ENDPOINT scope");
+    public AnalyticsRankingQueryResponse rankings(AnalyticsQueryRequestParams params) {
+        if(params.scope().equals(AnalyticsScope.TENANT)) {
+            throw new BadRequestException("Ranking scope can not be tenant");
         }
-        requireRange(params.from(), params.to());
-        AnalyticsScopeHandler handler = handlerRegistry.get(params.scope());
-        AnalyticsRankingSort sort = ListQueryFilterReader.optionalEnum(
-                query, "sortBy", AnalyticsRankingSort.class,
-                AnalyticsRankingSort.TRAFFIC
-        );
-        Pageable pageable = query.toPageable(RANKING_SORTABLE);
-        List<AnalyticsRankingItem> content = handler.rankings(
-                tenantId, params.productId(), params.serviceId(), params.endpointId(), params.from(), params.to(),
-                params.bucket(), sort, pageable
-        ).stream().map(analyticsMapper::toRankingItem).toList();
-        long total = handler.rankingsCount(
-                tenantId, params.productId(), params.serviceId(), params.endpointId(), params.from(), params.to(),
-                params.bucket()
-        );
-        return new PageResponse<>(content, pageable.getPageNumber(), pageable.getPageSize(), total);
+//        AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
+//        AnalyticsBucketService bucketService = bucketServiceFactory.getAnalyticsService(AnalyticsScope.PRODUCT, bucket);
+//
+//        AnalyticsScopeHandler handler = handlerRegistry.get(params.scope());
+//        AnalyticsRankingSort sort = ListQueryFilterReader.optionalEnum(
+//                query, "sortBy", AnalyticsRankingSort.class,
+//                AnalyticsRankingSort.TRAFFIC
+//        );
+//        Pageable pageable = query.toPageable(RANKING_SORTABLE);
+//        List<AnalyticsRankingQueryResponse> content = handler.rankings(
+//                tenantId, params.productId(), params.serviceId(), params.endpointId(), params.from(), params.to(),
+//                params.bucket(), sort, pageable
+//        ).stream().map(analyticsMapper::toRankingItem).toList();
+//        long total = handler.rankingsCount(
+//                tenantId, params.productId(), params.serviceId(), params.endpointId(), params.from(), params.to(),
+//                params.bucket()
+//        );
+//        return new PageResponse<>(content, pageable.getPageNumber(), pageable.getPageSize(), total);
+        return null;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<StatusBreakdownItem> statusBreakdown(UUID tenantId, UUID endpointId, ListQueryRequest query) {
-        Instant from = query != null ? query.getFrom() : null;
-        Instant to = query != null ? query.getTo() : null;
-        requireRange(from, to);
-        endpointRepository
-                .findById_ServiceIdAndId_EndpointId(tenantId, endpointId)
-                .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
-        return queryService
-                .statusBreakdown(endpointId, tenantId, from, to)
-                .stream()
-                .map(analyticsMapper::toStatusItem)
-                .toList();
+//        Instant from = query != null ? query.getFrom() : null;
+//        Instant to = query != null ? query.getTo() : null;
+//        requireRange(from, to);
+//        endpointRepository
+//                .findById_ServiceIdAndId_EndpointId(tenantId, endpointId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
+//        return queryService
+//                .statusBreakdown(endpointId, tenantId, from, to)
+//                .stream()
+//                .map(analyticsMapper::toStatusItem)
+//                .toList();
+        return null;
     }
 
     private AnalyticsQueryParams parseParams(ListQueryRequest query) {

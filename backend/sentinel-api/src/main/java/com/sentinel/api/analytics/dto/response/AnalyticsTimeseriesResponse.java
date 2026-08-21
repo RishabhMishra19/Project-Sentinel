@@ -1,6 +1,6 @@
 package com.sentinel.api.analytics.dto.response;
 
-import com.sentinel.api.analytics.service.core.AnalyticsBucket;
+import com.sentinel.common.analytics.AnalyticsBucket;
 import java.time.Instant;
 import java.util.List;
 

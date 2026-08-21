@@ -1,14 +1,13 @@
 package com.sentinel.api.analytics.controller;
 
-import com.sentinel.api.analytics.dto.request.GetAnalyticsSummaryRequestParams;
-import com.sentinel.api.analytics.dto.response.AnalyticsRankingItem;
-import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
+import com.sentinel.api.analytics.dto.request.AnalyticsQueryRequestParams;
+import com.sentinel.api.analytics.dto.response.AnalyticsRankingQueryResponse;
+import com.sentinel.api.analytics.dto.response.AnalyticsSummaryQueryResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsTimeseriesResponse;
 import com.sentinel.api.analytics.dto.response.StatusBreakdownItem;
 import com.sentinel.api.analytics.service.AnalyticsFacade;
 import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.common.response.ApiResponses;
-import com.sentinel.api.common.response.PageResponse;
 import com.sentinel.api.security.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +34,8 @@ public class AnalyticsController {
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping("/summary")
-    public ResponseEntity<AnalyticsSummaryResponse> summary(@AuthenticationPrincipal UserPrincipal principal, @Valid @ModelAttribute GetAnalyticsSummaryRequestParams params) {
-        return ApiResponses.ok(analyticsFacade.summary(principal.getActiveTenantId(), params));
+    public ResponseEntity<AnalyticsSummaryQueryResponse> summary(@Valid @ModelAttribute AnalyticsQueryRequestParams params) {
+        return ApiResponses.ok(analyticsFacade.summary(params));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
@@ -46,9 +45,9 @@ public class AnalyticsController {
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
-    @PostMapping("/rankings")
-    public ResponseEntity<PageResponse<AnalyticsRankingItem>> rankings(@AuthenticationPrincipal UserPrincipal principal, @RequestBody ListQueryRequest query) {
-        return ApiResponses.okPage(analyticsFacade.rankings(principal.getActiveTenantId(), query));
+    @GetMapping("/rankings")
+    public ResponseEntity<AnalyticsRankingQueryResponse> rankings(@Valid @ModelAttribute AnalyticsQueryRequestParams params) {
+        return ApiResponses.ok(analyticsFacade.rankings(params));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")

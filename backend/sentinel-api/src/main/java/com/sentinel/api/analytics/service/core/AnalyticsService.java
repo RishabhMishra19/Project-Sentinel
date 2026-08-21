@@ -1,10 +1,12 @@
 package com.sentinel.api.analytics.service.core;
 
+import com.sentinel.api.analytics.dto.response.AnalyticsRankingQueryResponse;
+
 import java.time.Instant;
 import java.util.UUID;
 
 public interface AnalyticsService {
 
-    AnalyticsMetricsAggregate summary(UUID tenantId, Instant from, Instant to, AnalyticsBucket bucket);
+    AnalyticsMetrics findStats(UUID entityId, Instant from, Instant to);
 
 }

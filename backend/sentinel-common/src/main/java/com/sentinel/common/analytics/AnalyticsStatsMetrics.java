@@ -2,6 +2,7 @@ package com.sentinel.common.analytics;
 
 import com.sentinel.common.kafka.KafkaMessage;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.cassandra.core.mapping.Column;
@@ -9,6 +10,7 @@ import org.springframework.data.cassandra.core.mapping.Column;
 @Getter
 @Setter
 @AllArgsConstructor
+@Builder
 public class AnalyticsStatsMetrics {
 
     public AnalyticsStatsMetrics(AnalyticsStatsMetrics metrics) {

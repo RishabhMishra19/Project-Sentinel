@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public interface EndpointService {
 
-    long countEndPoints(UUID entityId, AnalyticsScope scope);
+    long countEndPoints(UUID entityId, com.sentinel.common.analytics.AnalyticsScope scope);
 
 }

@@ -3,19 +3,21 @@ package com.sentinel.api.analytics.service.core;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
+import com.sentinel.common.analytics.AnalyticsBucket;
 import org.springframework.data.domain.Pageable;
 
 public interface AnalyticsScopeHandler {
 
-    AnalyticsScope scope();
+    com.sentinel.common.analytics.AnalyticsScope scope();
 
-    AnalyticsMetricsAggregate summary(
+    AnalyticsMetrics summary(
             UUID tenantId, UUID productId, UUID serviceId, UUID endpointId, Instant from, Instant to, AnalyticsBucket bucket);
 
-    List<AnalyticsMetricsAggregate> timeseries(
+    List<AnalyticsMetrics> timeseries(
             UUID tenantId, UUID productId, UUID serviceId, UUID endpointId, Instant from, Instant to, AnalyticsBucket bucket);
 
-    List<AnalyticsMetricsAggregate> rankings(
+    List<AnalyticsMetrics> rankings(
             UUID tenantId,
             UUID productId,
             UUID serviceId,

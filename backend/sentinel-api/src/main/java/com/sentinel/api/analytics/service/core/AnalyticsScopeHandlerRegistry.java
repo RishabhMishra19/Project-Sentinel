@@ -9,17 +9,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class AnalyticsScopeHandlerRegistry {
 
-    private final Map<AnalyticsScope, AnalyticsScopeHandler> handlers;
+    private final Map<com.sentinel.common.analytics.AnalyticsScope, AnalyticsScopeHandler> handlers;
 
     public AnalyticsScopeHandlerRegistry(List<AnalyticsScopeHandler> handlerList) {
-        Map<AnalyticsScope, AnalyticsScopeHandler> map = new EnumMap<>(AnalyticsScope.class);
+        Map<com.sentinel.common.analytics.AnalyticsScope, AnalyticsScopeHandler> map = new EnumMap<>(
+                com.sentinel.common.analytics.AnalyticsScope.class);
         for (AnalyticsScopeHandler handler : handlerList) {
             map.put(handler.scope(), handler);
         }
         this.handlers = Map.copyOf(map);
     }
 
-    public AnalyticsScopeHandler get(AnalyticsScope scope) {
+    public AnalyticsScopeHandler get(com.sentinel.common.analytics.AnalyticsScope scope) {
         AnalyticsScopeHandler handler = handlers.get(scope);
         if (handler == null) {
             throw new BadRequestException("Unsupported analytics scope: " + scope);

@@ -1,12 +1,12 @@
 package com.sentinel.api.analytics.service.core;
 
-import java.time.Instant;
-import com.sentinel.common.analytics.tenant.entity.AnalyticsTenantStatsMinute;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,9 +17,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AnalyticsMetricsAggregate {
+@Builder
+public class AnalyticsMetrics {
 
-    public AnalyticsMetricsAggregate(UUID grainId, Instant bucketStart) {
+    public AnalyticsMetrics(UUID grainId, Instant bucketStart) {
         this.grainId = grainId;
         this.bucketStart = bucketStart;
         this.requestCount = 0;
@@ -40,9 +41,6 @@ public class AnalyticsMetricsAggregate {
 
     private Instant bucketStart;
     private UUID grainId;
-    private String name;
-    private String method;
-    private String pathTemplate;
     private long requestCount;
     private long errorCount;
     private long status2xx;
@@ -63,6 +61,33 @@ public class AnalyticsMetricsAggregate {
             return 0.0;
         }
         return (double) errorCount / (double) requestCount;
+    }
+
+    public void aggregate(List<AnalyticsMetrics> aggregateList) {
+        long latencyP50 = 0;
+        long latencyP95 = 0;
+        long latencyP99 = 0;
+        for (AnalyticsMetrics record : aggregateList) {
+            this.incrRequestCount(record.getRequestCount());
+            this.incrErrorCount(record.getErrorCount());
+            this.incrStatus2xx(record.getStatus2xx());
+            this.incrStatus3xx(record.getStatus3xx());
+            this.incrStatus4xx(record.getStatus4xx());
+            this.incrStatus5xx(record.getStatus5xx());
+            this.incrLatencySumMs(record.getLatencySumMs());
+            this.updateLatencyMinMs(record.getLatencyMinMs());
+            this.updateLatencyMaxMs(record.getLatencyMaxMs());
+            this.incrRequestBytesTotal(record.getRequestBytesTotal());
+            this.incrResponseBytesTotal(record.getResponseBytesTotal());
+            latencyP50 += record.getLatencyP50Ms() * record.getRequestCount();
+            latencyP95 += record.getLatencyP95Ms() * record.getRequestCount();
+            latencyP99 += record.getLatencyP99Ms() * record.getRequestCount();
+        }
+        if (this.getRequestCount() > 0) {
+            this.setLatencyP50Ms(latencyP50 / this.requestCount);
+            this.setLatencyP95Ms(latencyP95 / this.requestCount);
+            this.setLatencyP99Ms(latencyP99 / this.requestCount);
+        }
     }
 
     public void incrRequestCount(long count) {

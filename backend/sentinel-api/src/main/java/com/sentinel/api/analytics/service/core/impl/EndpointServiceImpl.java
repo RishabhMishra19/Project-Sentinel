@@ -1,6 +1,6 @@
 package com.sentinel.api.analytics.service.core.impl;
 
-import com.sentinel.api.analytics.service.core.AnalyticsScope;
+import com.sentinel.common.analytics.AnalyticsScope;
 import com.sentinel.api.analytics.service.core.EndpointService;
 import com.sentinel.api.product.entity.ProductStatus;
 import com.sentinel.api.product.repository.ProductRepository;
