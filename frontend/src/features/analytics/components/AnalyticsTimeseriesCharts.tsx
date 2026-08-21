@@ -21,10 +21,16 @@ export const AnalyticsTimeseriesCharts = ({ params }: { params: AnalyticsQueryPa
       errorMessage="Could not load timeseries."
       className="min-h-64"
     >
-      <div className="grid gap-4 lg:grid-cols-1">
-        <AnalyticsVolumeChart points={points} />
-        <AnalyticsErrorRateChart points={points} />
-        <AnalyticsLatencyChart points={points} />
+      <div className="flex 2-full">
+        <div className="flex-1">
+          <AnalyticsVolumeChart points={points} />
+        </div>
+        <div className="flex-1">
+          <AnalyticsErrorRateChart points={points} />
+        </div>
+        <div className="flex-1">
+          <AnalyticsLatencyChart points={points} />
+        </div>
       </div>
     </QueryGate>
   );

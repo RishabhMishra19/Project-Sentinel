@@ -8,32 +8,32 @@ import { useAnalyticsUrlState } from "../hooks/useAnalyticsUrlState";
 
 export const AnalyticsPage = () => {
   const {
-    scope,
+    // scope,
     scopeReady,
-    queryParams,
-    filterFields,
-    filtersConfig,
-    setTab,
+    // queryParams,
+    // filterFields,
+    // filtersConfig,
+    // setTab,
     openInLogs,
-    onEntityAggregatedClick,
+    // onEntityAggregatedClick,
   } = useAnalyticsUrlState();
 
   return (
     <PageContent>
       <AnalyticsToolbar
-        scope={scope}
+        // scope={scope}
         scopeReady={scopeReady}
-        filterFields={filterFields}
-        filtersConfig={filtersConfig}
-        onTabChange={setTab}
+        // filterFields={filterFields}
+        // filtersConfig={filtersConfig}
+        // onTabChange={setTab}
         onOpenInLogs={openInLogs}
       />
 
-      {!scopeReady || !queryParams ? (
+      {/* {!scopeReady || !queryParams ? (
         <AnalyticsEmptyState scope={scope} />
       ) : (
         <AnalyticsResults queryParams={queryParams} onRowClick={onEntityAggregatedClick} />
-      )}
+      )} */}
 
       <p className="text-xs text-muted-foreground">
         Need raw events?{" "}

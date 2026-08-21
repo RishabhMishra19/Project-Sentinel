@@ -23,87 +23,86 @@ import { useAppSelector } from "../../../redux/hooks";
 
 export const useAnalyticsUrlState = () => {
   const navigate = useNavigate();
-  const { params, scope, productId, serviceId, endpointId, from, to, bucket, patchParams } =
-    useAnalyticsSearchParams();
+  const { scope, entityId, from, to, bucket, mergeParams } = useAnalyticsSearchParams();
 
-  const catalog = useAnalyticsCatalog(scope, serviceId);
-  const ids = useMemo(
-    () => ({ productId, serviceId, endpointId }),
-    [productId, serviceId, endpointId],
-  );
+  // const catalog = useAnalyticsCatalog(scope, serviceId);
+  // const ids = useMemo(
+  //   () => ({ productId, serviceId, endpointId }),
+  //   [productId, serviceId, endpointId],
+  // );
 
-  useAnalyticsSelectionDefaults(scope, ids, catalog, patchParams);
+  // useAnalyticsSelectionDefaults(scope, ids, catalog, mergeParams);
 
-  const filters = useMemo(() => filtersFromSearchParams(params, scope), [params, scope]);
+  // const filters = useMemo(() => filtersFromSearchParams(params, scope), [params, scope]);
 
-  const filterFields: FilterField[] = useMemo(
-    () =>
-      buildAnalyticsFilterFields({
-        scope,
-        productOptions: catalog.productOptions,
-        serviceOptions: catalog.serviceOptions,
-        endpointOptions: catalog.endpointOptions,
-      }),
-    [scope, catalog.productOptions, catalog.serviceOptions, catalog.endpointOptions],
-  );
+  // const filterFields: FilterField[] = useMemo(
+  //   () =>
+  //     buildAnalyticsFilterFields({
+  //       scope,
+  //       productOptions: catalog.productOptions,
+  //       serviceOptions: catalog.serviceOptions,
+  //       endpointOptions: catalog.endpointOptions,
+  //     }),
+  //   [scope, catalog.productOptions, catalog.serviceOptions, catalog.endpointOptions],
+  // );
 
-  const onFiltersChange = useCallback(
-    (next: FiltersChange) => {
-      const mapped = mapAnalyticsFiltersToPatch(next, scope, ids);
-      const cascaded = withServiceProductCascade(mapped, scope, catalog.services);
-      patchParams({
-        productId: cascaded.productId,
-        serviceId: cascaded.serviceId,
-        endpointId: cascaded.endpointId,
-        from: cascaded.from,
-        to: cascaded.to,
-        bucket: cascaded.bucket,
-      });
-    },
-    [scope, ids, catalog.services, patchParams],
-  );
+  // const onFiltersChange = useCallback(
+  //   (next: FiltersChange) => {
+  //     const mapped = mapAnalyticsFiltersToPatch(next, scope, ids);
+  //     const cascaded = withServiceProductCascade(mapped, scope, catalog.services);
+  //     // patchParams({
+  //     //   productId: cascaded.productId,
+  //     //   serviceId: cascaded.serviceId,
+  //     //   endpointId: cascaded.endpointId,
+  //     //   from: cascaded.from,
+  //     //   to: cascaded.to,
+  //     //   bucket: cascaded.bucket,
+  //     // });
+  //   },
+  //   [scope, ids, catalog.services, patchParams],
+  // );
 
-  const filtersConfig: FiltersConfig = useMemo(
-    () => ({
-      filters,
-      onFiltersChange,
-    }),
-    [filters, onFiltersChange],
-  );
+  // const filtersConfig: FiltersConfig = useMemo(
+  //   () => ({
+  //     filters,
+  //     onFiltersChange,
+  //   }),
+  //   [filters, onFiltersChange],
+  // );
 
-  const queryParams = useMemo(
-    () => buildAnalyticsQueryParams(scope, ids, { from, to, bucket }),
-    [scope, ids, from, to, bucket],
-  );
+  // const queryParams = useMemo(
+  //   () => scope && buildAnalyticsQueryParams(scope as any, ids, { from, to, bucket }),
+  //   [scope, ids, from, to, bucket],
+  // );
 
-  const setTab = useCallback(
-    (nextScope: AnalyticsScope) => {
-      patchParams(tabChangePatch(nextScope, { from, to, bucket }));
-    },
-    [patchParams, from, to, bucket],
-  );
+  // const setTab = useCallback(
+  //   (nextScope: AnalyticsScope) => {
+  //     patchParams(tabChangePatch(nextScope, { from, to, bucket }));
+  //   },
+  //   [patchParams, from, to, bucket],
+  // );
 
-  const onEntityAggregatedClick = useCallback(
-    (item: AnalyticsEntityAggregatedResponse["items"][0]) => {
-      const patch = rankingClickPatch(scope, item, ids);
-      if (patch) patchParams(patch);
-    },
-    [scope, ids, patchParams],
-  );
+  // const onEntityAggregatedClick = useCallback(
+  //   (item: AnalyticsEntityAggregatedResponse["items"][0]) => {
+  //     const patch = rankingClickPatch(scope, item, ids);
+  //     if (patch) patchParams(patch);
+  //   },
+  //   [scope, ids, patchParams],
+  // );
 
   const openInLogs = useCallback(() => {
-    const q = buildLogsSearchParams(scope, { from, to }, ids);
-    navigate(`/${ROUTE_PATHS.logs}?${q.toString()}`);
-  }, [navigate, scope, from, to, ids]);
+    // const q = buildLogsSearchParams(scope, { from, to }, ids);
+    // navigate(`/${ROUTE_PATHS.logs}?${q.toString()}`);
+  }, [navigate, scope, from, to]);
 
   return {
-    scope,
-    scopeReady: queryParams != null,
-    queryParams,
-    filterFields,
-    filtersConfig,
-    setTab,
+    // scope,
+    scopeReady: true,
+    // queryParams,
+    // filterFields,
+    // filtersConfig,
+    // setTab,
     openInLogs,
-    onEntityAggregatedClick,
+    // onEntityAggregatedClick,
   };
 };

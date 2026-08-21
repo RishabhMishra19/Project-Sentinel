@@ -1,4 +1,4 @@
-package com.sentinel.api.analytics.service.core;
+        package com.sentinel.api.analytics.service.core;
 
 import java.util.UUID;
 

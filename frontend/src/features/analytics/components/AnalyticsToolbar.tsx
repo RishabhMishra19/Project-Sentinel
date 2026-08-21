@@ -5,6 +5,12 @@ import {
   type FiltersConfig,
 } from "../../../shared/ui/filters";
 import type { AnalyticsScope } from "../dto/request/analytics.request";
+import { useAnalyticsSearchParams } from "../hooks/useAnalyticsSearchParams";
+import { EndpointSelecField } from "./EndpointSelecField";
+import { ProductSelecField } from "./ProductSelecField";
+import { ScopeSelecField } from "./ScopeSelecField";
+import { ServiceSelecField } from "./ServiceSelecField";
+import { TenantSelecField } from "./TenantSelecField";
 
 const TABS: { id: AnalyticsScope; label: string }[] = [
   { id: "TENANT", label: "Tenant" },
@@ -14,42 +20,32 @@ const TABS: { id: AnalyticsScope; label: string }[] = [
 ];
 
 type AnalyticsToolbarProps = {
-  scope: AnalyticsScope;
+  // scope: AnalyticsScope;
   scopeReady: boolean;
-  filterFields: FilterField[];
-  filtersConfig: FiltersConfig;
-  onTabChange: (scope: AnalyticsScope) => void;
+  // filterFields: FilterField[];
+  // filtersConfig: FiltersConfig;
+  // onTabChange: (scope: AnalyticsScope) => void;
   onOpenInLogs: () => void;
 };
 
 export const AnalyticsToolbar = ({
-  scope,
+  // scope,
   scopeReady,
-  filterFields,
-  filtersConfig,
-  onTabChange,
+  // filterFields,
+  // filtersConfig,
   onOpenInLogs,
 }: AnalyticsToolbarProps) => {
+  const { scope } = useAnalyticsSearchParams();
   return (
     <>
       <div className="flex flex-wrap gap-2 border-b border-border pb-px">
-        {TABS.map((tab) => {
-          const active = scope === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => onTabChange(tab.id)}
-              className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
-                active
-                  ? "border-foreground text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+        <ScopeSelecField />
+        {["TENANT", "PRODUCT", "SERVICE", "ENDPOINT"].includes(scope as any) && (
+          <TenantSelecField />
+        )}
+        {["PRODUCT", "SERVICE", "ENDPOINT"].includes(scope as any) && <ProductSelecField />}
+        {["SERVICE", "ENDPOINT"].includes(scope as any) && <ServiceSelecField />}
+        {["ENDPOINT"].includes(scope as any) && <EndpointSelecField />}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -63,10 +59,10 @@ export const AnalyticsToolbar = ({
             Open in Logs
           </button>
           <div className="ml-auto">
-            <Filters fields={filterFields} filtersConfig={filtersConfig} />
+            {/* <Filters fields={filterFields} filtersConfig={filtersConfig} /> */}
           </div>
         </div>
-        <AppliedFilterChips fields={filterFields} filtersConfig={filtersConfig} />
+        {/* <AppliedFilterChips fields={filterFields} filtersConfig={filtersConfig} /> */}
       </div>
     </>
   );

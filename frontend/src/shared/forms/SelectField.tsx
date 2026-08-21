@@ -37,7 +37,7 @@ export const SelectField = ({
       disabled={disabled || isEmpty}
       {...selectProps}
     >
-      {resolvedPlaceholder ? <option value="">{resolvedPlaceholder}</option> : null}
+      {resolvedPlaceholder ? <option value={undefined}>{resolvedPlaceholder}</option> : null}
       {options.map((option) => (
         <option key={option.value} value={option.value}>
           {option.label}

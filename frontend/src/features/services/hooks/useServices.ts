@@ -5,7 +5,7 @@ import type { ListQueryRequest } from "../../../shared/dto/request/listQueryRequ
 import { ServicesApi } from "../api/ServicesApi";
 import type { CreateServiceRequest, UpdateServiceRequest } from "../dto/request/service.request";
 
-export const servicesQueryKey = (productId?: string) =>
+export const servicesQueryKey = (productId?: string | null) =>
   productId ? (["services", productId] as const) : (["services"] as const);
 
 export const useAllServicesQuery = (params: ListQueryRequest | null) => {
@@ -19,7 +19,7 @@ export const useAllServicesQuery = (params: ListQueryRequest | null) => {
 };
 
 export const useServicesQuery = (
-  productId: string | undefined,
+  productId: string | undefined | null,
   params: ListQueryRequest | null,
 ) => {
   return mapPageQuery(
@@ -31,7 +31,7 @@ export const useServicesQuery = (
   );
 };
 
-export const useServiceEndpointsQuery = (serviceId: string | undefined) => {
+export const useServiceEndpointsQuery = (serviceId: string | undefined | null) => {
   return mapListQuery(
     useQuery({
       queryKey: [...servicesQueryKey(), "endpoints", serviceId],
