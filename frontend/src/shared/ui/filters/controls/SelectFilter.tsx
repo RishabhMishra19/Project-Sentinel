@@ -26,5 +26,6 @@ export const SelectFilter = ({ value, options, onChange, disabled = false }: Sel
         </option>
       ))}
     </select>
+    {/* {JSON.stringify(options)} */}
   </TooltipWrapper>
 );

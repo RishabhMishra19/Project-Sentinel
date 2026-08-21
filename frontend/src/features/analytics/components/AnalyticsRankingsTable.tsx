@@ -19,7 +19,14 @@ export const AnalyticsRankingsTable = () => {
     useAnalyticsSearchParams();
   let params: AnalyticsEntityAggregatedRequestParams | null = null;
   if (from && to && scope) {
-    params = { from, to, scope: scope as any, tenantId, productId, serviceId };
+    params = {
+      from,
+      to,
+      scope: { TENANT: "PRODUCT", PRODUCT: "SERVICE", SERVICE: "ENDPOINT" }[scope] as any,
+      tenantId,
+      productId,
+      serviceId,
+    };
   }
   const entityAggregatedQuery = useAnalyticsEntityAggregatedQuery(params);
 
