@@ -41,7 +41,7 @@ public class AnalyticsController {
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
-    @PostMapping("/timeseries")
+    @GetMapping("/timeseries")
     public ResponseEntity<AnalyticsTimeSeriesResponse> getTimeSeries(@Valid @ModelAttribute AnalyticsTimeSeriesRequestParams params) {
         return ApiResponses.ok(analyticsFacade.getTimeSeries(params));
     }

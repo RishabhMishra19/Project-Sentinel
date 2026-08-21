@@ -6,6 +6,13 @@ export type AnalyticsRankingSort = "TRAFFIC" | "ERROR_RATE" | "P95";
 
 export type AnalyticsSummaryRequestParams = {
   scope: AnalyticsScope;
+  from: string;
+  to: string;
+  entityId: string;
+};
+
+export type AnalyticsTimeSeriesRequestParams = {
+  scope: AnalyticsScope;
   bucket: AnalyticsBucket;
   from: string;
   to: string;
@@ -14,7 +21,6 @@ export type AnalyticsSummaryRequestParams = {
 
 export type AnalyticsEntityAggregatedRequestParams = {
   scope: AnalyticsScope;
-  bucket: AnalyticsBucket;
   from: string;
   to: string;
   tenantId?: string;

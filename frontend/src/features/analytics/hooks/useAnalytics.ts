@@ -4,6 +4,7 @@ import type {
   AnalyticsEntityAggregatedRequestParams,
   AnalyticsQueryParams,
   AnalyticsSummaryRequestParams,
+  AnalyticsTimeSeriesRequestParams,
 } from "../dto/request/analytics.request";
 
 const analyticsQueryKey = ["analytics"];
@@ -16,7 +17,7 @@ export const useAnalyticsSummaryQuery = (params: AnalyticsSummaryRequestParams |
   });
 };
 
-export const useAnalyticsTimeseriesQuery = (params: AnalyticsQueryParams | null) => {
+export const useAnalyticsTimeseriesQuery = (params: AnalyticsTimeSeriesRequestParams | null) => {
   return useQuery({
     queryKey: [...analyticsQueryKey, "timeseries", params],
     queryFn: () => AnalyticsApi.timeseries(params!),

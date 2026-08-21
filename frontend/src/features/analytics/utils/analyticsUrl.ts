@@ -3,6 +3,7 @@ import type {
   AnalyticsQueryParams,
   AnalyticsScope,
   AnalyticsSummaryRequestParams,
+  AnalyticsTimeSeriesRequestParams,
 } from "../dto/request/analytics.request";
 import type { AnalyticsEntityAggregatedResponse } from "../dto/response/analytics.response";
 import type { AnalyticsFilterPatch } from "./analyticsFilters";
@@ -22,7 +23,7 @@ export const getSummaryRequestParams = (
   params: AnalyticsQueryParams,
   tenantId: string,
 ): AnalyticsSummaryRequestParams => {
-  const { scope, bucket, from, to, productId, serviceId, endpointId } = params;
+  const { scope, from, to, productId, serviceId, endpointId } = params;
   const entityId = {
     TENANT: tenantId,
     PRODUCT: productId!,
@@ -31,7 +32,26 @@ export const getSummaryRequestParams = (
   }[scope];
   return {
     scope,
+    from,
+    to,
+    entityId,
+  };
+};
+
+export const getTimeSeriesRequestParams = (
+  params: AnalyticsQueryParams,
+  tenantId: string,
+): AnalyticsTimeSeriesRequestParams => {
+  const { scope, bucket, from, to, productId, serviceId, endpointId } = params;
+  const entityId = {
+    TENANT: tenantId,
+    PRODUCT: productId!,
+    SERVICE: serviceId!,
+    ENDPOINT: endpointId!,
+  }[scope];
+  return {
     bucket,
+    scope,
     from,
     to,
     entityId,
@@ -78,7 +98,6 @@ export const buildAnalyticsRankingsParams = (
   if (queryParams === null) return null;
   return {
     scope: queryParams.scope,
-    bucket: queryParams.bucket,
     from: queryParams.from,
     to: queryParams.to,
     tenantId: tenantId,

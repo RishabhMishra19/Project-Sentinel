@@ -3,8 +3,8 @@ import { apiManager } from "../../../shared/api/ApiManager";
 import { analyticsParamsToListQuery } from "../../../shared/utils/queryUtils";
 import type {
   AnalyticsEntityAggregatedRequestParams,
-  AnalyticsQueryParams,
   AnalyticsSummaryRequestParams,
+  AnalyticsTimeSeriesRequestParams,
 } from "../dto/request/analytics.request";
 import type {
   AnalyticsEntityAggregatedResponse,
@@ -20,11 +20,12 @@ export class AnalyticsApi {
     });
   }
 
-  static timeseries(params: AnalyticsQueryParams): Promise<AnalyticsTimeseriesResponse> {
-    return apiManager.post<AnalyticsTimeseriesResponse>(
-      ANALYTICS_API_ROUTES.TIMESERIES,
-      analyticsParamsToListQuery(params),
-    );
+  static timeseries(
+    params: AnalyticsTimeSeriesRequestParams,
+  ): Promise<AnalyticsTimeseriesResponse> {
+    return apiManager.get<AnalyticsTimeseriesResponse>(ANALYTICS_API_ROUTES.TIMESERIES, {
+      params,
+    });
   }
 
   static entityAggregated(
