@@ -36,7 +36,7 @@ public record AnalyticsEntityAggregatedResponse(List<AnalyticsEntityAggregatedIt
                     aggMetrics.getStatsMetrics()
                             .getRequestCount() == 0 ? 0 : ((double) aggMetrics.getStatsMetrics()
                             .getErrorCount() / aggMetrics.getStatsMetrics()
-                            .getRequestCount()) * 100,
+                            .getRequestCount()),
                     aggMetrics.getStatsMetrics()
                             .getStatus2xx(),
                     aggMetrics.getStatsMetrics()

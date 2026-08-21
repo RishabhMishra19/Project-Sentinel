@@ -15,7 +15,7 @@ export const AnalyticsTimeseriesCharts = () => {
     params = { from, to, scope: scope as any, entityId, bucket: bucket as any };
   }
   const timeseriesQuery = useAnalyticsTimeseriesQuery(params);
-  const points = timeseriesQuery.data?.points ?? [];
+  const points = [...(timeseriesQuery.data?.points ?? [])].toReversed();
 
   return (
     <QueryGate

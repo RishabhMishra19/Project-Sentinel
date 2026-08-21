@@ -43,7 +43,7 @@ public record AnalyticsTimeSeriesResponse(AnalyticsBucket bucket, List<Point> po
                                 metrics.getStatsMetrics()
                                         .getRequestCount() == 0 ? 0 : ((double) metrics.getStatsMetrics()
                                         .getErrorCount() / metrics.getStatsMetrics()
-                                        .getRequestCount()) * 100,
+                                        .getRequestCount()),
                                 metrics.getStatsMetrics()
                                         .getStatus2xx(),
                                 metrics.getStatsMetrics()

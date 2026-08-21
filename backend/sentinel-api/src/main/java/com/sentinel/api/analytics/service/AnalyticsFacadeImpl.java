@@ -6,7 +6,6 @@ import com.sentinel.api.analytics.dto.request.AnalyticsTimeSeriesRequestParams;
 import com.sentinel.api.analytics.dto.response.AnalyticsEntityAggregatedResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsTimeSeriesResponse;
-import com.sentinel.api.analytics.dto.response.StatusBreakdownItem;
 import com.sentinel.api.analytics.service.core.AnalyticsScopeHandlerRegistry;
 import com.sentinel.api.analytics.service.core.EndpointService;
 import com.sentinel.api.analytics.utils.AnalyticsUtils;
@@ -111,8 +110,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
             }
         }
         AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
-        List<AnalyticsEntityAggregatedMetrics> aggregatedMetricsList = analyticsRepository.findAggregatedMetrics(
-                entityIds,
+        List<AnalyticsEntityAggregatedMetrics> aggregatedMetricsList = analyticsRepository.findAggregatedMetrics(entityIds,
                 params.from(),
                 params.to(),
                 params.scope(),
@@ -128,23 +126,6 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
                     ));
         }
         return response;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<StatusBreakdownItem> getStatusBreakdown(UUID tenantId, UUID endpointId, ListQueryRequest query) {
-//        Instant from = query != null ? query.getFrom() : null;
-//        Instant to = query != null ? query.getTo() : null;
-//        requireRange(from, to);
-//        endpointRepository
-//                .findById_ServiceIdAndId_EndpointId(tenantId, endpointId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found"));
-//        return queryService
-//                .statusBreakdown(endpointId, tenantId, from, to)
-//                .stream()
-//                .map(analyticsMapper::toStatusItem)
-//                .toList();
-        return null;
     }
 
     private AnalyticsQueryParams parseParams(ListQueryRequest query) {

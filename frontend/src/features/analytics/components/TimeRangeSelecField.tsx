@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DateRangeFilter, DateTimeRangeFilter } from "../../../shared/ui/filters/controls";
+import { DateTimeRangeFilter } from "../../../shared/ui/filters/controls";
 import { Popover } from "../../../shared/ui/primitives/Popover";
 import { useAnalyticsSearchParams } from "../hooks/useAnalyticsSearchParams";
 import { FilterSelectWrapper } from "./FilterSelectWrapper";

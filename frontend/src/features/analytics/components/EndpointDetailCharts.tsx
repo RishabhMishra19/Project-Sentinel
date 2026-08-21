@@ -1,4 +1,13 @@
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { QueryGate } from "../../../shared/ui";
 import type { StatusBreakdownItem } from "../dto/response/analytics.response";
 import { useAnalyticsSummaryQuery } from "../hooks/useAnalytics";
@@ -8,7 +17,13 @@ import { useAnalyticsSearchParams } from "../hooks/useAnalyticsSearchParams";
 
 const AXIS = { fontSize: 12, fill: "var(--color-muted-foreground, #737373)" };
 const GRID = "var(--color-border, #e5e5e5)";
-const BAR = "#0f766e";
+const BAR: { [key: string]: string } = {
+  ["2xx"]: "#0f766e",
+  ["3xx"]: "#e7f05e",
+  ["4xx"]: "#ac5c41",
+  ["5xx"]: "#b30000",
+};
+
 const CHART_MARGIN = { top: 8, right: 12, bottom: 4, left: 4 };
 
 const StatusChartContent = ({ items }: { items: StatusBreakdownItem[] }) => {
@@ -27,7 +42,11 @@ const StatusChartContent = ({ items }: { items: StatusBreakdownItem[] }) => {
           <XAxis dataKey="statusCode" tick={AXIS} />
           <YAxis tick={AXIS} allowDecimals={false} />
           <Tooltip />
-          <Bar dataKey="requestCount" name="Requests" fill={BAR} />
+          <Bar dataKey="requestCount" name="Requests">
+            {items.map((item) => (
+              <Cell fill={BAR[item.statusCode]} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </ChartShell>

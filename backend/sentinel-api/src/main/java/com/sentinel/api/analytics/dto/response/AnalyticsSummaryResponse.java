@@ -36,7 +36,7 @@ public record AnalyticsSummaryResponse(
                 scopeId,
                 statsMetrics.getRequestCount(),
                 statsMetrics.getErrorCount(),
-                statsMetrics.getRequestCount() == 0 ? 0 : ((double) statsMetrics.getErrorCount() / statsMetrics.getRequestCount()) * 100,
+                statsMetrics.getRequestCount() == 0 ? 0 : ((double) statsMetrics.getErrorCount() / statsMetrics.getRequestCount()),
                 statsMetrics.getStatus2xx(),
                 statsMetrics.getStatus3xx(),
                 statsMetrics.getStatus4xx(),
