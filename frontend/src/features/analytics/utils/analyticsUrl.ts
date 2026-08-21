@@ -2,6 +2,7 @@ import type {
   AnalyticsQueryParams,
   AnalyticsRankingsParams,
   AnalyticsScope,
+  GetAnalyticsSummaryRequestParams,
 } from "../dto/request/analytics.request";
 import type { AnalyticsRankingItem } from "../dto/response/analytics.response";
 import type { AnalyticsFilterPatch } from "./analyticsFilters";
@@ -16,6 +17,26 @@ export type AnalyticsSelectionIds = {
 };
 
 type ServiceRef = { id: string; productId: string };
+
+export const getSummaryRequestParams = (
+  params: AnalyticsQueryParams,
+  tenantId: string,
+): GetAnalyticsSummaryRequestParams => {
+  const { scope, bucket, from, to, productId, serviceId, endpointId } = params;
+  const entityId = {
+    TENANT: tenantId,
+    PRODUCT: productId!,
+    SERVICE: serviceId!,
+    ENDPOINT: endpointId!,
+  }[scope];
+  return {
+    scope,
+    bucket,
+    from,
+    to,
+    entityId,
+  };
+};
 
 export const parseScope = (raw: string | null): AnalyticsScope => {
   if (raw === "PRODUCT" || raw === "SERVICE" || raw === "ENDPOINT") {

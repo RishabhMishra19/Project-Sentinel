@@ -20,20 +20,20 @@ public class AnalyticsMapper {
         return new AnalyticsSummaryResponse(
                 bucket,
                 scopeId,
-                agg.requestCount(),
-                agg.errorCount(),
+                agg.getRequestCount(),
+                agg.getErrorCount(),
                 agg.errorRate(),
-                agg.status2xx(),
-                agg.status3xx(),
-                agg.status4xx(),
-                agg.status5xx(),
-                agg.latencyMinMs(),
-                agg.latencyMaxMs(),
-                agg.latencyP50Ms(),
-                agg.latencyP95Ms(),
-                agg.latencyP99Ms(),
-                agg.requestBytesTotal(),
-                agg.responseBytesTotal(),
+                agg.getStatus2xx(),
+                agg.getStatus3xx(),
+                agg.getStatus4xx(),
+                agg.getStatus5xx(),
+                agg.getLatencyMinMs(),
+                agg.getLatencyMaxMs(),
+                agg.getLatencyP50Ms(),
+                agg.getLatencyP95Ms(),
+                agg.getLatencyP99Ms(),
+                agg.getRequestBytesTotal(),
+                agg.getResponseBytesTotal(),
                 activeEndpointCount);
     }
 
@@ -42,34 +42,34 @@ public class AnalyticsMapper {
                 rows.stream()
                         .map(
                                 r -> new AnalyticsTimeseriesResponse.Point(
-                                        r.bucketStart(),
-                                        r.requestCount(),
-                                        r.errorCount(),
+                                        r.getBucketStart(),
+                                        r.getRequestCount(),
+                                        r.getErrorCount(),
                                         r.errorRate(),
-                                        r.status2xx(),
-                                        r.status3xx(),
-                                        r.status4xx(),
-                                        r.status5xx(),
-                                        r.latencyMinMs(),
-                                        r.latencyMaxMs(),
-                                        r.latencyP50Ms(),
-                                        r.latencyP95Ms(),
-                                        r.latencyP99Ms(),
-                                        r.requestBytesTotal(),
-                                        r.responseBytesTotal()))
+                                        r.getStatus2xx(),
+                                        r.getStatus3xx(),
+                                        r.getStatus4xx(),
+                                        r.getStatus5xx(),
+                                        r.getLatencyMinMs(),
+                                        r.getLatencyMaxMs(),
+                                        r.getLatencyP50Ms(),
+                                        r.getLatencyP95Ms(),
+                                        r.getLatencyP99Ms(),
+                                        r.getRequestBytesTotal(),
+                                        r.getResponseBytesTotal()))
                         .toList();
         return new AnalyticsTimeseriesResponse(bucket, points);
     }
 
     public AnalyticsRankingItem toRankingItem(AnalyticsMetricsAggregate agg) {
         return new AnalyticsRankingItem(
-                agg.grainId(),
-                agg.name(),
-                agg.method(),
-                agg.pathTemplate(),
-                agg.requestCount(),
+                agg.getGrainId(),
+                agg.getName(),
+                agg.getMethod(),
+                agg.getPathTemplate(),
+                agg.getRequestCount(),
                 agg.errorRate(),
-                agg.latencyP95Ms());
+                agg.getLatencyP95Ms());
     }
 
     public StatusBreakdownItem toStatusItem(AnalyticsStatsQueryService.StatusCount c) {

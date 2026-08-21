@@ -1,5 +1,10 @@
 package com.sentinel.api.analytics.service.core;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Component;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -8,10 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -128,22 +129,6 @@ public class AnalyticsStatsQueryService {
             case SERVICE -> countRankedEndpoints(parentId, tenantId, from, to, bucket);
             case ENDPOINT -> 0L;
         };
-    }
-
-    public long countActiveEndpoints(UUID tenantId, Instant from, Instant to) {
-        String sql =
-                """
-                SELECT COUNT(DISTINCT e.id)
-                FROM endpoints e
-                JOIN services s ON s.id = e.service_id
-                JOIN products p ON p.id = s.product_id
-                WHERE p.tenant_id = :tenantId
-                  AND e.last_seen_at >= :from
-                  AND e.last_seen_at < :to
-                """;
-        Map<String, Object> params = Map.of("tenantId", tenantId, "from", Timestamp.from(from), "to", Timestamp.from(to));
-        Long count = jdbc.queryForObject(sql, params, Long.class);
-        return count == null ? 0L : count;
     }
 
     public List<StatusCount> statusBreakdown(UUID endpointId, UUID tenantId, Instant from, Instant to) {
@@ -521,11 +506,11 @@ public class AnalyticsStatsQueryService {
         Instant bucketStart = bucketTs == null ? null : bucketTs.toInstant();
         Object grainObj = rs.getObject("grain_id");
         UUID grainId = grainObj == null ? null : (UUID) grainObj;
-        Integer min = (Integer) rs.getObject("latency_min_ms");
-        Integer max = (Integer) rs.getObject("latency_max_ms");
-        Integer p50 = (Integer) rs.getObject("latency_p50_ms");
-        Integer p95 = (Integer) rs.getObject("latency_p95_ms");
-        Integer p99 = (Integer) rs.getObject("latency_p99_ms");
+        Long min = (Long) rs.getObject("latency_min_ms");
+        Long max = (Long) rs.getObject("latency_max_ms");
+        Long p50 = (Long) rs.getObject("latency_p50_ms");
+        Long p95 = (Long) rs.getObject("latency_p95_ms");
+        Long p99 = (Long) rs.getObject("latency_p99_ms");
         return new AnalyticsMetricsAggregate(
                 bucketStart,
                 grainId,

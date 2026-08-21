@@ -5,6 +5,7 @@ import type { PageResponse } from "../../../shared/dto/response/PageResponse";
 import type {
   AnalyticsQueryParams,
   AnalyticsRankingsParams,
+  GetAnalyticsSummaryRequestParams,
 } from "../dto/request/analytics.request";
 import type {
   AnalyticsRankingItem,
@@ -15,11 +16,10 @@ import type {
 } from "../dto/response/analytics.response";
 
 export class AnalyticsApi {
-  static summary(params: AnalyticsQueryParams): Promise<AnalyticsSummaryResponse> {
-    return apiManager.post<AnalyticsSummaryResponse>(
-      ANALYTICS_API_ROUTES.SUMMARY,
-      analyticsParamsToListQuery(params),
-    );
+  static summary(params: GetAnalyticsSummaryRequestParams): Promise<AnalyticsSummaryResponse> {
+    return apiManager.get<AnalyticsSummaryResponse>(ANALYTICS_API_ROUTES.SUMMARY, {
+      params,
+    });
   }
 
   static timeseries(params: AnalyticsQueryParams): Promise<AnalyticsTimeseriesResponse> {

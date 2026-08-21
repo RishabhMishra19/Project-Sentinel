@@ -4,6 +4,14 @@ export type AnalyticsBucket = "MINUTE" | "HOUR" | "DAY";
 
 export type AnalyticsRankingSort = "TRAFFIC" | "ERROR_RATE" | "P95";
 
+export type GetAnalyticsSummaryRequestParams = {
+  scope: AnalyticsScope;
+  bucket: AnalyticsBucket;
+  from: string;
+  to: string;
+  entityId: string;
+};
+
 export type AnalyticsQueryParams = {
   scope: AnalyticsScope;
   productId?: string;

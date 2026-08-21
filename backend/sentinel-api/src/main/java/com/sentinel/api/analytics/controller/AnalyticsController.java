@@ -1,5 +1,6 @@
 package com.sentinel.api.analytics.controller;
 
+import com.sentinel.api.analytics.dto.request.GetAnalyticsSummaryRequestParams;
 import com.sentinel.api.analytics.dto.response.AnalyticsRankingItem;
 import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsTimeseriesResponse;
@@ -12,10 +13,14 @@ import com.sentinel.api.common.response.PageResponse;
 import com.sentinel.api.security.UserPrincipal;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,10 +35,10 @@ public class AnalyticsController {
     private final AnalyticsFacade analyticsFacade;
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
-    @PostMapping("/summary")
+    @GetMapping("/summary")
     public ResponseEntity<AnalyticsSummaryResponse> summary(
-            @AuthenticationPrincipal UserPrincipal principal, @RequestBody ListQueryRequest query) {
-        return ApiResponses.ok(analyticsFacade.summary(principal.getActiveTenantId(), query));
+            @AuthenticationPrincipal UserPrincipal principal, @Valid @ModelAttribute GetAnalyticsSummaryRequestParams params) {
+        return ApiResponses.ok(analyticsFacade.summary(principal.getActiveTenantId(), params));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")

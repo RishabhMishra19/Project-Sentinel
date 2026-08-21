@@ -9,4 +9,4 @@ public record AnalyticsRankingItem(
         String pathTemplate,
         long requestCount,
         double errorRate,
-        Integer latencyP95Ms) {}
+        Long latencyP95Ms) {}

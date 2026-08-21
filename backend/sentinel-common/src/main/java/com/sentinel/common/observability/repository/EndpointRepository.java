@@ -19,6 +19,10 @@ public interface EndpointRepository
 
     List<Endpoint> findById_ServiceId(UUID serviceId);
 
+    List<Endpoint> findById_ServiceIdIn(List<UUID> serviceIds);
+
+    long countById_ServiceIdIn(List<UUID> serviceIds);
+
     @Query("""
         SELECT *
         FROM endpoints

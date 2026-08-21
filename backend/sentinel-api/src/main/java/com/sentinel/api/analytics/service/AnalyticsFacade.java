@@ -1,5 +1,6 @@
 package com.sentinel.api.analytics.service;
 
+import com.sentinel.api.analytics.dto.request.GetAnalyticsSummaryRequestParams;
 import com.sentinel.api.analytics.dto.response.AnalyticsRankingItem;
 import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsTimeseriesResponse;
@@ -12,7 +13,7 @@ import java.util.UUID;
 
 public interface AnalyticsFacade {
 
-    AnalyticsSummaryResponse summary(UUID tenantId, ListQueryRequest query);
+    AnalyticsSummaryResponse summary(UUID tenantId, GetAnalyticsSummaryRequestParams params);
 
     AnalyticsTimeseriesResponse timeseries(UUID tenantId, ListQueryRequest query);
 

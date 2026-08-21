@@ -1,6 +1,11 @@
+import { useAppSelector } from "../../../redux/hooks";
 import { QueryGate } from "../../../shared/ui";
-import type { AnalyticsQueryParams } from "../dto/request/analytics.request";
+import type {
+  GetAnalyticsSummaryRequestParams,
+  AnalyticsQueryParams,
+} from "../dto/request/analytics.request";
 import { useAnalyticsSummaryQuery } from "../hooks/useAnalytics";
+import { getSummaryRequestParams } from "../utils/analyticsUrl";
 import { formatNumber, formatRate } from "../utils/timeRange";
 
 const Kpi = ({ label, value }: { label: string; value: string }) => {
@@ -13,7 +18,8 @@ const Kpi = ({ label, value }: { label: string; value: string }) => {
 };
 
 export const AnalyticsKpiStrip = ({ params }: { params: AnalyticsQueryParams }) => {
-  const summaryQuery = useAnalyticsSummaryQuery(params);
+  const tenantId = useAppSelector((state) => state.session.activeTenant?.id!);
+  const summaryQuery = useAnalyticsSummaryQuery(getSummaryRequestParams(params, tenantId));
   const summary = summaryQuery.data;
 
   return (

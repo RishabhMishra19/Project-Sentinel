@@ -4,11 +4,12 @@ import { AnalyticsApi } from "../api/AnalyticsApi";
 import type {
   AnalyticsQueryParams,
   AnalyticsRankingsParams,
+  GetAnalyticsSummaryRequestParams,
 } from "../dto/request/analytics.request";
 
 const analyticsQueryKey = ["analytics"];
 
-export const useAnalyticsSummaryQuery = (params: AnalyticsQueryParams | null) => {
+export const useAnalyticsSummaryQuery = (params: GetAnalyticsSummaryRequestParams | null) => {
   return useQuery({
     queryKey: [...analyticsQueryKey, "summary", params],
     queryFn: () => AnalyticsApi.summary(params!),

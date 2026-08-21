@@ -15,11 +15,11 @@ public record AnalyticsTimeseriesResponse(AnalyticsBucket bucket, List<Point> po
             long status3xx,
             long status4xx,
             long status5xx,
-            Integer latencyMinMs,
-            Integer latencyMaxMs,
-            Integer latencyP50Ms,
-            Integer latencyP95Ms,
-            Integer latencyP99Ms,
+            Long latencyMinMs,
+            Long latencyMaxMs,
+            Long latencyP50Ms,
+            Long latencyP95Ms,
+            Long latencyP99Ms,
             long requestBytesTotal,
             long responseBytesTotal) {}
 }
