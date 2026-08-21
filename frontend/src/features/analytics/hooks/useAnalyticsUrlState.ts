@@ -10,7 +10,6 @@ import {
 } from "../utils/analyticsFilters";
 import {
   buildAnalyticsQueryParams,
-  buildAnalyticsRankingsParams,
   buildLogsSearchParams,
   rankingClickPatch,
   tabChangePatch,
@@ -23,7 +22,6 @@ import { ROUTE_PATHS } from "../../../routes/constants";
 import { useAppSelector } from "../../../redux/hooks";
 
 export const useAnalyticsUrlState = () => {
-  const tenantId = useAppSelector((store) => store.session.activeTenant?.id!);
   const navigate = useNavigate();
   const { params, scope, productId, serviceId, endpointId, from, to, bucket, patchParams } =
     useAnalyticsSearchParams();
@@ -77,10 +75,6 @@ export const useAnalyticsUrlState = () => {
     () => buildAnalyticsQueryParams(scope, ids, { from, to, bucket }),
     [scope, ids, from, to, bucket],
   );
-  const rankingsParams = useMemo(
-    () => buildAnalyticsRankingsParams(queryParams, tenantId),
-    [queryParams, tenantId],
-  );
 
   const setTab = useCallback(
     (nextScope: AnalyticsScope) => {
@@ -106,7 +100,6 @@ export const useAnalyticsUrlState = () => {
     scope,
     scopeReady: queryParams != null,
     queryParams,
-    rankingsParams,
     filterFields,
     filtersConfig,
     setTab,

@@ -34,6 +34,6 @@ export type AnalyticsTimeseriesResponse = {
 };
 
 export type StatusBreakdownItem = {
-  statusCode: number;
+  statusCode: string;
   requestCount: number;
 };

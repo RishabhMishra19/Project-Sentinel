@@ -1,10 +1,13 @@
+import { useAppSelector } from "../../../redux/hooks";
 import { QueryGate } from "../../../shared/ui";
 import type {
   AnalyticsEntityAggregatedRequestParams,
+  AnalyticsQueryParams,
   AnalyticsScope,
 } from "../dto/request/analytics.request";
 import type { AnalyticsEntityAggregatedResponse } from "../dto/response/analytics.response";
 import { useAnalyticsEntityAggregatedQuery } from "../hooks/useAnalytics";
+import { getEntityAggregatedRequestParams } from "../utils/analyticsUrl";
 import { formatNumber, formatRate } from "../utils/timeRange";
 
 const TAB_LABEL: Record<AnalyticsScope, string> = {
@@ -25,10 +28,13 @@ export const AnalyticsRankingsTable = ({
   params,
   onRowClick,
 }: {
-  params: AnalyticsEntityAggregatedRequestParams;
+  params: AnalyticsQueryParams;
   onRowClick?: (item: AnalyticsEntityAggregatedResponse["items"][0]) => void;
 }) => {
-  const entityAggregatedQuery = useAnalyticsEntityAggregatedQuery(params);
+  const tenantId = useAppSelector((state) => state.session.activeTenant?.id!);
+  const entityAggregatedQuery = useAnalyticsEntityAggregatedQuery(
+    getEntityAggregatedRequestParams(params, tenantId),
+  );
 
   return (
     <div className="flex min-h-48 flex-col gap-3 rounded-xl border border-border bg-background">

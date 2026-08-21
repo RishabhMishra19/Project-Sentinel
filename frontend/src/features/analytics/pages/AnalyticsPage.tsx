@@ -11,7 +11,6 @@ export const AnalyticsPage = () => {
     scope,
     scopeReady,
     queryParams,
-    rankingsParams,
     filterFields,
     filtersConfig,
     setTab,
@@ -33,11 +32,7 @@ export const AnalyticsPage = () => {
       {!scopeReady || !queryParams ? (
         <AnalyticsEmptyState scope={scope} />
       ) : (
-        <AnalyticsResults
-          queryParams={queryParams}
-          rankingsParams={rankingsParams}
-          onRowClick={onEntityAggregatedClick}
-        />
+        <AnalyticsResults queryParams={queryParams} onRowClick={onEntityAggregatedClick} />
       )}
 
       <p className="text-xs text-muted-foreground">

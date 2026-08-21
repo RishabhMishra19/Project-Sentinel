@@ -58,6 +58,22 @@ export const getTimeSeriesRequestParams = (
   };
 };
 
+export const getEntityAggregatedRequestParams = (
+  params: AnalyticsQueryParams | null,
+  tenantId: string,
+): AnalyticsEntityAggregatedRequestParams | null => {
+  if (params === null) return null;
+  const { scope, from, to, productId, serviceId } = params;
+  return {
+    scope,
+    from,
+    to,
+    tenantId,
+    productId,
+    serviceId,
+  };
+};
+
 export const parseScope = (raw: string | null): AnalyticsScope => {
   if (raw === "PRODUCT" || raw === "SERVICE" || raw === "ENDPOINT") {
     return raw;
@@ -88,21 +104,6 @@ export const buildAnalyticsQueryParams = (
     from: range.from,
     to: range.to,
     bucket: range.bucket,
-  };
-};
-
-export const buildAnalyticsRankingsParams = (
-  queryParams: AnalyticsQueryParams | null,
-  tenantId: string,
-): AnalyticsEntityAggregatedRequestParams | null => {
-  if (queryParams === null) return null;
-  return {
-    scope: queryParams.scope,
-    from: queryParams.from,
-    to: queryParams.to,
-    tenantId: tenantId,
-    productId: queryParams.productId,
-    serviceId: queryParams.serviceId,
   };
 };
 

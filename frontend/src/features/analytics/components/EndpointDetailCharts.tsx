@@ -1,8 +1,11 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { QueryGate } from "../../../shared/ui";
-import type { ExceptionMetricItem, StatusBreakdownItem } from "../dto/response/analytics.response";
-import { useEndpointStatusBreakdownQuery } from "../hooks/useAnalytics";
+import type { StatusBreakdownItem } from "../dto/response/analytics.response";
+import { useAnalyticsSummaryQuery } from "../hooks/useAnalytics";
 import { ChartShell } from "./ChartShell";
+import type { AnalyticsQueryParams } from "../dto/request/analytics.request";
+import { getSummaryRequestParams } from "../utils/analyticsUrl";
+import { useAppSelector } from "../../../redux/hooks";
 
 const AXIS = { fontSize: 12, fill: "var(--color-muted-foreground, #737373)" };
 const GRID = "var(--color-border, #e5e5e5)";
@@ -32,16 +35,28 @@ const StatusChartContent = ({ items }: { items: StatusBreakdownItem[] }) => {
   );
 };
 
-export const EndpointStatusChart = ({
-  endpointId,
-  from,
-  to,
-}: {
-  endpointId: string;
-  from: string;
-  to: string;
-}) => {
-  const statusQuery = useEndpointStatusBreakdownQuery(endpointId, from, to);
+export const EndpointStatusChart = ({ params }: { params: AnalyticsQueryParams }) => {
+  const tenantId = useAppSelector((state) => state.session.activeTenant?.id!);
+  const statusQuery = useAnalyticsSummaryQuery(getSummaryRequestParams(params, tenantId));
+
+  const items: StatusBreakdownItem[] = [
+    {
+      requestCount: statusQuery.data?.status2xx ?? 0,
+      statusCode: "2xx",
+    },
+    {
+      requestCount: statusQuery.data?.status3xx ?? 0,
+      statusCode: "3xx",
+    },
+    {
+      requestCount: statusQuery.data?.status4xx ?? 0,
+      statusCode: "4xx",
+    },
+    {
+      requestCount: statusQuery.data?.status5xx ?? 0,
+      statusCode: "5xx",
+    },
+  ];
 
   return (
     <QueryGate
@@ -50,7 +65,7 @@ export const EndpointStatusChart = ({
       errorMessage="Could not load status breakdown."
       className="min-h-56 rounded-xl border border-border bg-background"
     >
-      <StatusChartContent items={statusQuery.data ?? []} />
+      <StatusChartContent items={items} />
     </QueryGate>
   );
 };
