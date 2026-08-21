@@ -2,12 +2,11 @@ package com.sentinel.api.analytics.service;
 
 import com.sentinel.api.analytics.dto.request.AnalyticsEntityAggregatedRequestParams;
 import com.sentinel.api.analytics.dto.request.AnalyticsSummaryRequestParams;
+import com.sentinel.api.analytics.dto.request.AnalyticsTimeSeriesRequestParams;
 import com.sentinel.api.analytics.dto.response.AnalyticsEntityAggregatedResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
-import com.sentinel.api.analytics.dto.response.AnalyticsTimeseriesResponse;
+import com.sentinel.api.analytics.dto.response.AnalyticsTimeSeriesResponse;
 import com.sentinel.api.analytics.dto.response.StatusBreakdownItem;
-import com.sentinel.api.analytics.service.core.AnalyticsMetrics;
-import com.sentinel.api.analytics.service.core.AnalyticsScopeHandler;
 import com.sentinel.api.analytics.service.core.AnalyticsScopeHandlerRegistry;
 import com.sentinel.api.analytics.service.core.EndpointService;
 import com.sentinel.api.analytics.utils.AnalyticsUtils;
@@ -25,6 +24,7 @@ import com.sentinel.common.analytics.AnalyticsEntityAggregatedMetrics;
 import com.sentinel.common.analytics.AnalyticsRepository;
 import com.sentinel.common.analytics.AnalyticsScope;
 import com.sentinel.common.analytics.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.AnalyticsTimeSeriesMetrics;
 import com.sentinel.common.observability.repository.EndpointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -53,7 +53,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public AnalyticsSummaryResponse summary(AnalyticsSummaryRequestParams params) {
+    public AnalyticsSummaryResponse getSummary(AnalyticsSummaryRequestParams params) {
         AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
         AnalyticsStatsMetrics metrics = analyticsRepository.findStats(
                 params.entityId(),
@@ -68,26 +68,21 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public AnalyticsTimeseriesResponse timeseries(UUID tenantId, ListQueryRequest query) {
-        AnalyticsQueryParams params = parseParams(query);
-        requireRange(params.from(), params.to());
-        AnalyticsScopeHandler handler = handlerRegistry.get(params.scope());
-        List<AnalyticsMetrics> rows = handler.timeseries(
-                tenantId,
-                params.productId(),
-                params.serviceId(),
-                params.endpointId(),
+    public AnalyticsTimeSeriesResponse getTimeSeries(AnalyticsTimeSeriesRequestParams params) {
+        List<AnalyticsTimeSeriesMetrics> metricsList = analyticsRepository.findTimeSeriesMetrics(
+                params.entityId(),
                 params.from(),
                 params.to(),
+                params.scope(),
                 params.bucket()
         );
-//        return analyticsMapper.toTimeseries(rows, params.bucket());
-        return null;
+        long activeEndpoints = endpointService.countEndPoints(params.entityId(), params.scope());
+        return AnalyticsTimeSeriesResponse.from(params.bucket(), metricsList, activeEndpoints);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public AnalyticsEntityAggregatedResponse entityAggregated(AnalyticsEntityAggregatedRequestParams params) {
+    public AnalyticsEntityAggregatedResponse getEntityAggregated(AnalyticsEntityAggregatedRequestParams params) {
         List<UUID> entityIds = null;
         switch (params.scope()) {
             case TENANT -> {
@@ -137,7 +132,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<StatusBreakdownItem> statusBreakdown(UUID tenantId, UUID endpointId, ListQueryRequest query) {
+    public List<StatusBreakdownItem> getStatusBreakdown(UUID tenantId, UUID endpointId, ListQueryRequest query) {
 //        Instant from = query != null ? query.getFrom() : null;
 //        Instant to = query != null ? query.getTo() : null;
 //        requireRange(from, to);

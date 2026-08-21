@@ -2,9 +2,10 @@ package com.sentinel.api.analytics.controller;
 
 import com.sentinel.api.analytics.dto.request.AnalyticsEntityAggregatedRequestParams;
 import com.sentinel.api.analytics.dto.request.AnalyticsSummaryRequestParams;
+import com.sentinel.api.analytics.dto.request.AnalyticsTimeSeriesRequestParams;
 import com.sentinel.api.analytics.dto.response.AnalyticsEntityAggregatedResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
-import com.sentinel.api.analytics.dto.response.AnalyticsTimeseriesResponse;
+import com.sentinel.api.analytics.dto.response.AnalyticsTimeSeriesResponse;
 import com.sentinel.api.analytics.dto.response.StatusBreakdownItem;
 import com.sentinel.api.analytics.service.AnalyticsFacade;
 import com.sentinel.api.common.query.ListQueryRequest;
@@ -35,26 +36,26 @@ public class AnalyticsController {
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping("/summary")
-    public ResponseEntity<AnalyticsSummaryResponse> summary(@Valid @ModelAttribute AnalyticsSummaryRequestParams params) {
-        return ApiResponses.ok(analyticsFacade.summary(params));
+    public ResponseEntity<AnalyticsSummaryResponse> getSummary(@Valid @ModelAttribute AnalyticsSummaryRequestParams params) {
+        return ApiResponses.ok(analyticsFacade.getSummary(params));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @PostMapping("/timeseries")
-    public ResponseEntity<AnalyticsTimeseriesResponse> timeseries(@AuthenticationPrincipal UserPrincipal principal, @RequestBody ListQueryRequest query) {
-        return ApiResponses.ok(analyticsFacade.timeseries(principal.getActiveTenantId(), query));
+    public ResponseEntity<AnalyticsTimeSeriesResponse> getTimeSeries(@Valid @ModelAttribute AnalyticsTimeSeriesRequestParams params) {
+        return ApiResponses.ok(analyticsFacade.getTimeSeries(params));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping("/entityAggregated")
-    public ResponseEntity<AnalyticsEntityAggregatedResponse> rankings(@Valid @ModelAttribute AnalyticsEntityAggregatedRequestParams params) {
-        return ApiResponses.ok(analyticsFacade.entityAggregated(params));
+    public ResponseEntity<AnalyticsEntityAggregatedResponse> getEntityAggregated(@Valid @ModelAttribute AnalyticsEntityAggregatedRequestParams params) {
+        return ApiResponses.ok(analyticsFacade.getEntityAggregated(params));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @PostMapping("/endpoints/{endpointId}/status-breakdown")
-    public ResponseEntity<List<StatusBreakdownItem>> statusBreakdown(@AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID endpointId, @RequestBody ListQueryRequest query) {
-        return ApiResponses.ok(analyticsFacade.statusBreakdown(principal.getActiveTenantId(), endpointId, query));
+    public ResponseEntity<List<StatusBreakdownItem>> getStatusBreakdown(@AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID endpointId, @RequestBody ListQueryRequest query) {
+        return ApiResponses.ok(analyticsFacade.getStatusBreakdown(principal.getActiveTenantId(), endpointId, query));
     }
 
 }

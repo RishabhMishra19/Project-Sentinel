@@ -57,4 +57,25 @@ public class AnalyticsRepository {
         return entityAggregatedMetricsList;
     }
 
+    public List<AnalyticsTimeSeriesMetrics> findTimeSeriesMetrics(
+            UUID entityId,
+            Instant from,
+            Instant to,
+            AnalyticsScope scope,
+            AnalyticsBucket bucket
+    ) {
+        String cql = AnalyticsUtils.getTimeSeriesStatsCql(scope, bucket);
+        List<AnalyticsTimeSeriesMetrics> entityTimeSeriesMetricsList = cqlTemplate.query(
+                cql,
+                AnalyticsUtils::entityTimeSeriesRowMapper,
+                entityId,
+                from,
+                to
+        );
+        for (AnalyticsTimeSeriesMetrics metrics : entityTimeSeriesMetricsList) {
+            AnalyticsUtils.updateMetricsLatencies(metrics.getStatsMetrics());
+        }
+        return entityTimeSeriesMetricsList;
+    }
+
 }

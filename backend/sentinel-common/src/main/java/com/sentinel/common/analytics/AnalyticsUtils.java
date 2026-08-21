@@ -2,6 +2,7 @@ package com.sentinel.common.analytics;
 
 import com.datastax.oss.driver.api.core.cql.Row;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public class AnalyticsUtils {
@@ -72,6 +73,21 @@ public class AnalyticsUtils {
         );
     }
 
+    public static String getTimeSeriesStatsCql(AnalyticsScope scope, AnalyticsBucket bucket) {
+        String tableName = AnalyticsUtils.getTableName(scope, bucket);
+        String idColumnName = AnalyticsUtils.getIdColumnName(scope);
+        return String.format(
+                """
+                            SELECT
+                               *
+                            FROM %s
+                            WHERE %s = ?
+                               AND bucket_start >= ?
+                               AND bucket_start < ?
+                        """, tableName, idColumnName
+        );
+    }
+
     public static void updateMetricsLatencies(AnalyticsStatsMetrics statsMetrics) {
         if (statsMetrics != null && statsMetrics.getRequestCount() > 0) {
             statsMetrics.setLatencyP50Ms((long) Math.ceil((double) statsMetrics.getLatencyP50Ms() / statsMetrics.getRequestCount()));
@@ -83,6 +99,13 @@ public class AnalyticsUtils {
     public static AnalyticsEntityAggregatedMetrics entityAggregatedMetricsRowMapper(Row row, int rowColumn) {
         return AnalyticsEntityAggregatedMetrics.builder()
                 .scopeId(getUUID(row, "entity_id"))
+                .statsMetrics(statsMetricsRowMapper(row, rowColumn))
+                .build();
+    }
+
+    public static AnalyticsTimeSeriesMetrics entityTimeSeriesRowMapper(Row row, int rowColumn) {
+        return AnalyticsTimeSeriesMetrics.builder()
+                .bucketStart(getInstant(row, "bucket_start"))
                 .statsMetrics(statsMetricsRowMapper(row, rowColumn))
                 .build();
     }
@@ -113,6 +136,10 @@ public class AnalyticsUtils {
 
     public static UUID getUUID(Row row, String column) {
         return row.get(column, UUID.class);
+    }
+
+    public static Instant getInstant(Row row, String column) {
+        return row.get(column, Instant.class);
     }
 
 }
