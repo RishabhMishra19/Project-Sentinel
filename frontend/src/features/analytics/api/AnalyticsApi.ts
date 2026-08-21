@@ -1,22 +1,20 @@
 import { ANALYTICS_API_ROUTES } from "../../../shared/api/api.routes";
 import { apiManager } from "../../../shared/api/ApiManager";
 import { analyticsParamsToListQuery } from "../../../shared/utils/queryUtils";
-import type { PageResponse } from "../../../shared/dto/response/PageResponse";
 import type {
+  AnalyticsEntityAggregatedRequestParams,
   AnalyticsQueryParams,
-  AnalyticsRankingsParams,
-  GetAnalyticsSummaryRequestParams,
+  AnalyticsSummaryRequestParams,
 } from "../dto/request/analytics.request";
 import type {
-  AnalyticsRankingItem,
+  AnalyticsEntityAggregatedResponse,
   AnalyticsSummaryResponse,
   AnalyticsTimeseriesResponse,
-  ExceptionMetricItem,
   StatusBreakdownItem,
 } from "../dto/response/analytics.response";
 
 export class AnalyticsApi {
-  static summary(params: GetAnalyticsSummaryRequestParams): Promise<AnalyticsSummaryResponse> {
+  static summary(params: AnalyticsSummaryRequestParams): Promise<AnalyticsSummaryResponse> {
     return apiManager.get<AnalyticsSummaryResponse>(ANALYTICS_API_ROUTES.SUMMARY, {
       params,
     });
@@ -29,10 +27,14 @@ export class AnalyticsApi {
     );
   }
 
-  static rankings(params: AnalyticsRankingsParams): Promise<PageResponse<AnalyticsRankingItem>> {
-    return apiManager.post<PageResponse<AnalyticsRankingItem>>(
-      ANALYTICS_API_ROUTES.RANKINGS,
-      analyticsParamsToListQuery(params),
+  static entityAggregated(
+    params: AnalyticsEntityAggregatedRequestParams,
+  ): Promise<AnalyticsEntityAggregatedResponse> {
+    return apiManager.get<AnalyticsEntityAggregatedResponse>(
+      ANALYTICS_API_ROUTES.ENTITY_AGGREGATED,
+      {
+        params,
+      },
     );
   }
 

@@ -1,8 +1,8 @@
 import type {
+  AnalyticsEntityAggregatedRequestParams,
   AnalyticsQueryParams,
-  AnalyticsRankingsParams,
 } from "../dto/request/analytics.request";
-import type { AnalyticsRankingItem } from "../dto/response/analytics.response";
+import type { AnalyticsEntityAggregatedResponse } from "../dto/response/analytics.response";
 import { AnalyticsKpiStrip } from "./AnalyticsKpiStrip";
 import { AnalyticsRankingsTable } from "./AnalyticsRankingsTable";
 import { AnalyticsTimeseriesCharts } from "./AnalyticsTimeseriesCharts";
@@ -10,14 +10,14 @@ import { EndpointStatusChart } from "./EndpointDetailCharts";
 
 type AnalyticsResultsProps = {
   queryParams: AnalyticsQueryParams;
-  rankingsParams: AnalyticsRankingsParams | null;
-  onRankingClick: (item: AnalyticsRankingItem) => void;
+  rankingsParams: AnalyticsEntityAggregatedRequestParams | null;
+  onRowClick: (item: AnalyticsEntityAggregatedResponse["items"][0]) => void;
 };
 
 export const AnalyticsResults = ({
   queryParams,
   rankingsParams,
-  onRankingClick,
+  onRowClick,
 }: AnalyticsResultsProps) => {
   const isEndpoint = queryParams.scope === "ENDPOINT";
   const endpointId = queryParams.endpointId;
@@ -36,7 +36,7 @@ export const AnalyticsResults = ({
           />
         </div>
       ) : rankingsParams ? (
-        <AnalyticsRankingsTable params={rankingsParams} onRowClick={onRankingClick} />
+        <AnalyticsRankingsTable params={rankingsParams} onRowClick={onRowClick} />
       ) : null}
     </div>
   );

@@ -1,52 +1,49 @@
 import { QueryGate } from "../../../shared/ui";
-import type { AnalyticsRankingsParams, AnalyticsScope } from "../dto/request/analytics.request";
-import type { AnalyticsRankingItem } from "../dto/response/analytics.response";
-import { useAnalyticsRankingsQuery } from "../hooks/useAnalytics";
+import type {
+  AnalyticsEntityAggregatedRequestParams,
+  AnalyticsScope,
+} from "../dto/request/analytics.request";
+import type { AnalyticsEntityAggregatedResponse } from "../dto/response/analytics.response";
+import { useAnalyticsEntityAggregatedQuery } from "../hooks/useAnalytics";
 import { formatNumber, formatRate } from "../utils/timeRange";
 
 const TAB_LABEL: Record<AnalyticsScope, string> = {
-  TENANT: "Products",
-  PRODUCT: "Services",
-  SERVICE: "Endpoints",
-  ENDPOINT: "—",
+  TENANT: "Tenants",
+  PRODUCT: "Products",
+  SERVICE: "Services",
+  ENDPOINT: "Endpoints",
 };
 
-const rowLabel = (item: AnalyticsRankingItem, scope: AnalyticsScope) => {
-  if (scope === "SERVICE") {
-    return `${item.method ?? ""} ${item.pathTemplate ?? ""}`.trim() || item.id;
-  }
-  return item.name ?? item.id;
+const rowLabel = (item: AnalyticsEntityAggregatedResponse["items"][0], scope: AnalyticsScope) => {
+  // if (scope === "SERVICE") {
+  //   return `${item.method ?? ""} ${item.pathTemplate ?? ""}`.trim() || item.id;
+  // }
+  return item.scopeId;
 };
 
 export const AnalyticsRankingsTable = ({
   params,
   onRowClick,
 }: {
-  params: AnalyticsRankingsParams;
-  onRowClick?: (item: AnalyticsRankingItem) => void;
+  params: AnalyticsEntityAggregatedRequestParams;
+  onRowClick?: (item: AnalyticsEntityAggregatedResponse["items"][0]) => void;
 }) => {
-  const rankingsQuery = useAnalyticsRankingsQuery(params);
-  const scope = params.scope;
-  const items = rankingsQuery.rows;
-
-  if (scope === "ENDPOINT") {
-    return null;
-  }
+  const entityAggregatedQuery = useAnalyticsEntityAggregatedQuery(params);
 
   return (
     <div className="flex min-h-48 flex-col gap-3 rounded-xl border border-border bg-background">
       <div className="shrink-0 border-b border-border px-4 py-3">
         <h3 className="text-sm font-medium text-foreground">
-          Ranked {TAB_LABEL[scope].toLowerCase()}
+          Ranked {TAB_LABEL[params.scope].toLowerCase()}
         </h3>
       </div>
       <QueryGate
-        isLoading={rankingsQuery.isLoading}
-        isError={rankingsQuery.isError}
+        isLoading={entityAggregatedQuery.isLoading}
+        isError={entityAggregatedQuery.isError}
         errorMessage="Could not load rankings."
         className="px-4 py-8"
       >
-        {items.length === 0 ? (
+        {(entityAggregatedQuery.data?.items ?? []).length === 0 ? (
           <p className="px-4 py-8 text-sm text-muted-foreground">No traffic in this range.</p>
         ) : (
           <div className="overflow-x-auto">
@@ -60,9 +57,9 @@ export const AnalyticsRankingsTable = ({
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => (
+                {(entityAggregatedQuery.data?.items ?? []).map((item) => (
                   <tr
-                    key={item.id}
+                    key={item.scopeId}
                     className={
                       onRowClick
                         ? "cursor-pointer border-b border-border/60 hover:bg-muted/40"
@@ -71,7 +68,7 @@ export const AnalyticsRankingsTable = ({
                     onClick={() => onRowClick?.(item)}
                   >
                     <td className="px-4 py-2.5 font-medium text-foreground">
-                      {rowLabel(item, scope)}
+                      {rowLabel(item, params.scope)}
                     </td>
                     <td className="px-4 py-2.5 tabular-nums">{formatNumber(item.requestCount)}</td>
                     <td className="px-4 py-2.5 tabular-nums">{formatRate(item.errorRate)}</td>

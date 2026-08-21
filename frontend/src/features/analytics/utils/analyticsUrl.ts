@@ -1,10 +1,10 @@
 import type {
+  AnalyticsEntityAggregatedRequestParams,
   AnalyticsQueryParams,
-  AnalyticsRankingsParams,
   AnalyticsScope,
-  GetAnalyticsSummaryRequestParams,
+  AnalyticsSummaryRequestParams,
 } from "../dto/request/analytics.request";
-import type { AnalyticsRankingItem } from "../dto/response/analytics.response";
+import type { AnalyticsEntityAggregatedResponse } from "../dto/response/analytics.response";
 import type { AnalyticsFilterPatch } from "./analyticsFilters";
 import { clampLogsRange, parseBucket, suggestedBucket } from "./timeRange";
 
@@ -21,7 +21,7 @@ type ServiceRef = { id: string; productId: string };
 export const getSummaryRequestParams = (
   params: AnalyticsQueryParams,
   tenantId: string,
-): GetAnalyticsSummaryRequestParams => {
+): AnalyticsSummaryRequestParams => {
   const { scope, bucket, from, to, productId, serviceId, endpointId } = params;
   const entityId = {
     TENANT: tenantId,
@@ -73,10 +73,19 @@ export const buildAnalyticsQueryParams = (
 
 export const buildAnalyticsRankingsParams = (
   queryParams: AnalyticsQueryParams | null,
-): AnalyticsRankingsParams | null =>
-  queryParams && queryParams.scope !== "ENDPOINT"
-    ? { ...queryParams, sortBy: "TRAFFIC", page: 0, size: 20 }
-    : null;
+  tenantId: string,
+): AnalyticsEntityAggregatedRequestParams | null => {
+  if (queryParams === null) return null;
+  return {
+    scope: queryParams.scope,
+    bucket: queryParams.bucket,
+    from: queryParams.from,
+    to: queryParams.to,
+    tenantId: tenantId,
+    productId: queryParams.productId,
+    serviceId: queryParams.serviceId,
+  };
+};
 
 /** Apply a partial patch onto search params, keeping from/to/bucket populated. */
 export const applyAnalyticsUrlPatch = (
@@ -127,13 +136,13 @@ export const tabChangePatch = (
 
 export const rankingClickPatch = (
   scope: AnalyticsScope,
-  item: AnalyticsRankingItem,
+  item: AnalyticsEntityAggregatedResponse["items"][0],
   ids: AnalyticsSelectionIds,
 ): AnalyticsUrlPatch | null => {
   if (scope === "TENANT") {
     return {
       tab: "product",
-      productId: item.id,
+      productId: item.scopeId,
       serviceId: null,
       endpointId: null,
     };
@@ -142,7 +151,7 @@ export const rankingClickPatch = (
     return {
       tab: "service",
       productId: ids.productId ?? null,
-      serviceId: item.id,
+      serviceId: item.scopeId,
       endpointId: null,
     };
   }
@@ -151,7 +160,7 @@ export const rankingClickPatch = (
       tab: "endpoint",
       productId: ids.productId ?? null,
       serviceId: ids.serviceId ?? null,
-      endpointId: item.id,
+      endpointId: item.scopeId,
     };
   }
   return null;

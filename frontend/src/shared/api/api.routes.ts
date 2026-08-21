@@ -63,7 +63,7 @@ export const ROLES_API_ROUTES = {
 export const ANALYTICS_API_ROUTES = {
   SUMMARY: "/analytics/summary",
   TIMESERIES: "/analytics/timeseries",
-  RANKINGS: "/analytics/rankings",
+  ENTITY_AGGREGATED: "/analytics/entityAggregated",
   STATUS_BREAKDOWN: (endpointId: string) => `/analytics/endpoints/${endpointId}/status-breakdown`,
 } as const;
 

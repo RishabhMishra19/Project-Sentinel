@@ -48,7 +48,7 @@ public class AnalyticsController {
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping("/entityAggregated")
     public ResponseEntity<AnalyticsEntityAggregatedResponse> rankings(@Valid @ModelAttribute AnalyticsEntityAggregatedRequestParams params) {
-        return ApiResponses.ok(analyticsFacade.rankings(params));
+        return ApiResponses.ok(analyticsFacade.entityAggregated(params));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")

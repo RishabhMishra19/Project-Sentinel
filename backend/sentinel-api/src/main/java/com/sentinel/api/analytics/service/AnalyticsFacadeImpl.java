@@ -87,29 +87,29 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public AnalyticsEntityAggregatedResponse rankings(AnalyticsEntityAggregatedRequestParams params) {
+    public AnalyticsEntityAggregatedResponse entityAggregated(AnalyticsEntityAggregatedRequestParams params) {
         List<UUID> entityIds = null;
         switch (params.scope()) {
             case TENANT -> {
-                entityIds = tenantRepository.findIdByStatus(TenantStatus.ACTIVE);
+                entityIds = tenantRepository.findIdsByStatus(TenantStatus.ACTIVE);
             }
             case PRODUCT -> {
                 if (params.tenantId() != null) {
-                    entityIds = productRepository.findIdByTenantIdAndStatus(params.tenantId(), ProductStatus.ACTIVE);
+                    entityIds = productRepository.findIdsByTenantIdAndStatus(params.tenantId(), ProductStatus.ACTIVE);
                 } else {
-                    entityIds = productRepository.findIdByStatus(ProductStatus.ACTIVE);
+                    entityIds = productRepository.findIdsByStatus(ProductStatus.ACTIVE);
                 }
             }
             case SERVICE -> {
                 if (params.productId() != null) {
-                    entityIds = serviceRepository.findIdByProductIdAndStatus(params.productId(), ServiceStatus.ACTIVE);
+                    entityIds = serviceRepository.findIdsByProductIdAndStatus(params.productId(), ServiceStatus.ACTIVE);
                 } else {
-                    entityIds = serviceRepository.findIdByStatus(ServiceStatus.ACTIVE);
+                    entityIds = serviceRepository.findIdsByStatus(ServiceStatus.ACTIVE);
                 }
             }
             case ENDPOINT -> {
                 if (params.serviceId() != null) {
-                    entityIds = endpointRepository.findIdByServiceId(params.productId());
+                    entityIds = endpointRepository.findIdsByServiceId(params.serviceId());
                 } else {
                     entityIds = endpointRepository.findAllIds();
                 }

@@ -13,6 +13,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TenantRepository
         extends JpaRepository<Tenant, UUID>, JpaSpecificationExecutor<Tenant> {
@@ -28,5 +30,6 @@ public interface TenantRepository
     @EntityGraph(attributePaths = {"createdBy", "updatedBy"})
     Optional<Tenant> findWithAuditById(UUID id);
 
-    List<UUID> findIdByStatus(TenantStatus status);
+    @Query("SELECT t.id FROM Tenant t WHERE t.status = :status")
+    List<UUID> findIdsByStatus(@Param("status") TenantStatus status);
 }

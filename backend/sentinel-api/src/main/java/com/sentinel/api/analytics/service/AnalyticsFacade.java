@@ -17,7 +17,7 @@ public interface AnalyticsFacade {
 
     AnalyticsTimeseriesResponse timeseries(UUID tenantId, ListQueryRequest query);
 
-    AnalyticsEntityAggregatedResponse rankings(AnalyticsEntityAggregatedRequestParams params);
+    AnalyticsEntityAggregatedResponse entityAggregated(AnalyticsEntityAggregatedRequestParams params);
 
     List<StatusBreakdownItem> statusBreakdown(UUID tenantId, UUID endpointId, ListQueryRequest query);
 

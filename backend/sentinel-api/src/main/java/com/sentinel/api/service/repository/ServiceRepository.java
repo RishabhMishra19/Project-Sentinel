@@ -47,8 +47,10 @@ public interface ServiceRepository extends JpaRepository<Service, UUID>, JpaSpec
             """)
     List<UUID> findAllServiceIdsByProductIdAndStatus(UUID productId, ServiceStatus status);
 
-    List<UUID> findIdByProductIdAndStatus(UUID productId, ServiceStatus status);
+    @Query("SELECT s.id FROM Service s WHERE s.status = :status and s.id = :productId")
+    List<UUID> findIdsByProductIdAndStatus(UUID productId, ServiceStatus status);
 
-    List<UUID> findIdByStatus(ServiceStatus serviceStatus);
+    @Query("SELECT s.id FROM Service s WHERE s.status = :status")
+    List<UUID> findIdsByStatus(@Param("status") ServiceStatus serviceStatus);
 
 }

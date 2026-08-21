@@ -38,27 +38,16 @@ export type AnalyticsTimeseriesPoint = {
   responseBytesTotal: number;
 };
 
+export type AnalyticsEntityAggregatedResponse = {
+  items: Omit<AnalyticsSummaryResponse, "bucket">[];
+};
+
 export type AnalyticsTimeseriesResponse = {
   bucket: AnalyticsBucket;
   points: AnalyticsTimeseriesPoint[];
 };
 
-export type AnalyticsRankingItem = {
-  id: string;
-  name: string | null;
-  method: string | null;
-  pathTemplate: string | null;
-  requestCount: number;
-  errorRate: number;
-  latencyP95Ms: number | null;
-};
-
 export type StatusBreakdownItem = {
   statusCode: number;
   requestCount: number;
-};
-
-export type ExceptionMetricItem = {
-  exceptionType: string;
-  exceptionCount: number;
 };

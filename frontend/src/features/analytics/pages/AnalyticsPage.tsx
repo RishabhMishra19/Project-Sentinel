@@ -16,7 +16,7 @@ export const AnalyticsPage = () => {
     filtersConfig,
     setTab,
     openInLogs,
-    onRankingClick,
+    onEntityAggregatedClick,
   } = useAnalyticsUrlState();
 
   return (
@@ -36,7 +36,7 @@ export const AnalyticsPage = () => {
         <AnalyticsResults
           queryParams={queryParams}
           rankingsParams={rankingsParams}
-          onRankingClick={onRankingClick}
+          onRowClick={onEntityAggregatedClick}
         />
       )}
 

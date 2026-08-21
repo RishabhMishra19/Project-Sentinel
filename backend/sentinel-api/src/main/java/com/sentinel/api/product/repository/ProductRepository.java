@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
 
@@ -39,8 +40,10 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
             """)
     List<UUID> findAllProductIdsByTenantIdAndStatus(UUID tenantId, ProductStatus status);
 
-    List<UUID> findIdByTenantIdAndStatus(UUID tenantId, ProductStatus status);
+    @Query("SELECT p.id FROM Product p WHERE p.status = :status and p.id = :tenantId")
+    List<UUID> findIdsByTenantIdAndStatus(UUID tenantId, ProductStatus status);
 
-    List<UUID> findIdByStatus(ProductStatus status);
+    @Query("SELECT p.id FROM Product p WHERE p.status = :status")
+    List<UUID> findIdsByStatus(@Param("status") ProductStatus status);
 
 }

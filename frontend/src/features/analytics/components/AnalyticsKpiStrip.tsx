@@ -1,7 +1,7 @@
 import { useAppSelector } from "../../../redux/hooks";
 import { QueryGate } from "../../../shared/ui";
 import type {
-  GetAnalyticsSummaryRequestParams,
+  AnalyticsSummaryRequestParams,
   AnalyticsQueryParams,
 } from "../dto/request/analytics.request";
 import { useAnalyticsSummaryQuery } from "../hooks/useAnalytics";

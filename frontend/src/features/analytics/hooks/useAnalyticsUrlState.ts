@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import type { FiltersChange, FiltersConfig, FilterField } from "../../../shared/ui/filters";
 import type { AnalyticsScope } from "../dto/request/analytics.request";
-import type { AnalyticsRankingItem } from "../dto/response/analytics.response";
+import type { AnalyticsEntityAggregatedResponse } from "../dto/response/analytics.response";
 import {
   buildAnalyticsFilterFields,
   filtersFromSearchParams,
@@ -20,8 +20,10 @@ import { useAnalyticsCatalog } from "./useAnalyticsCatalog";
 import { useAnalyticsSearchParams } from "./useAnalyticsSearchParams";
 import { useAnalyticsSelectionDefaults } from "./useAnalyticsSelectionDefaults";
 import { ROUTE_PATHS } from "../../../routes/constants";
+import { useAppSelector } from "../../../redux/hooks";
 
 export const useAnalyticsUrlState = () => {
+  const tenantId = useAppSelector((store) => store.session.activeTenant?.id!);
   const navigate = useNavigate();
   const { params, scope, productId, serviceId, endpointId, from, to, bucket, patchParams } =
     useAnalyticsSearchParams();
@@ -75,7 +77,10 @@ export const useAnalyticsUrlState = () => {
     () => buildAnalyticsQueryParams(scope, ids, { from, to, bucket }),
     [scope, ids, from, to, bucket],
   );
-  const rankingsParams = useMemo(() => buildAnalyticsRankingsParams(queryParams), [queryParams]);
+  const rankingsParams = useMemo(
+    () => buildAnalyticsRankingsParams(queryParams, tenantId),
+    [queryParams, tenantId],
+  );
 
   const setTab = useCallback(
     (nextScope: AnalyticsScope) => {
@@ -84,8 +89,8 @@ export const useAnalyticsUrlState = () => {
     [patchParams, from, to, bucket],
   );
 
-  const onRankingClick = useCallback(
-    (item: AnalyticsRankingItem) => {
+  const onEntityAggregatedClick = useCallback(
+    (item: AnalyticsEntityAggregatedResponse["items"][0]) => {
       const patch = rankingClickPatch(scope, item, ids);
       if (patch) patchParams(patch);
     },
@@ -106,6 +111,6 @@ export const useAnalyticsUrlState = () => {
     filtersConfig,
     setTab,
     openInLogs,
-    onRankingClick,
+    onEntityAggregatedClick,
   };
 };

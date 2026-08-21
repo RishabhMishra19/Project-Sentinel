@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface EndpointRepository
         extends CassandraRepository<
@@ -33,7 +34,8 @@ public interface EndpointRepository
             UUID serviceId,
             List<UUID> endpointIds);
 
-    List<UUID> findIdByServiceId(UUID serviceId);
+    @Query("SELECT e.id FROM endpoints e where e.service_id = :serviceId")
+    List<UUID> findIdsByServiceId(@Param("serviceId") UUID serviceId);
 
     @Query("SELECT id FROM endpoints")
     List<UUID> findAllIds();
