@@ -5,7 +5,7 @@ import com.sentinel.common.analytics.AnalyticsStatsMetrics;
 
 import java.util.UUID;
 
-public record AnalyticsSummaryQueryResponse(
+public record AnalyticsSummaryResponse(
         AnalyticsBucket bucket,
         UUID scopeId,
         long requestCount,
@@ -25,7 +25,7 @@ public record AnalyticsSummaryQueryResponse(
         Long activeEndpointCount
 ) {
 
-    public AnalyticsSummaryQueryResponse(
+    public AnalyticsSummaryResponse(
             AnalyticsBucket bucket,
             UUID scopeId,
             AnalyticsStatsMetrics statsMetrics,

@@ -47,4 +47,8 @@ public interface ServiceRepository extends JpaRepository<Service, UUID>, JpaSpec
             """)
     List<UUID> findAllServiceIdsByProductIdAndStatus(UUID productId, ServiceStatus status);
 
+    List<UUID> findIdByProductIdAndStatus(UUID productId, ServiceStatus status);
+
+    List<UUID> findIdByStatus(ServiceStatus serviceStatus);
+
 }

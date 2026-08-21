@@ -1,8 +1,12 @@
 package com.sentinel.api.tenant.repository;
 
 import com.sentinel.api.tenant.entity.Tenant;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.sentinel.api.tenant.entity.TenantStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,4 +27,6 @@ public interface TenantRepository
 
     @EntityGraph(attributePaths = {"createdBy", "updatedBy"})
     Optional<Tenant> findWithAuditById(UUID id);
+
+    List<UUID> findIdByStatus(TenantStatus status);
 }

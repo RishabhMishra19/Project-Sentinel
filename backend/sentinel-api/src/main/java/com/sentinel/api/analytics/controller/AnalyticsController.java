@@ -1,8 +1,9 @@
 package com.sentinel.api.analytics.controller;
 
-import com.sentinel.api.analytics.dto.request.AnalyticsQueryRequestParams;
-import com.sentinel.api.analytics.dto.response.AnalyticsRankingQueryResponse;
-import com.sentinel.api.analytics.dto.response.AnalyticsSummaryQueryResponse;
+import com.sentinel.api.analytics.dto.request.AnalyticsEntityAggregatedRequestParams;
+import com.sentinel.api.analytics.dto.request.AnalyticsSummaryRequestParams;
+import com.sentinel.api.analytics.dto.response.AnalyticsEntityAggregatedResponse;
+import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsTimeseriesResponse;
 import com.sentinel.api.analytics.dto.response.StatusBreakdownItem;
 import com.sentinel.api.analytics.service.AnalyticsFacade;
@@ -34,7 +35,7 @@ public class AnalyticsController {
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping("/summary")
-    public ResponseEntity<AnalyticsSummaryQueryResponse> summary(@Valid @ModelAttribute AnalyticsQueryRequestParams params) {
+    public ResponseEntity<AnalyticsSummaryResponse> summary(@Valid @ModelAttribute AnalyticsSummaryRequestParams params) {
         return ApiResponses.ok(analyticsFacade.summary(params));
     }
 
@@ -45,8 +46,8 @@ public class AnalyticsController {
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
-    @GetMapping("/rankings")
-    public ResponseEntity<AnalyticsRankingQueryResponse> rankings(@Valid @ModelAttribute AnalyticsQueryRequestParams params) {
+    @GetMapping("/entityAggregated")
+    public ResponseEntity<AnalyticsEntityAggregatedResponse> rankings(@Valid @ModelAttribute AnalyticsEntityAggregatedRequestParams params) {
         return ApiResponses.ok(analyticsFacade.rankings(params));
     }
 

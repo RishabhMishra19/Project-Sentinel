@@ -39,4 +39,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
             """)
     List<UUID> findAllProductIdsByTenantIdAndStatus(UUID tenantId, ProductStatus status);
 
+    List<UUID> findIdByTenantIdAndStatus(UUID tenantId, ProductStatus status);
+
+    List<UUID> findIdByStatus(ProductStatus status);
+
 }

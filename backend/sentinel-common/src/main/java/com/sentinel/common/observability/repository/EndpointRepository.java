@@ -32,4 +32,10 @@ public interface EndpointRepository
     List<Endpoint> findByServiceIdAndEndpointIdIn(
             UUID serviceId,
             List<UUID> endpointIds);
+
+    List<UUID> findIdByServiceId(UUID serviceId);
+
+    @Query("SELECT id FROM endpoints")
+    List<UUID> findAllIds();
+
 }

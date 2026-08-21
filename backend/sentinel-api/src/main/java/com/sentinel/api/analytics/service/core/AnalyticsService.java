@@ -1,7 +1,5 @@
 package com.sentinel.api.analytics.service.core;
 
-import com.sentinel.api.analytics.dto.response.AnalyticsRankingQueryResponse;
-
 import java.time.Instant;
 import java.util.UUID;
 
