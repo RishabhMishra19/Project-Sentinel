@@ -1,7 +1,7 @@
 package com.sentinel.api.analytics.dto.request;
 
-import com.sentinel.common.analytics.AnalyticsBucket;
-import com.sentinel.common.analytics.AnalyticsScope;
+import com.sentinel.common.analytics.utils.AnalyticsBucket;
+import com.sentinel.common.analytics.utils.AnalyticsScope;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;

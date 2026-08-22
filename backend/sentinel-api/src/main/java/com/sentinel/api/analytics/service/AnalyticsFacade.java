@@ -7,12 +7,14 @@ import com.sentinel.api.analytics.dto.response.AnalyticsEntityAggregatedResponse
 import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsTimeSeriesResponse;
 
+import java.util.UUID;
+
 public interface AnalyticsFacade {
 
     AnalyticsSummaryResponse getSummary(AnalyticsSummaryRequestParams params);
 
     AnalyticsTimeSeriesResponse getTimeSeries(AnalyticsTimeSeriesRequestParams params);
 
-    AnalyticsEntityAggregatedResponse getEntityAggregated(AnalyticsEntityAggregatedRequestParams params);
+    AnalyticsEntityAggregatedResponse getEntityAggregated(UUID activeTenantId, AnalyticsEntityAggregatedRequestParams params);
 
 }

@@ -1,6 +1,6 @@
 package com.sentinel.processor.kafka.listener.service;
 
-import com.sentinel.common.analytics.service.entity.AnalyticsServiceStatsHour;
+import com.sentinel.common.analytics.entity.service.AnalyticsServiceStatsHour;
 import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;
 import lombok.RequiredArgsConstructor;

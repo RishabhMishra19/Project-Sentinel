@@ -1,7 +1,7 @@
 package com.sentinel.api.analytics.dto.response;
 
-import com.sentinel.common.analytics.AnalyticsBucket;
-import com.sentinel.common.analytics.AnalyticsTimeSeriesMetrics;
+import com.sentinel.common.analytics.utils.AnalyticsBucket;
+import com.sentinel.common.analytics.dto.AnalyticsTimeSeriesMetrics;
 
 import java.time.Instant;
 import java.util.List;

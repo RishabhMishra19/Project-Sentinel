@@ -1,6 +1,6 @@
 package com.sentinel.api.analytics.dto.response;
 
-import com.sentinel.common.analytics.AnalyticsEntityAggregatedMetrics;
+import com.sentinel.common.analytics.dto.AnalyticsEntityAggregatedMetrics;
 
 import java.util.List;
 import java.util.UUID;

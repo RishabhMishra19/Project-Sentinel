@@ -1,6 +1,6 @@
 package com.sentinel.processor.kafka.listener.endpoint;
 
-import com.sentinel.common.analytics.endpoint.entity.AnalyticsEndpointStatsDay;
+import com.sentinel.common.analytics.entity.endpoint.AnalyticsEndpointStatsDay;
 import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;
 import lombok.RequiredArgsConstructor;

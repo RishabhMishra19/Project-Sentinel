@@ -1,7 +1,7 @@
 package com.sentinel.api.analytics.dto.response;
 
-import com.sentinel.common.analytics.AnalyticsBucket;
-import com.sentinel.common.analytics.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.utils.AnalyticsBucket;
+import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
 
 import java.util.UUID;
 

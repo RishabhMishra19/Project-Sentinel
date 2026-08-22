@@ -37,7 +37,10 @@ public interface ServiceRepository extends JpaRepository<Service, UUID>, JpaSpec
                 WHERE s.product.id IN :productIds
                   AND s.status = :status
             """)
-    List<UUID> findAllServiceIdsByProductIdsAndStatus(@Param("productIds") List<UUID> productIds, @Param("status") ServiceStatus status);
+    List<UUID> findAllServiceIdsByProductIdsAndStatus(
+            @Param("productIds") List<UUID> productIds,
+            @Param("status") ServiceStatus status
+    );
 
     @Query("""
                 SELECT s.id
@@ -47,8 +50,30 @@ public interface ServiceRepository extends JpaRepository<Service, UUID>, JpaSpec
             """)
     List<UUID> findAllServiceIdsByProductIdAndStatus(UUID productId, ServiceStatus status);
 
-    @Query("SELECT s.id FROM Service s WHERE s.status = :status and s.id = :productId")
-    List<UUID> findIdsByProductIdAndStatus(UUID productId, ServiceStatus status);
+    @Query("SELECT s.id FROM Service s WHERE s.status = :status and s.id in :productIds")
+    List<UUID> findIdsByProductIdsAndStatus(
+            @Param("productIds") List<UUID> productIds,
+            @Param("status") ServiceStatus status
+    );
+
+    @Query("""
+                SELECT s.id
+                FROM Service s
+                LEFT JOIN Product p on s.product.id = p.id
+                Left JOIN Tenant t on p.tenant.id = t.id
+                WHERE t.id = :tenantId
+                  AND s.status = :status
+            """)
+    List<UUID> findIdsByTenantIdAndStatus(@Param("tenantId") UUID tenantId, @Param("status") ServiceStatus status);
+
+    @Query("""
+                SELECT s.id
+                FROM Service s
+                LEFT JOIN Product p on s.product.id = p.id
+                WHERE p.id = :productId
+                  AND s.status = :status
+            """)
+    List<UUID> findIdsByProductIdAndStatus(@Param("productId") UUID productId, @Param("status") ServiceStatus status);
 
     @Query("SELECT s.id FROM Service s WHERE s.status = :status")
     List<UUID> findIdsByStatus(@Param("status") ServiceStatus serviceStatus);

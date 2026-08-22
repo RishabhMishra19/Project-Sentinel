@@ -1,6 +1,6 @@
 package com.sentinel.common.kafka;
 
-import com.sentinel.common.analytics.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
