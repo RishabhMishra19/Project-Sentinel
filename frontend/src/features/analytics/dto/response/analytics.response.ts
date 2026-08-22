@@ -1,8 +1,8 @@
-import type { AnalyticsBucket } from "../request/analytics.request";
+import { AnalyticsBucket, AnalyticsScope } from "../../utils/analytics.constants";
 
-export type AnalyticsSummaryResponse = {
-  bucket: AnalyticsBucket;
-  scopeId: string;
+export type AnalyticsStatsMetrics = {
+  entityId: string;
+  bucketStart: Date;
   requestCount: number;
   errorCount: number;
   errorRate: number;
@@ -10,30 +10,35 @@ export type AnalyticsSummaryResponse = {
   status3xx: number;
   status4xx: number;
   status5xx: number;
-  latencyMinMs: number | null;
-  latencyMaxMs: number | null;
-  latencyP50Ms: number | null;
-  latencyP95Ms: number | null;
-  latencyP99Ms: number | null;
+  latencyMinMs: number;
+  latencyMaxMs: number;
+  latencyP50Ms: number;
+  latencyP95Ms: number;
+  latencyP99Ms: number;
   requestBytesTotal: number;
   responseBytesTotal: number;
-  activeEndpointCount: number | null;
 };
 
-export type AnalyticsTimeseriesPoint = Omit<AnalyticsSummaryResponse, "bucket" | "scopeId"> & {
-  bucketStart: Date;
+export type AnalyticsSummaryResponse = {
+  bucket: keyof typeof AnalyticsBucket;
+  scope: keyof typeof AnalyticsScope;
+  entityId: string;
+  totalStats: AnalyticsStatsMetrics;
+  endpointCount: number;
+};
+
+export type AnalyticsTimeSeriesResponse = {
+  bucket: keyof typeof AnalyticsBucket;
+  scope: keyof typeof AnalyticsScope;
+  entityId: string;
+  timeSeriesStats: AnalyticsStatsMetrics[];
+  endpointCount: number;
 };
 
 export type AnalyticsEntityAggregatedResponse = {
-  items: (Omit<AnalyticsSummaryResponse, "bucket" | "scopeId"> & { id: string })[];
-};
-
-export type AnalyticsTimeseriesResponse = {
-  bucket: AnalyticsBucket;
-  points: AnalyticsTimeseriesPoint[];
-};
-
-export type StatusBreakdownItem = {
-  statusCode: string;
-  requestCount: number;
+  bucket: keyof typeof AnalyticsBucket;
+  scope: keyof typeof AnalyticsScope;
+  entityIds: string[];
+  entityAggregatedStats: AnalyticsStatsMetrics[];
+  endpointCountMap: Record<string, number>;
 };

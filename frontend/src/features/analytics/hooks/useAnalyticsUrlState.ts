@@ -1,108 +1,185 @@
-import { useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import type { FiltersChange, FiltersConfig, FilterField } from "../../../shared/ui/filters";
-import type { AnalyticsScope } from "../dto/request/analytics.request";
-import type { AnalyticsEntityAggregatedResponse } from "../dto/response/analytics.response";
-import {
-  buildAnalyticsFilterFields,
-  filtersFromSearchParams,
-  mapAnalyticsFiltersToPatch,
-} from "../utils/analyticsFilters";
-import {
-  buildAnalyticsQueryParams,
-  buildLogsSearchParams,
-  rankingClickPatch,
-  tabChangePatch,
-  withServiceProductCascade,
-} from "../utils/analyticsUrl";
-import { useAnalyticsCatalog } from "./useAnalyticsCatalog";
-import { useAnalyticsSearchParams } from "./useAnalyticsSearchParams";
-import { useAnalyticsSelectionDefaults } from "./useAnalyticsSelectionDefaults";
-import { ROUTE_PATHS } from "../../../routes/constants";
+import { useSearchParams } from "react-router-dom";
 import { useAppSelector } from "../../../redux/hooks";
+import { AnalyticsBucket, AnalyticsScope } from "../utils/analytics.constants";
+import { isValidDate } from "../../../shared/utils/dateUtils";
+import type { AnalyticsBucketType, AnalyticsScopeType } from "../dto/request/analytics.request";
+import { useEffect } from "react";
+
+type AnalyticsUrlState =
+  | {
+      from: string;
+      to: string;
+      bucket: AnalyticsBucketType;
+      scope: "TENANT";
+      tenantId: string;
+      productId: null;
+      serviceId: null;
+      endpointId: null;
+    }
+  | {
+      from: string;
+      to: string;
+      bucket: AnalyticsBucketType;
+      scope: "PRODUCT";
+      tenantId: string;
+      productId: string;
+      serviceId: null;
+      endpointId: null;
+    }
+  | {
+      from: string;
+      to: string;
+      bucket: AnalyticsBucketType;
+      scope: "SERVICE";
+      tenantId: string;
+      productId: string;
+      serviceId: string;
+      endpointId: null;
+    }
+  | {
+      from: string;
+      to: string;
+      bucket: AnalyticsBucketType;
+      scope: "ENDPOINT";
+      tenantId: string;
+      productId: string;
+      serviceId: string;
+      endpointId: string;
+    };
+
+const getValidBucket = (bucket: string | null): AnalyticsBucketType => {
+  switch (bucket) {
+    case AnalyticsBucket.MINUTE:
+      return AnalyticsBucket.MINUTE;
+    case AnalyticsBucket.HOUR:
+      return AnalyticsBucket.HOUR;
+    case AnalyticsBucket.DAY:
+      return AnalyticsBucket.DAY;
+  }
+  return AnalyticsBucket.MINUTE;
+};
+
+const getValidDateRange = (from: string | null, to: string | null) => {
+  const now = new Date();
+  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  if (!from || !to || !isValidDate(from) || !isValidDate(to)) {
+    return { from: twentyFourHoursAgo.toISOString(), to: now.toISOString() };
+  }
+  return { from, to };
+};
+
+const convertSearchParamsToValidState = (
+  searchParams: URLSearchParams,
+  activeTenantId: string,
+): AnalyticsUrlState => {
+  const scope = searchParams.get("scope");
+  const bucket = getValidBucket(searchParams.get("bucket"));
+  const { from, to } = getValidDateRange(searchParams.get("from"), searchParams.get("to"));
+  const tenantId = searchParams.get("tenantId") ?? activeTenantId;
+  const productId = searchParams.get("productId");
+  const serviceId = searchParams.get("serviceId");
+  const endpointId = searchParams.get("endpointId");
+  if (scope === "PRODUCT")
+    if (scope === AnalyticsScope.PRODUCT && !!productId) {
+      return {
+        scope,
+        bucket,
+        from,
+        to,
+        tenantId,
+        productId: productId,
+        serviceId: null,
+        endpointId: null,
+      };
+    }
+  if (scope === AnalyticsScope.SERVICE && !!productId && !!serviceId) {
+    return {
+      scope,
+      bucket,
+      from,
+      to,
+      tenantId,
+      productId: productId,
+      serviceId: serviceId,
+      endpointId: null,
+    };
+  }
+  if (scope === AnalyticsScope.ENDPOINT && !!productId && !!serviceId && !!endpointId) {
+    return {
+      scope,
+      bucket,
+      from,
+      to,
+      tenantId,
+      productId: productId,
+      serviceId: serviceId,
+      endpointId: endpointId,
+    };
+  }
+  return {
+    scope: "TENANT",
+    bucket,
+    from,
+    to,
+    tenantId,
+    productId: null,
+    serviceId: null,
+    endpointId: null,
+  };
+};
+
+const covertSearchParamsToState = (searchParams: URLSearchParams) => {
+  return {
+    scope: searchParams.get("scope"),
+    bucket: searchParams.get("bucket"),
+    from: searchParams.get("from"),
+    to: searchParams.get("to"),
+    tenantId: searchParams.get("tenantId"),
+    productId: searchParams.get("productId"),
+    serviceId: searchParams.get("serviceId"),
+    endpointId: searchParams.get("endpointId"),
+  };
+};
+
+const convertValidStateToSearchParams = (validState: AnalyticsUrlState) => {
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(validState)) {
+    if (value !== null) {
+      searchParams.set(key, value);
+    }
+  }
+  return searchParams;
+};
 
 export const useAnalyticsUrlState = () => {
-  const navigate = useNavigate();
-  const { scope, entityId, from, to, bucket, mergeParams } = useAnalyticsSearchParams();
+  const activeTenant = useAppSelector((state) => state.session.activeTenant!);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // const catalog = useAnalyticsCatalog(scope, serviceId);
-  // const ids = useMemo(
-  //   () => ({ productId, serviceId, endpointId }),
-  //   [productId, serviceId, endpointId],
-  // );
+  const validState = convertSearchParamsToValidState(searchParams, activeTenant.id);
 
-  // useAnalyticsSelectionDefaults(scope, ids, catalog, mergeParams);
+  useEffect(() => {
+    const urlState = covertSearchParamsToState(searchParams);
+    if (JSON.stringify(urlState) !== JSON.stringify(validState)) {
+      const validSearchParams = convertValidStateToSearchParams(validState);
+      setSearchParams(validSearchParams);
+    }
+  }, [validState, searchParams, setSearchParams]);
 
-  // const filters = useMemo(() => filtersFromSearchParams(params, scope), [params, scope]);
+  const updateState = (newValidState: AnalyticsUrlState) => {
+    const newValidSearchParams = convertValidStateToSearchParams(newValidState);
+    setSearchParams(newValidSearchParams);
+  };
 
-  // const filterFields: FilterField[] = useMemo(
-  //   () =>
-  //     buildAnalyticsFilterFields({
-  //       scope,
-  //       productOptions: catalog.productOptions,
-  //       serviceOptions: catalog.serviceOptions,
-  //       endpointOptions: catalog.endpointOptions,
-  //     }),
-  //   [scope, catalog.productOptions, catalog.serviceOptions, catalog.endpointOptions],
-  // );
-
-  // const onFiltersChange = useCallback(
-  //   (next: FiltersChange) => {
-  //     const mapped = mapAnalyticsFiltersToPatch(next, scope, ids);
-  //     const cascaded = withServiceProductCascade(mapped, scope, catalog.services);
-  //     // patchParams({
-  //     //   productId: cascaded.productId,
-  //     //   serviceId: cascaded.serviceId,
-  //     //   endpointId: cascaded.endpointId,
-  //     //   from: cascaded.from,
-  //     //   to: cascaded.to,
-  //     //   bucket: cascaded.bucket,
-  //     // });
-  //   },
-  //   [scope, ids, catalog.services, patchParams],
-  // );
-
-  // const filtersConfig: FiltersConfig = useMemo(
-  //   () => ({
-  //     filters,
-  //     onFiltersChange,
-  //   }),
-  //   [filters, onFiltersChange],
-  // );
-
-  // const queryParams = useMemo(
-  //   () => scope && buildAnalyticsQueryParams(scope as any, ids, { from, to, bucket }),
-  //   [scope, ids, from, to, bucket],
-  // );
-
-  // const setTab = useCallback(
-  //   (nextScope: AnalyticsScope) => {
-  //     patchParams(tabChangePatch(nextScope, { from, to, bucket }));
-  //   },
-  //   [patchParams, from, to, bucket],
-  // );
-
-  // const onEntityAggregatedClick = useCallback(
-  //   (item: AnalyticsEntityAggregatedResponse["items"][0]) => {
-  //     const patch = rankingClickPatch(scope, item, ids);
-  //     if (patch) patchParams(patch);
-  //   },
-  //   [scope, ids, patchParams],
-  // );
-
-  const openInLogs = useCallback(() => {
-    // const q = buildLogsSearchParams(scope, { from, to }, ids);
-    // navigate(`/${ROUTE_PATHS.logs}?${q.toString()}`);
-  }, [navigate, scope, from, to]);
+  const entityId = {
+    [AnalyticsScope.TENANT]: validState.tenantId,
+    [AnalyticsScope.PRODUCT]: validState.productId,
+    [AnalyticsScope.SERVICE]: validState.serviceId,
+    [AnalyticsScope.ENDPOINT]: validState.endpointId,
+  }[validState.scope];
 
   return {
-    // scope,
-    scopeReady: true,
-    // queryParams,
-    // filterFields,
-    // filtersConfig,
-    // setTab,
-    openInLogs,
-    // onEntityAggregatedClick,
+    entityId: entityId as string,
+    validState,
+    updateState,
   };
 };

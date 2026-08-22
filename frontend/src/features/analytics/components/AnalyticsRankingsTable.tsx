@@ -1,95 +1,114 @@
-import { QueryGate } from "../../../shared/ui";
-import type {
-  AnalyticsEntityAggregatedRequestParams,
-  AnalyticsScope,
-} from "../dto/request/analytics.request";
-import { useAnalyticsEntityAggregatedQuery } from "../hooks/useAnalytics";
-import { useAnalyticsSearchParams } from "../hooks/useAnalyticsSearchParams";
-import { formatNumber, formatRate } from "../utils/timeRange";
+import type { AnalyticsStatsMetrics } from "../dto/response/analytics.response";
+import { useAnalyticsUrlState } from "../hooks/useAnalyticsUrlState";
+import { AnalyticsScope } from "../utils/analytics.constants";
 
-const TAB_LABEL: Record<AnalyticsScope, string> = {
-  TENANT: "Products",
-  PRODUCT: "Services",
-  SERVICE: "Endpoints",
-  ENDPOINT: "",
+type AnalyticsRankingTableProps = {
+  title: string;
+  entityLabel: string;
+  items: AnalyticsStatsMetrics[];
 };
 
-export const AnalyticsRankingsTable = () => {
-  const { tenantId, productId, serviceId, scope, from, to, mergeParams } =
-    useAnalyticsSearchParams();
-  let params: AnalyticsEntityAggregatedRequestParams | null = null;
-  if (from && to && scope) {
-    params = {
-      from,
-      to,
-      scope: { TENANT: "PRODUCT", PRODUCT: "SERVICE", SERVICE: "ENDPOINT" }[scope] as any,
-      tenantId,
-      productId,
-      serviceId,
-    };
+const formatCount = (value: number) => {
+  if (value >= 1_000_000) {
+    return `${(value / 1_000_000).toFixed(1)}M`;
   }
-  const entityAggregatedQuery = useAnalyticsEntityAggregatedQuery(params);
 
-  const onRowClick = (scopeId: string) => {
-    if (scope === "TENANT") {
-      mergeParams({ scope: "PRODUCT", productId: scopeId });
-    } else if (scope === "PRODUCT") {
-      mergeParams({ scope: "SERVICE", serviceId: scopeId });
-    } else if (scope === "SERVICE") {
-      mergeParams({ scope: "ENDPOINT", endpoint: scopeId });
+  if (value >= 1_000) {
+    return `${(value / 1_000).toFixed(1)}K`;
+  }
+
+  return value.toString();
+};
+
+const formatLatency = (value: number) => {
+  return `${value} ms`;
+};
+
+export const AnalyticsRankingTable = ({
+  title,
+  entityLabel,
+  items,
+}: AnalyticsRankingTableProps) => {
+  const { validState, updateState } = useAnalyticsUrlState();
+
+  const handleNavigate = (entityId: string) => {
+    switch (validState.scope) {
+      case AnalyticsScope.TENANT: {
+        updateState({ ...validState, scope: AnalyticsScope.PRODUCT, productId: entityId });
+        break;
+      }
+      case AnalyticsScope.PRODUCT: {
+        updateState({ ...validState, scope: AnalyticsScope.SERVICE, serviceId: entityId });
+        break;
+      }
+      case AnalyticsScope.SERVICE: {
+        updateState({ ...validState, scope: AnalyticsScope.ENDPOINT, endpointId: entityId });
+        break;
+      }
     }
   };
 
   return (
-    <div className="flex min-h-48 flex-col gap-3 rounded-xl border border-border bg-background">
-      <div className="shrink-0 border-b border-border px-4 py-3">
-        <h3 className="text-sm font-medium text-foreground">
-          Ranked {scope ? TAB_LABEL[scope as AnalyticsScope].toLowerCase() : ""}
-        </h3>
+    <div className="rounded-lg border border-border/60 bg-card/50 shadow-sm w-[49%]">
+      <div className="border-b border-border/60 px-4 py-2">
+        <div className="flex justify-between">
+          <h3 className="text-sm font-semibold">{title}</h3>
+          {items.length > 0 && (
+            <span
+              className="text-sm font-semibold text-blue-600 cursor-pointer hover:bg-blue-100 p-1 rounded-sm"
+              onClick={(e) => handleNavigate(items[0]?.entityId)}
+            >
+              View all
+            </span>
+          )}
+        </div>
       </div>
-      <QueryGate
-        isLoading={entityAggregatedQuery.isLoading}
-        isError={entityAggregatedQuery.isError}
-        errorMessage="Could not load rankings."
-        className="px-4 py-8"
-      >
-        {(entityAggregatedQuery.data?.items ?? []).length === 0 ? (
-          <p className="px-4 py-8 text-sm text-muted-foreground">No traffic in this range.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[32rem] text-left text-sm">
-              <thead className="border-b border-border text-xs text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-2 font-medium">Name</th>
-                  <th className="px-4 py-2 font-medium">Requests</th>
-                  <th className="px-4 py-2 font-medium">Error %</th>
-                  <th className="px-4 py-2 font-medium">p95</th>
+
+      {items.length === 0 ? (
+        <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+          No data available.
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border/60 text-xs tracking-wider text-muted-foreground bg-gray-100">
+                <th className="px-4 py-2 text-left font-medium">{entityLabel}</th>
+
+                <th className="px-4 py-2 text-right font-medium">Requests</th>
+
+                <th className="px-4 py-2 text-right font-medium">Error %</th>
+
+                <th className="px-4 py-2 text-right font-medium">P95</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {items.map((item) => (
+                <tr
+                  key={item.entityId}
+                  className="border-b border-border/40 last:border-0 hover:bg-gray-50 cursor-pointer"
+                  onClick={(e) => handleNavigate(item.entityId)}
+                >
+                  <td className="max-w-[240px] truncate px-4 py-2 font-medium">{item.entityId}</td>
+
+                  <td className="px-4 py-2 text-right tabular-nums">
+                    {formatCount(item.requestCount)}
+                  </td>
+
+                  <td className="px-4 py-2 text-right tabular-nums">
+                    {item.errorRate.toFixed(1)}%
+                  </td>
+
+                  <td className="px-4 py-2 text-right tabular-nums">
+                    {formatLatency(item.latencyP95Ms)}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {(entityAggregatedQuery.data?.items ?? []).map((item) => (
-                  <tr
-                    key={item.id}
-                    className={
-                      scope !== "PRODUCTS"
-                        ? "cursor-pointer border-b border-border/60 hover:bg-muted/40"
-                        : "border-b border-border/60"
-                    }
-                    onClick={() => scope !== "PRODUCTS" && onRowClick(item.id)}
-                  >
-                    <td className="px-4 py-2.5 font-medium text-foreground">{item.id}</td>
-                    <td className="px-4 py-2.5 tabular-nums">{formatNumber(item.requestCount)}</td>
-                    <td className="px-4 py-2.5 tabular-nums">{formatRate(item.errorRate)}</td>
-                    <td className="px-4 py-2.5 tabular-nums">
-                      {item.latencyP95Ms != null ? `${item.latencyP95Ms} ms` : "—"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </QueryGate>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

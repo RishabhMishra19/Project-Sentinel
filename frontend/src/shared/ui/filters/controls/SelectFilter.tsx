@@ -7,12 +7,19 @@ type SelectFilterProps = {
   options: FilterOption[];
   onChange: (value: FilterValue<"select">) => void;
   disabled?: boolean;
+  classname?: string;
 };
 
-export const SelectFilter = ({ value, options, onChange, disabled = false }: SelectFilterProps) => (
+export const SelectFilter = ({
+  value,
+  options,
+  onChange,
+  disabled = false,
+  classname,
+}: SelectFilterProps) => (
   <TooltipWrapper value={options.find((option) => option.value === value)?.label ?? "Any"}>
     <select
-      className={`${inputClassName} w-full`}
+      className={classname ? `${inputClassName} ${classname}` : inputClassName}
       value={value ?? ""}
       onChange={(event) => onChange(event.target.value || null)}
       disabled={disabled}

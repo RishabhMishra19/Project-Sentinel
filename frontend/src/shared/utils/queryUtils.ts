@@ -51,6 +51,7 @@ export const toListQueryRequest = (state: DataTableQueryState): ListQueryRequest
     if (key === "from" || key === "to" || !value) continue;
     body.filterConfigs!.push({
       fieldName: key,
+
       filterValues: splitValues(value),
     });
   }

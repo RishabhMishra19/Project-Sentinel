@@ -1,5 +1,8 @@
 import {
+  Bar,
+  BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   Line,
   LineChart,
@@ -8,8 +11,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { AnalyticsTimeseriesPoint } from "../dto/response/analytics.response";
 import { ChartShell } from "./ChartShell";
+import type {
+  AnalyticsSummaryResponse,
+  AnalyticsTimeSeriesResponse,
+} from "../dto/response/analytics.response";
 
 const AXIS = { fontSize: 12, fill: "var(--color-muted-foreground, #737373)" };
 const GRID = "var(--color-border, #e5e5e5)";
@@ -19,6 +25,12 @@ const SERIES = {
   p50: "#0369a1",
   p95: "#c2410c",
   p99: "#7c2d12",
+};
+const BAR: { [key: string]: string } = {
+  ["2xx"]: "#0f766e",
+  ["3xx"]: "#e7f05e",
+  ["4xx"]: "#ac5c41",
+  ["5xx"]: "#b30000",
 };
 const CHART_MARGIN = { top: 8, right: 12, bottom: 4, left: 4 };
 
@@ -32,9 +44,25 @@ const formatTick = (iso: string) => {
   });
 };
 
-export const AnalyticsVolumeChart = ({ points }: { points: AnalyticsTimeseriesPoint[] }) => {
+export const AnalyticsVolumeChart = ({
+  data,
+  isLoading,
+  isError,
+  errorMessage,
+}: {
+  data?: AnalyticsTimeSeriesResponse;
+  isLoading: boolean;
+  isError: boolean;
+  errorMessage: string;
+}) => {
+  const points = data?.timeSeriesStats ?? [];
   return (
-    <ChartShell title="Request volume" xLabel="Time" yLabel="Requests" empty={points.length === 0}>
+    <ChartShell
+      title="Request volume"
+      xLabel="Time"
+      yLabel="Requests"
+      {...{ isLoading, isError, errorMessage, isEmpty: points.length === 0 }}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={points} margin={CHART_MARGIN}>
           <CartesianGrid stroke={GRID} strokeDasharray="3 3" />
@@ -55,8 +83,18 @@ export const AnalyticsVolumeChart = ({ points }: { points: AnalyticsTimeseriesPo
   );
 };
 
-export const AnalyticsErrorRateChart = ({ points }: { points: AnalyticsTimeseriesPoint[] }) => {
-  const data = points.map((p) => ({
+export const AnalyticsErrorRateChart = ({
+  data,
+  isLoading,
+  isError,
+  errorMessage,
+}: {
+  data?: AnalyticsTimeSeriesResponse;
+  isLoading: boolean;
+  isError: boolean;
+  errorMessage: string;
+}) => {
+  const points = (data?.timeSeriesStats ?? []).map((p) => ({
     ...p,
     errorRatePct: Number((p.errorRate * 100).toFixed(3)),
   }));
@@ -65,10 +103,10 @@ export const AnalyticsErrorRateChart = ({ points }: { points: AnalyticsTimeserie
       title="Error rate (%)"
       xLabel="Time"
       yLabel="Error rate (%)"
-      empty={points.length === 0}
+      {...{ isLoading, isError, errorMessage, isEmpty: points.length === 0 }}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={CHART_MARGIN}>
+        <LineChart data={points} margin={CHART_MARGIN}>
           <CartesianGrid stroke={GRID} strokeDasharray="3 3" />
           <XAxis dataKey="bucketStart" tickFormatter={formatTick} tick={AXIS} minTickGap={32} />
           <YAxis tick={AXIS} />
@@ -87,13 +125,24 @@ export const AnalyticsErrorRateChart = ({ points }: { points: AnalyticsTimeserie
   );
 };
 
-export const AnalyticsLatencyChart = ({ points }: { points: AnalyticsTimeseriesPoint[] }) => {
+export const AnalyticsLatencyChart = ({
+  data,
+  isLoading,
+  isError,
+  errorMessage,
+}: {
+  data?: AnalyticsTimeSeriesResponse;
+  isLoading: boolean;
+  isError: boolean;
+  errorMessage: string;
+}) => {
+  const points = data?.timeSeriesStats ?? [];
   return (
     <ChartShell
       title="Latency (ms)"
       xLabel="Time"
       yLabel="Latency (ms)"
-      empty={points.length === 0}
+      {...{ isLoading, isError, errorMessage, isEmpty: points.length === 0 }}
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={points} margin={{ ...CHART_MARGIN, top: 4 }}>
@@ -127,6 +176,60 @@ export const AnalyticsLatencyChart = ({ points }: { points: AnalyticsTimeseriesP
             dot={false}
           />
         </LineChart>
+      </ResponsiveContainer>
+    </ChartShell>
+  );
+};
+
+export const AnalyticsStatusChart = ({
+  data,
+  isLoading,
+  isError,
+  errorMessage,
+}: {
+  data?: AnalyticsSummaryResponse;
+  isLoading: boolean;
+  isError: boolean;
+  errorMessage: string;
+}) => {
+  const items = [
+    {
+      requestCount: data?.totalStats.status2xx ?? 0,
+      statusCode: "2xx",
+    },
+    {
+      requestCount: data?.totalStats.status3xx ?? 0,
+      statusCode: "3xx",
+    },
+    {
+      requestCount: data?.totalStats.status4xx ?? 0,
+      statusCode: "4xx",
+    },
+    {
+      requestCount: data?.totalStats.status5xx ?? 0,
+      statusCode: "5xx",
+    },
+  ];
+
+  return (
+    <ChartShell
+      title="Status codes"
+      xLabel="Status code"
+      yLabel="Requests"
+      {...{ isLoading, isError, errorMessage, isEmpty: !data?.totalStats.requestCount }}
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={items} margin={CHART_MARGIN}>
+          <CartesianGrid stroke={GRID} strokeDasharray="3 3" />
+          <XAxis dataKey="statusCode" tick={AXIS} />
+          <YAxis tick={AXIS} allowDecimals={false} />
+          <Tooltip />
+          <Bar dataKey="requestCount" name="Requests">
+            {items.map((item) => (
+              <Cell fill={BAR[item.statusCode]} />
+            ))}
+          </Bar>
+        </BarChart>
       </ResponsiveContainer>
     </ChartShell>
   );

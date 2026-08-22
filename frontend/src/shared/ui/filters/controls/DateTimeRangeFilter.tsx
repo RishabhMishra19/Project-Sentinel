@@ -61,6 +61,7 @@ export const matchDateTimeRangePreset = (value: {
 type DateTimeRangeFilterProps = {
   value: FilterValue<"dateTimeRange">;
   onChange: (value: FilterValue<"dateTimeRange">) => void;
+  classname?: string;
 };
 
 const chipClassName = (active: boolean) =>
@@ -70,13 +71,13 @@ const chipClassName = (active: boolean) =>
       : "border-border text-foreground hover:bg-chrome"
   }`;
 
-export const DateTimeRangeFilter = ({ value, onChange }: DateTimeRangeFilterProps) => {
+export const DateTimeRangeFilter = ({ value, onChange, classname }: DateTimeRangeFilterProps) => {
   const range = value ?? { from: null, to: null };
   const matchedPreset = matchDateTimeRangePreset(range);
   const isCustom = matchedPreset == null;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className={`flex flex-col gap-3 ${classname}`}>
       <div className="flex flex-col gap-1.5">
         <p className="text-[11px] text-muted">Last</p>
         <div className="flex flex-nowrap gap-1">
