@@ -1,7 +1,7 @@
 package com.sentinel.api.logs.mapper;
 
-import com.sentinel.common.observability.entity.Endpoint;
-import com.sentinel.common.observability.entity.RequestLog;
+import com.sentinel.common.postgresql.endpoint.entity.Endpoint;
+import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
 import com.sentinel.api.logs.dto.response.RequestLogListResponse;
 import com.sentinel.api.product.entity.Product;
 import com.sentinel.api.service.entity.Service;

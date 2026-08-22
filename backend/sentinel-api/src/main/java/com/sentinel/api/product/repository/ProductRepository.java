@@ -46,4 +46,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
     @Query("SELECT p.id FROM Product p WHERE p.status = :status")
     List<UUID> findIdsByStatus(@Param("status") ProductStatus status);
 
+    List<Product> findByIdIn(List<UUID> ids);
+
 }

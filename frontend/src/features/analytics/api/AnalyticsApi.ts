@@ -1,14 +1,14 @@
 import { ANALYTICS_API_ROUTES } from "../../../shared/api/api.routes";
 import { apiManager } from "../../../shared/api/ApiManager";
 import type {
-  AnalyticsEntityAggregatedRequestParams,
+  AnalyticsEntityAggregatedRequestParams as AnalyticsChildrenAggregatedRequestParams,
   AnalyticsSummaryRequestParams,
   AnalyticsTimeSeriesRequestParams,
 } from "../dto/request/analytics.request";
 import type {
   AnalyticsSummaryResponse,
   AnalyticsTimeSeriesResponse,
-  AnalyticsEntityAggregatedResponse,
+  AnalyticsEntityAggregatedResponse as AnalyticsChildrenAggregatedResponse,
 } from "../dto/response/analytics.response";
 
 export class AnalyticsApi {
@@ -26,11 +26,11 @@ export class AnalyticsApi {
     });
   }
 
-  static entityAggregated(
-    params: AnalyticsEntityAggregatedRequestParams,
-  ): Promise<AnalyticsEntityAggregatedResponse> {
-    return apiManager.get<AnalyticsEntityAggregatedResponse>(
-      ANALYTICS_API_ROUTES.ENTITY_AGGREGATED,
+  static childrenAggregated(
+    params: AnalyticsChildrenAggregatedRequestParams,
+  ): Promise<AnalyticsChildrenAggregatedResponse> {
+    return apiManager.get<AnalyticsChildrenAggregatedResponse>(
+      ANALYTICS_API_ROUTES.CHILDREN_AGGREGATED,
       {
         params,
       },

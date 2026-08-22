@@ -2,10 +2,10 @@ package com.sentinel.api.logs.service.core;
 
 import com.sentinel.api.logs.dto.RequestLogCursorEncoder;
 import com.sentinel.api.logs.dto.request.GetRequestLogsListRequest;
-import com.sentinel.common.observability.entity.RequestLog;
-import com.sentinel.common.observability.entity.RequestLogLookup;
-import com.sentinel.common.observability.repository.RequestLogLookupRepository;
-import com.sentinel.common.observability.repository.RequestLogRepository;
+import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
+import com.sentinel.common.cassandra.requestlog.entity.RequestLogLookup;
+import com.sentinel.common.cassandra.requestlog.repository.RequestLogLookupRepository;
+import com.sentinel.common.cassandra.requestlog.repository.RequestLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

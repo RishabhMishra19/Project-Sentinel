@@ -6,6 +6,7 @@ type AnalyticsRankingTableProps = {
   title: string;
   entityLabel: string;
   items: AnalyticsStatsMetrics[];
+  idToNameMap: Record<string, string>;
 };
 
 const formatCount = (value: number) => {
@@ -28,6 +29,7 @@ export const AnalyticsRankingTable = ({
   title,
   entityLabel,
   items,
+  idToNameMap,
 }: AnalyticsRankingTableProps) => {
   const { validState, updateState } = useAnalyticsUrlState();
 
@@ -90,7 +92,9 @@ export const AnalyticsRankingTable = ({
                   className="border-b border-border/40 last:border-0 hover:bg-gray-50 cursor-pointer"
                   onClick={(e) => handleNavigate(item.entityId)}
                 >
-                  <td className="max-w-[240px] truncate px-4 py-2 font-medium">{item.entityId}</td>
+                  <td className="max-w-[240px] truncate px-4 py-2 font-medium">
+                    {idToNameMap[item.entityId]}
+                  </td>
 
                   <td className="px-4 py-2 text-right tabular-nums">
                     {formatCount(item.requestCount)}

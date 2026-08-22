@@ -8,10 +8,10 @@ import com.sentinel.api.logs.service.core.RequestLogService;
 import com.sentinel.api.product.entity.Product;
 import com.sentinel.api.service.entity.Service;
 import com.sentinel.api.service.service.core.ServiceService;
-import com.sentinel.common.cassandra.dto.CursorPaginationResponse;
-import com.sentinel.common.observability.entity.Endpoint;
-import com.sentinel.common.observability.entity.RequestLog;
-import com.sentinel.common.observability.repository.EndpointRepository;
+import com.sentinel.common.cassandra.paginator.dto.CursorPaginationResponse;
+import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
+import com.sentinel.common.postgresql.endpoint.entity.Endpoint;
+import com.sentinel.common.postgresql.endpoint.repository.EndpointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,44 +31,41 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
     private final RequestLogMapper requestLogMapper;
     private final EndpointRepository endpointRepository;
     private final ServiceService serviceService;
-    private final RequestLogCassandraPaginator  requestLogCassandraPaginator;
+    private final RequestLogCassandraPaginator requestLogCassandraPaginator;
 
     @Override
     @Transactional(readOnly = true)
     public CursorPaginationResponse<RequestLogListResponse> getAll(GetRequestLogsListRequest request) {
         CursorPaginationResponse<RequestLog> response = requestLogCassandraPaginator.getPage(request);
-
-        Map<UUID, Endpoint> endpoints = loadEndpoints(response.getContent(), request.getServiceId());
+        Map<UUID, Endpoint> endpoints = loadEndpoints(response.getContent());
         Map<UUID, Service> services = loadServices(endpoints.values());
-
-        List<RequestLogListResponse> apiResult = response
-                .getContent()
+        List<RequestLogListResponse> apiResult = response.getContent()
                 .stream()
-                .map(v->this.toResponse(v, endpoints, services))
+                .map(v -> this.toResponse(v, endpoints, services))
                 .toList();
-
         return response.getApiResponse(apiResult);
     }
 
     @Override
     @Transactional(readOnly = true)
     public RequestLogListResponse getById(UUID tenantId, UUID serviceId, UUID id) {
-        RequestLog log =
-                requestLogService
-                        .getLogById(tenantId, serviceId, id)
-                        .orElseThrow(() -> new ResourceNotFoundException("Request log not found"));
-        Map<UUID, Endpoint> endpoints = loadEndpoints(List.of(log), serviceId);
+        RequestLog log = requestLogService.getLogById(tenantId, serviceId, id)
+                .orElseThrow(() -> new ResourceNotFoundException("Request log not found"));
+        Map<UUID, Endpoint> endpoints = loadEndpoints(List.of(log));
         Map<UUID, Service> services = loadServices(endpoints.values());
         return toResponse(log, endpoints, services);
     }
 
     private RequestLogListResponse toResponse(
-            RequestLog log, Map<UUID, Endpoint> endpoints, Map<UUID, Service> services) {
+            RequestLog log,
+            Map<UUID, Endpoint> endpoints,
+            Map<UUID, Service> services
+    ) {
         Endpoint endpoint = endpoints.get(log.getEndpointId());
         if (endpoint == null) {
             throw new ResourceNotFoundException("Endpoint not found");
         }
-        Service service = services.get(endpoint.getId().getServiceId());
+        Service service = services.get(endpoint.getServiceId());
         if (service == null) {
             throw new ResourceNotFoundException("Service not found");
         }
@@ -76,7 +73,7 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
         return requestLogMapper.toResponse(log, endpoint, service, product);
     }
 
-    private Map<UUID, Endpoint> loadEndpoints(List<RequestLog> logs, UUID serviceId) {
+    private Map<UUID, Endpoint> loadEndpoints(List<RequestLog> logs) {
         Set<UUID> ids = new HashSet<>();
         for (RequestLog log : logs) {
             if (log.getEndpointId() != null) {
@@ -85,8 +82,9 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
         }
         Map<UUID, Endpoint> endpoints = new HashMap<>();
         if (!ids.isEmpty()) {
-            for (Endpoint endpoint : endpointRepository.findByServiceIdAndEndpointIdIn(serviceId, ids.stream().toList())) {
-                endpoints.put(endpoint.getId().getEndpointId(), endpoint);
+            for (Endpoint endpoint : endpointRepository.findByIdIn(ids.stream()
+                    .toList())) {
+                endpoints.put(endpoint.getId(), endpoint);
             }
         }
         return endpoints;
@@ -95,14 +93,13 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
     private Map<UUID, Service> loadServices(Iterable<Endpoint> endpoints) {
         Set<UUID> ids = new HashSet<>();
         for (Endpoint endpoint : endpoints) {
-            if (endpoint.getId().getServiceId() != null) {
-                ids.add(endpoint.getId().getServiceId());
+            if (endpoint.getServiceId() != null) {
+                ids.add(endpoint.getServiceId());
             }
         }
         Map<UUID, Service> services = new HashMap<>();
         for (UUID id : ids) {
-            serviceService
-                    .findWithAuditById(id)
+            serviceService.findWithAuditById(id)
                     .ifPresent(service -> services.put(service.getId(), service));
         }
         return services;

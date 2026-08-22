@@ -32,4 +32,6 @@ public interface TenantRepository
 
     @Query("SELECT t.id FROM Tenant t WHERE t.status = :status")
     List<UUID> findIdsByStatus(@Param("status") TenantStatus status);
+
+    List<Tenant> findByIdIn(List<UUID> ids);
 }

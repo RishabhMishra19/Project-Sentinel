@@ -3,8 +3,8 @@ package com.sentinel.api.logs.service;
 import com.sentinel.api.logs.dto.RequestLogCursorEncoder;
 import com.sentinel.api.logs.dto.request.GetRequestLogsListRequest;
 import com.sentinel.api.logs.service.core.RequestLogService;
-import com.sentinel.common.cassandra.CassandraPaginator;
-import com.sentinel.common.observability.entity.RequestLog;
+import com.sentinel.common.cassandra.paginator.CassandraPaginator;
+import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
 import org.springframework.stereotype.Component;
 
 @Component

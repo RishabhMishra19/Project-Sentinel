@@ -5,7 +5,7 @@ import com.sentinel.common.apikey.repository.ServiceApiKeyRepository;
 import com.sentinel.common.crypto.Sha256Hasher;
 import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;
-import com.sentinel.common.observability.entity.Endpoint;
+import com.sentinel.common.postgresql.endpoint.entity.Endpoint;
 import com.sentinel.common.observability.entity.EndpointLookup;
 import com.sentinel.common.observability.repository.EndpointLookupRepository;
 import com.sentinel.ingest.common.exception.BadRequestException;

@@ -19,9 +19,7 @@ export type AnalyticsTimeSeriesRequestParams = {
 
 export type AnalyticsEntityAggregatedRequestParams = {
   scope: AnalyticsScopeType;
-  tenantId: string | null;
-  productId: string | null;
-  serviceId: string | null;
+  entityId: string;
   from: string;
   to: string;
 };

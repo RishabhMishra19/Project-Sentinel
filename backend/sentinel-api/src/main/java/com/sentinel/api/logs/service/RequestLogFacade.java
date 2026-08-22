@@ -2,7 +2,7 @@ package com.sentinel.api.logs.service;
 
 import com.sentinel.api.logs.dto.request.GetRequestLogsListRequest;
 import com.sentinel.api.logs.dto.response.RequestLogListResponse;
-import com.sentinel.common.cassandra.dto.CursorPaginationResponse;
+import com.sentinel.common.cassandra.paginator.dto.CursorPaginationResponse;
 
 import java.util.UUID;
 

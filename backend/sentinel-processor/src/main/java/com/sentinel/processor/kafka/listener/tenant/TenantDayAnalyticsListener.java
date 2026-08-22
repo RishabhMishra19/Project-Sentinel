@@ -1,6 +1,6 @@
 package com.sentinel.processor.kafka.listener.tenant;
 
-import com.sentinel.common.analytics.entity.tenant.AnalyticsTenantStatsDay;
+import com.sentinel.common.cassandra.analytics.entity.tenant.AnalyticsTenantStatsDay;
 import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;
 import lombok.RequiredArgsConstructor;

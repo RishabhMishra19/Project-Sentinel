@@ -10,7 +10,7 @@ import { AnalyticsRankingTable } from "../components/AnalyticsRankingsTable";
 import { AnalyticsToolbar } from "../components/toolbar/AnalyticsToolbar";
 import { TrafficSummary } from "../components/TrafficSummary";
 import {
-  useAnalyticsEntityAggregatedQuery,
+  useAnalyticsChildrenAggregatedQuery,
   useAnalyticsSummaryQuery,
   useAnalyticsTimeseriesQuery,
 } from "../hooks/useAnalytics";
@@ -27,7 +27,7 @@ export const AnalyticsPage = () => {
   const { validState } = useAnalyticsUrlState();
   const timeSeries = useAnalyticsTimeseriesQuery();
   const summary = useAnalyticsSummaryQuery();
-  const entityAggregated = useAnalyticsEntityAggregatedQuery();
+  const entityAggregated = useAnalyticsChildrenAggregatedQuery();
 
   return (
     <PageContent className="m-0 p-0">
@@ -50,6 +50,7 @@ export const AnalyticsPage = () => {
             items={(entityAggregated.data?.entityAggregatedStats ?? []).toSorted(
               (a, b) => b.requestCount - a.requestCount,
             )}
+            idToNameMap={entityAggregated.data?.idToNameMap ?? {}}
           />
           <AnalyticsRankingTable
             title={`Error Prone ${RankMapping[validState.scope]}s`}
@@ -57,6 +58,7 @@ export const AnalyticsPage = () => {
             items={(entityAggregated.data?.entityAggregatedStats ?? []).toSorted(
               (a, b) => b.errorCount - a.errorCount,
             )}
+            idToNameMap={entityAggregated.data?.idToNameMap ?? {}}
           />
         </div>
       )}

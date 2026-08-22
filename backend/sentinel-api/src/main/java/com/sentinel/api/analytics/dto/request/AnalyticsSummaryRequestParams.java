@@ -1,6 +1,6 @@
 package com.sentinel.api.analytics.dto.request;
 
-import com.sentinel.common.analytics.utils.AnalyticsScope;
+import com.sentinel.common.cassandra.analytics.utils.AnalyticsScope;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;

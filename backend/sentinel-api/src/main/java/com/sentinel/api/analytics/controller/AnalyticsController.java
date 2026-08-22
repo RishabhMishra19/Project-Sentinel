@@ -1,19 +1,17 @@
 package com.sentinel.api.analytics.controller;
 
-import com.sentinel.api.analytics.dto.request.AnalyticsEntityAggregatedRequestParams;
+import com.sentinel.api.analytics.dto.request.AnalyticsChildrenAggregatedRequestParams;
 import com.sentinel.api.analytics.dto.request.AnalyticsSummaryRequestParams;
 import com.sentinel.api.analytics.dto.request.AnalyticsTimeSeriesRequestParams;
-import com.sentinel.api.analytics.dto.response.AnalyticsEntityAggregatedResponse;
+import com.sentinel.api.analytics.dto.response.AnalyticsChildrenAggregatedResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsTimeSeriesResponse;
 import com.sentinel.api.analytics.service.AnalyticsFacade;
 import com.sentinel.api.common.response.ApiResponses;
-import com.sentinel.api.security.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,9 +37,9 @@ public class AnalyticsController {
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
-    @GetMapping("/entityAggregated")
-    public ResponseEntity<AnalyticsEntityAggregatedResponse> getEntityAggregated(@AuthenticationPrincipal UserPrincipal principal, @Valid @ModelAttribute AnalyticsEntityAggregatedRequestParams params) {
-        return ApiResponses.ok(analyticsFacade.getEntityAggregated(principal.getActiveTenantId(), params));
+    @GetMapping("/childrenAggregated")
+    public ResponseEntity<AnalyticsChildrenAggregatedResponse> getChildrenAggregated(@Valid @ModelAttribute AnalyticsChildrenAggregatedRequestParams params) {
+        return ApiResponses.ok(analyticsFacade.getChildrenAggregated(params));
     }
 
 }

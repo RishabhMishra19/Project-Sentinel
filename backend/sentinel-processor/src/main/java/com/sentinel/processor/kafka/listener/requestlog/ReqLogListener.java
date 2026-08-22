@@ -2,7 +2,7 @@ package com.sentinel.processor.kafka.listener.requestlog;
 
 import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;
-import com.sentinel.common.observability.entity.RequestLog;
+import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;

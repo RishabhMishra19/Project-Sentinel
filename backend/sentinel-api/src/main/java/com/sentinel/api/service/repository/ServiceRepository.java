@@ -31,25 +31,6 @@ public interface ServiceRepository extends JpaRepository<Service, UUID>, JpaSpec
     @EntityGraph(attributePaths = {"product", "product.tenant", "createdBy", "updatedBy"})
     Optional<Service> findWithAuditByIdAndProductId(UUID id, UUID productId);
 
-    @Query("""
-                SELECT s.id
-                FROM Service s
-                WHERE s.product.id IN :productIds
-                  AND s.status = :status
-            """)
-    List<UUID> findAllServiceIdsByProductIdsAndStatus(
-            @Param("productIds") List<UUID> productIds,
-            @Param("status") ServiceStatus status
-    );
-
-    @Query("""
-                SELECT s.id
-                FROM Service s
-                WHERE s.product.id = :productId
-                  AND s.status = :status
-            """)
-    List<UUID> findAllServiceIdsByProductIdAndStatus(UUID productId, ServiceStatus status);
-
     @Query("SELECT s.id FROM Service s WHERE s.status = :status and s.product.id in :productIds")
     List<UUID> findIdsByProductIdsAndStatus(
             @Param("productIds") List<UUID> productIds,
@@ -77,5 +58,7 @@ public interface ServiceRepository extends JpaRepository<Service, UUID>, JpaSpec
 
     @Query("SELECT s.id FROM Service s WHERE s.status = :status")
     List<UUID> findIdsByStatus(@Param("status") ServiceStatus serviceStatus);
+
+    List<Service> findByIdIn(List<UUID> ids);
 
 }

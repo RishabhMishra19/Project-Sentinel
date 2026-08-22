@@ -1,37 +1,41 @@
 package com.sentinel.api.analytics.service.impl;
 
-import com.sentinel.api.analytics.dto.request.AnalyticsEntityAggregatedRequestParams;
+import com.sentinel.api.analytics.dto.request.AnalyticsChildrenAggregatedRequestParams;
 import com.sentinel.api.analytics.dto.request.AnalyticsSummaryRequestParams;
 import com.sentinel.api.analytics.dto.request.AnalyticsTimeSeriesRequestParams;
-import com.sentinel.api.analytics.dto.response.AnalyticsEntityAggregatedResponse;
+import com.sentinel.api.analytics.dto.response.AnalyticsChildrenAggregatedResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsSummaryResponse;
 import com.sentinel.api.analytics.dto.response.AnalyticsTimeSeriesResponse;
 import com.sentinel.api.analytics.service.AnalyticsFacade;
+import com.sentinel.api.common.exception.BadRequestException;
+import com.sentinel.api.endpoint.service.EndpointService;
+import com.sentinel.api.product.entity.Product;
 import com.sentinel.api.product.entity.ProductStatus;
 import com.sentinel.api.product.repository.ProductRepository;
+import com.sentinel.api.service.entity.Service;
 import com.sentinel.api.service.entity.ServiceStatus;
 import com.sentinel.api.service.repository.ServiceRepository;
-import com.sentinel.api.tenant.entity.TenantStatus;
+import com.sentinel.api.tenant.entity.Tenant;
 import com.sentinel.api.tenant.repository.TenantRepository;
-import com.sentinel.common.analytics.dto.response.EntityAggregatedStatsResponse;
-import com.sentinel.common.analytics.dto.response.TimeSeriesStatsResponse;
-import com.sentinel.common.analytics.dto.response.TotalStatsResponse;
-import com.sentinel.common.analytics.service.AnalyticsService;
-import com.sentinel.common.analytics.utils.AnalyticsBucket;
-import com.sentinel.common.analytics.utils.AnalyticsScope;
-import com.sentinel.common.analytics.utils.AnalyticsUtils;
-import com.sentinel.common.observability.repository.EndpointRepository;
+import com.sentinel.common.cassandra.analytics.dto.response.EntityAggregatedStatsResponse;
+import com.sentinel.common.cassandra.analytics.dto.response.TimeSeriesStatsResponse;
+import com.sentinel.common.cassandra.analytics.dto.response.TotalStatsResponse;
+import com.sentinel.common.cassandra.analytics.service.AnalyticsService;
+import com.sentinel.common.cassandra.analytics.utils.AnalyticsBucket;
+import com.sentinel.common.cassandra.analytics.utils.AnalyticsScope;
+import com.sentinel.common.cassandra.analytics.utils.AnalyticsUtils;
+import com.sentinel.common.postgresql.endpoint.entity.Endpoint;
+import com.sentinel.common.postgresql.endpoint.repository.EndpointRepository;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Service
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
 @Transactional
 public class AnalyticsFacadeImpl implements AnalyticsFacade {
@@ -41,6 +45,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     private final ProductRepository productRepository;
     private final ServiceRepository serviceRepository;
     private final EndpointRepository endpointRepository;
+    private final EndpointService endpointService;
 
     @Override
     @Transactional(readOnly = true)
@@ -54,7 +59,8 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
                 bucket
         );
         long activeEndpoints = this.countEndPoints(params.entityId(), params.scope());
-        return new AnalyticsSummaryResponse(totalStats, activeEndpoints);
+        Map<UUID, String> idToNameMap = this.getIdToNameMap(List.of(params.entityId()), params.scope());
+        return new AnalyticsSummaryResponse(totalStats, activeEndpoints, idToNameMap.get(params.entityId()));
     }
 
     @Override
@@ -68,21 +74,26 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
                 params.bucket()
         );
         long activeEndpoints = this.countEndPoints(params.entityId(), params.scope());
-        return new AnalyticsTimeSeriesResponse(timeSeriesStatsResponse, activeEndpoints);
+        Map<UUID, String> idToNameMap = this.getIdToNameMap(List.of(params.entityId()), params.scope());
+        return new AnalyticsTimeSeriesResponse(
+                timeSeriesStatsResponse,
+                activeEndpoints,
+                idToNameMap.get(params.entityId())
+        );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public AnalyticsEntityAggregatedResponse getEntityAggregated(
-            UUID activeTenantId,
-            AnalyticsEntityAggregatedRequestParams params
+    public AnalyticsChildrenAggregatedResponse getChildrenAggregated(
+            AnalyticsChildrenAggregatedRequestParams params
     ) {
-        List<UUID> entityIds = this.getScopeEntityIds(activeTenantId, params);
+        AnalyticsScope childScope = this.getChildScope(params.scope());
+        List<UUID> entityIds = this.getChildEntityIds(params.scope(), params.entityId());
         AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
         EntityAggregatedStatsResponse entityAggregatedStatsResponse = analyticsService.findEntityAggregatedStats(entityIds,
                 params.from(),
                 params.to(),
-                params.scope(),
+                childScope,
                 bucket
         );
         Map<UUID, Long> endpointCountMap = new HashMap<>();
@@ -90,50 +101,66 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
             long activeEndpoints = this.countEndPoints(entityId, params.scope());
             endpointCountMap.put(entityId, activeEndpoints);
         }
-        return new AnalyticsEntityAggregatedResponse(entityAggregatedStatsResponse, endpointCountMap);
+        Map<UUID, String> idToNameMap = this.getIdToNameMap(entityIds, childScope);
+        return new AnalyticsChildrenAggregatedResponse(entityAggregatedStatsResponse, endpointCountMap, idToNameMap);
     }
 
-    private List<UUID> getScopeEntityIds(UUID activeTenantId, AnalyticsEntityAggregatedRequestParams params) {
-        UUID tenantId = params.tenantId() != null ? params.tenantId() : activeTenantId;
-        List<UUID> productIds = params.productId() != null ? List.of(params.productId()) : productRepository.findIdsByTenantIdAndStatus(tenantId,
-                ProductStatus.ACTIVE
-        );
-        List<UUID> serviceIds = params.serviceId() != null ? List.of(params.serviceId()) : serviceRepository.findIdsByProductIdsAndStatus(productIds,
-                ServiceStatus.ACTIVE
-        );
-        switch (params.scope()) {
-            case TENANT -> {
-                return tenantRepository.findIdsByStatus(TenantStatus.ACTIVE);
-            }
-            case PRODUCT -> {
-                return productRepository.findIdsByTenantIdAndStatus(tenantId, ProductStatus.ACTIVE);
-            }
-            case SERVICE -> {
-                return serviceRepository.findIdsByProductIdsAndStatus(productIds, ServiceStatus.ACTIVE);
-            }
-            case ENDPOINT -> {
-                return endpointRepository.findIdsByServiceIds(serviceIds).stream().map(v->v.getId().getEndpointId()).toList();
-            }
-        }
-        return new ArrayList<>();
+    private AnalyticsScope getChildScope(@NotNull AnalyticsScope scope) {
+        return switch (scope) {
+            case TENANT -> AnalyticsScope.PRODUCT;
+            case PRODUCT -> AnalyticsScope.SERVICE;
+            case SERVICE -> AnalyticsScope.ENDPOINT;
+            case ENDPOINT -> throw new BadRequestException("invalid scope");
+        };
+    }
+
+    private List<UUID> getChildEntityIds(AnalyticsScope scope, UUID entityId) {
+        return switch (scope) {
+            case TENANT -> productRepository.findIdsByTenantIdAndStatus(entityId, ProductStatus.ACTIVE);
+            case PRODUCT -> serviceRepository.findIdsByProductIdAndStatus(entityId, ServiceStatus.ACTIVE);
+            case SERVICE -> endpointRepository.findIdByServiceId(entityId);
+            case ENDPOINT -> throw new BadRequestException("invalid scope");
+        };
     }
 
     private long countEndPoints(UUID entityId, AnalyticsScope scope) {
-        List<UUID> serviceIds = null;
+        return switch (scope) {
+            case TENANT -> endpointService.findCountByTenantId(entityId);
+            case PRODUCT -> endpointService.findCountByProductId(entityId);
+            case SERVICE -> endpointService.findCountByServiceId(entityId);
+            case ENDPOINT -> 1L;
+        };
+    }
+
+    private Map<UUID, String> getIdToNameMap(List<UUID> ids, AnalyticsScope scope) {
+        Map<UUID, String> idToNameMap = new HashMap<>();
         switch (scope) {
-            case TENANT:
-                serviceIds = serviceRepository.findIdsByTenantIdAndStatus(entityId, ServiceStatus.ACTIVE);
-                break;
-            case PRODUCT:
-                serviceIds = serviceRepository.findIdsByProductIdAndStatus(entityId, ServiceStatus.ACTIVE);
-                break;
-            case SERVICE:
-                serviceIds = List.of(entityId);
-                break;
-            case ENDPOINT:
-                return 1L;
+            case TENANT -> {
+                List<Tenant> tenants = tenantRepository.findByIdIn(ids);
+                for (Tenant tenant : tenants) {
+                    idToNameMap.put(tenant.getId(), tenant.getName());
+                }
+            }
+            case PRODUCT -> {
+                List<Product> products = productRepository.findByIdIn(ids);
+                for (Product product : products) {
+                    idToNameMap.put(product.getId(), product.getName());
+                }
+            }
+            case SERVICE -> {
+                List<Service> services = serviceRepository.findByIdIn(ids);
+                for (Service service : services) {
+                    idToNameMap.put(service.getId(), service.getName());
+                }
+            }
+            case ENDPOINT -> {
+                List<Endpoint> endpoints = endpointRepository.findByIdIn(ids);
+                for (Endpoint endpoint : endpoints) {
+                    idToNameMap.put(endpoint.getId(), endpoint.getMethod() + " | " + endpoint.getPathTemplate());
+                }
+            }
         }
-        return endpointRepository.countById_ServiceIdIn(serviceIds);
+        return idToNameMap;
     }
 
 }

@@ -1,6 +1,6 @@
 package com.sentinel.api.logs.dto.request;
 
-import com.sentinel.common.cassandra.dto.CursorPaginationRequest;
+import com.sentinel.common.cassandra.paginator.dto.CursorPaginationRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

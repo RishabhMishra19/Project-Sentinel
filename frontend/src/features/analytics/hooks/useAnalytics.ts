@@ -60,27 +60,18 @@ export const useAnalyticsTimeseriesQuery = () => {
   };
 };
 
-export const useAnalyticsEntityAggregatedQuery = () => {
-  const { validState } = useAnalyticsUrlState();
-  const nextScope = {
-    [AnalyticsScope.TENANT]: AnalyticsScope.PRODUCT,
-    [AnalyticsScope.PRODUCT]: AnalyticsScope.SERVICE,
-    [AnalyticsScope.SERVICE]: AnalyticsScope.ENDPOINT,
-    [AnalyticsScope.ENDPOINT]: AnalyticsScope.ENDPOINT,
-  }[validState.scope];
+export const useAnalyticsChildrenAggregatedQuery = () => {
+  const { entityId, validState } = useAnalyticsUrlState();
+
   const params = {
-    scope: nextScope,
-    bucket: validState.bucket,
+    scope: validState.scope,
     from: validState.from,
     to: validState.to,
-    tenantId: validState.tenantId,
-    productId: validState.productId,
-    serviceId: validState.serviceId,
-    endpointId: validState.endpointId,
+    entityId,
   };
   const { data, isLoading, isError, error } = useQuery({
     queryKey: [...analyticsQueryKey, "rankings", params],
-    queryFn: () => AnalyticsApi.entityAggregated(params!),
+    queryFn: () => AnalyticsApi.childrenAggregated(params!),
     enabled: params != null,
   });
   return {

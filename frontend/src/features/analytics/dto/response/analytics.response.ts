@@ -25,6 +25,7 @@ export type AnalyticsSummaryResponse = {
   entityId: string;
   totalStats: AnalyticsStatsMetrics;
   endpointCount: number;
+  entityName: string;
 };
 
 export type AnalyticsTimeSeriesResponse = {
@@ -33,6 +34,7 @@ export type AnalyticsTimeSeriesResponse = {
   entityId: string;
   timeSeriesStats: AnalyticsStatsMetrics[];
   endpointCount: number;
+  entityName: string;
 };
 
 export type AnalyticsEntityAggregatedResponse = {
@@ -41,4 +43,5 @@ export type AnalyticsEntityAggregatedResponse = {
   entityIds: string[];
   entityAggregatedStats: AnalyticsStatsMetrics[];
   endpointCountMap: Record<string, number>;
+  idToNameMap: Record<string, string>;
 };

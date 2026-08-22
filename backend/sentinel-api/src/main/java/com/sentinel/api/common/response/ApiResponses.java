@@ -1,6 +1,6 @@
 package com.sentinel.api.common.response;
 
-import com.sentinel.common.cassandra.dto.CursorPaginationResponse;
+import com.sentinel.common.cassandra.paginator.dto.CursorPaginationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

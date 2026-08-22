@@ -1,6 +1,6 @@
 package com.sentinel.api.analytics.dto.response;
 
-import com.sentinel.common.analytics.dto.response.TimeSeriesStatsResponse;
+import com.sentinel.common.cassandra.analytics.dto.response.TimeSeriesStatsResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AnalyticsTimeSeriesResponse extends TimeSeriesStatsResponse {
 
-    public AnalyticsTimeSeriesResponse(TimeSeriesStatsResponse timeSeriesStatsResponse, Long endpointCount) {
+    public AnalyticsTimeSeriesResponse(
+            TimeSeriesStatsResponse timeSeriesStatsResponse,
+            Long endpointCount,
+            String entityName
+    ) {
         super(
                 timeSeriesStatsResponse.getBucket(),
                 timeSeriesStatsResponse.getScope(),
@@ -20,8 +24,10 @@ public class AnalyticsTimeSeriesResponse extends TimeSeriesStatsResponse {
                 timeSeriesStatsResponse.getTimeSeriesStats()
         );
         this.endpointCount = endpointCount;
+        this.entityName = entityName;
     }
 
     private Long endpointCount;
+    private String entityName;
 
 }

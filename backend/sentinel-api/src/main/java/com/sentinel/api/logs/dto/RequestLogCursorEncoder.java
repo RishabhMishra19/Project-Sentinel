@@ -1,7 +1,7 @@
 package com.sentinel.api.logs.dto;
 
-import com.sentinel.common.cassandra.CursorEncoder;
-import com.sentinel.common.observability.entity.RequestLog;
+import com.sentinel.common.cassandra.paginator.CursorEncoder;
+import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

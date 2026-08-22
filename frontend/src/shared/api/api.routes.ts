@@ -63,7 +63,7 @@ export const ROLES_API_ROUTES = {
 export const ANALYTICS_API_ROUTES = {
   SUMMARY: "/analytics/summary",
   TIMESERIES: "/analytics/timeseries",
-  ENTITY_AGGREGATED: "/analytics/entityAggregated",
+  CHILDREN_AGGREGATED: "/analytics/childrenAggregated",
 } as const;
 
 export const LOGS_API_ROUTES = {
