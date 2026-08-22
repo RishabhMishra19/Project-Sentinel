@@ -1,12 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { AnalyticsApi } from "../api/AnalyticsApi";
-import type {
-  AnalyticsEntityAggregatedRequestParams,
-  AnalyticsSummaryRequestParams,
-} from "../dto/request/analytics.request";
+import type { AnalyticsSummaryRequestParams } from "../dto/request/analytics.request";
 import { useAnalyticsUrlState } from "./useAnalyticsUrlState";
 import type { AnalyticsTimeSeriesResponse } from "../dto/response/analytics.response";
-import { AnalyticsScope } from "../utils/analytics.constants";
 
 const analyticsQueryKey = ["analytics"];
 
