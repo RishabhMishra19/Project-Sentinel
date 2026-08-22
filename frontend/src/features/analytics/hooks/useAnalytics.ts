@@ -6,6 +6,7 @@ import type {
 } from "../dto/request/analytics.request";
 import { useAnalyticsUrlState } from "./useAnalyticsUrlState";
 import type { AnalyticsTimeSeriesResponse } from "../dto/response/analytics.response";
+import { AnalyticsScope } from "../utils/analytics.constants";
 
 const analyticsQueryKey = ["analytics"];
 
@@ -61,8 +62,14 @@ export const useAnalyticsTimeseriesQuery = () => {
 
 export const useAnalyticsEntityAggregatedQuery = () => {
   const { validState } = useAnalyticsUrlState();
+  const nextScope = {
+    [AnalyticsScope.TENANT]: AnalyticsScope.PRODUCT,
+    [AnalyticsScope.PRODUCT]: AnalyticsScope.SERVICE,
+    [AnalyticsScope.SERVICE]: AnalyticsScope.ENDPOINT,
+    [AnalyticsScope.ENDPOINT]: AnalyticsScope.ENDPOINT,
+  }[validState.scope];
   const params = {
-    scope: validState.scope,
+    scope: nextScope,
     bucket: validState.bucket,
     from: validState.from,
     to: validState.to,
