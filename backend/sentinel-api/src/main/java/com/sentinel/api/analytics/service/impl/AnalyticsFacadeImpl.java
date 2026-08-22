@@ -52,7 +52,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
                 bucket
         );
         long activeEndpoints = this.countEndPoints(params.entityId(), params.scope());
-        return new AnalyticsSummaryResponse(bucket, params.entityId(), metrics, activeEndpoints);
+        return new AnalyticsSummaryResponse(bucket, params.scope(), params.entityId(), activeEndpoints, metrics);
     }
 
     @Override

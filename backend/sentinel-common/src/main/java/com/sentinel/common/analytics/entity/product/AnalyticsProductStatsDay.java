@@ -19,8 +19,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AnalyticsProductStatsDay extends AnalyticsStatsMetrics {
 
-    public AnalyticsProductStatsDay(AnalyticsStatsMetrics metrics, UUID productId, Instant startBucket) {
-        super(metrics);
+    public AnalyticsProductStatsDay(AnalyticsStatsMetrics statsMetrics, UUID productId, Instant startBucket) {
+        super(statsMetrics);
         this.id = new PrimaryKeyComposite();
         this.id.productId = productId;
         this.id.bucketStart = startBucket;

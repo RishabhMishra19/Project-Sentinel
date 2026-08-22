@@ -25,6 +25,8 @@ public class AnalyticsUtils {
         return String.format(
                 """
                             SELECT
+                               %s as scopeId,
+                               MIN(bucket_start) as bucket_start,
                                SUM(request_count) AS request_count,
                                SUM(error_count) AS error_count,
                                SUM(status_2xx) AS status_2xx,
@@ -43,7 +45,7 @@ public class AnalyticsUtils {
                             WHERE %s = ?
                               AND bucket_start >= ?
                               AND bucket_start < ?
-                        """, tableName, idColumnName
+                        """, idColumnName, tableName, idColumnName
         );
     }
 
