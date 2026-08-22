@@ -1,7 +1,7 @@
 import type { AnalyticsBucketType } from "../../dto/request/analytics.request";
 import { useAnalyticsUrlState } from "../../hooks/useAnalyticsUrlState";
 import { AnalyticsScope } from "../../utils/analytics.constants";
-import { BucketSelecField } from "../BucketSelecField";
+import { BucketSelecField } from "./BucketSelecField";
 import { EndpointSelecField } from "./EndpointSelecField";
 import { ProductSelecField } from "./ProductSelecField";
 import { ServiceSelectField } from "./ServiceSelectField";

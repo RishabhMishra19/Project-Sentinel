@@ -1,6 +1,6 @@
-import { SelectFilter } from "../../../shared/ui/filters/controls";
-import { BUCKET_OPTIONS } from "../utils/analytics.constants";
-import { FilterSelectWrapper } from "./toolbar/FilterSelectWrapper";
+import { SelectFilter } from "../../../../shared/ui/filters/controls";
+import { BUCKET_OPTIONS } from "../../utils/analytics.constants";
+import { FilterSelectWrapper } from "./FilterSelectWrapper";
 
 type BucketSelecFieldProps = {
   val: string;

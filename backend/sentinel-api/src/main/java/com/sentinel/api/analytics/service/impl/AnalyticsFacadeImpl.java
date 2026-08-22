@@ -112,7 +112,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
                 return serviceRepository.findIdsByProductIdsAndStatus(productIds, ServiceStatus.ACTIVE);
             }
             case ENDPOINT -> {
-                return endpointRepository.findIdsByServiceIds(serviceIds);
+                return endpointRepository.findIdsByServiceIds(serviceIds).stream().map(v->v.getId().getEndpointId()).toList();
             }
         }
         return new ArrayList<>();

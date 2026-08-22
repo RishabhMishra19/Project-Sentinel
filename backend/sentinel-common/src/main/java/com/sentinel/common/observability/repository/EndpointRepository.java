@@ -34,8 +34,8 @@ public interface EndpointRepository
             UUID serviceId,
             List<UUID> endpointIds);
 
-    @Query("SELECT e.id FROM endpoints e where e.service_id in :serviceIds")
-    List<UUID> findIdsByServiceIds(@Param("serviceIds") List<UUID> serviceIds);
+    @Query("SELECT * FROM endpoints where service_id in :serviceIds")
+    List<Endpoint> findIdsByServiceIds(@Param("serviceIds") List<UUID> serviceIds);
 
     @Query("SELECT id FROM endpoints")
     List<UUID> findAllIds();
