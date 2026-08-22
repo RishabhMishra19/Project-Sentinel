@@ -40,7 +40,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
             """)
     List<UUID> findAllProductIdsByTenantIdAndStatus(UUID tenantId, ProductStatus status);
 
-    @Query("SELECT p.id FROM Product p WHERE p.status = :status and p.id = :tenantId")
+    @Query("SELECT p.id FROM Product p WHERE p.status = :status and p.tenant.id = :tenantId")
     List<UUID> findIdsByTenantIdAndStatus(UUID tenantId, ProductStatus status);
 
     @Query("SELECT p.id FROM Product p WHERE p.status = :status")

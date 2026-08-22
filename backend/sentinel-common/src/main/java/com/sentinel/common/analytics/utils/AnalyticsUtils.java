@@ -1,9 +1,7 @@
 package com.sentinel.common.analytics.utils;
 
 import com.datastax.oss.driver.api.core.cql.Row;
-import com.sentinel.common.analytics.dto.AnalyticsEntityAggregatedMetrics;
-import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
-import com.sentinel.common.analytics.dto.AnalyticsTimeSeriesMetrics;
+import com.sentinel.common.analytics.dto.AnalyticsStatsMetrics;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -19,13 +17,13 @@ public class AnalyticsUtils {
         return scope.getName() + "_id";
     }
 
-    public static String getStatCql(AnalyticsScope scope, AnalyticsBucket bucket) {
+    public static String getTotalStatCql(AnalyticsScope scope, AnalyticsBucket bucket) {
         String tableName = AnalyticsUtils.getTableName(scope, bucket);
         String idColumnName = AnalyticsUtils.getIdColumnName(scope);
         return String.format(
                 """
                             SELECT
-                               %s as scopeId,
+                               %s as entity_id,
                                MIN(bucket_start) as bucket_start,
                                SUM(request_count) AS request_count,
                                SUM(error_count) AS error_count,
@@ -36,9 +34,9 @@ public class AnalyticsUtils {
                                SUM(latency_sum_ms) AS latency_sum_ms,
                                MIN(latency_min_ms) AS latency_min_ms,
                                MAX(latency_max_ms) AS latency_max_ms,
-                               SUM(latency_p50_ms * request_count) AS latency_p50_ms,
-                               SUM(latency_p95_ms * request_count) AS latency_p95_ms,
-                               SUM(latency_p99_ms * request_count) AS latency_p99_ms,
+                               SUM(latency_p50_ms * request_count) AS latency_p50_ms_weighted_sum,
+                               SUM(latency_p95_ms * request_count) AS latency_p95_ms_weighted_sum,
+                               SUM(latency_p99_ms * request_count) AS latency_p99_ms_weighted_sum,
                                SUM(request_bytes_total) AS request_bytes_total,
                                SUM(response_bytes_total) AS response_bytes_total
                             FROM %s
@@ -56,6 +54,7 @@ public class AnalyticsUtils {
                 """
                             SELECT
                                %s as entity_id,
+                               MIN(bucket_start) as bucket_start,
                                SUM(request_count) AS request_count,
                                SUM(error_count) AS error_count,
                                SUM(status_2xx) AS status_2xx,
@@ -65,9 +64,9 @@ public class AnalyticsUtils {
                                SUM(latency_sum_ms) AS latency_sum_ms,
                                MIN(latency_min_ms) AS latency_min_ms,
                                MAX(latency_max_ms) AS latency_max_ms,
-                               SUM(latency_p50_ms * request_count) AS latency_p50_ms,
-                               SUM(latency_p95_ms * request_count) AS latency_p95_ms,
-                               SUM(latency_p99_ms * request_count) AS latency_p99_ms,
+                               SUM(latency_p50_ms * request_count) AS latency_p50_ms_weighted_sum,
+                               SUM(latency_p95_ms * request_count) AS latency_p95_ms_weighted_sum,
+                               SUM(latency_p99_ms * request_count) AS latency_p99_ms_weighted_sum,
                                SUM(request_bytes_total) AS request_bytes_total,
                                SUM(response_bytes_total) AS response_bytes_total
                             FROM %s
@@ -85,41 +84,37 @@ public class AnalyticsUtils {
         return String.format(
                 """
                             SELECT
-                               *
+                               %s as entity_id,
+                               bucket_start,
+                               request_count,
+                               error_count,
+                               status_2xx,
+                               status_3xx,
+                               status_4xx,
+                               status_5xx,
+                               latency_sum_ms,
+                               latency_min_ms,
+                               latency_max_ms,
+                               (latency_p50_ms * request_count) * 1 AS latency_p50_ms_weighted_sum,
+                               (latency_p95_ms * request_count) * 1 AS latency_p95_ms_weighted_sum,
+                               (latency_p99_ms * request_count) * 1 AS latency_p99_ms_weighted_sum,
+                               request_bytes_total,
+                               response_bytes_total
                             FROM %s
                             WHERE %s = ?
                                AND bucket_start >= ?
                                AND bucket_start < ?
-                        """, tableName, idColumnName
+                        """, idColumnName, tableName, idColumnName
         );
-    }
-
-    public static void updateMetricsLatencies(AnalyticsStatsMetrics statsMetrics) {
-        if (statsMetrics != null && statsMetrics.getRequestCount() > 0) {
-            statsMetrics.setLatencyP50Ms((long) Math.ceil((double) statsMetrics.getLatencyP50Ms() / statsMetrics.getRequestCount()));
-            statsMetrics.setLatencyP95Ms((long) Math.ceil((double) statsMetrics.getLatencyP95Ms() / statsMetrics.getRequestCount()));
-            statsMetrics.setLatencyP99Ms((long) Math.ceil((double) statsMetrics.getLatencyP99Ms() / statsMetrics.getRequestCount()));
-        }
-    }
-
-    public static AnalyticsEntityAggregatedMetrics entityAggregatedMetricsRowMapper(Row row, int rowColumn) {
-        return AnalyticsEntityAggregatedMetrics.builder()
-                .scopeId(getUUID(row, "entity_id"))
-                .statsMetrics(statsMetricsRowMapper(row, rowColumn))
-                .build();
-    }
-
-    public static AnalyticsTimeSeriesMetrics entityTimeSeriesRowMapper(Row row, int rowColumn) {
-        return AnalyticsTimeSeriesMetrics.builder()
-                .bucketStart(getInstant(row, "bucket_start"))
-                .statsMetrics(statsMetricsRowMapper(row, rowColumn))
-                .build();
     }
 
     public static AnalyticsStatsMetrics statsMetricsRowMapper(Row row, int rowNum) {
         return AnalyticsStatsMetrics.builder()
+                .entityId(getUUID(row, "entity_id"))
+                .bucketStart(getInstant(row, "bucket_start"))
                 .requestCount(getLong(row, "request_count"))
                 .errorCount(getLong(row, "error_count"))
+                .errorRate((double)getLong(row, "error_count") / (double)Math.min(1L, getLong(row, "request_count")))
                 .status2xx(getLong(row, "status_2xx"))
                 .status3xx(getLong(row, "status_3xx"))
                 .status4xx(getLong(row, "status_4xx"))
@@ -127,9 +122,9 @@ public class AnalyticsUtils {
                 .latencySumMs(getLong(row, "latency_sum_ms"))
                 .latencyMinMs(getLong(row, "latency_min_ms"))
                 .latencyMaxMs(getLong(row, "latency_max_ms"))
-                .latencyP50Ms(getLong(row, "latency_p50_ms"))
-                .latencyP95Ms(getLong(row, "latency_p95_ms"))
-                .latencyP99Ms(getLong(row, "latency_p99_ms"))
+                .latencyP50Ms(getLong(row, "latency_p50_ms_weighted_sum") / Math.min(1L, getLong(row, "request_count")))
+                .latencyP95Ms(getLong(row, "latency_p95_ms_weighted_sum") / Math.min(1L, getLong(row, "request_count")))
+                .latencyP99Ms(getLong(row, "latency_p99_ms_weighted_sum") / Math.min(1L, getLong(row, "request_count")))
                 .requestBytesTotal(getLong(row, "request_bytes_total"))
                 .responseBytesTotal(getLong(row, "response_bytes_total"))
                 .build();
@@ -149,10 +144,12 @@ public class AnalyticsUtils {
     }
 
     public static AnalyticsBucket getAnalyticsBucket(Instant from, Instant to) {
-        if(from.truncatedTo(ChronoUnit.DAYS).isBefore(to.truncatedTo(ChronoUnit.DAYS))) {
+        if (from.truncatedTo(ChronoUnit.DAYS)
+                .isBefore(to.truncatedTo(ChronoUnit.DAYS))) {
             return AnalyticsBucket.DAY;
         }
-        if(from.truncatedTo(ChronoUnit.HOURS).isBefore(to.truncatedTo(ChronoUnit.HOURS))) {
+        if (from.truncatedTo(ChronoUnit.HOURS)
+                .isBefore(to.truncatedTo(ChronoUnit.HOURS))) {
             return AnalyticsBucket.HOUR;
         }
         return AnalyticsBucket.MINUTE;

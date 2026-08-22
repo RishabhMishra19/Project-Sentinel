@@ -1,6 +1,7 @@
 package com.sentinel.common.analytics.entity.service;
 
-import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.entity.AnalyticsStatsBase;
+import com.sentinel.common.analytics.dto.AnalyticsStatsMetrics;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,11 +18,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AnalyticsServiceStatsDay extends AnalyticsStatsMetrics {
+public class AnalyticsServiceStatsDay extends AnalyticsStatsBase {
 
     public AnalyticsServiceStatsDay(AnalyticsStatsMetrics statsMetrics, UUID serviceId, Instant startBucket) {
         super(statsMetrics);
-        this.id  = new PrimaryKeyComposite();
+        this.id = new PrimaryKeyComposite();
         this.id.serviceId = serviceId;
         this.id.bucketStart = startBucket;
     }
@@ -35,16 +36,11 @@ public class AnalyticsServiceStatsDay extends AnalyticsStatsMetrics {
     @PrimaryKeyClass
     public static class PrimaryKeyComposite {
 
-        @PrimaryKeyColumn(
-            name = "service_id",
-            type = PrimaryKeyType.PARTITIONED
-        )
+        @PrimaryKeyColumn(name = "service_id", type = PrimaryKeyType.PARTITIONED)
         private UUID serviceId;
-
-        @PrimaryKeyColumn(
-            name = "bucket_start",
-            type = PrimaryKeyType.CLUSTERED
-        )
+        @PrimaryKeyColumn(name = "bucket_start", type = PrimaryKeyType.CLUSTERED)
         private Instant bucketStart;
+
     }
+
 }

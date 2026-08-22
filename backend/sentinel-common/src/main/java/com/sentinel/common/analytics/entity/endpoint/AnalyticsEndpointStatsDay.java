@@ -1,6 +1,7 @@
 package com.sentinel.common.analytics.entity.endpoint;
 
-import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.entity.AnalyticsStatsBase;
+import com.sentinel.common.analytics.dto.AnalyticsStatsMetrics;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AnalyticsEndpointStatsDay extends AnalyticsStatsMetrics {
+public class AnalyticsEndpointStatsDay extends AnalyticsStatsBase {
 
     public AnalyticsEndpointStatsDay(AnalyticsStatsMetrics statsMetrics, UUID endpointId, Instant bucketStart) {
         super(statsMetrics);

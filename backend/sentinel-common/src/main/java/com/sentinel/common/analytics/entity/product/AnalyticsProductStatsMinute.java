@@ -1,6 +1,7 @@
 package com.sentinel.common.analytics.entity.product;
 
-import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.entity.AnalyticsStatsBase;
+import com.sentinel.common.analytics.dto.AnalyticsStatsMetrics;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AnalyticsProductStatsMinute extends AnalyticsStatsMetrics {
+public class AnalyticsProductStatsMinute extends AnalyticsStatsBase {
 
     @PrimaryKey
     private PrimaryKeyComposite id;
@@ -35,16 +36,11 @@ public class AnalyticsProductStatsMinute extends AnalyticsStatsMetrics {
     @PrimaryKeyClass
     public static class PrimaryKeyComposite {
 
-        @PrimaryKeyColumn(
-            name = "product_id",
-            type = PrimaryKeyType.PARTITIONED
-        )
+        @PrimaryKeyColumn(name = "product_id", type = PrimaryKeyType.PARTITIONED)
         private UUID productId;
-
-        @PrimaryKeyColumn(
-            name = "bucket_start",
-            type = PrimaryKeyType.CLUSTERED
-        )
+        @PrimaryKeyColumn(name = "bucket_start", type = PrimaryKeyType.CLUSTERED)
         private Instant bucketStart;
+
     }
+
 }

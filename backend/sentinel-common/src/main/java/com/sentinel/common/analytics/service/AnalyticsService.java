@@ -1,8 +1,8 @@
 package com.sentinel.common.analytics.service;
 
-import com.sentinel.common.analytics.dto.AnalyticsEntityAggregatedMetrics;
-import com.sentinel.common.analytics.dto.AnalyticsTimeSeriesMetrics;
-import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.dto.response.EntityAggregatedStatsResponse;
+import com.sentinel.common.analytics.dto.response.TimeSeriesStatsResponse;
+import com.sentinel.common.analytics.dto.response.TotalStatsResponse;
 import com.sentinel.common.analytics.utils.AnalyticsBucket;
 import com.sentinel.common.analytics.utils.AnalyticsScope;
 
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public interface AnalyticsService {
 
-    AnalyticsStatsMetrics findStats(
+    TotalStatsResponse findTotalStats(
             UUID entityId,
             Instant from,
             Instant to,
@@ -20,7 +20,7 @@ public interface AnalyticsService {
             AnalyticsBucket bucket
     );
 
-    List<AnalyticsEntityAggregatedMetrics> findAggregatedMetrics(
+    EntityAggregatedStatsResponse findEntityAggregatedStats(
             List<UUID> entityIds,
             Instant from,
             Instant to,
@@ -28,7 +28,7 @@ public interface AnalyticsService {
             AnalyticsBucket bucket
     );
 
-    List<AnalyticsTimeSeriesMetrics> findTimeSeriesMetrics(
+    TimeSeriesStatsResponse findTimeSeriesStats(
             UUID entityId,
             Instant from,
             Instant to,

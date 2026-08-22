@@ -1,6 +1,7 @@
 package com.sentinel.common.analytics.entity.endpoint;
 
-import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.entity.AnalyticsStatsBase;
+import com.sentinel.common.analytics.dto.AnalyticsStatsMetrics;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,11 +18,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AnalyticsEndpointStatsHour extends AnalyticsStatsMetrics {
+public class AnalyticsEndpointStatsHour extends AnalyticsStatsBase {
 
-    public AnalyticsEndpointStatsHour(AnalyticsStatsMetrics statsMetrics, UUID endpointId, Instant bucketStart){
+    public AnalyticsEndpointStatsHour(AnalyticsStatsMetrics statsMetrics, UUID endpointId, Instant bucketStart) {
         super(statsMetrics);
-        this.id  = new PrimaryKeyComposite();
+        this.id = new PrimaryKeyComposite();
         this.id.endpointId = endpointId;
         this.id.bucketStart = bucketStart;
     }
@@ -35,16 +36,11 @@ public class AnalyticsEndpointStatsHour extends AnalyticsStatsMetrics {
     @PrimaryKeyClass
     public static class PrimaryKeyComposite {
 
-        @PrimaryKeyColumn(
-            name = "endpoint_id",
-            type = PrimaryKeyType.PARTITIONED
-        )
+        @PrimaryKeyColumn(name = "endpoint_id", type = PrimaryKeyType.PARTITIONED)
         private UUID endpointId;
-
-        @PrimaryKeyColumn(
-            name = "bucket_start",
-            type = PrimaryKeyType.CLUSTERED
-        )
+        @PrimaryKeyColumn(name = "bucket_start", type = PrimaryKeyType.CLUSTERED)
         private Instant bucketStart;
+
     }
+
 }

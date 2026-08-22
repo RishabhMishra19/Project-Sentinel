@@ -1,8 +1,9 @@
 package com.sentinel.common.analytics.service;
 
-import com.sentinel.common.analytics.dto.AnalyticsEntityAggregatedMetrics;
-import com.sentinel.common.analytics.dto.AnalyticsTimeSeriesMetrics;
-import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.dto.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.dto.response.EntityAggregatedStatsResponse;
+import com.sentinel.common.analytics.dto.response.TimeSeriesStatsResponse;
+import com.sentinel.common.analytics.dto.response.TotalStatsResponse;
 import com.sentinel.common.analytics.utils.AnalyticsBucket;
 import com.sentinel.common.analytics.utils.AnalyticsScope;
 import com.sentinel.common.analytics.utils.AnalyticsUtils;
@@ -20,15 +21,15 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     private final CqlTemplate cqlTemplate;
 
-    public AnalyticsStatsMetrics findStats(
+    public TotalStatsResponse findTotalStats(
             UUID entityId,
             Instant from,
             Instant to,
             AnalyticsScope scope,
             AnalyticsBucket bucket
     ) {
-        String cql = AnalyticsUtils.getStatCql(scope, bucket);
-        AnalyticsStatsMetrics statsMetrics = cqlTemplate.query(
+        String cql = AnalyticsUtils.getTotalStatCql(scope, bucket);
+        AnalyticsStatsMetrics totalStats = cqlTemplate.query(
                         cql,
                         AnalyticsUtils::statsMetricsRowMapper,
                         entityId,
@@ -38,11 +39,10 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .stream()
                 .findFirst()
                 .orElse(null);
-        AnalyticsUtils.updateMetricsLatencies(statsMetrics);
-        return statsMetrics;
+        return new TotalStatsResponse(bucket, scope, entityId, totalStats);
     }
 
-    public List<AnalyticsEntityAggregatedMetrics> findAggregatedMetrics(
+    public EntityAggregatedStatsResponse findEntityAggregatedStats(
             List<UUID> entityIds,
             Instant from,
             Instant to,
@@ -50,20 +50,17 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             AnalyticsBucket bucket
     ) {
         String cql = AnalyticsUtils.getEntityAggregatedStatsCql(scope, bucket);
-        List<AnalyticsEntityAggregatedMetrics> entityAggregatedMetricsList = cqlTemplate.query(
+        List<AnalyticsStatsMetrics> entityAggregatedStats = cqlTemplate.query(
                 cql,
-                AnalyticsUtils::entityAggregatedMetricsRowMapper,
+                AnalyticsUtils::statsMetricsRowMapper,
                 entityIds,
                 from,
                 to
         );
-        for (AnalyticsEntityAggregatedMetrics metrics : entityAggregatedMetricsList) {
-            AnalyticsUtils.updateMetricsLatencies(metrics.getStatsMetrics());
-        }
-        return entityAggregatedMetricsList;
+        return new EntityAggregatedStatsResponse(bucket, scope, entityIds, entityAggregatedStats);
     }
 
-    public List<AnalyticsTimeSeriesMetrics> findTimeSeriesMetrics(
+    public TimeSeriesStatsResponse findTimeSeriesStats(
             UUID entityId,
             Instant from,
             Instant to,
@@ -71,17 +68,14 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             AnalyticsBucket bucket
     ) {
         String cql = AnalyticsUtils.getTimeSeriesStatsCql(scope, bucket);
-        List<AnalyticsTimeSeriesMetrics> entityTimeSeriesMetricsList = cqlTemplate.query(
+        List<AnalyticsStatsMetrics> timeSeriesStats = cqlTemplate.query(
                 cql,
-                AnalyticsUtils::entityTimeSeriesRowMapper,
+                AnalyticsUtils::statsMetricsRowMapper,
                 entityId,
                 from,
                 to
         );
-        for (AnalyticsTimeSeriesMetrics metrics : entityTimeSeriesMetricsList) {
-            AnalyticsUtils.updateMetricsLatencies(metrics.getStatsMetrics());
-        }
-        return entityTimeSeriesMetricsList;
+        return new TimeSeriesStatsResponse(bucket, scope, entityId, timeSeriesStats);
     }
 
 }

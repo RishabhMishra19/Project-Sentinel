@@ -1,39 +1,27 @@
 package com.sentinel.api.analytics.dto.response;
 
-import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
-import com.sentinel.common.analytics.utils.AnalyticsBucket;
-import com.sentinel.common.analytics.utils.AnalyticsScope;
+import com.sentinel.common.analytics.dto.response.TotalStatsResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnalyticsSummaryResponse extends AnalyticsStatsMetrics {
+public class AnalyticsSummaryResponse extends TotalStatsResponse {
 
-    public AnalyticsSummaryResponse(
-            AnalyticsBucket bucket,
-            AnalyticsScope scope,
-            UUID scopeId,
-            Long activeEndpointCount,
-            AnalyticsStatsMetrics statsMetrics
-    ) {
-        super(statsMetrics);
-        this.bucket = bucket;
-        this.scope = scope;
-        this.scopeId = scopeId;
-        this.activeEndpointCount = activeEndpointCount;
+    public AnalyticsSummaryResponse(TotalStatsResponse totalStatsResponse, Long endpointCount) {
+        super(
+                totalStatsResponse.getBucket(),
+                totalStatsResponse.getScope(),
+                totalStatsResponse.getEntityId(),
+                totalStatsResponse.getTotalStats()
+        );
+        this.endpointCount = endpointCount;
     }
 
-    private AnalyticsBucket bucket;
-    private AnalyticsScope scope;
-    private UUID scopeId;
-    private Double errorRate;
-    private Long activeEndpointCount;
+    private Long endpointCount;
 
 }

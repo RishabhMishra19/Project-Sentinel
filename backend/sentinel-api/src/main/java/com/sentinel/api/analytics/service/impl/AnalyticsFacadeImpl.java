@@ -13,9 +13,9 @@ import com.sentinel.api.service.entity.ServiceStatus;
 import com.sentinel.api.service.repository.ServiceRepository;
 import com.sentinel.api.tenant.entity.TenantStatus;
 import com.sentinel.api.tenant.repository.TenantRepository;
-import com.sentinel.common.analytics.dto.AnalyticsEntityAggregatedMetrics;
-import com.sentinel.common.analytics.dto.AnalyticsTimeSeriesMetrics;
-import com.sentinel.common.analytics.entity.AnalyticsStatsMetrics;
+import com.sentinel.common.analytics.dto.response.EntityAggregatedStatsResponse;
+import com.sentinel.common.analytics.dto.response.TimeSeriesStatsResponse;
+import com.sentinel.common.analytics.dto.response.TotalStatsResponse;
 import com.sentinel.common.analytics.service.AnalyticsService;
 import com.sentinel.common.analytics.utils.AnalyticsBucket;
 import com.sentinel.common.analytics.utils.AnalyticsScope;
@@ -26,7 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -44,7 +46,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     @Transactional(readOnly = true)
     public AnalyticsSummaryResponse getSummary(AnalyticsSummaryRequestParams params) {
         AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
-        AnalyticsStatsMetrics metrics = analyticsService.findStats(
+        TotalStatsResponse totalStats = analyticsService.findTotalStats(
                 params.entityId(),
                 params.from(),
                 params.to(),
@@ -52,13 +54,13 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
                 bucket
         );
         long activeEndpoints = this.countEndPoints(params.entityId(), params.scope());
-        return new AnalyticsSummaryResponse(bucket, params.scope(), params.entityId(), activeEndpoints, metrics);
+        return new AnalyticsSummaryResponse(totalStats, activeEndpoints);
     }
 
     @Override
     @Transactional(readOnly = true)
     public AnalyticsTimeSeriesResponse getTimeSeries(AnalyticsTimeSeriesRequestParams params) {
-        List<AnalyticsTimeSeriesMetrics> metricsList = analyticsService.findTimeSeriesMetrics(
+        TimeSeriesStatsResponse timeSeriesStatsResponse = analyticsService.findTimeSeriesStats(
                 params.entityId(),
                 params.from(),
                 params.to(),
@@ -66,7 +68,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
                 params.bucket()
         );
         long activeEndpoints = this.countEndPoints(params.entityId(), params.scope());
-        return AnalyticsTimeSeriesResponse.from(params.bucket(), metricsList, activeEndpoints);
+        return new AnalyticsTimeSeriesResponse(timeSeriesStatsResponse, activeEndpoints);
     }
 
     @Override
@@ -77,23 +79,18 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     ) {
         List<UUID> entityIds = this.getScopeEntityIds(activeTenantId, params);
         AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
-        List<AnalyticsEntityAggregatedMetrics> aggregatedMetricsList = analyticsService.findAggregatedMetrics(
-                entityIds,
+        EntityAggregatedStatsResponse entityAggregatedStatsResponse = analyticsService.findEntityAggregatedStats(entityIds,
                 params.from(),
                 params.to(),
                 params.scope(),
                 bucket
         );
-        AnalyticsEntityAggregatedResponse response = new AnalyticsEntityAggregatedResponse(new ArrayList<>());
-        for (AnalyticsEntityAggregatedMetrics entityAggregatedMetrics : aggregatedMetricsList) {
-            long activeEndpoints = this.countEndPoints(entityAggregatedMetrics.getScopeId(), params.scope());
-            response.items()
-                    .add(new AnalyticsEntityAggregatedResponse.AnalyticsEntityAggregatedItem(
-                            entityAggregatedMetrics,
-                            activeEndpoints
-                    ));
+        Map<UUID, Long> endpointCountMap = new HashMap<>();
+        for (UUID entityId : entityIds) {
+            long activeEndpoints = this.countEndPoints(entityId, params.scope());
+            endpointCountMap.put(entityId, activeEndpoints);
         }
-        return response;
+        return new AnalyticsEntityAggregatedResponse(entityAggregatedStatsResponse, endpointCountMap);
     }
 
     private List<UUID> getScopeEntityIds(UUID activeTenantId, AnalyticsEntityAggregatedRequestParams params) {

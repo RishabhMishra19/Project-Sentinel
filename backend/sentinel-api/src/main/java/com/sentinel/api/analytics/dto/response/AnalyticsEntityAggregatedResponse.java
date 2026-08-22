@@ -1,68 +1,33 @@
 package com.sentinel.api.analytics.dto.response;
 
-import com.sentinel.common.analytics.dto.AnalyticsEntityAggregatedMetrics;
+import com.sentinel.common.analytics.dto.response.EntityAggregatedStatsResponse;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-public record AnalyticsEntityAggregatedResponse(List<AnalyticsEntityAggregatedItem> items) {
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class AnalyticsEntityAggregatedResponse extends EntityAggregatedStatsResponse {
 
-    public record AnalyticsEntityAggregatedItem(
-            UUID id,
-            long requestCount,
-            long errorCount,
-            double errorRate,
-            long status2xx,
-            long status3xx,
-            long status4xx,
-            long status5xx,
-            Long latencyMinMs,
-            Long latencyMaxMs,
-            Long latencyP50Ms,
-            Long latencyP95Ms,
-            Long latencyP99Ms,
-            long requestBytesTotal,
-            long responseBytesTotal,
-            Long activeEndpointCount
+    public AnalyticsEntityAggregatedResponse(
+            EntityAggregatedStatsResponse entityAggregatedStatsResponse,
+            Map<UUID, Long> endpointCountMap
     ) {
-
-        public AnalyticsEntityAggregatedItem(AnalyticsEntityAggregatedMetrics aggMetrics, long activeEndpointCount) {
-            this(
-                    aggMetrics.getScopeId(),
-                    aggMetrics.getStatsMetrics()
-                            .getRequestCount(),
-                    aggMetrics.getStatsMetrics()
-                            .getErrorCount(),
-                    aggMetrics.getStatsMetrics()
-                            .getRequestCount() == 0 ? 0 : ((double) aggMetrics.getStatsMetrics()
-                            .getErrorCount() / aggMetrics.getStatsMetrics()
-                            .getRequestCount()),
-                    aggMetrics.getStatsMetrics()
-                            .getStatus2xx(),
-                    aggMetrics.getStatsMetrics()
-                            .getStatus3xx(),
-                    aggMetrics.getStatsMetrics()
-                            .getStatus4xx(),
-                    aggMetrics.getStatsMetrics()
-                            .getStatus5xx(),
-                    aggMetrics.getStatsMetrics()
-                            .getLatencyMinMs(),
-                    aggMetrics.getStatsMetrics()
-                            .getLatencyMaxMs(),
-                    aggMetrics.getStatsMetrics()
-                            .getLatencyP50Ms(),
-                    aggMetrics.getStatsMetrics()
-                            .getLatencyP95Ms(),
-                    aggMetrics.getStatsMetrics()
-                            .getLatencyP99Ms(),
-                    aggMetrics.getStatsMetrics()
-                            .getRequestBytesTotal(),
-                    aggMetrics.getStatsMetrics()
-                            .getResponseBytesTotal(),
-                    activeEndpointCount
-            );
-        }
-
+        super(
+                entityAggregatedStatsResponse.getBucket(),
+                entityAggregatedStatsResponse.getScope(),
+                entityAggregatedStatsResponse.getEntityIds(),
+                entityAggregatedStatsResponse.getEntityAggregatedStats()
+        );
+        this.endpointCountMap = endpointCountMap;
     }
+
+    private Map<UUID, Long> endpointCountMap;
 
 }
