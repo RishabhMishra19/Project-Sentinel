@@ -50,10 +50,7 @@ export const DataTable = <T extends object>({
           isLoading={isLoading}
           emptyMessage={emptyMessage}
           skeletonRowCount={pagination?.pageSize}
-          onScrollEnd={() => {
-            console.log("on scroll end");
-            onScrollEnd?.();
-          }}
+          onScrollEnd={onScrollEnd}
         />
         {cursorPagination ? (
           <DataTableCursorPaginationBar cursorPagination={cursorPagination} />

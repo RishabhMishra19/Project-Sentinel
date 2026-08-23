@@ -62,7 +62,7 @@ export const AnalyticsKpiStrip = () => {
       className="min-h-[4.5rem]"
     >
       {summary ? (
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-row gap-2 p-0 m-0">
           <Kpi
             label="Total Requests"
             value={formatNumber(summary.totalStats.requestCount)}

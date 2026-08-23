@@ -4,6 +4,8 @@ import { AnalyticsBucket, AnalyticsScope } from "../utils/analytics.constants";
 import { isValidDate } from "../../../shared/utils/dateUtils";
 import type { AnalyticsBucketType, AnalyticsScopeType } from "../dto/request/analytics.request";
 import { useEffect } from "react";
+import { useProductsQuery } from "../../products/hooks/useProducts";
+import { useServiceEndpointsQuery, useServicesQuery } from "../../services/hooks/useServices";
 
 type AnalyticsUrlState =
   | {
@@ -157,6 +159,29 @@ export const useAnalyticsUrlState = () => {
 
   const validState = convertSearchParamsToValidState(searchParams, activeTenant.id);
 
+  const productQuery = useProductsQuery({ pageable: { page: 0, size: 100 } });
+
+  const serviceQuery = useServicesQuery(validState.productId, {
+    pageable: { page: 0, size: 100 },
+  });
+
+  const endpointQuery = useServiceEndpointsQuery(validState.productId, validState.serviceId);
+
+  const productOptions = (productQuery.data?.content ?? []).map((product) => ({
+    label: product.name,
+    value: product.id,
+  }));
+
+  const serviceOptions = (serviceQuery.data?.content ?? []).map((service) => ({
+    label: service.name,
+    value: service.id,
+  }));
+
+  const endpointOptions = (endpointQuery.data ?? []).map((endpoint) => ({
+    label: endpoint.method + " :  " + endpoint.pathTemplate,
+    value: endpoint.id,
+  }));
+
   useEffect(() => {
     const urlState = covertSearchParamsToState(searchParams);
     if (JSON.stringify(urlState) !== JSON.stringify(validState)) {
@@ -167,7 +192,7 @@ export const useAnalyticsUrlState = () => {
 
   const updateState = (newValidState: AnalyticsUrlState) => {
     const newValidSearchParams = convertValidStateToSearchParams(newValidState);
-    setSearchParams(newValidSearchParams, { replace: true });
+    setSearchParams(newValidSearchParams);
   };
 
   const entityId = {
@@ -177,9 +202,21 @@ export const useAnalyticsUrlState = () => {
     [AnalyticsScope.ENDPOINT]: validState.endpointId,
   }[validState.scope];
 
+  const selectedTenant = activeTenant.name;
+  const selectedProduct = productOptions.find((v) => v.value === validState.productId)?.label;
+  const selectedService = serviceOptions.find((v) => v.value === validState.serviceId)?.label;
+  const selectedEndpoint = endpointOptions.find((v) => v.value === validState.endpointId)?.label;
+
   return {
     entityId: entityId as string,
     validState,
     updateState,
+    productOptions,
+    serviceOptions,
+    endpointOptions,
+    selectedTenant,
+    selectedProduct,
+    selectedService,
+    selectedEndpoint,
   };
 };

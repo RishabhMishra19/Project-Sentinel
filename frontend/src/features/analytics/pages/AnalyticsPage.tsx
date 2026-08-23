@@ -6,6 +6,7 @@ import {
   AnalyticsVolumeChart,
 } from "../components/AnalyticsCharts";
 import { AnalyticsKpiStrip } from "../components/AnalyticsKpiStrip";
+import { AnalyticsNavigation } from "../components/AnalyticsNavigation";
 import { AnalyticsRankingTable } from "../components/AnalyticsRankingsTable";
 import { AnalyticsToolbar } from "../components/toolbar/AnalyticsToolbar";
 import { TrafficSummary } from "../components/TrafficSummary";
@@ -31,10 +32,11 @@ export const AnalyticsPage = () => {
 
   return (
     <PageContent className="m-0 p-0">
-      <div className="flex justify-between py-2">
-        <AnalyticsKpiStrip />
+      <div className="flex justify-between">
+        <AnalyticsNavigation />
         <AnalyticsToolbar />
       </div>
+      <AnalyticsKpiStrip />
       <TrafficSummary totalStats={summary.data?.totalStats} />
       <div className="flex justify-between flex-wrap">
         <AnalyticsVolumeChart {...timeSeries} />
