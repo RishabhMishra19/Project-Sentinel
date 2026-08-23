@@ -48,7 +48,10 @@ public class AnalyticsStream {
                 value.productId(),
                 value.serviceId(),
                 value.endpointId()
-        )).groupByKey(Grouped.with(Serdes.String(), reqLogSerde));
+        )).groupByKey(Grouped.with(
+                Serdes.String(),
+                reqLogSerde
+        ));
         TimeWindowedKStream<String, KafkaMessage.ReqLog> minuteWindowedStreamEndpoint1M = groupedStreamEndpoint1M.windowedBy(minuteWindow);
         KStream<Windowed<String>, KafkaMessage.Analytics> aggregatedKStreamEndpoint1M = minuteWindowedStreamEndpoint1M.aggregate(
                 KafkaMessage.Analytics::new,
@@ -261,10 +264,10 @@ public class AnalyticsStream {
     }
 
     public void flushToDatabaseTopic(KStream<Windowed<String>, KafkaMessage.Analytics> aggregatedKStream, String targetTopic) {
-        aggregatedKStream.map((windowedKey, val) -> KeyValue.pair(windowedKey.key(), val)).to(
-                targetTopic,
-                Produced.with(Serdes.String(), analyticsSerde)
-        );
+        aggregatedKStream.map((windowedKey, val) -> {
+            val.setStartBucket(windowedKey.window().startTime());
+            return KeyValue.pair(windowedKey.key(), val);
+        }).to(targetTopic, Produced.with(Serdes.String(), analyticsSerde));
     }
 
 }

@@ -52,6 +52,7 @@ public class KafkaMessage {
         public Analytics accumulate(ReqLog reqLog, UUID entityId) {
             this.metrics.accumulate(reqLog);
             this.metrics.setEntityId(entityId);
+            this.id = entityId;
             latencyBuckets[getLatencyBucket(reqLog.durationMs)]++;
             return this;
         }
@@ -59,6 +60,7 @@ public class KafkaMessage {
         public Analytics accumulate(Analytics analytics, UUID entityId) {
             this.metrics.accumulate(analytics.metrics);
             this.metrics.setEntityId(entityId);
+            this.id = entityId;
             for(int i = 0; i < analytics.latencyBuckets.length; i++) {
                 latencyBuckets[i] += analytics.latencyBuckets[i];
             }
