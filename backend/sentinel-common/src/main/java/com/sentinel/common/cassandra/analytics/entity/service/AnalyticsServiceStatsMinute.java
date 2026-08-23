@@ -1,7 +1,7 @@
 package com.sentinel.common.cassandra.analytics.entity.service;
 
 import com.sentinel.common.cassandra.analytics.entity.AnalyticsStatsBase;
-import com.sentinel.common.cassandra.analytics.dto.AnalyticsStatsMetrics;
+import com.sentinel.common.kafka.KafkaMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,7 +23,7 @@ public class AnalyticsServiceStatsMinute extends AnalyticsStatsBase {
     @PrimaryKey
     private PrimaryKeyComposite id;
 
-    public AnalyticsServiceStatsMinute(AnalyticsStatsMetrics statsMetrics, UUID serviceId, Instant bucketStart) {
+    public AnalyticsServiceStatsMinute(KafkaMessage.AnalyticsMetrics statsMetrics, UUID serviceId, Instant bucketStart) {
         super(statsMetrics);
         this.id = new PrimaryKeyComposite();
         this.id.serviceId = serviceId;

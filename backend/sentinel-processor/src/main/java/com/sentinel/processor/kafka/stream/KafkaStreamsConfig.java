@@ -55,8 +55,8 @@ public class KafkaStreamsConfig {
     }
 
     @Bean
-    public Serde<KafkaMessage.Analytics> analyticsSerde(ObjectMapper objectMapper) {
-        return customSerde(objectMapper, KafkaMessage.Analytics.class);
+    public Serde<KafkaMessage.AnalyticsMetrics> analyticsSerde(ObjectMapper objectMapper) {
+        return customSerde(objectMapper, KafkaMessage.AnalyticsMetrics.class);
     }
 
     @Bean

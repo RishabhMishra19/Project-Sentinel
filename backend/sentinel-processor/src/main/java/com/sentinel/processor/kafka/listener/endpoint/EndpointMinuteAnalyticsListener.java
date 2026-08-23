@@ -19,33 +19,33 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class EndpointMinuteAnalyticsListener {
-    private static final Logger log = LoggerFactory.getLogger(EndpointMinuteAnalyticsListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(EndpointMinuteAnalyticsListener.class);
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-    @KafkaListener(topics = KafkaTopics.endpoint_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.endpoint_minute_analytics+"_group")
+    @KafkaListener(topics = KafkaTopics.endpoint_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.endpoint_minute_analytics + "_group")
     public void onEndpointMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
         }
         List<AnalyticsEndpointStatsMinute> stats = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
-            KafkaMessage.Analytics analytics = objectMapper.readValue(record.value(), KafkaMessage.Analytics.class);
-            analytics.calculateAndUpdateLatencyPercentiles();
+            KafkaMessage.AnalyticsMetrics analytics = objectMapper.readValue(record.value(), KafkaMessage.AnalyticsMetrics.class);
             stats.add(toEndpointStatsMinute(analytics));
         }
-
         try {
             CassandraBatchOperations batchOperations = cassandraTemplate.batchOps();
             stats.forEach(batchOperations::insert);
             batchOperations.execute();
         } catch (Exception e) {
-            log.error("Failed processing Kafka batch", e); throw e;
+            log.error("Failed processing Kafka batch", e);
+            throw e;
         }
     }
 
-    private AnalyticsEndpointStatsMinute toEndpointStatsMinute(KafkaMessage.Analytics analytics) {
-        return new AnalyticsEndpointStatsMinute(analytics.getMetrics(), analytics.getId(), analytics.getStartBucket());
+    private AnalyticsEndpointStatsMinute toEndpointStatsMinute(KafkaMessage.AnalyticsMetrics analytics) {
+        return new AnalyticsEndpointStatsMinute(analytics, analytics.getEndpointId(), analytics.getBucketStart());
     }
+
 }

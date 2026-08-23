@@ -19,34 +19,33 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class TenantMinuteAnalyticsListener {
-    private static final Logger log = LoggerFactory.getLogger(TenantMinuteAnalyticsListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(TenantMinuteAnalyticsListener.class);
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-
-    @KafkaListener(topics = KafkaTopics.tenant_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.tenant_minute_analytics+"_group")
+    @KafkaListener(topics = KafkaTopics.tenant_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.tenant_minute_analytics + "_group")
     public void onTenantMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
         }
         List<AnalyticsTenantStatsMinute> analyticsTenantStatsMinutes = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
-            KafkaMessage.Analytics analytics = objectMapper.readValue(record.value(), KafkaMessage.Analytics.class);
-            analytics.calculateAndUpdateLatencyPercentiles();
+            KafkaMessage.AnalyticsMetrics analytics = objectMapper.readValue(record.value(), KafkaMessage.AnalyticsMetrics.class);
             analyticsTenantStatsMinutes.add(this.toTenantStatsMinute(analytics));
         }
         try {
             CassandraBatchOperations batchOperations = cassandraTemplate.batchOps();
             analyticsTenantStatsMinutes.forEach(batchOperations::insert);
             batchOperations.execute();
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed processing Kafka batch", e);
             throw e;
         }
     }
 
-    private AnalyticsTenantStatsMinute toTenantStatsMinute(KafkaMessage.Analytics analytics) {
-        return new  AnalyticsTenantStatsMinute(analytics.getMetrics(), analytics.getId(), analytics.getStartBucket());
+    private AnalyticsTenantStatsMinute toTenantStatsMinute(KafkaMessage.AnalyticsMetrics analytics) {
+        return new AnalyticsTenantStatsMinute(analytics, analytics.getTenantId(), analytics.getBucketStart());
     }
+
 }

@@ -1,7 +1,7 @@
 package com.sentinel.common.cassandra.analytics.entity.endpoint;
 
 import com.sentinel.common.cassandra.analytics.entity.AnalyticsStatsBase;
-import com.sentinel.common.cassandra.analytics.dto.AnalyticsStatsMetrics;
+import com.sentinel.common.kafka.KafkaMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AnalyticsEndpointStatsHour extends AnalyticsStatsBase {
 
-    public AnalyticsEndpointStatsHour(AnalyticsStatsMetrics statsMetrics, UUID endpointId, Instant bucketStart) {
+    public AnalyticsEndpointStatsHour(KafkaMessage.AnalyticsMetrics statsMetrics, UUID endpointId, Instant bucketStart) {
         super(statsMetrics);
         this.id = new PrimaryKeyComposite();
         this.id.endpointId = endpointId;

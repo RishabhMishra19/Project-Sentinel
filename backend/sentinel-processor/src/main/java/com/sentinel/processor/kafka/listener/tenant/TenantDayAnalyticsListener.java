@@ -19,34 +19,33 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class TenantDayAnalyticsListener {
-    private static final Logger log = LoggerFactory.getLogger(TenantDayAnalyticsListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(TenantDayAnalyticsListener.class);
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-
-    @KafkaListener(topics = KafkaTopics.tenant_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.tenant_day_analytics+"_group")
+    @KafkaListener(topics = KafkaTopics.tenant_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.tenant_day_analytics + "_group")
     public void onTenantDayAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
         }
         List<AnalyticsTenantStatsDay> analyticsTenantStatsDays = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
-            KafkaMessage.Analytics analytics = objectMapper.readValue(record.value(), KafkaMessage.Analytics.class);
-            analytics.calculateAndUpdateLatencyPercentiles();
+            KafkaMessage.AnalyticsMetrics analytics = objectMapper.readValue(record.value(), KafkaMessage.AnalyticsMetrics.class);
             analyticsTenantStatsDays.add(this.toTenantStatsDay(analytics));
         }
         try {
             CassandraBatchOperations batchOperations = cassandraTemplate.batchOps();
             analyticsTenantStatsDays.forEach(batchOperations::insert);
             batchOperations.execute();
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed processing Kafka batch", e);
             throw e;
         }
     }
 
-    private AnalyticsTenantStatsDay toTenantStatsDay(KafkaMessage.Analytics analytics) {
-        return new  AnalyticsTenantStatsDay(analytics.getMetrics(), analytics.getId(), analytics.getStartBucket());
+    private AnalyticsTenantStatsDay toTenantStatsDay(KafkaMessage.AnalyticsMetrics analytics) {
+        return new AnalyticsTenantStatsDay(analytics, analytics.getTenantId(), analytics.getBucketStart());
     }
+
 }

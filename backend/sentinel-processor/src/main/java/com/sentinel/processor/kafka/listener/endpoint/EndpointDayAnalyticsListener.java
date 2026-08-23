@@ -19,20 +19,19 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class EndpointDayAnalyticsListener {
-    private static final Logger log = LoggerFactory.getLogger(EndpointDayAnalyticsListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(EndpointDayAnalyticsListener.class);
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-    @KafkaListener(topics = KafkaTopics.endpoint_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.endpoint_day_analytics+"_group")
+    @KafkaListener(topics = KafkaTopics.endpoint_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.endpoint_day_analytics + "_group")
     public void onEndpointDayAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
         }
         List<AnalyticsEndpointStatsDay> stats = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
-            KafkaMessage.Analytics analytics = objectMapper.readValue(record.value(), KafkaMessage.Analytics.class);
-            analytics.calculateAndUpdateLatencyPercentiles();
+            KafkaMessage.AnalyticsMetrics analytics = objectMapper.readValue(record.value(), KafkaMessage.AnalyticsMetrics.class);
             stats.add(toEndpointStatsDay(analytics));
         }
         try {
@@ -40,11 +39,13 @@ public class EndpointDayAnalyticsListener {
             stats.forEach(batchOperations::insert);
             batchOperations.execute();
         } catch (Exception e) {
-            log.error("Failed processing Kafka batch", e); throw e;
+            log.error("Failed processing Kafka batch", e);
+            throw e;
         }
     }
 
-    private AnalyticsEndpointStatsDay toEndpointStatsDay(KafkaMessage.Analytics analytics) {
-        return new AnalyticsEndpointStatsDay(analytics.getMetrics(), analytics.getId(), analytics.getStartBucket());
+    private AnalyticsEndpointStatsDay toEndpointStatsDay(KafkaMessage.AnalyticsMetrics analytics) {
+        return new AnalyticsEndpointStatsDay(analytics, analytics.getEndpointId(), analytics.getBucketStart());
     }
+
 }

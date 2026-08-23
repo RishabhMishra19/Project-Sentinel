@@ -19,20 +19,19 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class TenantHourAnalyticsListener {
-    private static final Logger log = LoggerFactory.getLogger(TenantHourAnalyticsListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(TenantHourAnalyticsListener.class);
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-    @KafkaListener(topics = KafkaTopics.tenant_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.tenant_hour_analytics+"_group")
+    @KafkaListener(topics = KafkaTopics.tenant_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.tenant_hour_analytics + "_group")
     public void onTenantHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
         }
         List<AnalyticsTenantStatsHour> stats = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
-            KafkaMessage.Analytics analytics = objectMapper.readValue(record.value(), KafkaMessage.Analytics.class);
-            analytics.calculateAndUpdateLatencyPercentiles();
+            KafkaMessage.AnalyticsMetrics analytics = objectMapper.readValue(record.value(), KafkaMessage.AnalyticsMetrics.class);
             stats.add(toTenantStatsHour(analytics));
         }
         try {
@@ -40,11 +39,13 @@ public class TenantHourAnalyticsListener {
             stats.forEach(batchOperations::insert);
             batchOperations.execute();
         } catch (Exception e) {
-            log.error("Failed processing Kafka batch", e); throw e;
+            log.error("Failed processing Kafka batch", e);
+            throw e;
         }
     }
 
-    private AnalyticsTenantStatsHour toTenantStatsHour(KafkaMessage.Analytics analytics) {
-        return new AnalyticsTenantStatsHour(analytics.getMetrics(), analytics.getId(), analytics.getStartBucket());
+    private AnalyticsTenantStatsHour toTenantStatsHour(KafkaMessage.AnalyticsMetrics analytics) {
+        return new AnalyticsTenantStatsHour(analytics, analytics.getTenantId(), analytics.getBucketStart());
     }
+
 }

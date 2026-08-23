@@ -31,8 +31,7 @@ public class ProductMinuteAnalyticsListener {
         }
         List<AnalyticsProductStatsMinute> stats = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
-            KafkaMessage.Analytics analytics = objectMapper.readValue(record.value(), KafkaMessage.Analytics.class);
-            analytics.calculateAndUpdateLatencyPercentiles();
+            KafkaMessage.AnalyticsMetrics analytics = objectMapper.readValue(record.value(), KafkaMessage.AnalyticsMetrics.class);
             stats.add(toProductStatsMinute(analytics));
         }
         try {
@@ -45,8 +44,8 @@ public class ProductMinuteAnalyticsListener {
         }
     }
 
-    private AnalyticsProductStatsMinute toProductStatsMinute(KafkaMessage.Analytics analytics) {
-        return new AnalyticsProductStatsMinute(analytics.getMetrics(), analytics.getId(), analytics.getStartBucket());
+    private AnalyticsProductStatsMinute toProductStatsMinute(KafkaMessage.AnalyticsMetrics analytics) {
+        return new AnalyticsProductStatsMinute(analytics, analytics.getProductId(), analytics.getBucketStart());
     }
 
 }

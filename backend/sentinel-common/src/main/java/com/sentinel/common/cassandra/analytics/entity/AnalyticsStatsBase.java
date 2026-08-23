@@ -1,6 +1,6 @@
 package com.sentinel.common.cassandra.analytics.entity;
 
-import com.sentinel.common.cassandra.analytics.dto.AnalyticsStatsMetrics;
+import com.sentinel.common.kafka.KafkaMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,21 +15,21 @@ import org.springframework.data.cassandra.core.mapping.Column;
 @Builder
 public class AnalyticsStatsBase {
 
-    public AnalyticsStatsBase(AnalyticsStatsMetrics statsMetrics) {
-        this.requestCount = statsMetrics.getRequestCount();
-        this.errorCount = statsMetrics.getErrorCount();
-        this.status2xx = statsMetrics.getStatus2xx();
-        this.status3xx = statsMetrics.getStatus3xx();
-        this.status4xx = statsMetrics.getStatus4xx();
-        this.status5xx = statsMetrics.getStatus5xx();
-        this.latencySumMs = statsMetrics.getLatencySumMs();
-        this.latencyMinMs = statsMetrics.getLatencyMinMs();
-        this.latencyMaxMs = statsMetrics.getLatencyMaxMs();
-        this.latencyP50Ms = statsMetrics.getLatencyP50Ms();
-        this.latencyP95Ms = statsMetrics.getLatencyP95Ms();
-        this.latencyP99Ms = statsMetrics.getLatencyP99Ms();
-        this.requestBytesTotal = statsMetrics.getRequestBytesTotal();
-        this.responseBytesTotal = statsMetrics.getResponseBytesTotal();
+    public AnalyticsStatsBase(KafkaMessage.AnalyticsMetrics metrics) {
+        this.requestCount = metrics.getMetrics().getRequestCount();
+        this.errorCount = metrics.getMetrics().getErrorCount();
+        this.status2xx = metrics.getMetrics().getStatus2xx();
+        this.status3xx = metrics.getMetrics().getStatus3xx();
+        this.status4xx = metrics.getMetrics().getStatus4xx();
+        this.status5xx = metrics.getMetrics().getStatus5xx();
+        this.latencySumMs = metrics.getMetrics().getLatencySumMs();
+        this.latencyMinMs = metrics.getMetrics().getLatencyMinMs();
+        this.latencyMaxMs = metrics.getMetrics().getLatencyMaxMs();
+        this.latencyP50Ms = (long) metrics.getMetrics().getLatencyHistogram().getPercentileAtOrBelowValue(50);
+        this.latencyP95Ms = (long) metrics.getMetrics().getLatencyHistogram().getPercentileAtOrBelowValue(95);
+        this.latencyP99Ms = (long) metrics.getMetrics().getLatencyHistogram().getPercentileAtOrBelowValue(99);
+        this.requestBytesTotal = metrics.getMetrics().getRequestBytesTotal();
+        this.responseBytesTotal = metrics.getMetrics().getResponseBytesTotal();
     }
 
     @Column("request_count")

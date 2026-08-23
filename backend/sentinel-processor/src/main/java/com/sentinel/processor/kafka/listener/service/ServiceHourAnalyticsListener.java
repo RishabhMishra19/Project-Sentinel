@@ -19,31 +19,33 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class ServiceHourAnalyticsListener {
-    private static final Logger log = LoggerFactory.getLogger(ServiceHourAnalyticsListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(ServiceHourAnalyticsListener.class);
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-    @KafkaListener(topics = KafkaTopics.service_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.service_hour_analytics+"_group")
+    @KafkaListener(topics = KafkaTopics.service_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.service_hour_analytics + "_group")
     public void onServiceHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
         }
         List<AnalyticsServiceStatsHour> stats = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
-            KafkaMessage.Analytics analytics = objectMapper.readValue(record.value(), KafkaMessage.Analytics.class);
-            analytics.calculateAndUpdateLatencyPercentiles(); stats.add(toServiceStatsHour(analytics));
+            KafkaMessage.AnalyticsMetrics analytics = objectMapper.readValue(record.value(), KafkaMessage.AnalyticsMetrics.class);
+            stats.add(toServiceStatsHour(analytics));
         }
         try {
             CassandraBatchOperations batchOperations = cassandraTemplate.batchOps();
             stats.forEach(batchOperations::insert);
             batchOperations.execute();
         } catch (Exception e) {
-            log.error("Failed processing Kafka batch", e); throw e;
+            log.error("Failed processing Kafka batch", e);
+            throw e;
         }
     }
 
-    private AnalyticsServiceStatsHour toServiceStatsHour(KafkaMessage.Analytics analytics) {
-        return new AnalyticsServiceStatsHour(analytics.getMetrics(), analytics.getId(), analytics.getStartBucket());
+    private AnalyticsServiceStatsHour toServiceStatsHour(KafkaMessage.AnalyticsMetrics analytics) {
+        return new AnalyticsServiceStatsHour(analytics, analytics.getServiceId(), analytics.getBucketStart());
     }
+
 }

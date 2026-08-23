@@ -19,32 +19,33 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class ProductHourAnalyticsListener {
-    private static final Logger log = LoggerFactory.getLogger(ProductHourAnalyticsListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(ProductHourAnalyticsListener.class);
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-    @KafkaListener(topics = KafkaTopics.product_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.product_hour_analytics+"_group")
+    @KafkaListener(topics = KafkaTopics.product_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.product_hour_analytics + "_group")
     public void onProductHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
         }
         List<AnalyticsProductStatsHour> stats = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
-            KafkaMessage.Analytics analytics = objectMapper.readValue(record.value(), KafkaMessage.Analytics.class);
-            analytics.calculateAndUpdateLatencyPercentiles(); stats.add(toProductStatsHour(analytics));
+            KafkaMessage.AnalyticsMetrics analytics = objectMapper.readValue(record.value(), KafkaMessage.AnalyticsMetrics.class);
+            stats.add(toProductStatsHour(analytics));
         }
-
         try {
             CassandraBatchOperations batchOperations = cassandraTemplate.batchOps();
             stats.forEach(batchOperations::insert);
             batchOperations.execute();
         } catch (Exception e) {
-            log.error("Failed processing Kafka batch", e); throw e;
+            log.error("Failed processing Kafka batch", e);
+            throw e;
         }
     }
 
-    private AnalyticsProductStatsHour toProductStatsHour(KafkaMessage.Analytics analytics) {
-        return new AnalyticsProductStatsHour(analytics.getMetrics(), analytics.getId(), analytics.getStartBucket());
+    private AnalyticsProductStatsHour toProductStatsHour(KafkaMessage.AnalyticsMetrics analytics) {
+        return new AnalyticsProductStatsHour(analytics, analytics.getProductId(), analytics.getBucketStart());
     }
+
 }
