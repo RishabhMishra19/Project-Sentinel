@@ -156,7 +156,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
             case ENDPOINT -> {
                 List<Endpoint> endpoints = endpointRepository.findByIdIn(ids);
                 for (Endpoint endpoint : endpoints) {
-                    idToNameMap.put(endpoint.getId(), endpoint.getMethod() + " | " + endpoint.getPathTemplate());
+                    idToNameMap.put(endpoint.getId(), endpoint.getMethod() + " :  " + endpoint.getPathTemplate());
                 }
             }
         }

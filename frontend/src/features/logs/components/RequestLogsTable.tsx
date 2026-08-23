@@ -86,7 +86,5 @@ export const RequestLogsTable = ({ onView, products, services }: RequestLogsTabl
 
   const page = useRequestLogsQuery(selectedServiceId, listQueryRequest);
 
-  console.log({ page, as: bindPage(page) });
-
   return <DataTable {...bindPage(page)} />;
 };

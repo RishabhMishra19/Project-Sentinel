@@ -8,6 +8,7 @@ type SelectFilterProps = {
   onChange: (value: FilterValue<"select">) => void;
   disabled?: boolean;
   classname?: string;
+  hideAnyOption?: boolean;
 };
 
 export const SelectFilter = ({
@@ -16,6 +17,7 @@ export const SelectFilter = ({
   onChange,
   disabled = false,
   classname,
+  hideAnyOption = false,
 }: SelectFilterProps) => (
   <TooltipWrapper value={options.find((option) => option.value === value)?.label ?? "Any"}>
     <select
@@ -24,9 +26,11 @@ export const SelectFilter = ({
       onChange={(event) => onChange(event.target.value || null)}
       disabled={disabled}
     >
-      <option key="any" value={undefined}>
-        Any
-      </option>
+      {!hideAnyOption && (
+        <option key="any" value={undefined}>
+          Any
+        </option>
+      )}
       {options.map((option) => (
         <option key={option.value} value={option.value}>
           {option.label}

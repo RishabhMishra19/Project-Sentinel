@@ -161,13 +161,13 @@ export const useAnalyticsUrlState = () => {
     const urlState = covertSearchParamsToState(searchParams);
     if (JSON.stringify(urlState) !== JSON.stringify(validState)) {
       const validSearchParams = convertValidStateToSearchParams(validState);
-      setSearchParams(validSearchParams);
+      setSearchParams(validSearchParams, { replace: true });
     }
   }, [validState, searchParams, setSearchParams]);
 
   const updateState = (newValidState: AnalyticsUrlState) => {
     const newValidSearchParams = convertValidStateToSearchParams(newValidState);
-    setSearchParams(newValidSearchParams);
+    setSearchParams(newValidSearchParams, { replace: true });
   };
 
   const entityId = {

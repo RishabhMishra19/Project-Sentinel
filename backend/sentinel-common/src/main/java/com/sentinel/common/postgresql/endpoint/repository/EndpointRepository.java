@@ -2,8 +2,9 @@ package com.sentinel.common.postgresql.endpoint.repository;
 
 import com.sentinel.common.postgresql.endpoint.entity.Endpoint;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -14,7 +15,8 @@ public interface EndpointRepository extends JpaRepository<Endpoint, UUID> {
 
     List<Endpoint> findByIdIn(List<UUID> ids);
 
-    List<UUID> findIdByServiceId(UUID serviceId);
+    @Query("SELECT e.id FROM Endpoint e WHERE e.serviceId = :serviceId")
+    List<UUID> findIdByServiceId(@Param("serviceId") UUID serviceId);
 
     List<Endpoint> findByServiceId(UUID serviceId);
 

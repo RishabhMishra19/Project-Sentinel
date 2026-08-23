@@ -27,6 +27,7 @@ export const AnalyticsToolbar = () => {
       )}
       {validState.scope === AnalyticsScope.ENDPOINT && (
         <EndpointSelecField
+          productId={validState.productId}
           serviceId={validState.serviceId}
           val={validState.endpointId}
           onChange={(val) => updateState({ ...validState, endpointId: val })}

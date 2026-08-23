@@ -23,6 +23,7 @@ export const ProductSelecField = ({ val, onChange }: ProductSelecFieldProps) => 
         onChange={(newVal) => newVal && onChange(newVal)}
         disabled={isFetching}
         classname="text-xs h-6"
+        hideAnyOption={true}
       />
     </FilterSelectWrapper>
   );

@@ -15,6 +15,7 @@ export const BucketSelecField = ({ val, onChange }: BucketSelecFieldProps) => {
         options={BUCKET_OPTIONS}
         onChange={(newVal) => newVal && onChange(newVal)}
         classname="text-xs h-6"
+        hideAnyOption={true}
       />
     </FilterSelectWrapper>
   );

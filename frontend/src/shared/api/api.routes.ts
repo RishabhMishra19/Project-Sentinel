@@ -28,7 +28,8 @@ export const SERVICES_API_ROUTES = {
   LIST: (productId: string) => `/products/${productId}/services`,
   SEARCH: (productId: string) => `/products/${productId}/services/search`,
   BY_ID: (productId: string, id: string) => `/products/${productId}/services/${id}`,
-  ENDPOINTS: (serviceId: string) => `/services/${serviceId}/endpoints`,
+  ENDPOINTS: (productId: string, serviceId: string) =>
+    `/products/${productId}/services/${serviceId}/endpoints`,
 } as const;
 
 export const SERVICE_API_KEYS_API_ROUTES = {

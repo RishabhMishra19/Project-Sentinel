@@ -3,6 +3,7 @@ import { AnalyticsApi } from "../api/AnalyticsApi";
 import type { AnalyticsSummaryRequestParams } from "../dto/request/analytics.request";
 import { useAnalyticsUrlState } from "./useAnalyticsUrlState";
 import type { AnalyticsTimeSeriesResponse } from "../dto/response/analytics.response";
+import { AnalyticsScope } from "../utils/analytics.constants";
 
 const analyticsQueryKey = ["analytics"];
 
@@ -68,7 +69,7 @@ export const useAnalyticsChildrenAggregatedQuery = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: [...analyticsQueryKey, "rankings", params],
     queryFn: () => AnalyticsApi.childrenAggregated(params!),
-    enabled: params != null,
+    enabled: params != null && validState.scope != AnalyticsScope.ENDPOINT,
   });
   return {
     data,

@@ -18,8 +18,8 @@ export class ServicesApi {
     );
   }
 
-  static listEndpoints(serviceId: string): Promise<EndpointResponse[]> {
-    return apiManager.get<EndpointResponse[]>(SERVICES_API_ROUTES.ENDPOINTS(serviceId));
+  static listEndpoints(productId: string, serviceId: string): Promise<EndpointResponse[]> {
+    return apiManager.get<EndpointResponse[]>(SERVICES_API_ROUTES.ENDPOINTS(productId, serviceId));
   }
 
   static get(productId: string, id: string): Promise<ServiceResponse> {

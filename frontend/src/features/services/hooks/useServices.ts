@@ -31,12 +31,15 @@ export const useServicesQuery = (
   );
 };
 
-export const useServiceEndpointsQuery = (serviceId: string | undefined | null) => {
+export const useServiceEndpointsQuery = (
+  productId: string | undefined | null,
+  serviceId: string | undefined | null,
+) => {
   return mapListQuery(
     useQuery({
-      queryKey: [...servicesQueryKey(), "endpoints", serviceId],
-      queryFn: () => ServicesApi.listEndpoints(serviceId!),
-      enabled: serviceId != null,
+      queryKey: [...servicesQueryKey(), "endpoints", productId, serviceId],
+      queryFn: () => ServicesApi.listEndpoints(productId!, serviceId!),
+      enabled: serviceId !== null && productId !== null,
     }),
   );
 };
