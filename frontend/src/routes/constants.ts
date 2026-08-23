@@ -8,6 +8,7 @@ import {
   UsersIcon,
 } from "../assets/icons";
 import { ApiKeysIcon } from "../assets/icons/ApiKeysIcon";
+import { SystemMonitorIcon } from "../assets/icons/SystemMonitorIcon";
 import type { NavigationItem } from "./types";
 
 /** Relative path segments for React Router route `path` props (no leading `/`). */
@@ -24,9 +25,17 @@ export const ROUTE_PATHS = {
   settingsHome: "",
   settingsRoles: "roles",
   apiKeys: "api-keys",
+  systemMonitor: "system-monitor",
 } as const;
 
 export const NAVIGATION_PATHS: NavigationItem[] = [
+  {
+    id: "system-monitor",
+    path: `admin/${ROUTE_PATHS.systemMonitor}`,
+    label: "System Monitor",
+    icon: SystemMonitorIcon,
+    isAdminOnly: true,
+  },
   {
     id: "tenants",
     path: `admin/${ROUTE_PATHS.tenants}`,

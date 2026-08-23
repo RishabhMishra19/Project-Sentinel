@@ -47,7 +47,7 @@ public class SecurityConfig {
                                     "{\"errorCode\":\"FORBIDDEN\",\"error\":\"Forbidden\",\"message\":\"Access denied\"}");
                         }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(
                                         HttpMethod.POST,
                                         "/api/auth/login",
