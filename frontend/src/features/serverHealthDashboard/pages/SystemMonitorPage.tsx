@@ -23,9 +23,55 @@ interface StatCache {
   prevKafkaCount: number;
 }
 
+const PIPELINE_BLUEPRINT = [
+  {
+    layerName: "1. Ingest & Raw Logs Layer",
+    description: "Accepts incoming client traffic and produces raw logs.",
+    consumerGroup: "request_logs_group",
+    sourceTopics: ["request_logs"],
+    targetType: "Minute Analytics Rollups",
+  },
+  {
+    layerName: "2. Minute Processing Layer",
+    description: "Consumes raw logs and aggregates sliding window metrics every minute.",
+    consumerGroup: "sentinel-analytics",
+    sourceTopics: [
+      "tenant_minute_analytics",
+      "product_minute_analytics",
+      "service_minute_analytics",
+      "endpoint_minute_analytics",
+    ],
+    targetType: "Hour Analytics Rollups",
+  },
+  {
+    layerName: "3. Hour Processing Layer",
+    description: "Rolls minute streams up into hourly buckets.",
+    consumerGroup: "sentinel-analytics",
+    sourceTopics: [
+      "tenant_hour_analytics",
+      "product_hour_analytics",
+      "service_hour_analytics",
+      "endpoint_hour_analytics",
+    ],
+    targetType: "Day Analytics Rollups",
+  },
+  {
+    layerName: "4. Day Processing & Cassandra Sink Layer",
+    description: "Aggregates hourly streams into daily stats and writes to Cassandra tables.",
+    consumerGroup: "sentinel-analytics",
+    sourceTopics: [
+      "tenant_day_analytics",
+      "product_day_analytics",
+      "service_day_analytics",
+      "endpoint_day_analytics",
+    ],
+    targetType: "Persistent Cassandra Tables",
+  },
+];
+
 export default function SystemMonitorPage() {
   const [isMonitoring, setIsMonitoring] = useState<boolean>(false);
-  const [kafkaTopology, setKafkaTopology] = useState<any[]>([]);
+  const [topicStatsMap, setTopicStatsMap] = useState<{ [key: string]: any }>({});
 
   const [apps, setApps] = useState<AppMetrics[]>([
     {
@@ -147,7 +193,6 @@ export default function SystemMonitorPage() {
               reqJson.measurements.find((m: any) => m.statistic === "TOTAL_TIME")?.value || 0;
           }
 
-          // Pull custom processor streaming metrics if available
           let kafkaTotalMessages = 0;
           let kafkaAvgLatencyMs = 0;
           if (isProcessor && customStatsRes && customStatsRes.ok) {
@@ -158,7 +203,13 @@ export default function SystemMonitorPage() {
 
           if (isProcessor && topoRes && topoRes.ok) {
             const topoJson = await topoRes.json();
-            setKafkaTopology(topoJson.topics || []);
+            const map: { [key: string]: any } = {};
+            if (topoJson.topics) {
+              topoJson.topics.forEach((t: any) => {
+                map[t.topicName] = t;
+              });
+            }
+            setTopicStatsMap(map);
           }
 
           const cached = statsCacheRef.current[app.id] || {
@@ -184,7 +235,6 @@ export default function SystemMonitorPage() {
           };
 
           const avgTimeMs = totalRequests > 0 ? (totalTimeSum * 1000) / totalRequests : 0;
-
           const cpuVal = Number((cpuJson.measurements[0].value * 100).toFixed(1));
           const memValMb = Number((memJson.measurements[0].value / (1024 * 1024)).toFixed(1));
           const liveThreads = liveThreadJson.measurements[0].value;
@@ -254,35 +304,11 @@ export default function SystemMonitorPage() {
 
   const processorApp = apps.find((app) => app.name.toLowerCase().includes("processor")) || apps[2];
 
-  // Recursive renderer component for nested streams tree with stats and clean indentation
-  const renderChildStreams = (streams: any[]) => {
-    if (!streams || streams.length === 0) return null;
-
-    return streams.map((stream: any, idx: number) => (
-      <div key={idx} className="relative pl-4 ml-2 border-l border-indigo-500/40 space-y-2 mt-2">
-        <div className="flex items-center justify-between bg-gray-800/90 p-2 rounded border border-gray-700">
-          <div className="flex items-center gap-2 text-blue-300 font-semibold truncate">
-            <span className="text-indigo-400">└─</span>
-            <span className="text-gray-300 text-[11px] truncate">{stream.streamName}</span>
-          </div>
-          <div className="flex items-center gap-3 text-[10px]">
-            <span className="text-teal-300 bg-teal-950 px-2 py-0.5 rounded border border-teal-800">
-              Flow: {processorApp.kafkaMsgPerSec}
-            </span>
-          </div>
-        </div>
-
-        {/* Recursively render deeper steps */}
-        {renderChildStreams(stream.nextStreams)}
-      </div>
-    ));
-  };
-
   return (
     <div className="bg-gray-900 text-white font-sans p-4 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-indigo-400">Multi-Service System Monitor</h1>
+          <h1 className="text-2xl font-bold text-indigo-400">Project-Sentinel System Monitor</h1>
           <button
             onClick={toggleMonitor}
             className={`px-4 py-1.5 rounded text-sm font-semibold transition text-white ${
@@ -293,7 +319,7 @@ export default function SystemMonitorPage() {
           </button>
         </div>
 
-        {/* Grid layout for the 3 Spring Boot Services */}
+        {/* Grid layout for services */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {apps.map((app) => (
             <div
@@ -373,69 +399,127 @@ export default function SystemMonitorPage() {
           ))}
         </div>
 
-        {/* Data-Flow Graph Tree View */}
+        {/* Blueprint-Based Data Pipeline Diagram with Multi-Listener Partition Breakdown */}
         <div className="bg-gray-800 rounded-lg p-5 border border-gray-700 shadow-lg">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold text-indigo-400 flex items-center gap-2">
-              <span>📊</span> Kafka Stream Data-Flow & Topology Tree
+              <span>📊</span> Clean Architecture Data Pipeline & Partition Metrics
             </h2>
             <div className="text-xs text-gray-400 flex items-center gap-4">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-yellow-400 inline-block"></span>{" "}
                 Throughput: <strong className="text-white">{processorApp.kafkaMsgPerSec}</strong>
               </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-amber-300 inline-block"></span> Latency:{" "}
-                <strong className="text-white">{processorApp.kafkaProcessingTime}</strong>
-              </span>
             </div>
           </div>
 
-          {kafkaTopology.length === 0 ? (
-            <div className="text-center py-6 text-gray-400 text-xs italic">
-              {isMonitoring
-                ? "Loading active Kafka topology from Processor Server..."
-                : "Click 'Start Global Monitoring' to load live data-flow tree."}
-            </div>
-          ) : (
-            <div className="space-y-4 font-mono text-xs">
-              {kafkaTopology.map((topicItem, index) => (
-                <div key={index} className="bg-gray-900/60 p-3 rounded-lg border border-gray-700">
-                  <div className="flex items-center justify-between text-yellow-400 font-bold border-b border-gray-800 pb-2">
-                    {/* Topic Node with Offsets and Lag */}
-                    <div className="flex items-center justify-between text-yellow-400 font-bold border-b border-gray-800 pb-2 gap-2">
-                      <div className="flex items-center gap-2">
-                        <span>📦 KAFKA TOPIC:</span>
-                        <span className="text-white tracking-wide">{topicItem.topicName}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[10px]">
-                        <span className="bg-yellow-950 text-yellow-300 px-2 py-0.5 rounded border border-yellow-800">
-                          Offset: {topicItem.currentOffset ?? 0}
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 rounded border ${
-                            (topicItem.consumerLag ?? 0) > 0
-                              ? "bg-red-950 text-red-300 border-red-800 font-bold"
-                              : "bg-emerald-950 text-emerald-300 border-emerald-800"
-                          }`}
-                        >
-                          Lag: {topicItem.consumerLag ?? 0}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="bg-yellow-950 text-yellow-300 px-2 py-0.5 rounded text-[10px] border border-yellow-800">
-                      Inbound Source
-                    </span>
+          <div className="space-y-6 font-mono text-xs">
+            {PIPELINE_BLUEPRINT.map((layer, layerIdx) => (
+              <div key={layerIdx} className="bg-gray-900/80 p-4 rounded-xl border border-gray-700">
+                <div className="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
+                  <div>
+                    <h3 className="text-indigo-300 font-bold text-sm">{layer.layerName}</h3>
+                    <p className="text-gray-400 text-[11px] font-sans mt-0.5">
+                      {layer.description}
+                    </p>
                   </div>
-
-                  {/* Render children streams using backend's childrenStreams mapping */}
-                  <div className="pl-6 pt-3 space-y-3">
-                    {renderChildStreams(topicItem.childrenStreams)}
-                  </div>
+                  <span className="text-[10px] bg-teal-950 text-teal-300 px-2 py-0.5 rounded border border-teal-800">
+                    Group: {layer.consumerGroup}
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {layer.sourceTopics.map((topicName, tIdx) => {
+                    const stats = topicStatsMap[topicName] || {
+                      currentOffset: 0,
+                      consumerGroups: [],
+                    };
+
+                    // Fallback support if single group data format is passed
+                    const groupsToRender =
+                      stats.consumerGroups && stats.consumerGroups.length > 0
+                        ? stats.consumerGroups
+                        : [
+                            {
+                              consumerGroupId: stats.consumerGroupId || layer.consumerGroup,
+                              consumerLag: stats.consumerLag ?? 0,
+                              activeConsumers: stats.activeConsumers || [],
+                            },
+                          ];
+
+                    return (
+                      <div key={tIdx} className="bg-gray-950 p-3 rounded-lg border border-gray-800">
+                        <div className="text-amber-400 font-bold truncate mb-2" title={topicName}>
+                          📦 {topicName}
+                        </div>
+                        <div className="flex justify-between items-center text-[11px] mb-3">
+                          <span className="text-gray-400">Total Log Offset:</span>
+                          <span className="text-white font-bold">{stats.currentOffset ?? 0}</span>
+                        </div>
+
+                        {/* Render each independent consumer group listener (Streams app + Cassandra listener) */}
+                        {groupsToRender.map((group: any, gIdx: number) => (
+                          <div
+                            key={gIdx}
+                            className="mb-2.5 pb-2 border-b border-gray-800/80 last:border-0 last:mb-0 last:pb-0"
+                          >
+                            <div className="flex justify-between items-center text-[10px] mb-1">
+                              <span
+                                className="text-emerald-400 font-semibold truncate max-w-[110px]"
+                                title={group.consumerGroupId}
+                              >
+                                👥 {group.consumerGroupId}
+                              </span>
+                              <span
+                                className={`px-1.5 py-0.2 rounded font-bold text-[10px] ${
+                                  group.consumerLag > 0
+                                    ? "text-red-400 bg-red-950/60"
+                                    : "text-emerald-400 bg-emerald-950/60"
+                                }`}
+                              >
+                                Lag: {group.consumerLag}
+                              </span>
+                            </div>
+
+                            {/* Partition thread breakdown per listener group */}
+                            <div className="space-y-1 mt-1">
+                              {group.activeConsumers && group.activeConsumers.length > 0 ? (
+                                group.activeConsumers.map((consumer: any, cIdx: number) => (
+                                  <div
+                                    key={cIdx}
+                                    className="bg-gray-900 p-1.5 rounded flex justify-between items-center text-[10px]"
+                                  >
+                                    <span className="text-blue-300 truncate">
+                                      P{consumer.assignedPartition}
+                                    </span>
+                                    <span className="text-gray-300">
+                                      Off: {consumer.offset} | Lag:{" "}
+                                      <strong className="text-red-400">{consumer.lag}</strong>
+                                    </span>
+                                  </div>
+                                ))
+                              ) : (
+                                <div className="text-[10px] text-gray-500 italic">
+                                  No Active Threads
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {layer.targetType && (
+                  <div className="mt-3 text-right text-[11px] text-purple-400 font-sans flex items-center justify-end gap-1">
+                    <span>Downstream Sink Target ➔</span>
+                    <strong className="text-purple-200">{layer.targetType}</strong>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
