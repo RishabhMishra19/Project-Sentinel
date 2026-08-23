@@ -45,6 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 List<SimpleGrantedAuthority> authorities = new ArrayList<>();
                 List<ScopeGrant> scopeGrants = new ArrayList<>();
                 if (user.isSentinelAdmin()) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_SENTINEL_ADMIN"));
                     authorities.add(new SimpleGrantedAuthority(PermissionType.ALL.name()));
                 }
                 user.getRoles().stream()

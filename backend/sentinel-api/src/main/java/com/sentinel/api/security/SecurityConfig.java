@@ -47,7 +47,8 @@ public class SecurityConfig {
                                     "{\"errorCode\":\"FORBIDDEN\",\"error\":\"Forbidden\",\"message\":\"Access denied\"}");
                         }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("SENTINEL_ADMIN")
                         .requestMatchers(
                                         HttpMethod.POST,
                                         "/api/auth/login",
