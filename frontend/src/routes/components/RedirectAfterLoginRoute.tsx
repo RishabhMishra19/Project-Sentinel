@@ -9,7 +9,7 @@ export const RedirectAfterLoginRoute = () => {
     return <Navigate to={`/${ROUTE_PATHS.login}`} />;
   }
   if (RoutesUtils.isUserSentinelAdmin(auth)) {
-    return <Navigate to={`/admin/${ROUTE_PATHS.tenants}`} />;
+    return <Navigate to={`/admin/${ROUTE_PATHS.systemMonitor}`} />;
   }
   return <Navigate to={`/${ROUTE_PATHS.analytics}`} />;
 };
