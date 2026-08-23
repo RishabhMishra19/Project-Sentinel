@@ -97,17 +97,25 @@ export default function SystemMonitorPage() {
         const isProcessor = app.name.toLowerCase().includes("processor");
 
         try {
-          const [cpuRes, memRes, liveThreadRes, threadStatesRes, dbRes, reqRes, kafkaRes, topoRes] =
-            await Promise.all([
-              fetch(`${cleanUrl}/actuator/metrics/system.cpu.usage`),
-              fetch(`${cleanUrl}/actuator/metrics/jvm.memory.used`),
-              fetch(`${cleanUrl}/actuator/metrics/jvm.threads.live`),
-              fetch(`${cleanUrl}/actuator/metrics/jvm.threads.states?tag=state:runnable`),
-              fetch(`${cleanUrl}/actuator/metrics/hikaricp.connections.active`),
-              fetch(`${cleanUrl}/actuator/metrics/http.server.requests`),
-              fetch(`${cleanUrl}/actuator/metrics/spring.kafka.listener.seconds`),
-              isProcessor ? fetch(`${cleanUrl}/kafka-topology`) : Promise.resolve(null),
-            ]);
+          const [
+            cpuRes,
+            memRes,
+            liveThreadRes,
+            threadStatesRes,
+            dbRes,
+            reqRes,
+            customStatsRes,
+            topoRes,
+          ] = await Promise.all([
+            fetch(`${cleanUrl}/actuator/metrics/system.cpu.usage`),
+            fetch(`${cleanUrl}/actuator/metrics/jvm.memory.used`),
+            fetch(`${cleanUrl}/actuator/metrics/jvm.threads.live`),
+            fetch(`${cleanUrl}/actuator/metrics/jvm.threads.states?tag=state:runnable`),
+            fetch(`${cleanUrl}/actuator/metrics/hikaricp.connections.active`),
+            fetch(`${cleanUrl}/actuator/metrics/http.server.requests`),
+            isProcessor ? fetch(`${cleanUrl}/kafka-topology/stats`) : Promise.resolve(null),
+            isProcessor ? fetch(`${cleanUrl}/kafka-topology`) : Promise.resolve(null),
+          ]);
 
           if (!cpuRes.ok || !memRes.ok || !liveThreadRes.ok) {
             throw new Error("Endpoint failure");
@@ -139,14 +147,13 @@ export default function SystemMonitorPage() {
               reqJson.measurements.find((m: any) => m.statistic === "TOTAL_TIME")?.value || 0;
           }
 
-          let kafkaCount = 0;
-          let kafkaTimeSum = 0;
-          if (kafkaRes.ok) {
-            const kafkaJson = await kafkaRes.json();
-            kafkaCount =
-              kafkaJson.measurements.find((m: any) => m.statistic === "COUNT")?.value || 0;
-            kafkaTimeSum =
-              kafkaJson.measurements.find((m: any) => m.statistic === "TOTAL_TIME")?.value || 0;
+          // Pull custom processor streaming metrics if available
+          let kafkaTotalMessages = 0;
+          let kafkaAvgLatencyMs = 0;
+          if (isProcessor && customStatsRes && customStatsRes.ok) {
+            const statsJson = await customStatsRes.json();
+            kafkaTotalMessages = statsJson.totalMessages || 0;
+            kafkaAvgLatencyMs = statsJson.avgLatencyMs || 0;
           }
 
           if (isProcessor && topoRes && topoRes.ok) {
@@ -157,7 +164,7 @@ export default function SystemMonitorPage() {
           const cached = statsCacheRef.current[app.id] || {
             prevCount: totalRequests,
             prevTime: now,
-            prevKafkaCount: kafkaCount,
+            prevKafkaCount: kafkaTotalMessages,
           };
           const timeElapsedSec = (now - cached.prevTime) / 1000;
 
@@ -165,17 +172,18 @@ export default function SystemMonitorPage() {
           let kafkaRps = 0;
           if (timeElapsedSec > 0) {
             rps = Math.max(0, totalRequests - cached.prevCount) / timeElapsedSec;
-            kafkaRps = Math.max(0, kafkaCount - cached.prevKafkaCount) / timeElapsedSec;
+            if (isProcessor) {
+              kafkaRps = Math.max(0, kafkaTotalMessages - cached.prevKafkaCount) / timeElapsedSec;
+            }
           }
 
           statsCacheRef.current[app.id] = {
             prevCount: totalRequests,
             prevTime: now,
-            prevKafkaCount: kafkaCount,
+            prevKafkaCount: kafkaTotalMessages,
           };
 
           const avgTimeMs = totalRequests > 0 ? (totalTimeSum * 1000) / totalRequests : 0;
-          const avgKafkaTimeMs = kafkaCount > 0 ? (kafkaTimeSum * 1000) / kafkaCount : 0;
 
           const cpuVal = Number((cpuJson.measurements[0].value * 100).toFixed(1));
           const memValMb = Number((memJson.measurements[0].value / (1024 * 1024)).toFixed(1));
@@ -191,8 +199,10 @@ export default function SystemMonitorPage() {
             requestsPerSec: `${rps.toFixed(1)}/s`,
             responsesPerSec: `${rps.toFixed(1)}/s`,
             avgResponseTime: `${avgTimeMs.toFixed(1)} ms`,
-            kafkaMsgPerSec: `${kafkaRps.toFixed(1)}/s`,
-            kafkaProcessingTime: `${avgKafkaTimeMs.toFixed(1)} ms`,
+            kafkaMsgPerSec: isProcessor ? `${kafkaRps.toFixed(1)}/s` : app.kafkaMsgPerSec,
+            kafkaProcessingTime: isProcessor
+              ? `${kafkaAvgLatencyMs.toFixed(1)} ms`
+              : app.kafkaProcessingTime,
             status: "Online" as const,
           };
         } catch (error) {
