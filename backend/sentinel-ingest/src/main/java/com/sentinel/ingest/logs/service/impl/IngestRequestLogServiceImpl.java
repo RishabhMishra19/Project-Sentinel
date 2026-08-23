@@ -22,7 +22,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.data.util.Pair;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -43,8 +42,7 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
     private static final int TTL_IN_MS = 10 * 60 * 1000;
     private final ServiceApiKeyRepository serviceApiKeyRepository;
     private final PathTemplateDeriver pathTemplateDeriver;
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper;
+    private final KafkaTemplate<String, KafkaMessage.ReqLog> kafkaTemplate;
     private final IngestCache ingestCache;
     private final ServiceIdentityResolverRepository serviceIdentityResolverRepository;
     private final EndpointService endpointService;
@@ -59,15 +57,7 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
         try {
             List<KafkaMessage.ReqLog> reqLogs = request.toReqLogKafkaMessage(serviceIdentity);
             for (KafkaMessage.ReqLog reqLog : reqLogs) {
-                String value = objectMapper.writeValueAsString(reqLog);
-                ProducerRecord<String, String> record = new ProducerRecord<>(
-                        KafkaTopics.request_logs,
-                        null,
-                        System.currentTimeMillis(),
-                        reqLog.getKey(),
-                        value
-                );
-                kafkaTemplate.send(record)
+                kafkaTemplate.send(new ProducerRecord<>(KafkaTopics.request_logs, null, System.currentTimeMillis(), reqLog.getKey(), reqLog))
                         .get();
             }
             return new IngestLogResponse("Successfully ingested", true);
@@ -94,11 +84,7 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
         Boolean exists = ingestCache.resolve(key);
         if (exists == null) {
             String keyHash = Sha256Hasher.hash(apiKey);
-            exists = serviceApiKeyRepository.existsByKeyHashAndServiceIdAndStatus(
-                    keyHash,
-                    serviceId,
-                    ServiceApiKeyStatus.ACTIVE
-            );
+            exists = serviceApiKeyRepository.existsByKeyHashAndServiceIdAndStatus(keyHash, serviceId, ServiceApiKeyStatus.ACTIVE);
             ingestCache.store(key, 60 * 1000, exists);
         }
         return exists;
@@ -130,14 +116,7 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
                 .toList());
         if (!notFoundPathTemplates.isEmpty()) {
             List<Endpoint> newEndpointsToBeCreated = notFoundPathTemplates.stream()
-                    .map(v -> new Endpoint(
-                            UUID.randomUUID(),
-                            request.serviceId(),
-                            v.getSecond(),
-                            v.getFirst(),
-                            Instant.now(),
-                            Instant.now()
-                    ))
+                    .map(v -> new Endpoint(UUID.randomUUID(), request.serviceId(), v.getSecond(), v.getFirst(), Instant.now(), Instant.now()))
                     .toList();
             endpointService.bulkInsertEndpoints(newEndpointsToBeCreated);
             for (Endpoint endpoint : newEndpointsToBeCreated) {

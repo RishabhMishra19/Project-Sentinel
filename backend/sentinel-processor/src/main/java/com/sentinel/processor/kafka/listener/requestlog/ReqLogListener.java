@@ -1,9 +1,9 @@
 package com.sentinel.processor.kafka.listener.requestlog;
 
+import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
 import com.sentinel.common.cassandra.requestlog.entity.RequestLogLookup;
 import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;
-import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
@@ -20,13 +20,12 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class ReqLogListener {
-    private static final Logger log = LoggerFactory.getLogger(ReqLogListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(ReqLogListener.class);
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-
-    @KafkaListener(topics = KafkaTopics.request_logs, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.request_logs+"_group")
+    @KafkaListener(topics = KafkaTopics.request_logs, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.request_logs + "_group")
     public void onReqLogsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
@@ -34,16 +33,16 @@ public class ReqLogListener {
         List<RequestLog> requestLogs = new ArrayList<>();
         List<RequestLogLookup> requestLogLookups = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
-            KafkaMessage.ReqLog reqLogKafkaMessage = objectMapper.readValue(record.value(), KafkaMessage.ReqLog.class);
-            requestLogs.add(this.toRequestLog(reqLogKafkaMessage));
-            requestLogLookups.add(this.toRequestLogLookup(reqLogKafkaMessage));
+            KafkaMessage.ReqLog reqLog = objectMapper.readValue(record.value(), KafkaMessage.ReqLog.class);
+            requestLogs.add(this.toRequestLog(reqLog));
+            requestLogLookups.add(this.toRequestLogLookup(reqLog));
         }
         try {
             CassandraBatchOperations batchOperations = cassandraTemplate.batchOps();
             requestLogs.forEach(batchOperations::insert);
             requestLogLookups.forEach(batchOperations::insert);
             batchOperations.execute();
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed processing Kafka batch", e);
             throw e;
         }
@@ -58,12 +57,7 @@ public class ReqLogListener {
 
     private RequestLog toRequestLog(KafkaMessage.ReqLog reqLog) {
         return RequestLog.builder()
-                .id(new RequestLog.PrimaryKeyComposite(
-                        reqLog.tenantId(),
-                        reqLog.serviceId(),
-                        reqLog.occurredAt(),
-                        reqLog.requestLogId()
-                ))
+                .id(new RequestLog.PrimaryKeyComposite(reqLog.tenantId(), reqLog.serviceId(), reqLog.occurredAt(), reqLog.requestLogId()))
                 .endpointId(reqLog.endpointId())
                 .requestId(reqLog.requestId())
                 .traceId(reqLog.traceId())
@@ -75,4 +69,5 @@ public class ReqLogListener {
                 .responseSizeBytes(reqLog.responseSizeBytes())
                 .build();
     }
+
 }

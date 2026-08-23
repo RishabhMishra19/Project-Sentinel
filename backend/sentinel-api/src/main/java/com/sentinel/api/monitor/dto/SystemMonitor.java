@@ -1,4 +1,4 @@
-package com.sentinel.api.monitor.dto.response;
+package com.sentinel.api.monitor.dto;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.sentinel.api.monitor.service.impl;
 
 import com.sentinel.api.monitor.SystemMonitorProperties;
-import com.sentinel.api.monitor.dto.response.SystemMonitor.*;
+import com.sentinel.api.monitor.dto.SystemMonitor.*;
 import com.sentinel.api.monitor.service.SystemMonitorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

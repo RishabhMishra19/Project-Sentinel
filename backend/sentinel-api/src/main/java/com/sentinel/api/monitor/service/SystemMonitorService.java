@@ -1,6 +1,6 @@
 package com.sentinel.api.monitor.service;
 
-import com.sentinel.api.monitor.dto.response.SystemMonitor;
+import com.sentinel.api.monitor.dto.SystemMonitor;
 
 public interface SystemMonitorService {
 

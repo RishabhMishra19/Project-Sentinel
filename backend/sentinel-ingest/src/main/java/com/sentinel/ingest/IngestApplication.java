@@ -2,6 +2,7 @@ package com.sentinel.ingest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = {"com.sentinel.ingest", "com.sentinel.common"})
 @EnableJpaRepositories(basePackages = {"com.sentinel.ingest", "com.sentinel.common"})
 @EnableCassandraRepositories(basePackages = {"com.sentinel.ingest", "com.sentinel.common"})
+@ConfigurationPropertiesScan(basePackages = {"com.sentinel.ingest", "com.sentinel.common"})
 public class IngestApplication {
 
     public static void main(String[] args) {
