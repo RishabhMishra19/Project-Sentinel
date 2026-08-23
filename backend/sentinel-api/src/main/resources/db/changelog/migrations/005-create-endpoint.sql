@@ -18,4 +18,4 @@ CREATE INDEX idx_endpoints_service_id
     ON endpoints(service_id);
 
 CREATE UNIQUE INDEX idx_endpoints_service_path
-    ON endpoints(service_id, path_template);
+    ON endpoints(service_id, method, path_template);

@@ -19,12 +19,12 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class ProductMinuteAnalyticsListener {
-    private static final Logger log = LoggerFactory.getLogger(ProductMinuteAnalyticsListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(ProductMinuteAnalyticsListener.class);
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-    @KafkaListener(topics = KafkaTopics.product_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.product_minute_analytics+"_group")
+    @KafkaListener(topics = KafkaTopics.product_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.product_minute_analytics + "_group")
     public void onProductMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
@@ -32,18 +32,21 @@ public class ProductMinuteAnalyticsListener {
         List<AnalyticsProductStatsMinute> stats = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
             KafkaMessage.Analytics analytics = objectMapper.readValue(record.value(), KafkaMessage.Analytics.class);
-            analytics.calculateAndUpdateLatencyPercentiles(); stats.add(toProductStatsMinute(analytics));
+            analytics.calculateAndUpdateLatencyPercentiles();
+            stats.add(toProductStatsMinute(analytics));
         }
         try {
             CassandraBatchOperations batchOperations = cassandraTemplate.batchOps();
             stats.forEach(batchOperations::insert);
             batchOperations.execute();
         } catch (Exception e) {
-            log.error("Failed processing Kafka batch", e); throw e;
+            log.error("Failed processing Kafka batch", e);
+            throw e;
         }
     }
 
     private AnalyticsProductStatsMinute toProductStatsMinute(KafkaMessage.Analytics analytics) {
         return new AnalyticsProductStatsMinute(analytics.getMetrics(), analytics.getId(), analytics.getStartBucket());
     }
+
 }
