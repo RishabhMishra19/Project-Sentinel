@@ -2,7 +2,7 @@ package com.sentinel.api.auth.service.core;
 
 import com.sentinel.api.common.exception.AccessTokenExpiredException;
 import com.sentinel.api.security.JwtProperties;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

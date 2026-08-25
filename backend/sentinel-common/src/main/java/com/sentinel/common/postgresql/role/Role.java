@@ -1,7 +1,7 @@
-package com.sentinel.api.role.entity;
+package com.sentinel.common.postgresql.role;
 
-import com.sentinel.api.tenant.entity.Tenant;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.tenant.Tenant;
+import com.sentinel.common.postgresql.user.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

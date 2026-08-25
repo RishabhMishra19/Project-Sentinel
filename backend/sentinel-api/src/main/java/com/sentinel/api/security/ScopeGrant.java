@@ -1,7 +1,7 @@
 package com.sentinel.api.security;
 
-import com.sentinel.api.permission.entity.PermissionType;
-import com.sentinel.api.role.entity.RoleScopeType;
+import com.sentinel.common.postgresql.permission.PermissionType;
+import com.sentinel.common.postgresql.role.RoleScopeType;
 
 import java.util.UUID;
 

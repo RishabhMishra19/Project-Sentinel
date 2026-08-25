@@ -15,7 +15,7 @@ import com.sentinel.api.service.entity.ServiceStatus;
 import com.sentinel.api.service.mapper.ServiceMapper;
 import com.sentinel.api.service.repository.ServiceSpecifications;
 import com.sentinel.api.service.service.core.ServiceService;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.user.User;
 import com.sentinel.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

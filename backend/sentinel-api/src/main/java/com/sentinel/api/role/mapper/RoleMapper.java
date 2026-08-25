@@ -4,9 +4,9 @@ import com.sentinel.api.common.dto.response.UserBriefResponse;
 import com.sentinel.api.role.dto.response.RoleBriefResponse;
 import com.sentinel.api.role.dto.response.RoleResponse;
 import com.sentinel.api.role.dto.response.RoleScopeResponse;
-import com.sentinel.api.role.entity.Role;
-import com.sentinel.api.role.entity.RoleScope;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.role.Role;
+import com.sentinel.common.postgresql.role.RoleScope;
+import com.sentinel.common.postgresql.user.User;
 import org.springframework.stereotype.Component;
 
 @Component

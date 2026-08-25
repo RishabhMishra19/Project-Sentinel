@@ -14,7 +14,7 @@ import com.sentinel.api.product.entity.Product;
 import com.sentinel.api.product.service.core.ProductService;
 import com.sentinel.api.service.entity.Service;
 import com.sentinel.api.service.service.core.ServiceService;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.user.User;
 import com.sentinel.api.user.repository.UserRepository;
 import com.sentinel.common.apikey.entity.ServiceApiKey;
 import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;

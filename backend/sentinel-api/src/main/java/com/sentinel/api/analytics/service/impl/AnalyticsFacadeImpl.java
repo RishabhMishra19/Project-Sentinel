@@ -15,7 +15,7 @@ import com.sentinel.api.product.repository.ProductRepository;
 import com.sentinel.api.service.entity.Service;
 import com.sentinel.api.service.entity.ServiceStatus;
 import com.sentinel.api.service.repository.ServiceRepository;
-import com.sentinel.api.tenant.entity.Tenant;
+import com.sentinel.common.postgresql.tenant.Tenant;
 import com.sentinel.api.tenant.repository.TenantRepository;
 import com.sentinel.common.cassandra.analytics.dto.response.EntityAggregatedStatsResponse;
 import com.sentinel.common.cassandra.analytics.dto.response.TimeSeriesStatsResponse;

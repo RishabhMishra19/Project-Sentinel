@@ -10,7 +10,7 @@ import com.sentinel.api.auth.service.core.JwtService;
 import com.sentinel.api.auth.service.core.RefreshTokenService;
 import com.sentinel.api.common.exception.BadRequestException;
 import com.sentinel.api.common.exception.UnauthorizedException;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.user.User;
 import com.sentinel.api.user.service.core.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

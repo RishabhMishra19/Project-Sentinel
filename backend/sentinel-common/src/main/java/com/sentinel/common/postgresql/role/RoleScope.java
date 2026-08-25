@@ -1,6 +1,7 @@
-package com.sentinel.api.role.entity;
+package com.sentinel.common.postgresql.role;
 
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.permission.PermissionType;
+import com.sentinel.common.postgresql.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -46,7 +47,7 @@ public class RoleScope {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "permission", nullable = false, length = 32)
-    private com.sentinel.api.permission.entity.PermissionType permission;
+    private PermissionType permission;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

@@ -3,8 +3,8 @@ package com.sentinel.api.user.repository;
 import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.common.specification.GenericSpecifications;
 import com.sentinel.api.common.specification.QueryFieldAllowlist;
-import com.sentinel.api.user.entity.User;
-import com.sentinel.api.user.entity.UserStatus;
+import com.sentinel.common.postgresql.user.User;
+import com.sentinel.common.postgresql.user.UserStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Set;

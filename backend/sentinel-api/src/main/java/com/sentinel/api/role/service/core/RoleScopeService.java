@@ -1,10 +1,10 @@
 package com.sentinel.api.role.service.core;
 
-import com.sentinel.api.permission.entity.PermissionType;
-import com.sentinel.api.role.entity.Role;
-import com.sentinel.api.role.entity.RoleScope;
-import com.sentinel.api.role.entity.RoleScopeType;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.permission.PermissionType;
+import com.sentinel.common.postgresql.role.Role;
+import com.sentinel.common.postgresql.role.RoleScope;
+import com.sentinel.common.postgresql.role.RoleScopeType;
+import com.sentinel.common.postgresql.user.User;
 
 import java.util.List;
 import java.util.UUID;

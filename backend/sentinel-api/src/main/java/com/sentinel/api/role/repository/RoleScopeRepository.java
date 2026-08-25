@@ -1,7 +1,7 @@
 package com.sentinel.api.role.repository;
 
-import com.sentinel.api.role.entity.RoleScope;
-import com.sentinel.api.role.entity.RoleScopeType;
+import com.sentinel.common.postgresql.role.RoleScope;
+import com.sentinel.common.postgresql.role.RoleScopeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -4,12 +4,12 @@ import com.sentinel.api.auth.dto.response.AuthSessionResponse;
 import com.sentinel.api.auth.dto.response.ProfileResponse;
 import com.sentinel.api.auth.dto.response.common.RoleSummaryResponse;
 import com.sentinel.api.auth.dto.response.common.TenantSummaryResponse;
-import com.sentinel.api.role.entity.Role;
-import com.sentinel.api.role.entity.RoleScope;
-import com.sentinel.api.role.entity.RoleScopeStatus;
-import com.sentinel.api.role.entity.RoleStatus;
-import com.sentinel.api.tenant.entity.Tenant;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.role.Role;
+import com.sentinel.common.postgresql.role.RoleScope;
+import com.sentinel.common.postgresql.role.RoleScopeStatus;
+import com.sentinel.common.postgresql.role.RoleStatus;
+import com.sentinel.common.postgresql.tenant.Tenant;
+import com.sentinel.common.postgresql.user.User;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Component;
 

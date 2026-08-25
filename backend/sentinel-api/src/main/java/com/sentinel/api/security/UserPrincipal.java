@@ -1,6 +1,6 @@
 package com.sentinel.api.security;
 
-import com.sentinel.api.user.entity.UserStatus;
+import com.sentinel.common.postgresql.user.UserStatus;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

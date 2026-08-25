@@ -1,7 +1,7 @@
 package com.sentinel.api.role.dto.response;
 
 import com.sentinel.api.common.dto.response.UserBriefResponse;
-import com.sentinel.api.role.entity.RoleStatus;
+import com.sentinel.common.postgresql.role.RoleStatus;
 
 import java.time.Instant;
 

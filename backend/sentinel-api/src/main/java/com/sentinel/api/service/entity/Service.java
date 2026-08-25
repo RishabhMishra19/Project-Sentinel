@@ -1,7 +1,7 @@
 package com.sentinel.api.service.entity;
 
 import com.sentinel.api.product.entity.Product;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

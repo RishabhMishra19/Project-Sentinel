@@ -1,7 +1,7 @@
 package com.sentinel.api.tenant.repository;
 
-import com.sentinel.api.tenant.entity.Tenant;
-import com.sentinel.api.tenant.entity.TenantStatus;
+import com.sentinel.common.postgresql.tenant.Tenant;
+import com.sentinel.common.postgresql.tenant.TenantStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

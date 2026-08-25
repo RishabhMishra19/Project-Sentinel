@@ -1,11 +1,11 @@
 package com.sentinel.api.role.service.core;
 
 import com.sentinel.api.common.exception.ResourceNotFoundException;
-import com.sentinel.api.role.entity.Role;
-import com.sentinel.api.role.entity.RoleStatus;
+import com.sentinel.common.postgresql.role.Role;
+import com.sentinel.common.postgresql.role.RoleStatus;
 import com.sentinel.api.role.repository.RoleRepository;
-import com.sentinel.api.tenant.entity.Tenant;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.tenant.Tenant;
+import com.sentinel.common.postgresql.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

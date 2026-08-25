@@ -5,7 +5,7 @@ import com.sentinel.api.service.dto.request.CreateServiceRequest;
 import com.sentinel.api.service.dto.response.ServiceResponse;
 import com.sentinel.api.service.entity.Service;
 import com.sentinel.api.service.entity.ServiceStatus;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.user.User;
 import com.sentinel.api.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package com.sentinel.api.user.repository;
 
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

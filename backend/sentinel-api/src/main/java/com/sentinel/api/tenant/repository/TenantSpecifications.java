@@ -3,8 +3,8 @@ package com.sentinel.api.tenant.repository;
 import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.common.specification.GenericSpecifications;
 import com.sentinel.api.common.specification.QueryFieldAllowlist;
-import com.sentinel.api.tenant.entity.Tenant;
-import com.sentinel.api.tenant.entity.TenantStatus;
+import com.sentinel.common.postgresql.tenant.Tenant;
+import com.sentinel.common.postgresql.tenant.TenantStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Set;

@@ -1,4 +1,4 @@
-package com.sentinel.api.tenant.entity;
+package com.sentinel.common.postgresql.tenant;
 
 public enum TenantStatus {
     ACTIVE,

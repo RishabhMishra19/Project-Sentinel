@@ -4,7 +4,7 @@ import com.sentinel.api.common.dto.response.UserBriefResponse;
 import com.sentinel.api.role.mapper.RoleMapper;
 import com.sentinel.api.user.dto.response.CreateUserResponse;
 import com.sentinel.api.user.dto.response.UserResponse;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

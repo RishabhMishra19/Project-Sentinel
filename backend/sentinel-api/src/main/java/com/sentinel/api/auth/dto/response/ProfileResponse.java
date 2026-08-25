@@ -2,7 +2,7 @@ package com.sentinel.api.auth.dto.response;
 
 import com.sentinel.api.auth.dto.response.common.RoleSummaryResponse;
 import com.sentinel.api.auth.dto.response.common.TenantSummaryResponse;
-import com.sentinel.api.user.entity.UserStatus;
+import com.sentinel.common.postgresql.user.UserStatus;
 
 import java.time.Instant;
 import java.util.List;

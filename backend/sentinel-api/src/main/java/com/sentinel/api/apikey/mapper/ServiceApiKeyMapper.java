@@ -3,7 +3,7 @@ package com.sentinel.api.apikey.mapper;
 import com.sentinel.api.apikey.dto.request.CreateServiceApiKeyRequest;
 import com.sentinel.api.apikey.dto.response.ServiceApiKeyCreatedResponse;
 import com.sentinel.api.apikey.dto.response.ServiceApiKeyResponse;
-import com.sentinel.api.user.entity.User;
+import com.sentinel.common.postgresql.user.User;
 import com.sentinel.api.user.mapper.UserMapper;
 import com.sentinel.common.apikey.entity.ServiceApiKey;
 import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;

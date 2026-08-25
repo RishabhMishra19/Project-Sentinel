@@ -1,4 +1,4 @@
-package com.sentinel.api.role.entity;
+package com.sentinel.common.postgresql.role;
 
 public enum RoleScopeType {
     PRODUCT,
