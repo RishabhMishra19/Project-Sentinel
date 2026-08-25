@@ -1,4 +1,4 @@
-package com.sentinel.api.service.repository;
+package com.sentinel.common.postgresql.service.repository;
 
 import com.sentinel.common.postgresql.service.entity.Service;
 import com.sentinel.common.postgresql.service.entity.ServiceStatus;

@@ -1,7 +1,7 @@
 package com.sentinel.ingest.logs.service.impl;
 
-import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;
-import com.sentinel.common.apikey.repository.ServiceApiKeyRepository;
+import com.sentinel.common.postgresql.apikey.entity.ServiceApiKeyStatus;
+import com.sentinel.common.postgresql.apikey.repository.ServiceApiKeyRepository;
 import com.sentinel.common.crypto.Sha256Hasher;
 import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;

@@ -1,4 +1,4 @@
-package com.sentinel.api.tenant.repository;
+package com.sentinel.common.postgresql.tenant.repository;
 
 import com.sentinel.common.postgresql.tenant.entity.Tenant;
 import com.sentinel.common.postgresql.tenant.entity.TenantStatus;

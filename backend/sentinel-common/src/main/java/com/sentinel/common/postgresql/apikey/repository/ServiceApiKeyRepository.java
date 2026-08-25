@@ -1,7 +1,7 @@
-package com.sentinel.common.apikey.repository;
+package com.sentinel.common.postgresql.apikey.repository;
 
-import com.sentinel.common.apikey.entity.ServiceApiKey;
-import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;
+import com.sentinel.common.postgresql.apikey.entity.ServiceApiKey;
+import com.sentinel.common.postgresql.apikey.entity.ServiceApiKeyStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

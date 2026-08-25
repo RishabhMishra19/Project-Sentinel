@@ -1,4 +1,4 @@
-package com.sentinel.api.user.repository;
+package com.sentinel.common.postgresql.user.repository;
 
 import com.sentinel.common.postgresql.user.entity.User;
 import org.springframework.data.domain.Page;

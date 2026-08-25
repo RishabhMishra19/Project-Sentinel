@@ -1,4 +1,4 @@
-package com.sentinel.common.apikey.entity;
+package com.sentinel.common.postgresql.apikey.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

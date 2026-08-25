@@ -1,6 +1,6 @@
 package com.sentinel.ingest.utils;
 
-import com.sentinel.common.apikey.repository.ServiceApiKeyRepository;
+import com.sentinel.common.postgresql.apikey.repository.ServiceApiKeyRepository;
 import com.sentinel.ingest.logs.repository.ServiceIdentityResolverRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

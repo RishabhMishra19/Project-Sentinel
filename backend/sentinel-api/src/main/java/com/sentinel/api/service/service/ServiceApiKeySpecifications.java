@@ -1,36 +1,33 @@
-package com.sentinel.api.product.repository;
+package com.sentinel.api.service.service;
 
 import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.common.specification.GenericSpecifications;
 import com.sentinel.api.common.specification.QueryFieldAllowlist;
-import com.sentinel.common.postgresql.product.entity.Product;
-import com.sentinel.common.postgresql.product.entity.ProductStatus;
+import com.sentinel.common.postgresql.apikey.entity.ServiceApiKey;
+import com.sentinel.common.postgresql.apikey.entity.ServiceApiKeyStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Set;
 import java.util.UUID;
 
-public final class ProductSpecifications {
+public final class ServiceApiKeySpecifications {
 
     public static final QueryFieldAllowlist FIELDS =
         QueryFieldAllowlist.builder()
-            .equal("status", "status", ProductStatus.class)
-            .search("name", "name")
-            .defaultSearch("name")
+            .equal("status", "status", ServiceApiKeyStatus.class)
             .sortable("createdAt")
             .sortable("name")
             .sortable("status")
-            .rangePath("createdAt")
             .build();
 
     public static final Set<String> SORTABLE_FIELDS = FIELDS.sortableFields();
 
-    private ProductSpecifications() {
+    private ServiceApiKeySpecifications() {
     }
 
-    public static Specification<Product> withFilters(UUID tenantId, ListQueryRequest query) {
-        Specification<Product> scoped =
-            (root, q, cb) -> cb.equal(root.get("tenant").get("id"), tenantId);
+    public static Specification<ServiceApiKey> forService(UUID serviceId, ListQueryRequest query) {
+        Specification<ServiceApiKey> scoped =
+            (root, q, cb) -> cb.equal(root.get("serviceId"), serviceId);
         return scoped.and(GenericSpecifications.from(query, FIELDS));
     }
 }

@@ -1,6 +1,6 @@
 package com.sentinel.api.security;
 
-import com.sentinel.api.tenant.repository.TenantRepository;
+import com.sentinel.common.postgresql.tenant.repository.TenantRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

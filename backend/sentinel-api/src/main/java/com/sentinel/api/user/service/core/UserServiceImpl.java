@@ -6,7 +6,7 @@ import com.sentinel.common.postgresql.role.entity.Role;
 import com.sentinel.common.postgresql.tenant.entity.Tenant;
 import com.sentinel.common.postgresql.user.entity.User;
 import com.sentinel.common.postgresql.user.entity.UserStatus;
-import com.sentinel.api.user.repository.UserRepository;
+import com.sentinel.common.postgresql.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

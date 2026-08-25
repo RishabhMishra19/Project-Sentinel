@@ -1,7 +1,7 @@
 package com.sentinel.api.service.service.core;
 
 import com.sentinel.common.postgresql.service.entity.Service;
-import com.sentinel.api.service.repository.ServiceRepository;
+import com.sentinel.common.postgresql.service.repository.ServiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

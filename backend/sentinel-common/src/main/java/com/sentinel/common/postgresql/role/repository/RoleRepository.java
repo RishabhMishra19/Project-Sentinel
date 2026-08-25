@@ -1,4 +1,4 @@
-package com.sentinel.api.role.repository;
+package com.sentinel.common.postgresql.role.repository;
 
 import com.sentinel.common.postgresql.role.entity.Role;
 import org.springframework.data.jpa.repository.EntityGraph;

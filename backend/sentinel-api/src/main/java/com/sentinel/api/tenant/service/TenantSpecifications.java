@@ -1,4 +1,4 @@
-package com.sentinel.api.tenant.repository;
+package com.sentinel.api.tenant.service;
 
 import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.common.specification.GenericSpecifications;

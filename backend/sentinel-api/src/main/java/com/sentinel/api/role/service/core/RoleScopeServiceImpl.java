@@ -6,7 +6,7 @@ import com.sentinel.common.postgresql.role.entity.Role;
 import com.sentinel.common.postgresql.role.entity.RoleScope;
 import com.sentinel.common.postgresql.role.entity.RoleScopeStatus;
 import com.sentinel.common.postgresql.role.entity.RoleScopeType;
-import com.sentinel.api.role.repository.RoleScopeRepository;
+import com.sentinel.common.postgresql.role.repository.RoleScopeRepository;
 import com.sentinel.common.postgresql.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

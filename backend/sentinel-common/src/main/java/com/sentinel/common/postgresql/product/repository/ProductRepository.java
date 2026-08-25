@@ -1,4 +1,4 @@
-package com.sentinel.api.product.repository;
+package com.sentinel.common.postgresql.product.repository;
 
 import com.sentinel.common.postgresql.product.entity.Product;
 import com.sentinel.common.postgresql.product.entity.ProductStatus;

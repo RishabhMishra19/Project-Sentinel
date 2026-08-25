@@ -1,7 +1,7 @@
 package com.sentinel.api.apikey.dto.response;
 
 import com.sentinel.api.common.dto.response.UserBriefResponse;
-import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;
+import com.sentinel.common.postgresql.apikey.entity.ServiceApiKeyStatus;
 
 import java.time.Instant;
 

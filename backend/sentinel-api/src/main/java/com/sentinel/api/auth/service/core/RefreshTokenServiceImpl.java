@@ -3,7 +3,7 @@ package com.sentinel.api.auth.service.core;
 import com.sentinel.api.auth.dto.internal.RefreshTokenIssue;
 import com.sentinel.common.postgresql.refreshToken.entity.RefreshToken;
 import com.sentinel.common.postgresql.refreshToken.entity.RefreshTokenStatus;
-import com.sentinel.api.auth.repository.RefreshTokenRepository;
+import com.sentinel.common.postgresql.refreshToken.repository.RefreshTokenRepository;
 import com.sentinel.api.common.exception.UnauthorizedException;
 import com.sentinel.api.security.JwtProperties;
 import com.sentinel.common.postgresql.user.entity.User;

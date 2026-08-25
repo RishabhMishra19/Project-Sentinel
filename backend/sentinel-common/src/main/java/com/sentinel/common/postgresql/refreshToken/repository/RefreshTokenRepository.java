@@ -1,4 +1,4 @@
-package com.sentinel.api.auth.repository;
+package com.sentinel.common.postgresql.refreshToken.repository;
 
 import com.sentinel.common.postgresql.refreshToken.entity.RefreshToken;
 import com.sentinel.common.postgresql.refreshToken.entity.RefreshTokenStatus;
