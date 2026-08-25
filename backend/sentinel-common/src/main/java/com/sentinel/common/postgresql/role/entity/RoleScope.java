@@ -1,7 +1,7 @@
-package com.sentinel.common.postgresql.service;
+package com.sentinel.common.postgresql.role.entity;
 
-import com.sentinel.common.postgresql.product.Product;
-import com.sentinel.common.postgresql.user.User;
+import com.sentinel.common.postgresql.permission.entity.PermissionType;
+import com.sentinel.common.postgresql.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,11 +23,11 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "services")
+@Table(name = "role_scopes")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Service {
+public class RoleScope {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -35,15 +35,23 @@ public class Service {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "scope_type", nullable = false, length = 32)
+    private RoleScopeType scopeType;
+
+    @Column(name = "scope_id", nullable = false)
+    private UUID scopeId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "permission", nullable = false, length = 32)
+    private PermissionType permission;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private ServiceStatus status;
+    private RoleScopeStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)

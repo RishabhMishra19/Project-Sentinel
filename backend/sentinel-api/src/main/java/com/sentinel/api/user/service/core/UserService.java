@@ -1,8 +1,8 @@
 package com.sentinel.api.user.service.core;
 
-import com.sentinel.common.postgresql.role.Role;
-import com.sentinel.common.postgresql.tenant.Tenant;
-import com.sentinel.common.postgresql.user.User;
+import com.sentinel.common.postgresql.role.entity.Role;
+import com.sentinel.common.postgresql.tenant.entity.Tenant;
+import com.sentinel.common.postgresql.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

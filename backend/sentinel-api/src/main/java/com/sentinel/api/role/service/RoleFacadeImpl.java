@@ -10,18 +10,18 @@ import com.sentinel.api.role.dto.request.UpdateRoleRequest;
 import com.sentinel.api.role.dto.request.UpdateRoleScopeRequest;
 import com.sentinel.api.role.dto.response.RoleResponse;
 import com.sentinel.api.role.dto.response.RoleScopeResponse;
-import com.sentinel.common.postgresql.role.Role;
-import com.sentinel.common.postgresql.role.RoleScope;
-import com.sentinel.common.postgresql.role.RoleScopeStatus;
-import com.sentinel.common.postgresql.role.RoleScopeType;
-import com.sentinel.common.postgresql.role.RoleStatus;
+import com.sentinel.common.postgresql.role.entity.Role;
+import com.sentinel.common.postgresql.role.entity.RoleScope;
+import com.sentinel.common.postgresql.role.entity.RoleScopeStatus;
+import com.sentinel.common.postgresql.role.entity.RoleScopeType;
+import com.sentinel.common.postgresql.role.entity.RoleStatus;
 import com.sentinel.api.role.mapper.RoleMapper;
 import com.sentinel.api.role.service.core.RoleScopeService;
 import com.sentinel.api.role.service.core.RoleService;
 import com.sentinel.api.service.service.core.ServiceService;
-import com.sentinel.common.postgresql.tenant.Tenant;
+import com.sentinel.common.postgresql.tenant.entity.Tenant;
 import com.sentinel.api.tenant.repository.TenantRepository;
-import com.sentinel.common.postgresql.user.User;
+import com.sentinel.common.postgresql.user.entity.User;
 import com.sentinel.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -201,7 +201,7 @@ public class RoleFacadeImpl implements RoleFacade {
             return;
         }
         if (scopeType == RoleScopeType.SERVICE) {
-            com.sentinel.common.postgresql.service.Service service = serviceService
+            com.sentinel.common.postgresql.service.entity.Service service = serviceService
                 .findWithAuditById(scopeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
             UUID serviceTenantId = service.getProduct().getTenant().getId();

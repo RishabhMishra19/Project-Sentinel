@@ -1,4 +1,4 @@
-package com.sentinel.common.postgresql.user;
+package com.sentinel.common.postgresql.user.entity;
 
 public enum UserStatus {
     ACTIVE,

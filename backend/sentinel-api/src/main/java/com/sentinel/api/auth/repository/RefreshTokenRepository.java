@@ -1,7 +1,7 @@
 package com.sentinel.api.auth.repository;
 
-import com.sentinel.common.postgresql.refreshToken.RefreshToken;
-import com.sentinel.common.postgresql.refreshToken.RefreshTokenStatus;
+import com.sentinel.common.postgresql.refreshToken.entity.RefreshToken;
+import com.sentinel.common.postgresql.refreshToken.entity.RefreshTokenStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

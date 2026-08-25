@@ -1,7 +1,7 @@
 package com.sentinel.api.tenant.dto.response;
 
 import com.sentinel.api.common.dto.response.UserBriefResponse;
-import com.sentinel.common.postgresql.tenant.TenantStatus;
+import com.sentinel.common.postgresql.tenant.entity.TenantStatus;
 
 import java.time.Instant;
 import java.util.List;

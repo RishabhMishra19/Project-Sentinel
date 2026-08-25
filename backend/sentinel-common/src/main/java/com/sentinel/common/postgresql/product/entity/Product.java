@@ -1,7 +1,7 @@
-package com.sentinel.common.postgresql.product;
+package com.sentinel.common.postgresql.product.entity;
 
-import com.sentinel.common.postgresql.tenant.Tenant;
-import com.sentinel.common.postgresql.user.User;
+import com.sentinel.common.postgresql.tenant.entity.Tenant;
+import com.sentinel.common.postgresql.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -1,7 +1,7 @@
 package com.sentinel.api.auth.dto.internal;
 
 import com.sentinel.api.auth.dto.response.AuthSessionResponse;
-import com.sentinel.common.postgresql.refreshToken.RefreshToken;
+import com.sentinel.common.postgresql.refreshToken.entity.RefreshToken;
 
 /**
  * Internal auth result: API session body plus raw refresh token for the HttpOnly cookie. Raw token is never stored on

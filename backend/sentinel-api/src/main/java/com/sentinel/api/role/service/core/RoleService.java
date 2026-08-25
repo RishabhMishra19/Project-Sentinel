@@ -1,8 +1,8 @@
 package com.sentinel.api.role.service.core;
 
-import com.sentinel.common.postgresql.role.Role;
-import com.sentinel.common.postgresql.tenant.Tenant;
-import com.sentinel.common.postgresql.user.User;
+import com.sentinel.common.postgresql.role.entity.Role;
+import com.sentinel.common.postgresql.tenant.entity.Tenant;
+import com.sentinel.common.postgresql.user.entity.User;
 
 import java.util.List;
 import java.util.UUID;

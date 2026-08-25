@@ -1,11 +1,11 @@
 package com.sentinel.api.service.mapper;
 
-import com.sentinel.common.postgresql.product.Product;
+import com.sentinel.common.postgresql.product.entity.Product;
 import com.sentinel.api.service.dto.request.CreateServiceRequest;
 import com.sentinel.api.service.dto.response.ServiceResponse;
-import com.sentinel.common.postgresql.service.Service;
-import com.sentinel.common.postgresql.service.ServiceStatus;
-import com.sentinel.common.postgresql.user.User;
+import com.sentinel.common.postgresql.service.entity.Service;
+import com.sentinel.common.postgresql.service.entity.ServiceStatus;
+import com.sentinel.common.postgresql.user.entity.User;
 import com.sentinel.api.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

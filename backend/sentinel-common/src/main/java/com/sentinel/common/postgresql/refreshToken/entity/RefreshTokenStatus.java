@@ -1,4 +1,4 @@
-package com.sentinel.common.postgresql.refreshToken;
+package com.sentinel.common.postgresql.refreshToken.entity;
 
 public enum RefreshTokenStatus {
     ACTIVE,

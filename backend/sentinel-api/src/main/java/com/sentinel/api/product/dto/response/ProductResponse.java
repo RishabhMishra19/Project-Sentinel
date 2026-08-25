@@ -1,7 +1,7 @@
 package com.sentinel.api.product.dto.response;
 
 import com.sentinel.api.common.dto.response.UserBriefResponse;
-import com.sentinel.common.postgresql.product.ProductStatus;
+import com.sentinel.common.postgresql.product.entity.ProductStatus;
 
 import java.time.Instant;
 

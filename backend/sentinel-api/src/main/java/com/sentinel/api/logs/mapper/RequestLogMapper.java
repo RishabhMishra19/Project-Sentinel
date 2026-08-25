@@ -1,8 +1,8 @@
 package com.sentinel.api.logs.mapper;
 
 import com.sentinel.api.logs.dto.response.RequestLogListResponse;
-import com.sentinel.common.postgresql.product.Product;
-import com.sentinel.common.postgresql.service.Service;
+import com.sentinel.common.postgresql.product.entity.Product;
+import com.sentinel.common.postgresql.service.entity.Service;
 import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
 import com.sentinel.common.postgresql.endpoint.entity.Endpoint;
 import org.springframework.stereotype.Component;

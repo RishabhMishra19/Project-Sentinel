@@ -1,8 +1,8 @@
 package com.sentinel.api.security;
 
 import com.sentinel.api.common.exception.UnauthorizedException;
-import com.sentinel.common.postgresql.permission.PermissionType;
-import com.sentinel.common.postgresql.role.RoleScopeType;
+import com.sentinel.common.postgresql.permission.entity.PermissionType;
+import com.sentinel.common.postgresql.role.entity.RoleScopeType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;

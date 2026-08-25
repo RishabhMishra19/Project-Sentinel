@@ -1,6 +1,6 @@
 package com.sentinel.api.auth.service.core;
 
-import com.sentinel.common.postgresql.user.User;
+import com.sentinel.common.postgresql.user.entity.User;
 
 import java.util.UUID;
 

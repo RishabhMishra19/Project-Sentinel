@@ -1,4 +1,4 @@
-package com.sentinel.common.postgresql.role;
+package com.sentinel.common.postgresql.role.entity;
 
 public enum RoleStatus {
     ACTIVE,

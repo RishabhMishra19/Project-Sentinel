@@ -1,7 +1,7 @@
 package com.sentinel.api.product.repository;
 
-import com.sentinel.common.postgresql.product.Product;
-import com.sentinel.common.postgresql.product.ProductStatus;
+import com.sentinel.common.postgresql.product.entity.Product;
+import com.sentinel.common.postgresql.product.entity.ProductStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

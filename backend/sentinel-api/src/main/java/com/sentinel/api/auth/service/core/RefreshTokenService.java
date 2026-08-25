@@ -1,8 +1,8 @@
 package com.sentinel.api.auth.service.core;
 
 import com.sentinel.api.auth.dto.internal.RefreshTokenIssue;
-import com.sentinel.common.postgresql.refreshToken.RefreshToken;
-import com.sentinel.common.postgresql.user.User;
+import com.sentinel.common.postgresql.refreshToken.entity.RefreshToken;
+import com.sentinel.common.postgresql.user.entity.User;
 
 import java.util.UUID;
 

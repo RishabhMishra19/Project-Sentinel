@@ -1,7 +1,7 @@
 package com.sentinel.api.service.repository;
 
-import com.sentinel.common.postgresql.service.Service;
-import com.sentinel.common.postgresql.service.ServiceStatus;
+import com.sentinel.common.postgresql.service.entity.Service;
+import com.sentinel.common.postgresql.service.entity.ServiceStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

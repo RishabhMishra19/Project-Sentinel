@@ -2,10 +2,10 @@ package com.sentinel.api.user.service.core;
 
 import com.sentinel.api.common.exception.ResourceNotFoundException;
 import com.sentinel.api.common.exception.UnauthorizedException;
-import com.sentinel.common.postgresql.role.Role;
-import com.sentinel.common.postgresql.tenant.Tenant;
-import com.sentinel.common.postgresql.user.User;
-import com.sentinel.common.postgresql.user.UserStatus;
+import com.sentinel.common.postgresql.role.entity.Role;
+import com.sentinel.common.postgresql.tenant.entity.Tenant;
+import com.sentinel.common.postgresql.user.entity.User;
+import com.sentinel.common.postgresql.user.entity.UserStatus;
 import com.sentinel.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
