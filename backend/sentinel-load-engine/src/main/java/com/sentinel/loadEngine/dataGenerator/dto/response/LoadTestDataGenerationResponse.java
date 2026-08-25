@@ -1,7 +1,9 @@
 package com.sentinel.loadEngine.dataGenerator.dto.response;
 
+import java.util.UUID;
+
 public record LoadTestDataGenerationResponse(
-    String testDataId,
+    UUID testDataId,
     String prefix,
     int tenantsCreated,
     int productsCreated,

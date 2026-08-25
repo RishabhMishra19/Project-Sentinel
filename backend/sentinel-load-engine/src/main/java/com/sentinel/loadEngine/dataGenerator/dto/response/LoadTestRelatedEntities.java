@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record LoadTestRelatedEntities(
-    String loadTestId,
+    UUID loadTestId,
     List<IdName> tenants,
     List<IdName> products,
     List<IdName> services,

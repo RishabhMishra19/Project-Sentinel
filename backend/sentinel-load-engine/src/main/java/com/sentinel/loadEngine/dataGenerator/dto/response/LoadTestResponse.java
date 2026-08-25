@@ -3,13 +3,16 @@ package com.sentinel.loadEngine.dataGenerator.dto.response;
 import com.sentinel.loadEngine.dataGenerator.entity.LoadTest;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record LoadTestResponse(
-    String testDataId,
+    UUID testDataId,
     Integer targetRps,
     Integer concurrency,
     Long durationMs,
-    Integer endpointCount,
+    Integer tenantCount,
+    Integer productCount,
+    Integer serviceCount,
     Long totalRequests,
     Long successfulRequests,
     Long failedRequests,
@@ -25,11 +28,13 @@ public record LoadTestResponse(
 
     public LoadTestResponse(LoadTest loadTest) {
         this(
-            loadTest.getTestDataId(),
+            loadTest.getId(),
             loadTest.getTargetRps(),
             loadTest.getConcurrency(),
             loadTest.getDurationMs(),
-            loadTest.getEndpointCount(),
+            loadTest.getTenantCount(),
+            loadTest.getProductCount(),
+            loadTest.getServiceCount(),
             loadTest.getTotalRequests(),
             loadTest.getSuccessfulRequests(),
             loadTest.getFailedRequests(),

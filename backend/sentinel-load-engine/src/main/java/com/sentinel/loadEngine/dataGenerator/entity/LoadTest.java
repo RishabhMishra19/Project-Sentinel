@@ -2,6 +2,8 @@ package com.sentinel.loadEngine.dataGenerator.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -23,6 +25,7 @@ import java.util.UUID;
 public class LoadTest {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
     private UUID id;
 
@@ -31,9 +34,6 @@ public class LoadTest {
 
     @Column(nullable = false, length = 50)
     private String status;
-
-    @Column(name = "test_data_id", length = 255)
-    private String testDataId;
 
     @Column(name = "target_rps")
     private Integer targetRps;
@@ -44,8 +44,14 @@ public class LoadTest {
     @Column(name = "duration_ms")
     private Long durationMs;
 
-    @Column(name = "endpoint_count")
-    private Integer endpointCount;
+    @Column(name = "tenant_count")
+    private Integer tenantCount;
+
+    @Column(name = "product_count")
+    private Integer productCount;
+
+    @Column(name = "service_count")
+    private Integer serviceCount;
 
     @Column(name = "total_requests")
     private Long totalRequests;

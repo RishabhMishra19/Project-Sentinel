@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 public class LoadTestServiceImpl implements LoadTestService {
     private static final int DELETE_LOG_BATCH_SIZE = 50;
     private static final String LOAD_TEST_STATUS_CREATED = "CREATED";
-    private static final String LOAD_TEST = "LOAD_TEST_SENTINEL";
+    private static final String LOAD_TEST = "_LOAD_TEST_SENTINEL_";
 
     private final TenantRepository tenantRepository;
     private final ProductRepository productRepository;
@@ -66,7 +66,6 @@ public class LoadTestServiceImpl implements LoadTestService {
 
         User admin = getAdminUser();
 
-        String testDataId = UUID.randomUUID().toString();
         String prefix = request.prefix().trim();
 
         List<Tenant> tenants = generateTenants(
@@ -95,15 +94,15 @@ public class LoadTestServiceImpl implements LoadTestService {
 
         serviceRepository.saveAll(services);
 
-        createLoadTest(
+        UUID loadTestId = createLoadTest(
             prefix,
-            testDataId,
             tenants.size(),
+            products.size(),
             services.size()
         );
 
         return new LoadTestDataGenerationResponse(
-            testDataId,
+            loadTestId,
             prefix,
             tenants.size(),
             products.size(),
@@ -118,8 +117,7 @@ public class LoadTestServiceImpl implements LoadTestService {
                 "Load test not found: " + testDataId
             ));
 
-        String prefix = loadTest.getName().split(LOAD_TEST)[0];
-        String tenantPrefix = String.format("%stenant-%s-", prefix, LOAD_TEST);
+        String tenantPrefix = this.getTenantPrefixFromLoadTestName(loadTest.getName());
 
         List<Tenant> tenants =
             tenantRepository.findByNameStartingWith(tenantPrefix);
@@ -212,7 +210,7 @@ public class LoadTestServiceImpl implements LoadTestService {
         );
 
         return new LoadTestRelatedEntities(
-            loadTest.getTestDataId(),
+            loadTest.getId(),
             tenants.stream().map(v -> new LoadTestRelatedEntities.IdName(v.getId(), v.getName())).toList(),
             products.stream().map(v -> new LoadTestRelatedEntities.IdName(v.getId(), v.getName())).toList(),
             services.stream().map(v -> new LoadTestRelatedEntities.IdName(v.getId(), v.getName())).toList(),
@@ -351,11 +349,8 @@ public class LoadTestServiceImpl implements LoadTestService {
             String suffix = randomSuffix();
 
             Tenant tenant = new Tenant();
-            tenant.setName("%s-tenant-%s-%s".formatted(prefix, LOAD_TEST, suffix));
-            tenant.setSlug("%s-tenant-load-test-%s".formatted(
-                normalize(prefix),
-                suffix
-            ));
+            tenant.setName(this.getTenantPrefix(prefix) + randomSuffix());
+            tenant.setSlug(this.getTenantPrefix(prefix) + randomSuffix());
             tenant.setStatus(TenantStatus.ACTIVE);
             tenant.setCreatedBy(admin);
             tenant.setUpdatedBy(admin);
@@ -380,11 +375,7 @@ public class LoadTestServiceImpl implements LoadTestService {
                 Product product = new Product();
 
                 product.setTenant(tenant);
-                product.setName("%s-product-%s-%s".formatted(
-                    prefix,
-                    LOAD_TEST,
-                    randomSuffix()
-                ));
+                product.setName(this.getProductPrefix(prefix) + randomSuffix());
                 product.setStatus(ProductStatus.ACTIVE);
                 product.setCreatedBy(admin);
                 product.setUpdatedBy(admin);
@@ -410,11 +401,7 @@ public class LoadTestServiceImpl implements LoadTestService {
                 Service service = new Service();
 
                 service.setProduct(product);
-                service.setName("%s-service-%s-%s".formatted(
-                    prefix,
-                    LOAD_TEST,
-                    randomSuffix()
-                ));
+                service.setName(this.getServicePrefix(prefix) + randomSuffix());
                 service.setStatus(ServiceStatus.ACTIVE);
                 service.setCreatedBy(admin);
                 service.setUpdatedBy(admin);
@@ -426,23 +413,23 @@ public class LoadTestServiceImpl implements LoadTestService {
         return services;
     }
 
-    private void createLoadTest(
+    private UUID createLoadTest(
         String prefix,
-        String testDataId,
         int tenantCount,
+        int productCount,
         int serviceCount
     ) {
         LoadTest loadTest = LoadTest.builder()
-            .id(UUID.randomUUID())
-            .name("%s-%s-%s".formatted(prefix, LOAD_TEST, randomSuffix()))
+            .name(this.getLoadTestNamePrefix(prefix) + randomSuffix())
             .status(LOAD_TEST_STATUS_CREATED)
-            .testDataId(testDataId)
-            .endpointCount(serviceCount)
+            .tenantCount(tenantCount)
+            .productCount(productCount)
+            .serviceCount(serviceCount)
             .createdAt(java.time.LocalDateTime.now())
             .updatedAt(java.time.LocalDateTime.now())
             .build();
 
-        loadTestRepository.save(loadTest);
+        return loadTestRepository.save(loadTest).getId();
     }
 
     private void validate(LoadTestDataGenerateRequest request) {
@@ -533,5 +520,25 @@ public class LoadTestServiceImpl implements LoadTestService {
             """.formatted(tenantIdValues, serviceIdValues);
 
         cassandraTemplate.getCqlOperations().execute(deleteLogsCql);
+    }
+
+    private String getTenantPrefixFromLoadTestName(String loadTestName) {
+        return loadTestName.split(LOAD_TEST)[0]+LOAD_TEST;
+    }
+
+    private String getLoadTestNamePrefix(String loadTestPrefix) {
+        return loadTestPrefix + LOAD_TEST;
+    }
+
+    private String getTenantPrefix(String loadTestPrefix) {
+        return this.getLoadTestNamePrefix(loadTestPrefix) + "tenant_";
+    }
+
+    private String getProductPrefix(String loadTestPrefix) {
+        return this.getLoadTestNamePrefix(loadTestPrefix) + "service_";
+    }
+
+    private String getServicePrefix(String loadTestPrefix) {
+        return this.getLoadTestNamePrefix(loadTestPrefix) + "product_";
     }
 }
