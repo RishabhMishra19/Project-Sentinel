@@ -122,7 +122,6 @@ public class KafkaMessage {
         }
 
         public AnalyticsMetrics initialize(AnalyticsMetrics metrics) {
-            this.bucket = metrics.getBucket();
             this.timestamp = metrics.getTimestamp();
             this.requestCount = metrics.getRequestCount();
             this.errorCount = metrics.getErrorCount();

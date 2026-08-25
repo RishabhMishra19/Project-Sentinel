@@ -97,12 +97,12 @@ public class AnalyticsStreamUtils {
         return streamsBuilder.stream(
                 KafkaTopics.request_logs,
                 Consumed.with(Serdes.String(), requestLogSerde).withTimestampExtractor(reqLogTimestampExtractor)
-        ).peek((key, val) -> log.info("{}INPUT: topic={}, key={}, val={}", SENTINEL_LOGS_PREFIX, KafkaTopics.request_logs, key, val));
+        ).peek((key, val) -> log.info("{}INPUT: topic={}, timestamp={}, entityId={}, key={}, , val={}, ", SENTINEL_LOGS_PREFIX, KafkaTopics.request_logs, val.occurredAt(), val.endpointId(), key, val));
     }
 
     public KStream<String, KafkaMessage.AnalyticsMetrics> getAnalyticsInputStream(StreamsBuilder streamsBuilder, String inputTopic) {
         return streamsBuilder.stream(inputTopic, Consumed.with(Serdes.String(), analyticsMetricSerde).withTimestampExtractor(analyticsTimestampExtractor))
-                .peek((key, val) -> log.info("{}INPUT: topic={}, key={}, val={}", SENTINEL_LOGS_PREFIX, inputTopic, key, val));
+                .peek((key, val) -> log.info("{}INPUT: topic={}, timestamp={}, entityId={}, key={}, val={}", SENTINEL_LOGS_PREFIX, inputTopic, val.getTimestamp(), val.getEntityId(), key, val));
     }
 
     public String getCompositeKey(KafkaMessage.ReqLog reqLog) {
@@ -128,7 +128,7 @@ public class AnalyticsStreamUtils {
             String outputTopic
     ) {
         stream
-                .peek((key, value) -> log.info("{}Input: key={}, scope={}, bucket={}, entityId={}", SENTINEL_LOGS_PREFIX, key, value.getScope(), value.getBucket(), value.getEntityId()))
+                .peek((key, value) -> log.info("{}Repartitioned: , timestamp={}, entityId={}, scope={}, bucket={}, key={}", SENTINEL_LOGS_PREFIX, value.getTimestamp(), value.getEntityId(), value.getScope(), value.getBucket(), key))
                 .groupByKey(Grouped.with(Serdes.String(), analyticsMetricSerde))
                 .windowedBy(bucketToWindowMap.get(bucket))
                 .aggregate(
@@ -139,7 +139,7 @@ public class AnalyticsStreamUtils {
                                 .withValueSerde(this.analyticsMetricSerde))
                 .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"))
                 .toStream()
-                .peek((key, value) -> log.info("{}Output: topic={}, key={}, value={}", SENTINEL_LOGS_PREFIX, outputTopic, key, value))
+                .peek((key, value) -> log.info("{}Output: topic={}, timestamp={}, entityId={}, key={}, value={}", SENTINEL_LOGS_PREFIX, outputTopic, value.getTimestamp(), value.getEntityId(), key, value))
                 .map((windowedKey, val) -> KeyValue.pair(windowedKey.key(), val))
                 .to(outputTopic, Produced.with(Serdes.String(), analyticsMetricSerde));
 
