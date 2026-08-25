@@ -33,4 +33,6 @@ public interface TenantRepository
     List<UUID> findIdsByStatus(@Param("status") TenantStatus status);
 
     List<Tenant> findByIdIn(List<UUID> ids);
+
+    List<Tenant> findByNameStartingWith(String namePrefix);
 }

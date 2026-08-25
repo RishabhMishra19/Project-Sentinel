@@ -12,6 +12,18 @@ import java.util.UUID;
 
 public interface AnalyticsService {
 
+    Long getCount(
+        List<UUID> entityIds,
+        AnalyticsScope scope,
+        AnalyticsBucket bucket
+    );
+
+    void deleteByEntityIds(
+        List<UUID> entityIds,
+        AnalyticsScope scope,
+        AnalyticsBucket bucket
+    );
+
     TotalStatsResponse findTotalStats(
         UUID entityId,
         Instant from,

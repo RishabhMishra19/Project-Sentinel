@@ -24,4 +24,8 @@ public interface RequestLogRepository extends CassandraRepository<RequestLog, Re
 
     @Query("SELECT * FROM request_logs WHERE tenant_id = ?0 AND service_id = ?1 AND occurred_at = ?2 AND id = ?3")
     Optional<RequestLog> findByFullKey(UUID tenantId, UUID serviceId, Instant occurredAt, UUID requestLogId);
+
+    @Query("SELECT COUNT(*) FROM request_logs WHERE tenant_id in ?0 AND service_id in ?1")
+    long countByTenantIdsAndServiceIds(List<UUID> tenantIds, List<UUID> serviceIds);
+
 }

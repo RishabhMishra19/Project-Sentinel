@@ -61,4 +61,6 @@ public interface ServiceRepository extends JpaRepository<Service, UUID>, JpaSpec
 
     List<Service> findByIdIn(List<UUID> ids);
 
+    List<Service> findByProductIdIn(List<UUID> productIds);
+
 }

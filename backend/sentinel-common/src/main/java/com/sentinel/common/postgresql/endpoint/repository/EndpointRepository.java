@@ -22,4 +22,6 @@ public interface EndpointRepository extends JpaRepository<Endpoint, UUID> {
 
     List<Endpoint> findByServiceIdAndPathTemplateIn(UUID serviceId, Set<String> pathTemplateList);
 
+    List<Endpoint> findByServiceIdIn(List<UUID> serviceIds);
+
 }

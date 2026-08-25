@@ -7,6 +7,7 @@ import com.sentinel.common.cassandra.requestlog.entity.RequestLogLookup;
 import com.sentinel.common.cassandra.requestlog.repository.RequestLogLookupRepository;
 import com.sentinel.common.cassandra.requestlog.repository.RequestLogRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +20,11 @@ import java.util.UUID;
 @Transactional
 public class RequestLogServiceImpl implements RequestLogService {
 
+
+
     private final RequestLogRepository requestLogRepository;
     private final RequestLogLookupRepository requestLogLookupRepository;
+    private final CassandraTemplate cassandraTemplate;
 
 
     @Override
@@ -30,42 +34,25 @@ public class RequestLogServiceImpl implements RequestLogService {
             return Optional.empty();
         }
         RequestLogLookup lookup = lookupOpt.get();
-        return requestLogRepository.findByFullKey(
-            tenantId,
-            serviceId,
-            lookup.getOccurredAt(),
-            lookup.getRequestLogId()
-        );
+        return requestLogRepository.findByFullKey(tenantId, serviceId, lookup.getOccurredAt(), lookup.getRequestLogId());
     }
 
     @Override
     public List<RequestLog> getFirstPage(GetRequestLogsListRequest request) {
-        return requestLogRepository.findFirstPage(
-            request.getTenantId(),
-            request.getServiceId(),
-            request.getPageSize()
-        );
+        return requestLogRepository.findFirstPage(request.getTenantId(), request.getServiceId(), request.getPageSize());
     }
 
     @Override
     public List<RequestLog> getNextPage(GetRequestLogsListRequest request, RequestLogCursorEncoder.RequestLogCursor decodedCursor) {
-        return requestLogRepository.findNextPage(
-            request.getTenantId(),
-            request.getServiceId(),
-            decodedCursor.getOccurredAt(),
-            decodedCursor.getRequestLogId(),
-            request.getPageSize()
-        );
+        return requestLogRepository.findNextPage(request.getTenantId(), request.getServiceId(), decodedCursor.getOccurredAt(),
+            decodedCursor.getRequestLogId(), request.getPageSize());
     }
 
     @Override
     public List<RequestLog> getPrevPage(GetRequestLogsListRequest request, RequestLogCursorEncoder.RequestLogCursor decodedCursor) {
-        return requestLogRepository.findPrevPage(
-            request.getTenantId(),
-            request.getServiceId(),
-            decodedCursor.getOccurredAt(),
-            decodedCursor.getRequestLogId(),
-            request.getPageSize()
-        );
+        return requestLogRepository.findPrevPage(request.getTenantId(), request.getServiceId(), decodedCursor.getOccurredAt(),
+            decodedCursor.getRequestLogId(), request.getPageSize());
     }
+
+
 }

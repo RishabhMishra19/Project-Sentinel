@@ -17,6 +17,18 @@ public class AnalyticsUtils {
         return scope.getName() + "_id";
     }
 
+    public static String getCountSql(AnalyticsScope scope, AnalyticsBucket bucket) {
+        String tableName = AnalyticsUtils.getTableName(scope, bucket);
+        String idColumnName = AnalyticsUtils.getIdColumnName(scope);
+        return String.format("SELECT COUNT(*) FROM %s where %s in ?", tableName, idColumnName);
+    }
+
+    public static String getDeleteSql(AnalyticsScope scope, AnalyticsBucket bucket) {
+        String tableName = AnalyticsUtils.getTableName(scope, bucket);
+        String idColumnName = AnalyticsUtils.getIdColumnName(scope);
+        return String.format("DELETE FROM %s where %s in ?", tableName, idColumnName);
+    }
+
     public static String getTotalStatCql(AnalyticsScope scope, AnalyticsBucket bucket) {
         String tableName = AnalyticsUtils.getTableName(scope, bucket);
         String idColumnName = AnalyticsUtils.getIdColumnName(scope);

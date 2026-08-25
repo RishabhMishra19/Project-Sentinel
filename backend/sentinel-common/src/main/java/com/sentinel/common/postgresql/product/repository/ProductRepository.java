@@ -47,4 +47,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
 
     List<Product> findByIdIn(List<UUID> ids);
 
+    List<Product> findByTenantIdIn(List<UUID> tenantIds);
+
 }

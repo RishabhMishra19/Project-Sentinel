@@ -21,6 +21,24 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     private final CqlTemplate cqlTemplate;
 
+    public Long getCount(List<UUID> entityIds, AnalyticsScope scope, AnalyticsBucket bucket){
+        String cql = AnalyticsUtils.getCountSql(scope, bucket);
+        return (Long)cqlTemplate.queryForObject(
+            cql,
+            Long.class,
+            entityIds
+        );
+    }
+
+    @Override
+    public void deleteByEntityIds(List<UUID> entityIds, AnalyticsScope scope, AnalyticsBucket bucket) {
+        String cql = AnalyticsUtils.getDeleteSql(scope, bucket);
+        cqlTemplate.execute(
+            cql,
+            entityIds
+        );
+    }
+
     public TotalStatsResponse findTotalStats(
         UUID entityId,
         Instant from,
