@@ -246,6 +246,7 @@ public class LoadTestServiceImpl implements LoadTestService {
         LoadTestRelatedEntities relatedEntities = this.getRelatedEntitiesByLoadTestId(loadTestId);
         if (relatedEntities == null)
             return false;
+        loadTestRepository.deleteById(relatedEntities.loadTestId());
         analyticsService.deleteByEntityIds(
             relatedEntities.endpoints().stream().map(LoadTestRelatedEntities.IdName::id).toList(),
             AnalyticsScope.ENDPOINT,
