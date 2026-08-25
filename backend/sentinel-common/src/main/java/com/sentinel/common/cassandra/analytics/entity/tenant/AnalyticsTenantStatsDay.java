@@ -23,11 +23,11 @@ public class AnalyticsTenantStatsDay extends AnalyticsStatsBase {
     @PrimaryKey
     private PrimaryKeyComposite id;
 
-    public AnalyticsTenantStatsDay(KafkaMessage.AnalyticsMetrics statsMetrics, UUID tenantId, Instant bucketStart) {
+    public AnalyticsTenantStatsDay(KafkaMessage.AnalyticsMetrics statsMetrics) {
         super(statsMetrics);
         this.id = new PrimaryKeyComposite();
-        this.id.tenantId = tenantId;
-        this.id.bucketStart = bucketStart;
+        this.id.tenantId = statsMetrics.getEntityId();
+        this.id.bucketStart = statsMetrics.getTimestamp();
     }
 
     @Getter

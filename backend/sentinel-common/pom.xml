@@ -20,6 +20,11 @@
     </properties>
 
 	<dependencies>
+		<!-- Jackson 3 -->
+		<dependency>
+			<groupId>tools.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
 		 <!-- PostgreSQL / JPA -->
     <dependency>
         <groupId>org.springframework.boot</groupId>

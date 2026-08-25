@@ -3,6 +3,7 @@ include:
   - ./infrastructure/kafka/kafka-1.yml
   - ./infrastructure/kafka/kafka-2.yml
   - ./infrastructure/kafka/kafka-3.yml
+  - ./infrastructure/kafka/kafka-ui.yml
   - ./infrastructure/redis/redis.yml
   - ./infrastructure/memcached/memcached.yml
   - ./infrastructure/postgres/postgres.yml

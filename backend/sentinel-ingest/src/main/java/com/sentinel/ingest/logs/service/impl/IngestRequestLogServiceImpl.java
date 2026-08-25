@@ -57,7 +57,7 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
         try {
             List<KafkaMessage.ReqLog> reqLogs = request.toReqLogKafkaMessage(serviceIdentity);
             for (KafkaMessage.ReqLog reqLog : reqLogs) {
-                kafkaTemplate.send(new ProducerRecord<>(KafkaTopics.request_logs, null, System.currentTimeMillis(), reqLog.getKey(), reqLog))
+                kafkaTemplate.send(new ProducerRecord<>(KafkaTopics.request_logs, null, System.currentTimeMillis(), reqLog.requestId(), reqLog))
                         .get();
             }
             return new IngestLogResponse("Successfully ingested", true);

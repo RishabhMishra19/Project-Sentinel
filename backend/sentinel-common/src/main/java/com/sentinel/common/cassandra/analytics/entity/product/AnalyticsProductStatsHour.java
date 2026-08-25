@@ -20,11 +20,11 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AnalyticsProductStatsHour extends AnalyticsStatsBase {
 
-    public AnalyticsProductStatsHour(KafkaMessage.AnalyticsMetrics statsMetrics, UUID productId, Instant startBucket) {
+    public AnalyticsProductStatsHour(KafkaMessage.AnalyticsMetrics statsMetrics) {
         super(statsMetrics);
         this.id = new PrimaryKeyComposite();
-        this.id.productId = productId;
-        this.id.bucketStart = startBucket;
+        this.id.productId = statsMetrics.getEntityId();
+        this.id.bucketStart = statsMetrics.getTimestamp();
     }
 
     @PrimaryKey

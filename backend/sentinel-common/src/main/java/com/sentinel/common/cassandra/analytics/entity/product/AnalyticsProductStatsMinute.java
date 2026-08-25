@@ -23,11 +23,11 @@ public class AnalyticsProductStatsMinute extends AnalyticsStatsBase {
     @PrimaryKey
     private PrimaryKeyComposite id;
 
-    public AnalyticsProductStatsMinute(KafkaMessage.AnalyticsMetrics statsMetrics, UUID productId, Instant bucketStart) {
+    public AnalyticsProductStatsMinute(KafkaMessage.AnalyticsMetrics statsMetrics) {
         super(statsMetrics);
         this.id = new PrimaryKeyComposite();
-        this.id.productId = productId;
-        this.id.bucketStart = bucketStart;
+        this.id.productId = statsMetrics.getEntityId();
+        this.id.bucketStart = statsMetrics.getTimestamp();
     }
 
     @Getter

@@ -1,4 +1,4 @@
-package com.sentinel.processor.kafka.listener.requestlog;
+package com.sentinel.processor.kafka.stream.listener;
 
 import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
 import com.sentinel.common.cassandra.requestlog.entity.RequestLogLookup;

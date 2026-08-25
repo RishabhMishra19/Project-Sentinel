@@ -1,19 +1,19 @@
 package com.sentinel.processor.kafka.stream;
 
-import com.sentinel.common.kafka.KafkaMessage;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sentinel.common.kafka.KafkaProperties;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.common.serialization.Deserializer;
-import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.serialization.Serializer;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.processor.TimestampExtractor;
+import org.apache.kafka.streams.errors.DefaultProductionExceptionHandler;
+import org.apache.kafka.streams.errors.LogAndFailExceptionHandler;
+import org.apache.kafka.streams.errors.LogAndFailProcessingExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,43 +34,18 @@ public class KafkaStreamsConfig {
         props.put(StreamsConfig.ENSURE_EXPLICIT_INTERNAL_RESOURCE_NAMING_CONFIG, true);
         props.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 3000);
+        props.put(StreamsConfig.DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, LogAndFailExceptionHandler.class);
+        props.put(StreamsConfig.PROCESSING_EXCEPTION_HANDLER_CLASS_CONFIG, LogAndFailProcessingExceptionHandler.class);
+        props.put(StreamsConfig.PRODUCTION_EXCEPTION_HANDLER_CLASS_CONFIG, DefaultProductionExceptionHandler.class);
         return new KafkaStreamsConfiguration(props);
     }
 
-    private <T> Serde<T> customSerde(ObjectMapper objectMapper, Class<T> clazz) {
-        Serializer<T> serializer = (topic, data) -> {
-            if (data == null) return null;
-            try {return objectMapper.writeValueAsBytes(data);} catch (Exception e) {throw new RuntimeException(e);}
-        };
-        Deserializer<T> deserializer = (topic, data) -> {
-            if (data == null || data.length == 0) return null;
-            try {return objectMapper.readerFor(clazz).readValue(data);} catch (Exception e) {throw new RuntimeException(e);}
-        };
-        return Serdes.serdeFrom(serializer, deserializer);
-    }
-
     @Bean
-    public Serde<KafkaMessage.ReqLog> reqLogSerde(ObjectMapper objectMapper) {
-        return customSerde(objectMapper, KafkaMessage.ReqLog.class);
+    @Primary
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        // This explicitly enables support for Instant, LocalDateTime, LocalDate, etc.
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
     }
-
-    @Bean
-    public Serde<KafkaMessage.AnalyticsMetrics> analyticsSerde(ObjectMapper objectMapper) {
-        return customSerde(objectMapper, KafkaMessage.AnalyticsMetrics.class);
-    }
-
-    @Bean
-    public TimestampExtractor reqLogTimestampExtractor() {
-        return (record, previousTimeStamp) -> {
-            KafkaMessage.ReqLog log = (KafkaMessage.ReqLog) record.value();
-            if (log != null && log.occurredAt() != null) {
-                return log.occurredAt().toEpochMilli();
-            }
-            if (previousTimeStamp >= 0) {
-                return previousTimeStamp;
-            }
-            return record.timestamp();
-        };
-    }
-
 }

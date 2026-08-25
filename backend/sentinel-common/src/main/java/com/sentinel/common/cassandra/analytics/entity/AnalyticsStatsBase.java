@@ -16,20 +16,20 @@ import org.springframework.data.cassandra.core.mapping.Column;
 public class AnalyticsStatsBase {
 
     public AnalyticsStatsBase(KafkaMessage.AnalyticsMetrics metrics) {
-        this.requestCount = metrics.getMetrics().getRequestCount();
-        this.errorCount = metrics.getMetrics().getErrorCount();
-        this.status2xx = metrics.getMetrics().getStatus2xx();
-        this.status3xx = metrics.getMetrics().getStatus3xx();
-        this.status4xx = metrics.getMetrics().getStatus4xx();
-        this.status5xx = metrics.getMetrics().getStatus5xx();
-        this.latencySumMs = metrics.getMetrics().getLatencySumMs();
-        this.latencyMinMs = metrics.getMetrics().getLatencyMinMs();
-        this.latencyMaxMs = metrics.getMetrics().getLatencyMaxMs();
-        this.latencyP50Ms = (long) metrics.getMetrics().getLatencyHistogram().getPercentileAtOrBelowValue(50);
-        this.latencyP95Ms = (long) metrics.getMetrics().getLatencyHistogram().getPercentileAtOrBelowValue(95);
-        this.latencyP99Ms = (long) metrics.getMetrics().getLatencyHistogram().getPercentileAtOrBelowValue(99);
-        this.requestBytesTotal = metrics.getMetrics().getRequestBytesTotal();
-        this.responseBytesTotal = metrics.getMetrics().getResponseBytesTotal();
+        this.requestCount = metrics.getRequestCount();
+        this.errorCount = metrics.getErrorCount();
+        this.status2xx = metrics.getStatus2xx();
+        this.status3xx = metrics.getStatus3xx();
+        this.status4xx = metrics.getStatus4xx();
+        this.status5xx = metrics.getStatus5xx();
+        this.latencySumMs = metrics.getLatencySumMs();
+        this.latencyMinMs = metrics.getLatencyMinMs();
+        this.latencyMaxMs = metrics.getLatencyMaxMs();
+        this.latencyP50Ms = (long) metrics.getLatencyHistogram().getValueAtPercentile(50);
+        this.latencyP95Ms = (long) metrics.getLatencyHistogram().getValueAtPercentile(95);
+        this.latencyP99Ms = (long) metrics.getLatencyHistogram().getValueAtPercentile(99);
+        this.requestBytesTotal = metrics.getRequestBytesTotal();
+        this.responseBytesTotal = metrics.getResponseBytesTotal();
     }
 
     @Column("request_count")
