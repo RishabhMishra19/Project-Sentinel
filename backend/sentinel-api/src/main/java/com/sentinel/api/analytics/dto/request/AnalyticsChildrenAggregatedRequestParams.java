@@ -7,5 +7,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record AnalyticsChildrenAggregatedRequestParams(
-        @NotNull AnalyticsScope scope, @NotNull Instant from, @NotNull Instant to, UUID entityId
-) {}
+    @NotNull AnalyticsScope scope, @NotNull Instant from, @NotNull Instant to, UUID entityId
+) {
+}

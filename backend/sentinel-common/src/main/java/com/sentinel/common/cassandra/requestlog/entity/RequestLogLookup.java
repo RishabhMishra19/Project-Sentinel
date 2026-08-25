@@ -1,7 +1,5 @@
 package com.sentinel.common.cassandra.requestlog.entity;
 
-import java.time.Instant;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,6 +7,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
+
+import java.time.Instant;
+import java.util.UUID;
 
 @Table("request_logs_lookup_by_id")
 @Getter

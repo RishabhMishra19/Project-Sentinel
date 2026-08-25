@@ -23,12 +23,13 @@ import com.sentinel.api.tenant.entity.Tenant;
 import com.sentinel.api.tenant.repository.TenantRepository;
 import com.sentinel.api.user.entity.User;
 import com.sentinel.api.user.repository.UserRepository;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -43,13 +44,20 @@ public class RoleFacadeImpl implements RoleFacade {
     private final ProductService productService;
     private final ServiceService serviceService;
 
+    private static UUID requireActiveTenant(UUID tenantId) {
+        if (tenantId == null) {
+            throw new BadRequestException("Active tenant is required");
+        }
+        return tenantId;
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<RoleResponse> list(UUID tenantId) {
         requireActiveTenant(tenantId);
         return roleService.listByTenant(tenantId).stream()
-                .map(roleMapper::toResponse)
-                .toList();
+            .map(roleMapper::toResponse)
+            .toList();
     }
 
     @Override
@@ -74,7 +82,7 @@ public class RoleFacadeImpl implements RoleFacade {
 
     @Override
     public RoleResponse update(
-            UUID tenantId, UUID id, UpdateRoleRequest request, UUID actorId) {
+        UUID tenantId, UUID id, UpdateRoleRequest request, UUID actorId) {
         UUID effectiveTenantId = requireActiveTenant(tenantId);
         Role role = roleService.getByIdForTenant(effectiveTenantId, id);
         if (role.getStatus() == RoleStatus.INACTIVE) {
@@ -82,7 +90,7 @@ public class RoleFacadeImpl implements RoleFacade {
         }
         String name = request.name().trim();
         if (roleService.existsByTenantIdAndNameIgnoreCaseAndIdNot(
-                effectiveTenantId, name, id)) {
+            effectiveTenantId, name, id)) {
             throw new ConflictException("Role name already exists in this tenant");
         }
         User actorRef = userRepository.getReferenceById(actorId);
@@ -106,13 +114,13 @@ public class RoleFacadeImpl implements RoleFacade {
     public List<RoleScopeResponse> listScopes(UUID tenantId, UUID roleId) {
         requireActiveTenant(tenantId);
         return roleScopeService.listByRoleIdForTenant(tenantId, roleId).stream()
-                .map(scope -> roleMapper.toScopeResponse(scope, resolveScopeName(tenantId, scope)))
-                .toList();
+            .map(scope -> roleMapper.toScopeResponse(scope, resolveScopeName(tenantId, scope)))
+            .toList();
     }
 
     @Override
     public RoleScopeResponse createScope(
-            UUID tenantId, UUID roleId, CreateRoleScopeRequest request, UUID actorId) {
+        UUID tenantId, UUID roleId, CreateRoleScopeRequest request, UUID actorId) {
         UUID effectiveTenantId = requireActiveTenant(tenantId);
         Role role = roleService.getByIdForTenant(effectiveTenantId, roleId);
         if (role.getStatus() == RoleStatus.INACTIVE) {
@@ -128,18 +136,18 @@ public class RoleFacadeImpl implements RoleFacade {
 
         User actorRef = userRepository.getReferenceById(actorId);
         RoleScope saved =
-                roleScopeService.create(role, scopeType, scopeId, request.permission(), actorRef);
+            roleScopeService.create(role, scopeType, scopeId, request.permission(), actorRef);
         return roleMapper.toScopeResponse(
-                saved, resolveScopeName(effectiveTenantId, scopeType, scopeId));
+            saved, resolveScopeName(effectiveTenantId, scopeType, scopeId));
     }
 
     @Override
     public RoleScopeResponse updateScope(
-            UUID tenantId,
-            UUID roleId,
-            UUID scopeId,
-            UpdateRoleScopeRequest request,
-            UUID actorId) {
+        UUID tenantId,
+        UUID roleId,
+        UUID scopeId,
+        UpdateRoleScopeRequest request,
+        UUID actorId) {
         UUID effectiveTenantId = requireActiveTenant(tenantId);
         RoleScope scope = roleScopeService.getByIdForRole(effectiveTenantId, roleId, scopeId);
         if (scope.getStatus() == RoleScopeStatus.INACTIVE) {
@@ -147,9 +155,9 @@ public class RoleFacadeImpl implements RoleFacade {
         }
         User actorRef = userRepository.getReferenceById(actorId);
         RoleScope saved =
-                roleScopeService.updatePermission(scope, request.permission(), actorRef);
+            roleScopeService.updatePermission(scope, request.permission(), actorRef);
         return roleMapper.toScopeResponse(
-                saved, resolveScopeName(effectiveTenantId, saved));
+            saved, resolveScopeName(effectiveTenantId, saved));
     }
 
     @Override
@@ -170,17 +178,17 @@ public class RoleFacadeImpl implements RoleFacade {
     private String resolveScopeName(UUID tenantId, RoleScopeType scopeType, UUID scopeId) {
         if (scopeType == RoleScopeType.PRODUCT) {
             return productService
-                    .findWithAuditByIdAndTenantId(scopeId, tenantId)
-                    .map(product -> product.getName())
-                    .orElse("Unknown product");
+                .findWithAuditByIdAndTenantId(scopeId, tenantId)
+                .map(product -> product.getName())
+                .orElse("Unknown product");
         }
         if (scopeType == RoleScopeType.SERVICE) {
             return serviceService
-                    .findWithAuditById(scopeId)
-                    .filter(service ->
-                            Objects.equals(service.getProduct().getTenant().getId(), tenantId))
-                    .map(service -> service.getName())
-                    .orElse("Unknown service");
+                .findWithAuditById(scopeId)
+                .filter(service ->
+                    Objects.equals(service.getProduct().getTenant().getId(), tenantId))
+                .map(service -> service.getName())
+                .orElse("Unknown service");
         }
         return "—";
     }
@@ -188,14 +196,14 @@ public class RoleFacadeImpl implements RoleFacade {
     private void validateResourceScope(UUID tenantId, RoleScopeType scopeType, UUID scopeId) {
         if (scopeType == RoleScopeType.PRODUCT) {
             productService
-                    .findWithAuditByIdAndTenantId(scopeId, tenantId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+                .findWithAuditByIdAndTenantId(scopeId, tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
             return;
         }
         if (scopeType == RoleScopeType.SERVICE) {
             com.sentinel.api.service.entity.Service service = serviceService
-                    .findWithAuditById(scopeId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
+                .findWithAuditById(scopeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
             UUID serviceTenantId = service.getProduct().getTenant().getId();
             if (!Objects.equals(serviceTenantId, tenantId)) {
                 throw new ResourceNotFoundException("Service not found");
@@ -203,12 +211,5 @@ public class RoleFacadeImpl implements RoleFacade {
             return;
         }
         throw new BadRequestException("Unsupported scope type: " + scopeType);
-    }
-
-    private static UUID requireActiveTenant(UUID tenantId) {
-        if (tenantId == null) {
-            throw new BadRequestException("Active tenant is required");
-        }
-        return tenantId;
     }
 }

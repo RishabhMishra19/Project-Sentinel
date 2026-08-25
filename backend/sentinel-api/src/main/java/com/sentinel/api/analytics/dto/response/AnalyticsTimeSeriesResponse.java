@@ -12,22 +12,21 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AnalyticsTimeSeriesResponse extends TimeSeriesStatsResponse {
 
+    private Long endpointCount;
+    private String entityName;
     public AnalyticsTimeSeriesResponse(
-            TimeSeriesStatsResponse timeSeriesStatsResponse,
-            Long endpointCount,
-            String entityName
+        TimeSeriesStatsResponse timeSeriesStatsResponse,
+        Long endpointCount,
+        String entityName
     ) {
         super(
-                timeSeriesStatsResponse.getBucket(),
-                timeSeriesStatsResponse.getScope(),
-                timeSeriesStatsResponse.getEntityId(),
-                timeSeriesStatsResponse.getTimeSeriesStats()
+            timeSeriesStatsResponse.getBucket(),
+            timeSeriesStatsResponse.getScope(),
+            timeSeriesStatsResponse.getEntityId(),
+            timeSeriesStatsResponse.getTimeSeriesStats()
         );
         this.endpointCount = endpointCount;
         this.entityName = entityName;
     }
-
-    private Long endpointCount;
-    private String entityName;
 
 }

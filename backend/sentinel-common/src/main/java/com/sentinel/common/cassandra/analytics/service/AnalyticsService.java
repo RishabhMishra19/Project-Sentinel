@@ -13,27 +13,27 @@ import java.util.UUID;
 public interface AnalyticsService {
 
     TotalStatsResponse findTotalStats(
-            UUID entityId,
-            Instant from,
-            Instant to,
-            AnalyticsScope scope,
-            AnalyticsBucket bucket
+        UUID entityId,
+        Instant from,
+        Instant to,
+        AnalyticsScope scope,
+        AnalyticsBucket bucket
     );
 
     EntityAggregatedStatsResponse findEntityAggregatedStats(
-            List<UUID> entityIds,
-            Instant from,
-            Instant to,
-            AnalyticsScope scope,
-            AnalyticsBucket bucket
+        List<UUID> entityIds,
+        Instant from,
+        Instant to,
+        AnalyticsScope scope,
+        AnalyticsBucket bucket
     );
 
     TimeSeriesStatsResponse findTimeSeriesStats(
-            UUID entityId,
-            Instant from,
-            Instant to,
-            AnalyticsScope scope,
-            AnalyticsBucket bucket
+        UUID entityId,
+        Instant from,
+        Instant to,
+        AnalyticsScope scope,
+        AnalyticsBucket bucket
     );
 
 }

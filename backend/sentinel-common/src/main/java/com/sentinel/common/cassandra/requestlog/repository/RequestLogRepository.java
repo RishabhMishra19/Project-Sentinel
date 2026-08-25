@@ -1,13 +1,14 @@
 package com.sentinel.common.cassandra.requestlog.repository;
 
 import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
+import org.springframework.data.cassandra.repository.CassandraRepository;
+import org.springframework.data.cassandra.repository.Query;
+import org.springframework.stereotype.Repository;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.cassandra.repository.CassandraRepository;
-import org.springframework.data.cassandra.repository.Query;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RequestLogRepository extends CassandraRepository<RequestLog, RequestLog.PrimaryKeyComposite> {

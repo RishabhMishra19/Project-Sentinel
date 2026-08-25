@@ -1,11 +1,12 @@
 package com.sentinel.api.product.service.core;
 
 import com.sentinel.api.product.entity.Product;
-import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public interface ProductService {
 

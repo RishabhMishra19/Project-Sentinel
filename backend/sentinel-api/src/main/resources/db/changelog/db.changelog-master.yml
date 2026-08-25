@@ -1,11 +1,11 @@
 databaseChangeLog:
-  - include:
-      file: db/changelog/migrations/001-create-auth.sql
-  - include:
-      file: db/changelog/migrations/002-create-tenancy.sql
-  - include:
-      file: db/changelog/migrations/003-create-products-and-services.sql
-  - include:
-      file: db/changelog/migrations/004-seed-data.sql
-  - include:
-      file: db/changelog/migrations/005-create-endpoint.sql
+    -   include:
+            file: db/changelog/migrations/001-create-auth.sql
+    -   include:
+            file: db/changelog/migrations/002-create-tenancy.sql
+    -   include:
+            file: db/changelog/migrations/003-create-products-and-services.sql
+    -   include:
+            file: db/changelog/migrations/004-seed-data.sql
+    -   include:
+            file: db/changelog/migrations/005-create-endpoint.sql

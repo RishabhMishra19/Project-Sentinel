@@ -1,13 +1,14 @@
 -- liquibase formatted sql
 
 -- changeset sentinel:002-tenants
-CREATE TABLE tenants (
-    id UUID NOT NULL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    slug VARCHAR(100) NOT NULL,
-    status VARCHAR(32) NOT NULL,
-    created_by UUID NOT NULL,
-    updated_by UUID NOT NULL,
+CREATE TABLE tenants
+(
+    id         UUID                     NOT NULL PRIMARY KEY,
+    name       VARCHAR(255)             NOT NULL,
+    slug       VARCHAR(100)             NOT NULL,
+    status     VARCHAR(32)              NOT NULL,
+    created_by UUID                     NOT NULL,
+    updated_by UUID                     NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_tenants_created_by FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE RESTRICT,
@@ -25,18 +26,19 @@ ALTER TABLE users
     ADD CONSTRAINT fk_users_tenant FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE RESTRICT,
     ADD CONSTRAINT chk_users_tenant_vs_platform CHECK (
         (is_sentinel_admin = TRUE AND tenant_id IS NULL AND is_tenant_admin = FALSE)
-        OR (is_sentinel_admin = FALSE AND tenant_id IS NOT NULL)
-    );
+            OR (is_sentinel_admin = FALSE AND tenant_id IS NOT NULL)
+        );
 
 -- changeset sentinel:002-roles
 -- All roles belong to a tenant. Platform operators use users.is_sentinel_admin (not roles).
-CREATE TABLE roles (
-    id UUID NOT NULL PRIMARY KEY,
-    tenant_id UUID NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    status VARCHAR(32) NOT NULL,
-    created_by UUID NOT NULL,
-    updated_by UUID NOT NULL,
+CREATE TABLE roles
+(
+    id         UUID                     NOT NULL PRIMARY KEY,
+    tenant_id  UUID                     NOT NULL,
+    name       VARCHAR(255)             NOT NULL,
+    status     VARCHAR(32)              NOT NULL,
+    created_by UUID                     NOT NULL,
+    updated_by UUID                     NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT uk_roles_tenant_name UNIQUE (tenant_id, name),
@@ -48,7 +50,8 @@ CREATE TABLE roles (
 CREATE INDEX idx_roles_tenant_id ON roles (tenant_id);
 
 -- changeset sentinel:002-user-roles
-CREATE TABLE user_roles (
+CREATE TABLE user_roles
+(
     user_id UUID NOT NULL,
     role_id UUID NOT NULL,
     CONSTRAINT pk_user_roles PRIMARY KEY (user_id, role_id),
@@ -60,15 +63,16 @@ CREATE INDEX idx_user_roles_user_id ON user_roles (user_id);
 
 -- changeset sentinel:002-role-scopes
 -- permission per scope: ALL | READ | READ_AND_WRITE
-CREATE TABLE role_scopes (
-    id UUID NOT NULL PRIMARY KEY,
-    role_id UUID NOT NULL,
-    scope_type VARCHAR(32) NOT NULL,
-    scope_id UUID NOT NULL,
-    permission VARCHAR(32) NOT NULL,
-    status VARCHAR(32) NOT NULL,
-    created_by UUID NOT NULL,
-    updated_by UUID NOT NULL,
+CREATE TABLE role_scopes
+(
+    id         UUID                     NOT NULL PRIMARY KEY,
+    role_id    UUID                     NOT NULL,
+    scope_type VARCHAR(32)              NOT NULL,
+    scope_id   UUID                     NOT NULL,
+    permission VARCHAR(32)              NOT NULL,
+    status     VARCHAR(32)              NOT NULL,
+    created_by UUID                     NOT NULL,
+    updated_by UUID                     NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_role_scopes_role FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE,

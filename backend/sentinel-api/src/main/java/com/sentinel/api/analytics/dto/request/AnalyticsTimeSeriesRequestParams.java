@@ -8,10 +8,11 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record AnalyticsTimeSeriesRequestParams(
-        @NotNull AnalyticsBucket bucket,
-        @NotNull AnalyticsScope scope,
-        @NotNull Instant from,
-        @NotNull Instant to,
-        @NotNull UUID entityId
-) {}
+    @NotNull AnalyticsBucket bucket,
+    @NotNull AnalyticsScope scope,
+    @NotNull Instant from,
+    @NotNull Instant to,
+    @NotNull UUID entityId
+) {
+}
 

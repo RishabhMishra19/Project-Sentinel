@@ -18,12 +18,6 @@ import com.sentinel.api.tenant.repository.TenantSpecifications;
 import com.sentinel.api.user.entity.User;
 import com.sentinel.api.user.repository.UserRepository;
 import com.sentinel.api.user.service.core.UserService;
-import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +27,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -41,7 +42,7 @@ public class TenantFacadeImpl implements TenantFacade {
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "createdAt");
     private static final int TEMP_PASSWORD_LENGTH = 16;
     private static final String TEMP_PASSWORD_CHARS =
-            "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
+        "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final TenantRepository tenantRepository;
@@ -55,13 +56,13 @@ public class TenantFacadeImpl implements TenantFacade {
     @Transactional(readOnly = true)
     public PageResponse<TenantResponse> list(ListQueryRequest query) {
         Pageable effective =
-                query.toPageable(TenantSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
+            query.toPageable(TenantSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
         Specification<Tenant> spec = TenantSpecifications.withFilters(query);
         Page<Tenant> page = tenantRepository.findAll(spec, effective);
         Map<UUID, List<String>> adminEmailsByTenant = adminEmailsByTenantIds(
-                page.getContent().stream().map(Tenant::getId).toList());
+            page.getContent().stream().map(Tenant::getId).toList());
         return PageResponse.from(page.map(tenant -> tenantMapper.toResponse(
-                tenant, adminEmailsByTenant.getOrDefault(tenant.getId(), List.of()))));
+            tenant, adminEmailsByTenant.getOrDefault(tenant.getId(), List.of()))));
     }
 
     @Override
@@ -70,10 +71,10 @@ public class TenantFacadeImpl implements TenantFacade {
         requirePathMatchesActiveTenant(id);
         Tenant tenant = requireTenantWithAudit(id);
         List<String> adminEmails = userRepository
-                .findByTenantIdAndTenantAdminTrueOrderByEmailAsc(id)
-                .stream()
-                .map(User::getEmail)
-                .toList();
+            .findByTenantIdAndTenantAdminTrueOrderByEmailAsc(id)
+            .stream()
+            .map(User::getEmail)
+            .toList();
         return tenantMapper.toResponse(tenant, adminEmails);
     }
 
@@ -99,15 +100,15 @@ public class TenantFacadeImpl implements TenantFacade {
 
         String temporaryPassword = generateTemporaryPassword();
         User admin = userService.create(
-                adminEmail,
-                adminDisplayName,
-                passwordEncoder.encode(temporaryPassword),
-                saved,
-                true);
+            adminEmail,
+            adminDisplayName,
+            passwordEncoder.encode(temporaryPassword),
+            saved,
+            true);
 
         Tenant withAudit = requireTenantWithAudit(saved.getId());
         return tenantMapper.toCreateResponse(
-                withAudit, List.of(admin.getEmail()), admin, temporaryPassword);
+            withAudit, List.of(admin.getEmail()), admin, temporaryPassword);
     }
 
     @Override
@@ -140,14 +141,14 @@ public class TenantFacadeImpl implements TenantFacade {
             return Collections.emptyMap();
         }
         return userRepository.findByTenantIdInAndTenantAdminTrue(tenantIds).stream()
-                .collect(Collectors.groupingBy(
-                        user -> user.getTenant().getId(),
-                        Collectors.mapping(
-                                User::getEmail,
-                                Collectors.collectingAndThen(Collectors.toList(), emails -> emails
-                                        .stream()
-                                        .sorted(String.CASE_INSENSITIVE_ORDER)
-                                        .toList()))));
+            .collect(Collectors.groupingBy(
+                user -> user.getTenant().getId(),
+                Collectors.mapping(
+                    User::getEmail,
+                    Collectors.collectingAndThen(Collectors.toList(), emails -> emails
+                        .stream()
+                        .sorted(String.CASE_INSENSITIVE_ORDER)
+                        .toList()))));
     }
 
     private void requirePathMatchesActiveTenant(UUID id) {
@@ -158,14 +159,14 @@ public class TenantFacadeImpl implements TenantFacade {
 
     private Tenant requireTenant(UUID id) {
         return tenantRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tenant not found"));
+            .findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Tenant not found"));
     }
 
     private Tenant requireTenantWithAudit(UUID id) {
         return tenantRepository
-                .findWithAuditById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tenant not found"));
+            .findWithAuditById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Tenant not found"));
     }
 
     private String generateTemporaryPassword() {

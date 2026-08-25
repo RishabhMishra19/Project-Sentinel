@@ -32,64 +32,67 @@ public class AnalyticsStream {
         //---------------------------------------------------------------------------------------
         //1. reqLog to endpointMinuteAnalytics stream
         KStream<String, KafkaMessage.AnalyticsMetrics> rawEndpointAnalyticsStream = analyticsStreamUtils
-                .getReqLogInputStream(builder)
-                .map((key, val) -> KeyValue.pair(
-                        analyticsStreamUtils.getCompositeKey(val),
-                        new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.ENDPOINT, val.endpointId()).initialize(val)
-                ));
+            .getReqLogInputStream(builder)
+            .map((key, val) -> KeyValue.pair(
+                analyticsStreamUtils.getCompositeKey(val),
+                new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.ENDPOINT, val.endpointId()).initialize(val)
+            ));
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                rawEndpointAnalyticsStream,
-                AnalyticsBucket.MINUTE,
-                AnalyticsScope.ENDPOINT,
-                KafkaTopics.endpoint_minute_analytics
+            rawEndpointAnalyticsStream,
+            AnalyticsBucket.MINUTE,
+            AnalyticsScope.ENDPOINT,
+            KafkaTopics.endpoint_minute_analytics
         );
 
         //2. endpointMinuteAnalytics to serviceMinuteAnalytics stream
         KStream<String, KafkaMessage.AnalyticsMetrics> serviceMinuteStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.endpoint_minute_analytics
+            builder,
+            KafkaTopics.endpoint_minute_analytics
         ).map((key, val) -> {
             String newCompositeKey = analyticsStreamUtils.removeLastIdFromCompositeKey(key);
             UUID newEntityId = analyticsStreamUtils.extractUUIDAtLastFromCompositeKey(newCompositeKey);
-            return KeyValue.pair(newCompositeKey, new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.SERVICE, newEntityId).initialize(val));
+            return KeyValue.pair(newCompositeKey,
+                new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.SERVICE, newEntityId).initialize(val));
         });
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                serviceMinuteStream,
-                AnalyticsBucket.MINUTE,
-                AnalyticsScope.SERVICE,
-                KafkaTopics.service_minute_analytics
+            serviceMinuteStream,
+            AnalyticsBucket.MINUTE,
+            AnalyticsScope.SERVICE,
+            KafkaTopics.service_minute_analytics
         );
 
         //3. serviceMinuteAnalytics to productMinuteAnalytics stream
         KStream<String, KafkaMessage.AnalyticsMetrics> productMinuteStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.service_minute_analytics
+            builder,
+            KafkaTopics.service_minute_analytics
         ).map((key, val) -> {
             String newCompositeKey = analyticsStreamUtils.removeLastIdFromCompositeKey(key);
             UUID newEntityId = analyticsStreamUtils.extractUUIDAtLastFromCompositeKey(newCompositeKey);
-            return KeyValue.pair(newCompositeKey, new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.PRODUCT, newEntityId).initialize(val));
+            return KeyValue.pair(newCompositeKey,
+                new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.PRODUCT, newEntityId).initialize(val));
         });
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                productMinuteStream,
-                AnalyticsBucket.MINUTE,
-                AnalyticsScope.PRODUCT,
-                KafkaTopics.product_minute_analytics
+            productMinuteStream,
+            AnalyticsBucket.MINUTE,
+            AnalyticsScope.PRODUCT,
+            KafkaTopics.product_minute_analytics
         );
 
         //4. productMinuteAnalytics to tenantMinuteAnalytics stream
         KStream<String, KafkaMessage.AnalyticsMetrics> tenantMinuteStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.product_minute_analytics
+            builder,
+            KafkaTopics.product_minute_analytics
         ).map((key, val) -> {
             String newCompositeKey = analyticsStreamUtils.removeLastIdFromCompositeKey(key);
             UUID newEntityId = analyticsStreamUtils.extractUUIDAtLastFromCompositeKey(newCompositeKey);
-            return KeyValue.pair(newCompositeKey, new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.TENANT, newEntityId).initialize(val));
+            return KeyValue.pair(newCompositeKey,
+                new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.TENANT, newEntityId).initialize(val));
         });
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                tenantMinuteStream,
-                AnalyticsBucket.MINUTE,
-                AnalyticsScope.TENANT,
-                KafkaTopics.tenant_minute_analytics
+            tenantMinuteStream,
+            AnalyticsBucket.MINUTE,
+            AnalyticsScope.TENANT,
+            KafkaTopics.tenant_minute_analytics
         );
 
         //---------------------------------------------------------------------------------------
@@ -97,50 +100,54 @@ public class AnalyticsStream {
         //---------------------------------------------------------------------------------------
         //5. endpointMinuteAnalytics  to endpointHourAnalytics
         KStream<String, KafkaMessage.AnalyticsMetrics> endpointHourStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.endpoint_minute_analytics
-        ).mapValues(val-> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.ENDPOINT, val.getEntityId()).initialize(val));
+            builder,
+            KafkaTopics.endpoint_minute_analytics
+        ).mapValues(
+            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.ENDPOINT, val.getEntityId()).initialize(val));
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                endpointHourStream,
-                AnalyticsBucket.HOUR,
-                AnalyticsScope.ENDPOINT,
-                KafkaTopics.endpoint_hour_analytics
+            endpointHourStream,
+            AnalyticsBucket.HOUR,
+            AnalyticsScope.ENDPOINT,
+            KafkaTopics.endpoint_hour_analytics
         );
 
         //6. serviceMinuteAnalytics  to serviceHourAnalytics
         KStream<String, KafkaMessage.AnalyticsMetrics> serviceHourStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.service_minute_analytics
-        ).mapValues(val-> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.SERVICE, val.getEntityId()).initialize(val));
+            builder,
+            KafkaTopics.service_minute_analytics
+        ).mapValues(
+            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.SERVICE, val.getEntityId()).initialize(val));
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                serviceHourStream,
-                AnalyticsBucket.HOUR,
-                AnalyticsScope.SERVICE,
-                KafkaTopics.service_hour_analytics
+            serviceHourStream,
+            AnalyticsBucket.HOUR,
+            AnalyticsScope.SERVICE,
+            KafkaTopics.service_hour_analytics
         );
 
         //7. productMinuteAnalytics  to productHourAnalytics
         KStream<String, KafkaMessage.AnalyticsMetrics> productHourStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.product_minute_analytics
-        ).mapValues(val-> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.PRODUCT, val.getEntityId()).initialize(val));
+            builder,
+            KafkaTopics.product_minute_analytics
+        ).mapValues(
+            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.PRODUCT, val.getEntityId()).initialize(val));
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                productHourStream,
-                AnalyticsBucket.HOUR,
-                AnalyticsScope.PRODUCT,
-                KafkaTopics.product_hour_analytics
+            productHourStream,
+            AnalyticsBucket.HOUR,
+            AnalyticsScope.PRODUCT,
+            KafkaTopics.product_hour_analytics
         );
 
         //8. tenantMinuteAnalytics  to tenantHourAnalytics
         KStream<String, KafkaMessage.AnalyticsMetrics> tenantHourStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.tenant_minute_analytics
-        ).mapValues(val-> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.TENANT, val.getEntityId()).initialize(val));
+            builder,
+            KafkaTopics.tenant_minute_analytics
+        ).mapValues(
+            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.TENANT, val.getEntityId()).initialize(val));
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                tenantHourStream,
-                AnalyticsBucket.HOUR,
-                AnalyticsScope.TENANT,
-                KafkaTopics.tenant_hour_analytics
+            tenantHourStream,
+            AnalyticsBucket.HOUR,
+            AnalyticsScope.TENANT,
+            KafkaTopics.tenant_hour_analytics
         );
 
         //---------------------------------------------------------------------------------------
@@ -148,50 +155,57 @@ public class AnalyticsStream {
         //---------------------------------------------------------------------------------------
         //9. endpointHourAnalytics  to endpointDayAnalytics
         KStream<String, KafkaMessage.AnalyticsMetrics> endpointDayStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.endpoint_hour_analytics
-        ).mapValues(val-> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.ENDPOINT, val.getEntityId()).initialize(val));
+            builder,
+            KafkaTopics.endpoint_hour_analytics
+        ).mapValues(
+            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.ENDPOINT, val.getEntityId()).initialize(val));
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                endpointDayStream,
-                AnalyticsBucket.DAY,
-                AnalyticsScope.ENDPOINT,
-                KafkaTopics.endpoint_day_analytics
+            endpointDayStream,
+            AnalyticsBucket.DAY,
+            AnalyticsScope.ENDPOINT,
+            KafkaTopics.endpoint_day_analytics
         );
 
         //10. serviceHourAnalytics  to serviceDayAnalytics
         KStream<String, KafkaMessage.AnalyticsMetrics> serviceDayStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.service_hour_analytics
-        ).mapValues(val-> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.SERVICE, val.getEntityId()).initialize(val));;
+            builder,
+            KafkaTopics.service_hour_analytics
+        ).mapValues(
+            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.SERVICE, val.getEntityId()).initialize(val));
+        ;
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                serviceDayStream,
-                AnalyticsBucket.DAY,
-                AnalyticsScope.SERVICE,
-                KafkaTopics.service_day_analytics
+            serviceDayStream,
+            AnalyticsBucket.DAY,
+            AnalyticsScope.SERVICE,
+            KafkaTopics.service_day_analytics
         );
 
         //11. productHourAnalytics  to productDayAnalytics
         KStream<String, KafkaMessage.AnalyticsMetrics> productDayStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.product_hour_analytics
-        ).mapValues(val-> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.PRODUCT, val.getEntityId()).initialize(val));;
+            builder,
+            KafkaTopics.product_hour_analytics
+        ).mapValues(
+            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.PRODUCT, val.getEntityId()).initialize(val));
+        ;
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                productDayStream,
-                AnalyticsBucket.DAY,
-                AnalyticsScope.PRODUCT,
-                KafkaTopics.product_day_analytics
+            productDayStream,
+            AnalyticsBucket.DAY,
+            AnalyticsScope.PRODUCT,
+            KafkaTopics.product_day_analytics
         );
 
         //12. tenantHourAnalytics  to tenantDayAnalytics
         KStream<String, KafkaMessage.AnalyticsMetrics> tenantDayStream = analyticsStreamUtils.getAnalyticsInputStream(
-                builder,
-                KafkaTopics.tenant_hour_analytics
-        ).mapValues(val-> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.TENANT, val.getEntityId()).initialize(val));;
+            builder,
+            KafkaTopics.tenant_hour_analytics
+        ).mapValues(
+            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.TENANT, val.getEntityId()).initialize(val));
+        ;
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
-                tenantDayStream,
-                AnalyticsBucket.DAY,
-                AnalyticsScope.TENANT,
-                KafkaTopics.tenant_day_analytics
+            tenantDayStream,
+            AnalyticsBucket.DAY,
+            AnalyticsScope.TENANT,
+            KafkaTopics.tenant_day_analytics
         );
 
         return rawEndpointAnalyticsStream;

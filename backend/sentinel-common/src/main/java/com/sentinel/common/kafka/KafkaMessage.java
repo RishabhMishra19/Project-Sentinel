@@ -11,7 +11,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sentinel.common.cassandra.analytics.utils.AnalyticsBucket;
 import com.sentinel.common.cassandra.analytics.utils.AnalyticsScope;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.SneakyThrows;
 import org.HdrHistogram.Histogram;
 
 import java.io.IOException;
@@ -25,9 +29,9 @@ import java.util.UUID;
 public class KafkaMessage {
 
     private static final Map<AnalyticsBucket, ChronoUnit> bucketToChronoUnitMap = Map.ofEntries(
-            Map.entry(AnalyticsBucket.MINUTE, ChronoUnit.MINUTES),
-            Map.entry(AnalyticsBucket.HOUR, ChronoUnit.HOURS),
-            Map.entry(AnalyticsBucket.DAY, ChronoUnit.DAYS)
+        Map.entry(AnalyticsBucket.MINUTE, ChronoUnit.MINUTES),
+        Map.entry(AnalyticsBucket.HOUR, ChronoUnit.HOURS),
+        Map.entry(AnalyticsBucket.DAY, ChronoUnit.DAYS)
     );
 
     // Serializes the histogram into a compressed, Base64-encoded string
@@ -53,7 +57,8 @@ public class KafkaMessage {
         @Override
         public Histogram deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             String base64Str = p.getValueAsString();
-            if (base64Str == null) return null;
+            if (base64Str == null)
+                return null;
 
             byte[] bytes = Base64.getDecoder().decode(base64Str);
             return Histogram.decodeFromCompressedByteBuffer(ByteBuffer.wrap(bytes), 0);
@@ -64,24 +69,6 @@ public class KafkaMessage {
     @Setter
     @NoArgsConstructor
     public static class AnalyticsMetrics {
-
-        public AnalyticsMetrics(AnalyticsBucket bucket, AnalyticsScope scope, UUID entityId) {
-            this.bucket = bucket;
-            this.scope = scope;
-            this.entityId = entityId;
-            this.requestCount = 0;
-            this.errorCount = 0;
-            this.status2xx = 0;
-            this.status3xx = 0;
-            this.status4xx = 0;
-            this.status5xx = 0;
-            this.latencySumMs = 0;
-            this.latencyMinMs = Long.MAX_VALUE;
-            this.latencyMaxMs = 0;
-            this.requestBytesTotal = 0;
-            this.responseBytesTotal = 0;
-            this.latencyHistogram = new Histogram(2);
-        }
 
         private AnalyticsBucket bucket;
         private AnalyticsScope scope;
@@ -101,6 +88,23 @@ public class KafkaMessage {
         @JsonSerialize(using = JacksonHdrSerializer.class)
         @JsonDeserialize(using = JacksonHdrDeserializer.class)
         private Histogram latencyHistogram;
+        public AnalyticsMetrics(AnalyticsBucket bucket, AnalyticsScope scope, UUID entityId) {
+            this.bucket = bucket;
+            this.scope = scope;
+            this.entityId = entityId;
+            this.requestCount = 0;
+            this.errorCount = 0;
+            this.status2xx = 0;
+            this.status3xx = 0;
+            this.status4xx = 0;
+            this.status5xx = 0;
+            this.latencySumMs = 0;
+            this.latencyMinMs = Long.MAX_VALUE;
+            this.latencyMaxMs = 0;
+            this.requestBytesTotal = 0;
+            this.responseBytesTotal = 0;
+            this.latencyHistogram = new Histogram(2);
+        }
 
         public AnalyticsMetrics initialize(ReqLog reqLog) {
             this.timestamp = reqLog.occurredAt();
@@ -140,7 +144,7 @@ public class KafkaMessage {
 
         public AnalyticsMetrics aggregate(AnalyticsMetrics metric) {
             this.entityId = metric.entityId;
-            this.timestamp = metric.timestamp==null ? null : metric.timestamp.truncatedTo(bucketToChronoUnitMap.get(bucket));
+            this.timestamp = metric.timestamp == null ? null : metric.timestamp.truncatedTo(bucketToChronoUnitMap.get(bucket));
             this.requestCount += metric.requestCount;
             this.errorCount += metric.errorCount;
             this.status2xx += metric.status2xx;
@@ -160,21 +164,21 @@ public class KafkaMessage {
 
     @Builder
     public static record ReqLog(
-            UUID requestLogId,
-            UUID tenantId,
-            UUID productId,
-            UUID serviceId,
-            UUID endpointId,
-            String path,
-            Instant occurredAt,
-            Integer statusCode,
-            Integer durationMs,
-            String endUserIp,
-            String requestId,
-            String traceId,
-            String userId,
-            Integer requestSizeBytes,
-            Integer responseSizeBytes
+        UUID requestLogId,
+        UUID tenantId,
+        UUID productId,
+        UUID serviceId,
+        UUID endpointId,
+        String path,
+        Instant occurredAt,
+        Integer statusCode,
+        Integer durationMs,
+        String endUserIp,
+        String requestId,
+        String traceId,
+        String userId,
+        Integer requestSizeBytes,
+        Integer responseSizeBytes
     ) {
         @JsonIgnore
         public String getKey() {

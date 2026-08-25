@@ -1,10 +1,10 @@
 package com.sentinel.api.auth.service;
 
 import com.sentinel.api.auth.dto.internal.AuthSessionResult;
+import com.sentinel.api.auth.dto.internal.RefreshTokenIssue;
 import com.sentinel.api.auth.dto.request.ChangePasswordRequest;
 import com.sentinel.api.auth.dto.request.LoginRequest;
 import com.sentinel.api.auth.dto.response.ProfileResponse;
-import com.sentinel.api.auth.dto.internal.RefreshTokenIssue;
 import com.sentinel.api.auth.mapper.AuthMapper;
 import com.sentinel.api.auth.service.core.JwtService;
 import com.sentinel.api.auth.service.core.RefreshTokenService;
@@ -12,11 +12,12 @@ import com.sentinel.api.common.exception.BadRequestException;
 import com.sentinel.api.common.exception.UnauthorizedException;
 import com.sentinel.api.user.entity.User;
 import com.sentinel.api.user.service.core.UserService;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -48,8 +49,8 @@ public class AuthFacadeImpl implements AuthFacade {
         User user = userService.findByIdWithAuthorities(rotated.entity().getUser().getId());
         String accessToken = jwtService.createAccessToken(user);
         return new AuthSessionResult(
-                authMapper.toAuthSessionResponse(accessToken, jwtService.getAccessTokenTtlSeconds(), user),
-                rotated.rawToken());
+            authMapper.toAuthSessionResponse(accessToken, jwtService.getAccessTokenTtlSeconds(), user),
+            rotated.rawToken());
     }
 
     @Override
@@ -84,7 +85,7 @@ public class AuthFacadeImpl implements AuthFacade {
         RefreshTokenIssue refresh = refreshTokenService.issue(user);
         String accessToken = jwtService.createAccessToken(user);
         return new AuthSessionResult(
-                authMapper.toAuthSessionResponse(accessToken, jwtService.getAccessTokenTtlSeconds(), user),
-                refresh.rawToken());
+            authMapper.toAuthSessionResponse(accessToken, jwtService.getAccessTokenTtlSeconds(), user),
+            refresh.rawToken());
     }
 }

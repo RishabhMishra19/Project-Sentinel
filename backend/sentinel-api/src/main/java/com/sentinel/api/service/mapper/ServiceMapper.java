@@ -28,14 +28,14 @@ public class ServiceMapper {
 
     public ServiceResponse toResponse(Service service) {
         return new ServiceResponse(
-                service.getId().toString(),
-                service.getProduct().getId().toString(),
-                service.getProduct().getName(),
-                service.getName(),
-                service.getStatus(),
-                userMapper.toBrief(service.getCreatedBy()),
-                userMapper.toBrief(service.getUpdatedBy()),
-                service.getCreatedAt(),
-                service.getUpdatedAt());
+            service.getId().toString(),
+            service.getProduct().getId().toString(),
+            service.getProduct().getName(),
+            service.getName(),
+            service.getStatus(),
+            userMapper.toBrief(service.getCreatedBy()),
+            userMapper.toBrief(service.getUpdatedBy()),
+            service.getCreatedAt(),
+            service.getUpdatedAt());
     }
 }

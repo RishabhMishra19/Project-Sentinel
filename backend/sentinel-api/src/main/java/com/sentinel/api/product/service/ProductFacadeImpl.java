@@ -6,8 +6,8 @@ import com.sentinel.api.common.exception.ResourceNotFoundException;
 import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.common.response.PageResponse;
 import com.sentinel.api.product.dto.request.CreateProductRequest;
-import com.sentinel.api.product.dto.response.ProductResponse;
 import com.sentinel.api.product.dto.request.UpdateProductRequest;
+import com.sentinel.api.product.dto.response.ProductResponse;
 import com.sentinel.api.product.entity.Product;
 import com.sentinel.api.product.entity.ProductStatus;
 import com.sentinel.api.product.mapper.ProductMapper;
@@ -17,7 +17,6 @@ import com.sentinel.api.tenant.entity.Tenant;
 import com.sentinel.api.tenant.repository.TenantRepository;
 import com.sentinel.api.user.entity.User;
 import com.sentinel.api.user.repository.UserRepository;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +24,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +44,7 @@ public class ProductFacadeImpl implements ProductFacade {
     public PageResponse<ProductResponse> list(UUID tenantId, ListQueryRequest query) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         Pageable effective =
-                query.toPageable(ProductSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
+            query.toPageable(ProductSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
         Specification<Product> spec = ProductSpecifications.withFilters(effectiveTenantId, query);
         Page<Product> page = productService.findAll(spec, effective);
         return PageResponse.from(page.map(productMapper::toResponse));
@@ -65,18 +66,18 @@ public class ProductFacadeImpl implements ProductFacade {
         Tenant tenantRef = tenantRepository.getReferenceById(effectiveTenantId);
         User actorRef = userRepository.getReferenceById(actorId);
         Product saved = productService.save(productMapper.toEntity(
-                new CreateProductRequest(name), tenantRef, actorRef));
+            new CreateProductRequest(name), tenantRef, actorRef));
         return productMapper.toResponse(requireProductWithAudit(effectiveTenantId, saved.getId()));
     }
 
     @Override
     public ProductResponse update(
-            UUID tenantId, UUID id, UpdateProductRequest request, UUID actorId) {
+        UUID tenantId, UUID id, UpdateProductRequest request, UUID actorId) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         Product product = requireProduct(effectiveTenantId, id);
         String name = request.name().trim();
         if (productService.existsByTenantIdAndNameIgnoreCaseAndIdNot(
-                effectiveTenantId, name, id)) {
+            effectiveTenantId, name, id)) {
             throw new ConflictException("Product name already exists in this tenant");
         }
         product.setName(name);
@@ -106,8 +107,8 @@ public class ProductFacadeImpl implements ProductFacade {
 
     private Product requireProduct(UUID tenantId, UUID id) {
         Product product = productService
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+            .findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         if (!product.getTenant().getId().equals(tenantId)) {
             throw new ResourceNotFoundException("Product not found");
         }
@@ -116,7 +117,7 @@ public class ProductFacadeImpl implements ProductFacade {
 
     private Product requireProductWithAudit(UUID tenantId, UUID id) {
         return productService
-                .findWithAuditByIdAndTenantId(id, tenantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+            .findWithAuditByIdAndTenantId(id, tenantId)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
 }

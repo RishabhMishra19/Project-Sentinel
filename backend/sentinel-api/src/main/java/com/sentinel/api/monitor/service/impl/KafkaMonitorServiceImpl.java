@@ -24,34 +24,34 @@ public class KafkaMonitorServiceImpl implements KafkaMonitorService {
     @Override
     public KafkaMonitor.MonitorResponse getKafkaMonitors() {
         try (AdminClient adminClient = AdminClient.create(Map.of(
-                AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
-                properties.bootstrapServers()
+            AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
+            properties.bootstrapServers()
         ))) {
             Set<String> topicNames = adminClient.listTopics()
-                    .names()
-                    .get();
+                .names()
+                .get();
             Map<String, TopicDescription> descriptions = adminClient.describeTopics(topicNames)
-                    .allTopicNames()
-                    .get();
+                .allTopicNames()
+                .get();
             List<KafkaMonitor.Topic> topics = topicNames.stream()
-                    .map(name -> new KafkaMonitor.Topic(
-                            name,
-                            descriptions.get(name)
-                                    .partitions()
-                                    .size()
-                    ))
-                    .toList();
+                .map(name -> new KafkaMonitor.Topic(
+                    name,
+                    descriptions.get(name)
+                        .partitions()
+                        .size()
+                ))
+                .toList();
             return new KafkaMonitor.MonitorResponse(
-                    "UP",
-                    adminClient.describeCluster()
-                            .nodes()
-                            .get()
-                            .size(),
-                    topics
+                "UP",
+                adminClient.describeCluster()
+                    .nodes()
+                    .get()
+                    .size(),
+                topics
             );
         } catch (InterruptedException e) {
             Thread.currentThread()
-                    .interrupt();
+                .interrupt();
             log.error("Kafka monitoring interrupted", e);
             return new KafkaMonitor.MonitorResponse("DOWN", 0, List.of());
         } catch (Exception e) {

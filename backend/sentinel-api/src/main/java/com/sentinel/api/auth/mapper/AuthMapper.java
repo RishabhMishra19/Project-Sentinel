@@ -10,12 +10,11 @@ import com.sentinel.api.role.entity.RoleScopeStatus;
 import com.sentinel.api.role.entity.RoleStatus;
 import com.sentinel.api.tenant.entity.Tenant;
 import com.sentinel.api.user.entity.User;
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
-
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.stereotype.Component;
 
 @Component
 public class AuthMapper {
@@ -29,53 +28,53 @@ public class AuthMapper {
 
     public AuthSessionResponse toAuthSessionResponse(String accessToken, long expiresIn, User user) {
         return new AuthSessionResponse(
-                accessToken,
-                DateUtils.addSeconds(new Date(), Math.toIntExact(expiresIn)).toInstant(),
-                new AuthSessionResponse.User(
-                        user.getId().toString(),
-                        user.getEmail(),
-                        user.getDisplayName(),
-                        user.isSentinelAdmin(),
-                        user.isTenantAdmin(),
-                        toActiveRoleSummaries(user),
-                        toTenantSummary(user.getTenant())));
-    }
-
-    public ProfileResponse toProfileResponse(User user) {
-        return new ProfileResponse(
+            accessToken,
+            DateUtils.addSeconds(new Date(), Math.toIntExact(expiresIn)).toInstant(),
+            new AuthSessionResponse.User(
                 user.getId().toString(),
                 user.getEmail(),
                 user.getDisplayName(),
                 user.isSentinelAdmin(),
                 user.isTenantAdmin(),
                 toActiveRoleSummaries(user),
-                toTenantSummary(user.getTenant()),
-                user.getStatus(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getLastLoginAt());
+                toTenantSummary(user.getTenant())));
+    }
+
+    public ProfileResponse toProfileResponse(User user) {
+        return new ProfileResponse(
+            user.getId().toString(),
+            user.getEmail(),
+            user.getDisplayName(),
+            user.isSentinelAdmin(),
+            user.isTenantAdmin(),
+            toActiveRoleSummaries(user),
+            toTenantSummary(user.getTenant()),
+            user.getStatus(),
+            user.getCreatedAt(),
+            user.getUpdatedAt(),
+            user.getLastLoginAt());
     }
 
     private List<RoleSummaryResponse> toActiveRoleSummaries(User user) {
         return user.getRoles().stream()
-                .filter(role -> role.getStatus() == RoleStatus.ACTIVE)
-                .map(this::toRoleSummary)
-                .toList();
+            .filter(role -> role.getStatus() == RoleStatus.ACTIVE)
+            .map(this::toRoleSummary)
+            .toList();
     }
 
     public RoleSummaryResponse toRoleSummary(Role role) {
         List<RoleSummaryResponse.Scope> scopes = role.getRoleScopes().stream()
-                .filter(scope -> scope.getStatus() == RoleScopeStatus.ACTIVE)
-                .map(this::toScopeSummary)
-                .toList();
+            .filter(scope -> scope.getStatus() == RoleScopeStatus.ACTIVE)
+            .map(this::toScopeSummary)
+            .toList();
         return new RoleSummaryResponse(role.getId().toString(), role.getName(), scopes);
     }
 
     public RoleSummaryResponse.Scope toScopeSummary(RoleScope scope) {
         return new RoleSummaryResponse.Scope(
-                scope.getId().toString(),
-                scope.getScopeType().name(),
-                scope.getScopeId() != null ? scope.getScopeId().toString() : null,
-                scope.getPermission().name());
+            scope.getId().toString(),
+            scope.getScopeType().name(),
+            scope.getScopeId() != null ? scope.getScopeId().toString() : null,
+            scope.getPermission().name());
     }
 }

@@ -25,7 +25,7 @@ public class TenantServicesController {
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @PostMapping("/search")
     public ResponseEntity<PageResponse<ServiceResponse>> search(
-            @AuthenticationPrincipal UserPrincipal principal, @RequestBody ListQueryRequest query) {
+        @AuthenticationPrincipal UserPrincipal principal, @RequestBody ListQueryRequest query) {
         return ApiResponses.okPage(serviceFacade.listAll(principal.getActiveTenantId(), query));
     }
 }

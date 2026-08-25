@@ -7,34 +7,31 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-/** Allowlist of filter / search / sort / range fields for GenericSpecifications. */
+/**
+ * Allowlist of filter / search / sort / range fields for GenericSpecifications.
+ */
 public final class QueryFieldAllowlist {
-
-    public enum FilterKind {
-        EQUAL,
-        GTE,
-        STATUS_CLASS
-    }
-
-    public record FilterDef(String path, Class<?> type, FilterKind kind) {}
 
     private final Map<String, FilterDef> filters;
     private final Map<String, String> searchPaths;
     private final Set<String> defaultSearchPaths;
     private final Set<String> sortableFields;
     private final String rangePath;
-
     private QueryFieldAllowlist(
-            Map<String, FilterDef> filters,
-            Map<String, String> searchPaths,
-            Set<String> defaultSearchPaths,
-            Set<String> sortableFields,
-            String rangePath) {
+        Map<String, FilterDef> filters,
+        Map<String, String> searchPaths,
+        Set<String> defaultSearchPaths,
+        Set<String> sortableFields,
+        String rangePath) {
         this.filters = filters;
         this.searchPaths = searchPaths;
         this.defaultSearchPaths = defaultSearchPaths;
         this.sortableFields = sortableFields;
         this.rangePath = rangePath;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public Map<String, FilterDef> filters() {
@@ -57,8 +54,13 @@ public final class QueryFieldAllowlist {
         return rangePath;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public enum FilterKind {
+        EQUAL,
+        GTE,
+        STATUS_CLASS
+    }
+
+    public record FilterDef(String path, Class<?> type, FilterKind kind) {
     }
 
     public static final class Builder {
@@ -67,6 +69,10 @@ public final class QueryFieldAllowlist {
         private final Set<String> defaultSearchPaths = new LinkedHashSet<>();
         private final Set<String> sortableFields = new LinkedHashSet<>();
         private String rangePath;
+
+        private static String normalize(String fieldName) {
+            return fieldName.trim().toLowerCase();
+        }
 
         public Builder equal(String fieldName, String path, Class<?> type) {
             filters.put(normalize(fieldName), new FilterDef(path, type, FilterKind.EQUAL));
@@ -80,8 +86,8 @@ public final class QueryFieldAllowlist {
 
         public Builder statusClass(String fieldName, String statusCodePath) {
             filters.put(
-                    normalize(fieldName),
-                    new FilterDef(statusCodePath, Integer.class, FilterKind.STATUS_CLASS));
+                normalize(fieldName),
+                new FilterDef(statusCodePath, Integer.class, FilterKind.STATUS_CLASS));
             return this;
         }
 
@@ -107,15 +113,11 @@ public final class QueryFieldAllowlist {
 
         public QueryFieldAllowlist build() {
             return new QueryFieldAllowlist(
-                    Collections.unmodifiableMap(new HashMap<>(filters)),
-                    Collections.unmodifiableMap(new HashMap<>(searchPaths)),
-                    Collections.unmodifiableSet(new LinkedHashSet<>(defaultSearchPaths)),
-                    Collections.unmodifiableSet(new LinkedHashSet<>(sortableFields)),
-                    rangePath);
-        }
-
-        private static String normalize(String fieldName) {
-            return fieldName.trim().toLowerCase();
+                Collections.unmodifiableMap(new HashMap<>(filters)),
+                Collections.unmodifiableMap(new HashMap<>(searchPaths)),
+                Collections.unmodifiableSet(new LinkedHashSet<>(defaultSearchPaths)),
+                Collections.unmodifiableSet(new LinkedHashSet<>(sortableFields)),
+                rangePath);
         }
     }
 }

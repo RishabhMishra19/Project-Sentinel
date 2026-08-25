@@ -17,7 +17,31 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey, @NotEmpty @Size(max = 500)List<@Valid RequestLogRequest> requests) {
+public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
+                               @NotEmpty @Size(max = 500) List<@Valid RequestLogRequest> requests) {
+    public List<KafkaMessage.ReqLog> toReqLogKafkaMessage(ServiceIdentityResolverRepository.ServiceIdentity serviceIdentity) {
+        return this.requests.stream().map(log ->
+            KafkaMessage.ReqLog
+                .builder()
+                .requestLogId(UUID.randomUUID())
+                .tenantId(serviceIdentity.tenantId())
+                .productId(serviceIdentity.productId())
+                .serviceId(serviceId)
+                .endpointId(log.endpointId)
+                .path(log.path)
+                .occurredAt(log.occurredAt)
+                .statusCode(log.statusCode)
+                .durationMs(log.durationMs)
+                .endUserIp(log.endUserIp)
+                .requestSizeBytes(log.requestSizeBytes)
+                .responseSizeBytes(log.responseSizeBytes)
+                .requestId(log.requestId)
+                .traceId(log.traceId)
+                .userId(log.userId)
+                .build()
+        ).toList();
+    }
+
     @Setter
     @Getter
     @NoArgsConstructor
@@ -66,28 +90,5 @@ public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
         String pathTemplate; // this field I will fill
 
         UUID endpointId;  // this field I will fill
-    }
-
-    public List<KafkaMessage.ReqLog> toReqLogKafkaMessage(ServiceIdentityResolverRepository.ServiceIdentity serviceIdentity) {
-        return this.requests.stream().map(log->
-                  KafkaMessage.ReqLog
-                      .builder()
-                      .requestLogId(UUID.randomUUID())
-                      .tenantId(serviceIdentity.tenantId())
-                      .productId(serviceIdentity.productId())
-                      .serviceId(serviceId)
-                      .endpointId(log.endpointId)
-                      .path(log.path)
-                      .occurredAt(log.occurredAt)
-                      .statusCode(log.statusCode)
-                      .durationMs(log.durationMs)
-                      .endUserIp(log.endUserIp)
-                      .requestSizeBytes(log.requestSizeBytes)
-                      .responseSizeBytes(log.responseSizeBytes)
-                      .requestId(log.requestId)
-                      .traceId(log.traceId)
-                      .userId(log.userId)
-                      .build()
-        ).toList();
     }
 }

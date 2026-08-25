@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +28,7 @@ public class EndpointServiceImpl implements EndpointService {
         for (Endpoint endpoint : endpoints) {
             pathTemplateMapping.putIfAbsent(endpoint.getPathTemplate(), new HashMap<>());
             pathTemplateMapping.get(endpoint.getPathTemplate())
-                    .put(endpoint.getMethod(), endpoint.getId());
+                .put(endpoint.getMethod(), endpoint.getId());
         }
         return pathTemplateMapping;
     }
@@ -40,42 +39,43 @@ public class EndpointServiceImpl implements EndpointService {
             return;
         }
         String sql = """
-                INSERT INTO endpoints (
-                    id,
-                    service_id,
-                    method,
-                    path_template,
-                    first_seen_at,
-                    last_seen_at
-                )
-                VALUES (?, ?, ?, ?, ?, ?)
-                """;
+            INSERT INTO endpoints (
+                id,
+                service_id,
+                method,
+                path_template,
+                first_seen_at,
+                last_seen_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+            """;
         jdbcTemplate.batchUpdate(
-                sql, endpoints, endpoints.size(), (ps, endPoint) -> {
-                    ps.setObject(1, endPoint.getId());
-                    ps.setObject(2, endPoint.getServiceId());
-                    ps.setString(3, endPoint.getMethod());
-                    ps.setString(4, endPoint.getPathTemplate());
-                    ps.setTimestamp(5, Timestamp.from(endPoint.getFirstSeenAt()));
-                    ps.setTimestamp(6, Timestamp.from(endPoint.getLastSeenAt()));
-                }
+            sql, endpoints, endpoints.size(), (ps, endPoint) -> {
+                ps.setObject(1, endPoint.getId());
+                ps.setObject(2, endPoint.getServiceId());
+                ps.setString(3, endPoint.getMethod());
+                ps.setString(4, endPoint.getPathTemplate());
+                ps.setTimestamp(5, Timestamp.from(endPoint.getFirstSeenAt()));
+                ps.setTimestamp(6, Timestamp.from(endPoint.getLastSeenAt()));
+            }
         );
     }
 
     @Override
     public void bulkUpdateLastSeenToNow(List<UUID> endpointIds) {
-        if (endpointIds == null || endpointIds.isEmpty()) return;
+        if (endpointIds == null || endpointIds.isEmpty())
+            return;
         String sql = """
-                    UPDATE endpoints
-                    SET
-                        last_seen_at = ?
-                    WHERE id = ?
-                """;
+                UPDATE endpoints
+                SET
+                    last_seen_at = ?
+                WHERE id = ?
+            """;
         jdbcTemplate.batchUpdate(
-                sql, endpointIds, endpointIds.size(), (ps, endpointId) -> {
-                    ps.setTimestamp(1, Timestamp.from(Instant.now()));
-                    ps.setObject(2, endpointId);
-                }
+            sql, endpointIds, endpointIds.size(), (ps, endpointId) -> {
+                ps.setTimestamp(1, Timestamp.from(Instant.now()));
+                ps.setObject(2, endpointId);
+            }
         );
     }
 

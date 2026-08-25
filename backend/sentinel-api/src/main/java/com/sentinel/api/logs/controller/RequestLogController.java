@@ -31,23 +31,24 @@ public class RequestLogController {
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @PostMapping("")
     public ResponseEntity<CursorPaginationResponse<RequestLogListResponse>> getAll(
-            @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID serviceId, @Valid @RequestBody CursorPaginationRequest request) {
+        @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID serviceId,
+        @Valid @RequestBody CursorPaginationRequest request) {
 
         return ApiResponses.okPage(requestLogFacade.getAll(
-                GetRequestLogsListRequest.builder()
-                        .tenantId(principal.getActiveTenantId())
-                        .serviceId(serviceId)
-                        .cursor(request.getCursor())
-                        .pageSize(request.getPageSize())
-                        .direction(request.getDirection())
-                        .build()
+            GetRequestLogsListRequest.builder()
+                .tenantId(principal.getActiveTenantId())
+                .serviceId(serviceId)
+                .cursor(request.getCursor())
+                .pageSize(request.getPageSize())
+                .direction(request.getDirection())
+                .build()
         ));
     }
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping("/{id}")
     public ResponseEntity<RequestLogListResponse> getById(
-            @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID serviceId, @PathVariable UUID id) {
+        @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID serviceId, @PathVariable UUID id) {
         return ApiResponses.ok(requestLogFacade.getById(principal.getActiveTenantId(), serviceId, id));
     }
 }

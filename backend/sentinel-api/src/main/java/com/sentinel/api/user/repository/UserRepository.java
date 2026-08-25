@@ -1,10 +1,6 @@
 package com.sentinel.api.user.repository;
 
 import com.sentinel.api.user.entity.User;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,6 +10,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
 
     Optional<User> findByEmailIgnoreCase(String email);
@@ -21,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
     boolean existsByEmailIgnoreCase(String email);
 
     @Query(
-            """
+        """
             SELECT DISTINCT u FROM User u
             LEFT JOIN FETCH u.roles r
             LEFT JOIN FETCH r.roleScopes
@@ -30,7 +31,7 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
     Optional<User> findByIdWithRolesAndPermissions(@Param("id") UUID id);
 
     @Query(
-            """
+        """
             SELECT DISTINCT u FROM User u
             LEFT JOIN FETCH u.roles r
             LEFT JOIN FETCH r.roleScopes

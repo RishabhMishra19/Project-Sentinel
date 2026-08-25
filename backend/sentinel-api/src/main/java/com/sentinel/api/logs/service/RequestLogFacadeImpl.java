@@ -40,9 +40,9 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
         Map<UUID, Endpoint> endpoints = loadEndpoints(response.getContent());
         Map<UUID, Service> services = loadServices(endpoints.values());
         List<RequestLogListResponse> apiResult = response.getContent()
-                .stream()
-                .map(v -> this.toResponse(v, endpoints, services))
-                .toList();
+            .stream()
+            .map(v -> this.toResponse(v, endpoints, services))
+            .toList();
         return response.getApiResponse(apiResult);
     }
 
@@ -50,16 +50,16 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
     @Transactional(readOnly = true)
     public RequestLogListResponse getById(UUID tenantId, UUID serviceId, UUID id) {
         RequestLog log = requestLogService.getLogById(tenantId, serviceId, id)
-                .orElseThrow(() -> new ResourceNotFoundException("Request log not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Request log not found"));
         Map<UUID, Endpoint> endpoints = loadEndpoints(List.of(log));
         Map<UUID, Service> services = loadServices(endpoints.values());
         return toResponse(log, endpoints, services);
     }
 
     private RequestLogListResponse toResponse(
-            RequestLog log,
-            Map<UUID, Endpoint> endpoints,
-            Map<UUID, Service> services
+        RequestLog log,
+        Map<UUID, Endpoint> endpoints,
+        Map<UUID, Service> services
     ) {
         Endpoint endpoint = endpoints.get(log.getEndpointId());
         if (endpoint == null) {
@@ -83,7 +83,7 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
         Map<UUID, Endpoint> endpoints = new HashMap<>();
         if (!ids.isEmpty()) {
             for (Endpoint endpoint : endpointRepository.findByIdIn(ids.stream()
-                    .toList())) {
+                .toList())) {
                 endpoints.put(endpoint.getId(), endpoint);
             }
         }
@@ -100,7 +100,7 @@ public class RequestLogFacadeImpl implements RequestLogFacade {
         Map<UUID, Service> services = new HashMap<>();
         for (UUID id : ids) {
             serviceService.findWithAuditById(id)
-                    .ifPresent(service -> services.put(service.getId(), service));
+                .ifPresent(service -> services.put(service.getId(), service));
         }
         return services;
     }

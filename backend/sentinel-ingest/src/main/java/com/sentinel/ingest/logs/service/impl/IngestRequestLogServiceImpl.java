@@ -50,15 +50,18 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
     @Override
     public IngestLogResponse ingest(IngestLogRequest request) {
         ServiceIdentityResolverRepository.ServiceIdentity serviceIdentity = this.resolveServiceIdentity(request.serviceId());
-        if (serviceIdentity == null) throw new NotFoundException("Service Not Found");
+        if (serviceIdentity == null)
+            throw new NotFoundException("Service Not Found");
         boolean exists = this.existsApiKey(request.apiKey(), request.serviceId());
-        if (!exists) throw new UnauthorizedException("Api key not found");
+        if (!exists)
+            throw new UnauthorizedException("Api key not found");
         this.upsertEndpointsAndUpdateRequest(request);
         try {
             List<KafkaMessage.ReqLog> reqLogs = request.toReqLogKafkaMessage(serviceIdentity);
             for (KafkaMessage.ReqLog reqLog : reqLogs) {
-                kafkaTemplate.send(new ProducerRecord<>(KafkaTopics.request_logs, null, System.currentTimeMillis(), reqLog.requestId(), reqLog))
-                        .get();
+                kafkaTemplate.send(
+                        new ProducerRecord<>(KafkaTopics.request_logs, null, System.currentTimeMillis(), reqLog.requestId(), reqLog))
+                    .get();
             }
             return new IngestLogResponse("Successfully ingested", true);
         } catch (BadRequestException e) {
@@ -92,7 +95,7 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
 
     private void upsertEndpointsAndUpdateRequest(IngestLogRequest request) {
         String cacheKey = ENDPOINTS_BY_SERVICE_ID_ + request.serviceId()
-                .toString();
+            .toString();
         Map<String, Map<String, UUID>> pathTemplateMapping = ingestCache.resolve(cacheKey);
         if (pathTemplateMapping == null) {
             pathTemplateMapping = endpointService.findPathTemplateMappingForService(request.serviceId());
@@ -104,31 +107,31 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
             String method = requestLogRequest.getMethod();
             requestLogRequest.setPathTemplate(pathTemplate);
             if (pathTemplateMapping.containsKey(pathTemplate) && pathTemplateMapping.get(pathTemplate)
-                    .containsKey(method)) {
+                .containsKey(method)) {
                 requestLogRequest.setEndpointId(pathTemplateMapping.get(pathTemplate)
-                        .get(method));
+                    .get(method));
                 endPointIdsLastSeenToBeUpdatedFor.add(requestLogRequest.getEndpointId());
             } else {
                 notFoundPathTemplates.add(Pair.of(pathTemplate, method));
             }
         }
         endpointService.bulkUpdateLastSeenToNow(endPointIdsLastSeenToBeUpdatedFor.stream()
-                .toList());
+            .toList());
         if (!notFoundPathTemplates.isEmpty()) {
             List<Endpoint> newEndpointsToBeCreated = notFoundPathTemplates.stream()
-                    .map(v -> new Endpoint(UUID.randomUUID(), request.serviceId(), v.getSecond(), v.getFirst(), Instant.now(), Instant.now()))
-                    .toList();
+                .map(v -> new Endpoint(UUID.randomUUID(), request.serviceId(), v.getSecond(), v.getFirst(), Instant.now(), Instant.now()))
+                .toList();
             endpointService.bulkInsertEndpoints(newEndpointsToBeCreated);
             for (Endpoint endpoint : newEndpointsToBeCreated) {
                 pathTemplateMapping.putIfAbsent(endpoint.getPathTemplate(), new HashMap<>());
                 pathTemplateMapping.get(endpoint.getPathTemplate())
-                        .put(endpoint.getMethod(), endpoint.getId());
+                    .put(endpoint.getMethod(), endpoint.getId());
             }
             for (IngestLogRequest.RequestLogRequest requestLogRequest : request.requests()) {
                 String pathTemplate = requestLogRequest.getPathTemplate();
                 String method = requestLogRequest.getMethod();
                 UUID endpointId = pathTemplateMapping.get(pathTemplate)
-                        .get(method);
+                    .get(method);
                 requestLogRequest.setEndpointId(endpointId);
             }
         }

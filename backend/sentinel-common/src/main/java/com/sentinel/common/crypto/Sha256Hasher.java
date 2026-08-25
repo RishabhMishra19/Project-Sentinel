@@ -7,7 +7,8 @@ import java.util.HexFormat;
 
 public final class Sha256Hasher {
 
-    private Sha256Hasher() {}
+    private Sha256Hasher() {
+    }
 
     public static String hash(String value) {
         try {

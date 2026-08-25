@@ -38,7 +38,8 @@ public class AnalyticsController {
 
     @PreAuthorize("@accessSupport.canReadProductsAndServices()")
     @GetMapping("/childrenAggregated")
-    public ResponseEntity<AnalyticsChildrenAggregatedResponse> getChildrenAggregated(@Valid @ModelAttribute AnalyticsChildrenAggregatedRequestParams params) {
+    public ResponseEntity<AnalyticsChildrenAggregatedResponse> getChildrenAggregated(
+        @Valid @ModelAttribute AnalyticsChildrenAggregatedRequestParams params) {
         return ApiResponses.ok(analyticsFacade.getChildrenAggregated(params));
     }
 

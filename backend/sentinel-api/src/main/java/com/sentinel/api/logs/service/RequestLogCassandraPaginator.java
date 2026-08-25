@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RequestLogCassandraPaginator extends CassandraPaginator<RequestLog, GetRequestLogsListRequest,
-        RequestLogCursorEncoder.RequestLogCursor> {
+    RequestLogCursorEncoder.RequestLogCursor> {
 
     public RequestLogCassandraPaginator(
-            RequestLogService requestLogService,
-            RequestLogCursorEncoder requestLogCursorEncoder) {
+        RequestLogService requestLogService,
+        RequestLogCursorEncoder requestLogCursorEncoder) {
 
         super(requestLogService, requestLogCursorEncoder);
     }

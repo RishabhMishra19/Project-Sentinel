@@ -31,41 +31,41 @@ public class RequestLogServiceImpl implements RequestLogService {
         }
         RequestLogLookup lookup = lookupOpt.get();
         return requestLogRepository.findByFullKey(
-                tenantId,
-                serviceId,
-                lookup.getOccurredAt(),
-                lookup.getRequestLogId()
+            tenantId,
+            serviceId,
+            lookup.getOccurredAt(),
+            lookup.getRequestLogId()
         );
     }
 
     @Override
     public List<RequestLog> getFirstPage(GetRequestLogsListRequest request) {
         return requestLogRepository.findFirstPage(
-                request.getTenantId(),
-                request.getServiceId(),
-                request.getPageSize()
+            request.getTenantId(),
+            request.getServiceId(),
+            request.getPageSize()
         );
     }
 
     @Override
     public List<RequestLog> getNextPage(GetRequestLogsListRequest request, RequestLogCursorEncoder.RequestLogCursor decodedCursor) {
         return requestLogRepository.findNextPage(
-                request.getTenantId(),
-                request.getServiceId(),
-                decodedCursor.getOccurredAt(),
-                decodedCursor.getRequestLogId(),
-                request.getPageSize()
+            request.getTenantId(),
+            request.getServiceId(),
+            decodedCursor.getOccurredAt(),
+            decodedCursor.getRequestLogId(),
+            request.getPageSize()
         );
     }
 
     @Override
     public List<RequestLog> getPrevPage(GetRequestLogsListRequest request, RequestLogCursorEncoder.RequestLogCursor decodedCursor) {
         return requestLogRepository.findPrevPage(
-                request.getTenantId(),
-                request.getServiceId(),
-                decodedCursor.getOccurredAt(),
-                decodedCursor.getRequestLogId(),
-                request.getPageSize()
+            request.getTenantId(),
+            request.getServiceId(),
+            decodedCursor.getOccurredAt(),
+            decodedCursor.getRequestLogId(),
+            request.getPageSize()
         );
     }
 }

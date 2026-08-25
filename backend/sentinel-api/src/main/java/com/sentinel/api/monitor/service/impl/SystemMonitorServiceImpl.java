@@ -1,7 +1,19 @@
 package com.sentinel.api.monitor.service.impl;
 
 import com.sentinel.api.monitor.SystemMonitorProperties;
-import com.sentinel.api.monitor.dto.SystemMonitor.*;
+import com.sentinel.api.monitor.dto.SystemMonitor.ActuatorHealthResponse;
+import com.sentinel.api.monitor.dto.SystemMonitor.ActuatorMetricResponse;
+import com.sentinel.api.monitor.dto.SystemMonitor.CPU;
+import com.sentinel.api.monitor.dto.SystemMonitor.DBConnection;
+import com.sentinel.api.monitor.dto.SystemMonitor.Disk;
+import com.sentinel.api.monitor.dto.SystemMonitor.GC;
+import com.sentinel.api.monitor.dto.SystemMonitor.HTTPRequest;
+import com.sentinel.api.monitor.dto.SystemMonitor.Measurement;
+import com.sentinel.api.monitor.dto.SystemMonitor.Memory;
+import com.sentinel.api.monitor.dto.SystemMonitor.MonitorResponse;
+import com.sentinel.api.monitor.dto.SystemMonitor.ServiceResponse;
+import com.sentinel.api.monitor.dto.SystemMonitor.ThreadStates;
+import com.sentinel.api.monitor.dto.SystemMonitor.Threads;
 import com.sentinel.api.monitor.service.SystemMonitorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +32,9 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
     @Override
     public MonitorResponse getSystemMonitors() {
         return new MonitorResponse(
-                getServiceStatus("sentinel-api", systemMonitorProperties.serverUrl()),
-                getServiceStatus("sentinel-ingest", systemMonitorProperties.ingestUrl()),
-                getServiceStatus("sentinel-processor", systemMonitorProperties.processorUrl())
+            getServiceStatus("sentinel-api", systemMonitorProperties.serverUrl()),
+            getServiceStatus("sentinel-ingest", systemMonitorProperties.ingestUrl()),
+            getServiceStatus("sentinel-processor", systemMonitorProperties.processorUrl())
         );
     }
 
@@ -30,15 +42,15 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
         try {
             ActuatorHealthResponse health = getHealth(baseUrl);
             return new ServiceResponse(
-                    serviceName,
-                    health.status(),
-                    getCpuMetrics(baseUrl),
-                    getMemoryMetrics(baseUrl),
-                    getThreadsMetrics(baseUrl),
-                    getHTTPRequestMetrics(baseUrl),
-                    getGCMetrics(baseUrl),
-                    getDiskMetrics(baseUrl),
-                    getDBConnectionMetrics(baseUrl)
+                serviceName,
+                health.status(),
+                getCpuMetrics(baseUrl),
+                getMemoryMetrics(baseUrl),
+                getThreadsMetrics(baseUrl),
+                getHTTPRequestMetrics(baseUrl),
+                getGCMetrics(baseUrl),
+                getDiskMetrics(baseUrl),
+                getDBConnectionMetrics(baseUrl)
             );
         } catch (Exception e) {
             log.error("Failed to monitor {}", serviceName, e);
@@ -48,16 +60,16 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
 
     private ActuatorHealthResponse getHealth(String baseUrl) {
         return restClient.get()
-                .uri(baseUrl + "/actuator/health")
-                .retrieve()
-                .body(ActuatorHealthResponse.class);
+            .uri(baseUrl + "/actuator/health")
+            .retrieve()
+            .body(ActuatorHealthResponse.class);
     }
 
     private CPU getCpuMetrics(String baseUrl) {
         try {
             return new CPU(
-                    getMetricValue(baseUrl, "system.cpu.usage", "VALUE"),
-                    (int) getMetricValue(baseUrl, "system.cpu.count", "VALUE")
+                getMetricValue(baseUrl, "system.cpu.usage", "VALUE"),
+                (int) getMetricValue(baseUrl, "system.cpu.count", "VALUE")
             );
         } catch (Exception e) {
             log.error("Failed to fetch CPU metrics from {}", baseUrl, e);
@@ -68,9 +80,9 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
     private Memory getMemoryMetrics(String baseUrl) {
         try {
             return new Memory(
-                    (long) getMetricValue(baseUrl, "jvm.memory.used", "VALUE", "area:heap"),
-                    (long) getMetricValue(baseUrl, "jvm.memory.max", "VALUE", "area:heap"),
-                    (long) getMetricValue(baseUrl, "jvm.memory.used", "VALUE", "area:nonheap")
+                (long) getMetricValue(baseUrl, "jvm.memory.used", "VALUE", "area:heap"),
+                (long) getMetricValue(baseUrl, "jvm.memory.max", "VALUE", "area:heap"),
+                (long) getMetricValue(baseUrl, "jvm.memory.used", "VALUE", "area:nonheap")
             );
         } catch (Exception e) {
             log.error("Failed to fetch memory metrics from {}", baseUrl, e);
@@ -81,11 +93,11 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
     private Threads getThreadsMetrics(String baseUrl) {
         try {
             return new Threads(
-                    (long) getMetricValue(baseUrl, "jvm.threads.live", "VALUE"),
-                    (long) getMetricValue(baseUrl, "jvm.threads.peak", "VALUE"),
-                    (long) getMetricValue(baseUrl, "jvm.threads.daemon", "VALUE"),
-                    (long) getMetricValue(baseUrl, "jvm.threads.started", "VALUE"),
-                    getThreadStates(baseUrl)
+                (long) getMetricValue(baseUrl, "jvm.threads.live", "VALUE"),
+                (long) getMetricValue(baseUrl, "jvm.threads.peak", "VALUE"),
+                (long) getMetricValue(baseUrl, "jvm.threads.daemon", "VALUE"),
+                (long) getMetricValue(baseUrl, "jvm.threads.started", "VALUE"),
+                getThreadStates(baseUrl)
             );
         } catch (Exception e) {
             log.error("Failed to fetch thread metrics from {}", baseUrl, e);
@@ -95,12 +107,12 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
 
     private ThreadStates getThreadStates(String baseUrl) {
         return new ThreadStates(
-                (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:runnable"),
-                (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:blocked"),
-                (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:waiting"),
-                (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:timed-waiting"),
-                (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:new"),
-                (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:terminated")
+            (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:runnable"),
+            (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:blocked"),
+            (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:waiting"),
+            (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:timed-waiting"),
+            (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:new"),
+            (long) getMetricValue(baseUrl, "jvm.threads.states", "VALUE", "state:terminated")
         );
     }
 
@@ -126,9 +138,9 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
     private GC getGCMetrics(String baseUrl) {
         try {
             return new GC(
-                    (long) getMetricValue(baseUrl, "jvm.gc.memory.allocated", "VALUE"),
-                    (long) getMetricValue(baseUrl, "jvm.gc.memory.promoted", "VALUE"),
-                    getMetricValue(baseUrl, "jvm.gc.overhead", "VALUE")
+                (long) getMetricValue(baseUrl, "jvm.gc.memory.allocated", "VALUE"),
+                (long) getMetricValue(baseUrl, "jvm.gc.memory.promoted", "VALUE"),
+                getMetricValue(baseUrl, "jvm.gc.overhead", "VALUE")
             );
         } catch (Exception e) {
             log.error("Failed to fetch GC metrics from {}", baseUrl, e);
@@ -151,10 +163,10 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
     private DBConnection getDBConnectionMetrics(String baseUrl) {
         try {
             return new DBConnection(
-                    (long) getMetricValue(baseUrl, "hikaricp.connections.active", "VALUE"),
-                    (long) getMetricValue(baseUrl, "hikaricp.connections.idle", "VALUE"),
-                    (long) getMetricValue(baseUrl, "hikaricp.connections.max", "VALUE"),
-                    (long) getMetricValue(baseUrl, "hikaricp.connections.min", "VALUE")
+                (long) getMetricValue(baseUrl, "hikaricp.connections.active", "VALUE"),
+                (long) getMetricValue(baseUrl, "hikaricp.connections.idle", "VALUE"),
+                (long) getMetricValue(baseUrl, "hikaricp.connections.max", "VALUE"),
+                (long) getMetricValue(baseUrl, "hikaricp.connections.min", "VALUE")
             );
         } catch (Exception e) {
             log.error("Failed to fetch database metrics from {}", baseUrl, e);
@@ -172,9 +184,9 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
             url += "?tag=" + String.join("&tag=", tags);
         }
         return restClient.get()
-                .uri(url)
-                .retrieve()
-                .body(ActuatorMetricResponse.class);
+            .uri(url)
+            .retrieve()
+            .body(ActuatorMetricResponse.class);
     }
 
     private double getMetricValue(ActuatorMetricResponse metric, String statistic) {
@@ -182,11 +194,11 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
             return 0;
         }
         return metric.measurements()
-                .stream()
-                .filter(m -> statistic.equals(m.statistic()))
-                .mapToDouble(Measurement::value)
-                .findFirst()
-                .orElse(0);
+            .stream()
+            .filter(m -> statistic.equals(m.statistic()))
+            .mapToDouble(Measurement::value)
+            .findFirst()
+            .orElse(0);
     }
 
 }

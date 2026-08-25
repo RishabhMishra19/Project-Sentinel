@@ -7,6 +7,7 @@ import com.sentinel.api.user.dto.request.CreateUserRequest;
 import com.sentinel.api.user.dto.request.UpdateUserRequest;
 import com.sentinel.api.user.dto.response.CreateUserResponse;
 import com.sentinel.api.user.dto.response.UserResponse;
+
 import java.util.UUID;
 
 public interface UserFacade {

@@ -6,11 +6,12 @@ import com.sentinel.api.role.entity.RoleStatus;
 import com.sentinel.api.role.repository.RoleRepository;
 import com.sentinel.api.tenant.entity.Tenant;
 import com.sentinel.api.user.entity.User;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,16 +24,16 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(readOnly = true)
     public Role getById(UUID id) {
         return roleRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+            .findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Role getByIdForTenant(UUID tenantId, UUID id) {
         return roleRepository
-                .findByIdAndTenantId(id, tenantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+            .findByIdAndTenantId(id, tenantId)
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
     }
 
     @Override
@@ -50,7 +51,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsByTenantIdAndNameIgnoreCaseAndIdNot(
-            UUID tenantId, String name, UUID id) {
+        UUID tenantId, String name, UUID id) {
         return roleRepository.existsByTenantIdAndNameIgnoreCaseAndIdNot(tenantId, name, id);
     }
 

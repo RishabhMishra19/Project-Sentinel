@@ -11,7 +11,8 @@ public enum ErrorCode {
     CONFLICT(HttpStatus.CONFLICT, "Conflict"),
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "Bad Request"),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-    ILLEGAL_ARGUMENT(HttpStatus.INTERNAL_SERVER_ERROR, "Illegal Argument"),;
+    ILLEGAL_ARGUMENT(HttpStatus.INTERNAL_SERVER_ERROR, "Illegal Argument"),
+    ;
 
     private final HttpStatus status;
     private final String reason;

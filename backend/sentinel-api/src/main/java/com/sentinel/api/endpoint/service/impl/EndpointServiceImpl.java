@@ -44,7 +44,7 @@ public class EndpointServiceImpl implements EndpointService {
     @Override
     public EndpointResponse findById(UUID id) {
         Endpoint endpoint = endpointRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Endpoint not found with id " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Endpoint not found with id " + id));
         return new EndpointResponse(endpoint);
     }
 

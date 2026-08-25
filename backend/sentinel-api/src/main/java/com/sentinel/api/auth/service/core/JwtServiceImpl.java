@@ -1,19 +1,20 @@
 package com.sentinel.api.auth.service.core;
 
-import com.sentinel.api.security.JwtProperties;
 import com.sentinel.api.common.exception.AccessTokenExpiredException;
+import com.sentinel.api.security.JwtProperties;
 import com.sentinel.api.user.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.UUID;
-import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +28,12 @@ public class JwtServiceImpl implements JwtService {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtProperties.getAccessTokenTtl().toMillis());
         return Jwts.builder()
-                .subject(user.getId().toString())
-                .claim("email", user.getEmail())
-                .issuedAt(now)
-                .expiration(expiry)
-                .signWith(signingKey())
-                .compact();
+            .subject(user.getId().toString())
+            .claim("email", user.getEmail())
+            .issuedAt(now)
+            .expiration(expiry)
+            .signWith(signingKey())
+            .compact();
     }
 
     @Override
@@ -40,10 +41,10 @@ public class JwtServiceImpl implements JwtService {
     public UUID parseUserId(String token) {
         try {
             Claims claims = Jwts.parser()
-                    .verifyWith(signingKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+                .verifyWith(signingKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
             return UUID.fromString(claims.getSubject());
         } catch (JwtException | IllegalArgumentException ex) {
             throw new AccessTokenExpiredException();

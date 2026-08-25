@@ -22,58 +22,58 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final CqlTemplate cqlTemplate;
 
     public TotalStatsResponse findTotalStats(
-            UUID entityId,
-            Instant from,
-            Instant to,
-            AnalyticsScope scope,
-            AnalyticsBucket bucket
+        UUID entityId,
+        Instant from,
+        Instant to,
+        AnalyticsScope scope,
+        AnalyticsBucket bucket
     ) {
         String cql = AnalyticsUtils.getTotalStatCql(scope, bucket);
         AnalyticsStatsMetrics totalStats = cqlTemplate.query(
-                        cql,
-                        AnalyticsUtils::statsMetricsRowMapper,
-                        entityId,
-                        from,
-                        to
-                )
-                .stream()
-                .findFirst()
-                .orElse(null);
-        return new TotalStatsResponse(bucket, scope, entityId, totalStats);
-    }
-
-    public EntityAggregatedStatsResponse findEntityAggregatedStats(
-            List<UUID> entityIds,
-            Instant from,
-            Instant to,
-            AnalyticsScope scope,
-            AnalyticsBucket bucket
-    ) {
-        String cql = AnalyticsUtils.getEntityAggregatedStatsCql(scope, bucket);
-        List<AnalyticsStatsMetrics> entityAggregatedStats = cqlTemplate.query(
-                cql,
-                AnalyticsUtils::statsMetricsRowMapper,
-                entityIds,
-                from,
-                to
-        );
-        return new EntityAggregatedStatsResponse(bucket, scope, entityIds, entityAggregatedStats);
-    }
-
-    public TimeSeriesStatsResponse findTimeSeriesStats(
-            UUID entityId,
-            Instant from,
-            Instant to,
-            AnalyticsScope scope,
-            AnalyticsBucket bucket
-    ) {
-        String cql = AnalyticsUtils.getTimeSeriesStatsCql(scope, bucket);
-        List<AnalyticsStatsMetrics> timeSeriesStats = cqlTemplate.query(
                 cql,
                 AnalyticsUtils::statsMetricsRowMapper,
                 entityId,
                 from,
                 to
+            )
+            .stream()
+            .findFirst()
+            .orElse(null);
+        return new TotalStatsResponse(bucket, scope, entityId, totalStats);
+    }
+
+    public EntityAggregatedStatsResponse findEntityAggregatedStats(
+        List<UUID> entityIds,
+        Instant from,
+        Instant to,
+        AnalyticsScope scope,
+        AnalyticsBucket bucket
+    ) {
+        String cql = AnalyticsUtils.getEntityAggregatedStatsCql(scope, bucket);
+        List<AnalyticsStatsMetrics> entityAggregatedStats = cqlTemplate.query(
+            cql,
+            AnalyticsUtils::statsMetricsRowMapper,
+            entityIds,
+            from,
+            to
+        );
+        return new EntityAggregatedStatsResponse(bucket, scope, entityIds, entityAggregatedStats);
+    }
+
+    public TimeSeriesStatsResponse findTimeSeriesStats(
+        UUID entityId,
+        Instant from,
+        Instant to,
+        AnalyticsScope scope,
+        AnalyticsBucket bucket
+    ) {
+        String cql = AnalyticsUtils.getTimeSeriesStatsCql(scope, bucket);
+        List<AnalyticsStatsMetrics> timeSeriesStats = cqlTemplate.query(
+            cql,
+            AnalyticsUtils::statsMetricsRowMapper,
+            entityId,
+            from,
+            to
         );
         return new TimeSeriesStatsResponse(bucket, scope, entityId, timeSeriesStats);
     }

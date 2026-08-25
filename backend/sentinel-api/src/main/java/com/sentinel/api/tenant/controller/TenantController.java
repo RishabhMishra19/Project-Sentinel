@@ -10,7 +10,6 @@ import com.sentinel.api.tenant.dto.response.CreateTenantResponse;
 import com.sentinel.api.tenant.dto.response.TenantResponse;
 import com.sentinel.api.tenant.service.TenantFacade;
 import jakarta.validation.Valid;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +22,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/tenants")
@@ -46,24 +47,24 @@ public class TenantController {
     @PreAuthorize("@accessSupport.isSentinelAdmin()")
     @PostMapping
     public ResponseEntity<CreateTenantResponse> create(
-            @Valid @RequestBody CreateTenantRequest request,
-            @AuthenticationPrincipal UserPrincipal principal) {
+        @Valid @RequestBody CreateTenantRequest request,
+        @AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponses.created(tenantFacade.create(request, principal.getId()));
     }
 
     @PreAuthorize("@accessSupport.canWriteTenant(#id)")
     @PutMapping("/{id}")
     public ResponseEntity<TenantResponse> update(
-            @PathVariable UUID id,
-            @Valid @RequestBody UpdateTenantRequest request,
-            @AuthenticationPrincipal UserPrincipal principal) {
+        @PathVariable UUID id,
+        @Valid @RequestBody UpdateTenantRequest request,
+        @AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponses.ok(tenantFacade.update(id, request, principal.getId()));
     }
 
     @PreAuthorize("@accessSupport.isSentinelAdmin()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> softDelete(
-            @PathVariable UUID id, @AuthenticationPrincipal UserPrincipal principal) {
+        @PathVariable UUID id, @AuthenticationPrincipal UserPrincipal principal) {
         tenantFacade.softDelete(id, principal.getId());
         return ApiResponses.noContent();
     }

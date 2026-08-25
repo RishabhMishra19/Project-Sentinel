@@ -5,8 +5,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,12 +13,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
+import java.util.UUID;
+
 /**
  * After JWT: set {@code activeTenantId} from {@code X-Tenant-Id}, or fall back to home tenant.
  *
  * <p>Sentinel Admin: header is optional — omit uses {@code homeTenantId} when present, otherwise
- * leaves {@code activeTenantId} null; when present, the tenant must exist. Non-admins: header is
- * also optional (falls back to home); when present must match home tenant.
+ * leaves {@code activeTenantId} null; when present, the tenant must exist. Non-admins: header is also optional (falls back to home); when
+ * present must match home tenant.
  */
 @Component
 @RequiredArgsConstructor
@@ -30,10 +31,25 @@ public class TenantContextFilter extends OncePerRequestFilter {
 
     private final TenantRepository tenantRepository;
 
+    private static void setActiveTenant(UserPrincipal principal, UUID tenantId) {
+        UserPrincipal updated = principal.withActiveTenantId(tenantId);
+        SecurityContextHolder.getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken(
+                updated, null, updated.getAuthorities()));
+    }
+
+    private static void reject(HttpServletResponse response, int status, String code, String message)
+        throws IOException {
+        response.setStatus(status);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter()
+            .write("{\"errorCode\":\"" + code + "\",\"message\":\"" + message + "\"}");
+    }
+
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+        HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof UserPrincipal principal)) {
             filterChain.doFilter(request, response);
@@ -69,20 +85,5 @@ public class TenantContextFilter extends OncePerRequestFilter {
 
         setActiveTenant(principal, tenantId);
         filterChain.doFilter(request, response);
-    }
-
-    private static void setActiveTenant(UserPrincipal principal, UUID tenantId) {
-        UserPrincipal updated = principal.withActiveTenantId(tenantId);
-        SecurityContextHolder.getContext()
-                .setAuthentication(new UsernamePasswordAuthenticationToken(
-                        updated, null, updated.getAuthorities()));
-    }
-
-    private static void reject(HttpServletResponse response, int status, String code, String message)
-            throws IOException {
-        response.setStatus(status);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter()
-                .write("{\"errorCode\":\"" + code + "\",\"message\":\"" + message + "\"}");
     }
 }

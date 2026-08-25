@@ -4,18 +4,19 @@ import com.sentinel.api.auth.dto.internal.RefreshTokenIssue;
 import com.sentinel.api.auth.entity.RefreshToken;
 import com.sentinel.api.auth.entity.RefreshTokenStatus;
 import com.sentinel.api.auth.repository.RefreshTokenRepository;
-import com.sentinel.common.crypto.Sha256Hasher;
 import com.sentinel.api.common.exception.UnauthorizedException;
 import com.sentinel.api.security.JwtProperties;
 import com.sentinel.api.user.entity.User;
+import com.sentinel.common.crypto.Sha256Hasher;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,8 +42,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshToken validateActive(String rawToken) {
         RefreshToken token = refreshTokenRepository
-                .findByTokenHashAndStatus(hash(rawToken), RefreshTokenStatus.ACTIVE)
-                .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
+            .findByTokenHashAndStatus(hash(rawToken), RefreshTokenStatus.ACTIVE)
+            .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
         if (token.getExpiresAt().isBefore(Instant.now())) {
             token.setStatus(RefreshTokenStatus.EXPIRED);
             refreshTokenRepository.save(token);
@@ -63,19 +64,19 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public void revoke(String rawToken) {
         refreshTokenRepository
-                .findByTokenHashAndStatus(hash(rawToken), RefreshTokenStatus.ACTIVE)
-                .ifPresent(token -> {
-                    token.setStatus(RefreshTokenStatus.REVOKED);
-                    token.setRevokedAt(Instant.now());
-                    refreshTokenRepository.save(token);
-                });
+            .findByTokenHashAndStatus(hash(rawToken), RefreshTokenStatus.ACTIVE)
+            .ifPresent(token -> {
+                token.setStatus(RefreshTokenStatus.REVOKED);
+                token.setRevokedAt(Instant.now());
+                refreshTokenRepository.save(token);
+            });
     }
 
     @Override
     public void revokeAllForUser(UUID userId) {
         Instant now = Instant.now();
         List<RefreshToken> activeTokens =
-                refreshTokenRepository.findByUserIdAndStatus(userId, RefreshTokenStatus.ACTIVE);
+            refreshTokenRepository.findByUserIdAndStatus(userId, RefreshTokenStatus.ACTIVE);
         for (RefreshToken token : activeTokens) {
             token.setStatus(RefreshTokenStatus.REVOKED);
             token.setRevokedAt(now);

@@ -24,15 +24,6 @@ public class RequestLogCursorEncoder implements CursorEncoder<RequestLog, Reques
 
     private final String DELIMITER = "|";
 
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Getter
-    @Setter
-    public static class RequestLogCursor{
-        private UUID requestLogId;
-        private Instant occurredAt;
-    }
-
     @Override
     public String encode(RequestLog entity) {
         StringBuilder sb = new StringBuilder();
@@ -40,32 +31,41 @@ public class RequestLogCursorEncoder implements CursorEncoder<RequestLog, Reques
         sb.append(DELIMITER);
         sb.append(entity.getId().getOccurredAt().toEpochMilli());
         return Base64.getUrlEncoder()
-                .withoutPadding()
-                .encodeToString(sb.toString().getBytes(StandardCharsets.UTF_8));
+            .withoutPadding()
+            .encodeToString(sb.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
     public RequestLogCursorEncoder.RequestLogCursor decode(String value) {
-        if(value == null || value.isEmpty()) {
+        if (value == null || value.isEmpty()) {
             throw new IllegalArgumentException("Invalid cursor");
         }
-        try{
+        try {
             String decoded = new String(
-                    Base64.getDecoder().decode(value)
+                Base64.getDecoder().decode(value)
             );
             String[] values = decoded.split(
-                    Pattern.quote(DELIMITER),
-                    -1
+                Pattern.quote(DELIMITER),
+                -1
             );
-            if(values.length != 2) {
+            if (values.length != 2) {
                 throw new IllegalArgumentException("Invalid cursor");
             }
             UUID requestLogId = UUID.fromString(values[0]);
             Instant occurredAt = Instant.ofEpochMilli(Long.parseLong(values[1]));
             return new RequestLogCursor(requestLogId, occurredAt);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new IllegalArgumentException("Invalid cursor");
         }
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class RequestLogCursor {
+        private UUID requestLogId;
+        private Instant occurredAt;
     }
 }

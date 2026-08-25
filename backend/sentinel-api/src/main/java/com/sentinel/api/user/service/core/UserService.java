@@ -3,10 +3,11 @@ package com.sentinel.api.user.service.core;
 import com.sentinel.api.role.entity.Role;
 import com.sentinel.api.tenant.entity.Tenant;
 import com.sentinel.api.user.entity.User;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.util.UUID;
 
 public interface UserService {
 
@@ -27,7 +28,7 @@ public interface UserService {
     boolean existsByEmailIgnoreCase(String email);
 
     User create(
-            String email, String displayName, String passwordHash, Tenant tenant, boolean tenantAdmin);
+        String email, String displayName, String passwordHash, Tenant tenant, boolean tenantAdmin);
 
     User updateDisplayName(User user, String displayName);
 

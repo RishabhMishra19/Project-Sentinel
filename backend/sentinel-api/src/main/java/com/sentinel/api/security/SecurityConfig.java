@@ -1,6 +1,5 @@
 package com.sentinel.api.security;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +18,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -31,33 +32,33 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(401);
-                            response.setContentType("application/json");
-                            response.getWriter().write(
-                                    "{\"errorCode\":\"UNAUTHORIZED\",\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.setStatus(403);
-                            response.setContentType("application/json");
-                            response.getWriter().write(
-                                    "{\"errorCode\":\"FORBIDDEN\",\"error\":\"Forbidden\",\"message\":\"Access denied\"}");
-                        }))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/admin/**")
-                        .hasRole("SENTINEL_ADMIN")
-                        .requestMatchers(
-                                        HttpMethod.POST,
-                                        "/api/auth/login",
-                                        "/api/auth/refresh-token",
-                                        "/api/auth/logout")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(tenantContextFilter, JwtAuthenticationFilter.class);
+            .cors(Customizer.withDefaults())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(401);
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                        "{\"errorCode\":\"UNAUTHORIZED\",\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setStatus(403);
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                        "{\"errorCode\":\"FORBIDDEN\",\"error\":\"Forbidden\",\"message\":\"Access denied\"}");
+                }))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/admin/**")
+                .hasRole("SENTINEL_ADMIN")
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/auth/login",
+                    "/api/auth/refresh-token",
+                    "/api/auth/logout")
+                .permitAll()
+                .anyRequest().authenticated())
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(tenantContextFilter, JwtAuthenticationFilter.class);
         return http.build();
     }
 

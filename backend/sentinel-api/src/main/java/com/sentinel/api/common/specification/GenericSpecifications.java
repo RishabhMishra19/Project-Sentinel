@@ -10,18 +10,20 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
 
 public final class GenericSpecifications {
 
-    private GenericSpecifications() {}
+    private GenericSpecifications() {
+    }
 
     public static <T> Specification<T> from(ListQueryRequest query, QueryFieldAllowlist allowlist) {
         return (root, criteriaQuery, cb) -> {
@@ -41,11 +43,11 @@ public final class GenericSpecifications {
     }
 
     private static <T> void addFilterPredicates(
-            List<Predicate> predicates,
-            Root<T> root,
-            CriteriaBuilder cb,
-            ListQueryRequest query,
-            QueryFieldAllowlist allowlist) {
+        List<Predicate> predicates,
+        Root<T> root,
+        CriteriaBuilder cb,
+        ListQueryRequest query,
+        QueryFieldAllowlist allowlist) {
         if (query.getFilterConfigs() == null) {
             return;
         }
@@ -58,12 +60,12 @@ public final class GenericSpecifications {
                 continue;
             }
             List<String> rawValues =
-                    config.getFilterValues() == null
-                            ? List.of()
-                            : config.getFilterValues().stream()
-                                    .filter(StringUtils::hasText)
-                                    .map(String::trim)
-                                    .toList();
+                config.getFilterValues() == null
+                    ? List.of()
+                    : config.getFilterValues().stream()
+                    .filter(StringUtils::hasText)
+                    .map(String::trim)
+                    .toList();
             if (rawValues.isEmpty()) {
                 continue;
             }
@@ -71,7 +73,7 @@ public final class GenericSpecifications {
             Path<?> path = resolvePath(root, def.path());
             switch (def.kind()) {
                 case EQUAL -> predicates.add(
-                        equalOrIn(cb, path, coerceAll(rawValues, def.type(), config.getFieldName())));
+                    equalOrIn(cb, path, coerceAll(rawValues, def.type(), config.getFieldName())));
                 case GTE -> {
                     Object value = coerce(rawValues.getFirst(), def.type(), config.getFieldName());
                     predicates.add(gte(cb, path, value));
@@ -87,11 +89,11 @@ public final class GenericSpecifications {
     }
 
     private static <T> void addSearchPredicates(
-            List<Predicate> predicates,
-            Root<T> root,
-            CriteriaBuilder cb,
-            ListQueryRequest query,
-            QueryFieldAllowlist allowlist) {
+        List<Predicate> predicates,
+        Root<T> root,
+        CriteriaBuilder cb,
+        ListQueryRequest query,
+        QueryFieldAllowlist allowlist) {
         if (query.getSearchConfigs() == null || query.getSearchConfigs().isEmpty()) {
             return;
         }
@@ -102,10 +104,10 @@ public final class GenericSpecifications {
                 continue;
             }
             List<String> values =
-                    config.getSearchValues().stream()
-                            .filter(StringUtils::hasText)
-                            .map(v -> v.trim().toLowerCase(Locale.ROOT))
-                            .toList();
+                config.getSearchValues().stream()
+                    .filter(StringUtils::hasText)
+                    .map(v -> v.trim().toLowerCase(Locale.ROOT))
+                    .toList();
             if (values.isEmpty()) {
                 continue;
             }
@@ -113,7 +115,7 @@ public final class GenericSpecifications {
             Collection<String> paths;
             if (StringUtils.hasText(config.getFieldName())) {
                 String path =
-                        allowlist.searchPaths().get(config.getFieldName().trim().toLowerCase(Locale.ROOT));
+                    allowlist.searchPaths().get(config.getFieldName().trim().toLowerCase(Locale.ROOT));
                 if (path == null) {
                     continue;
                 }
@@ -138,11 +140,11 @@ public final class GenericSpecifications {
     }
 
     private static <T> void addRangePredicates(
-            List<Predicate> predicates,
-            Root<T> root,
-            CriteriaBuilder cb,
-            ListQueryRequest query,
-            QueryFieldAllowlist allowlist) {
+        List<Predicate> predicates,
+        Root<T> root,
+        CriteriaBuilder cb,
+        ListQueryRequest query,
+        QueryFieldAllowlist allowlist) {
         if (!StringUtils.hasText(allowlist.rangePath())) {
             return;
         }
@@ -169,7 +171,7 @@ public final class GenericSpecifications {
     }
 
     private static Predicate statusClassPredicate(
-            CriteriaBuilder cb, Path<?> statusCodePath, List<String> tokens) {
+        CriteriaBuilder cb, Path<?> statusCodePath, List<String> tokens) {
         List<Predicate> classPreds = new ArrayList<>();
         Expression<Integer> path = statusCodePath.as(Integer.class);
         for (String token : tokens) {
@@ -182,7 +184,8 @@ public final class GenericSpecifications {
                     case "3xx" -> classPreds.add(cb.between(path, 300, 399));
                     case "4xx" -> classPreds.add(cb.between(path, 400, 499));
                     case "5xx" -> classPreds.add(cb.between(path, 500, 599));
-                    default -> {}
+                    default -> {
+                    }
                 }
             }
         }

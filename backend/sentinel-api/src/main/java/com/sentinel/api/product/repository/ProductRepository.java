@@ -1,11 +1,6 @@
 package com.sentinel.api.product.repository;
 
 import com.sentinel.api.product.entity.Product;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.sentinel.api.product.entity.ProductStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +10,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
 
@@ -33,11 +32,11 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
     Optional<Product> findWithAuditByIdAndTenantId(UUID id, UUID tenantId);
 
     @Query("""
-                SELECT p.id
-                FROM Product p
-                WHERE p.tenant.id = :tenantId
-                  AND p.status = :status
-            """)
+            SELECT p.id
+            FROM Product p
+            WHERE p.tenant.id = :tenantId
+              AND p.status = :status
+        """)
     List<UUID> findAllProductIdsByTenantIdAndStatus(UUID tenantId, ProductStatus status);
 
     @Query("SELECT p.id FROM Product p WHERE p.status = :status and p.tenant.id = :tenantId")

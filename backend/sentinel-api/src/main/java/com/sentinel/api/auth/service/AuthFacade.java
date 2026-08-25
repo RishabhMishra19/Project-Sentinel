@@ -4,6 +4,7 @@ import com.sentinel.api.auth.dto.internal.AuthSessionResult;
 import com.sentinel.api.auth.dto.request.ChangePasswordRequest;
 import com.sentinel.api.auth.dto.request.LoginRequest;
 import com.sentinel.api.auth.dto.response.ProfileResponse;
+
 import java.util.UUID;
 
 public interface AuthFacade {

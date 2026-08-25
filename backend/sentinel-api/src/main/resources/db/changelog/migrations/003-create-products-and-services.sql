@@ -1,13 +1,14 @@
 -- liquibase formatted sql
 
 -- changeset sentinel:003-products
-CREATE TABLE products (
-    id UUID NOT NULL PRIMARY KEY,
-    tenant_id UUID NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    status VARCHAR(32) NOT NULL,
-    created_by UUID NOT NULL,
-    updated_by UUID NOT NULL,
+CREATE TABLE products
+(
+    id         UUID                     NOT NULL PRIMARY KEY,
+    tenant_id  UUID                     NOT NULL,
+    name       VARCHAR(255)             NOT NULL,
+    status     VARCHAR(32)              NOT NULL,
+    created_by UUID                     NOT NULL,
+    updated_by UUID                     NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_products_tenant FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE RESTRICT,
@@ -21,13 +22,14 @@ CREATE UNIQUE INDEX uk_products_tenant_id_lower_name ON products (tenant_id, low
 
 
 -- changeset sentinel:003-services
-CREATE TABLE services (
-    id UUID NOT NULL PRIMARY KEY,
-    product_id UUID NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    status VARCHAR(32) NOT NULL,
-    created_by UUID NOT NULL,
-    updated_by UUID NOT NULL,
+CREATE TABLE services
+(
+    id         UUID                     NOT NULL PRIMARY KEY,
+    product_id UUID                     NOT NULL,
+    name       VARCHAR(255)             NOT NULL,
+    status     VARCHAR(32)              NOT NULL,
+    created_by UUID                     NOT NULL,
+    updated_by UUID                     NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_services_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE RESTRICT,
@@ -41,14 +43,15 @@ CREATE UNIQUE INDEX uk_services_product_id_lower_name ON services (product_id, l
 
 
 -- changeset sentinel:003-service-api-keys
-CREATE TABLE service_api_keys (
-    id UUID NOT NULL PRIMARY KEY,
-    service_id UUID NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    key_hash VARCHAR(255) NOT NULL,
-    status VARCHAR(32) NOT NULL,
-    created_by UUID NOT NULL,
-    updated_by UUID NOT NULL,
+CREATE TABLE service_api_keys
+(
+    id         UUID                     NOT NULL PRIMARY KEY,
+    service_id UUID                     NOT NULL,
+    name       VARCHAR(255)             NOT NULL,
+    key_hash   VARCHAR(255)             NOT NULL,
+    status     VARCHAR(32)              NOT NULL,
+    created_by UUID                     NOT NULL,
+    updated_by UUID                     NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     revoked_at TIMESTAMP WITH TIME ZONE NULL,

@@ -1,16 +1,17 @@
 package com.sentinel.api.security;
 
 import com.sentinel.api.user.entity.UserStatus;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
 /**
- * Spring Security {@link UserDetails} adapter for our domain user.
- * Account flags map from {@link UserStatus}; password is unused for JWT auth.
+ * Spring Security {@link UserDetails} adapter for our domain user. Account flags map from {@link UserStatus}; password is unused for JWT
+ * auth.
  */
 @Getter
 public class UserPrincipal implements UserDetails {
@@ -26,15 +27,15 @@ public class UserPrincipal implements UserDetails {
     private final Collection<? extends GrantedAuthority> authorities;
 
     public UserPrincipal(
-            UUID id,
-            String email,
-            UserStatus status,
-            boolean sentinelAdmin,
-            boolean tenantAdmin,
-            UUID homeTenantId,
-            UUID activeTenantId,
-            List<ScopeGrant> scopeGrants,
-            Collection<? extends GrantedAuthority> authorities) {
+        UUID id,
+        String email,
+        UserStatus status,
+        boolean sentinelAdmin,
+        boolean tenantAdmin,
+        UUID homeTenantId,
+        UUID activeTenantId,
+        List<ScopeGrant> scopeGrants,
+        Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.status = status;
@@ -48,15 +49,15 @@ public class UserPrincipal implements UserDetails {
 
     public UserPrincipal withActiveTenantId(UUID activeTenantId) {
         return new UserPrincipal(
-                id,
-                email,
-                status,
-                sentinelAdmin,
-                tenantAdmin,
-                homeTenantId,
-                activeTenantId,
-                scopeGrants,
-                authorities);
+            id,
+            email,
+            status,
+            sentinelAdmin,
+            tenantAdmin,
+            homeTenantId,
+            activeTenantId,
+            scopeGrants,
+            authorities);
     }
 
     @Override

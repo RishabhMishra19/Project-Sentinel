@@ -19,13 +19,13 @@ public class CursorPaginationResponse<T> {
     private boolean hasNextPage;
     private boolean hasPreviousPage;
 
-    public <R> CursorPaginationResponse<R> getApiResponse(List<R> apiResult){
+    public <R> CursorPaginationResponse<R> getApiResponse(List<R> apiResult) {
         return new CursorPaginationResponse<R>(
-                apiResult,
-                startCursor,
-                endCursor,
-                hasNextPage,
-                hasPreviousPage
+            apiResult,
+            startCursor,
+            endCursor,
+            hasNextPage,
+            hasPreviousPage
         );
     }
 

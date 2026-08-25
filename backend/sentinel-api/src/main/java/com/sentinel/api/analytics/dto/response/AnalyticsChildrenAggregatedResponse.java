@@ -15,22 +15,21 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AnalyticsChildrenAggregatedResponse extends EntityAggregatedStatsResponse {
 
+    private Map<UUID, Long> endpointCountMap;
+    private Map<UUID, String> idToNameMap;
     public AnalyticsChildrenAggregatedResponse(
-            EntityAggregatedStatsResponse entityAggregatedStatsResponse,
-            Map<UUID, Long> endpointCountMap,
-            Map<UUID, String> idToNameMap
+        EntityAggregatedStatsResponse entityAggregatedStatsResponse,
+        Map<UUID, Long> endpointCountMap,
+        Map<UUID, String> idToNameMap
     ) {
         super(
-                entityAggregatedStatsResponse.getBucket(),
-                entityAggregatedStatsResponse.getScope(),
-                entityAggregatedStatsResponse.getEntityIds(),
-                entityAggregatedStatsResponse.getEntityAggregatedStats()
+            entityAggregatedStatsResponse.getBucket(),
+            entityAggregatedStatsResponse.getScope(),
+            entityAggregatedStatsResponse.getEntityIds(),
+            entityAggregatedStatsResponse.getEntityAggregatedStats()
         );
         this.endpointCountMap = endpointCountMap;
         this.idToNameMap = idToNameMap;
     }
-
-    private Map<UUID, Long> endpointCountMap;
-    private Map<UUID, String> idToNameMap;
 
 }

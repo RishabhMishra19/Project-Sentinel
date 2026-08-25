@@ -1,9 +1,5 @@
 package com.sentinel.api.common.query;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +9,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
 import tools.jackson.databind.annotation.JsonDeserialize;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -50,14 +51,14 @@ public class ListQueryRequest {
                 }
                 String field = config.getFieldName().trim();
                 if (allowedSortFields != null
-                        && !allowedSortFields.isEmpty()
-                        && !allowedSortFields.contains(field)) {
+                    && !allowedSortFields.isEmpty()
+                    && !allowedSortFields.contains(field)) {
                     continue;
                 }
                 Sort.Direction direction =
-                        config.getSortDirection() == SortDirection.DESC
-                                ? Sort.Direction.DESC
-                                : Sort.Direction.ASC;
+                    config.getSortDirection() == SortDirection.DESC
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC;
                 orders.add(new Sort.Order(direction, field));
             }
         }
@@ -88,9 +89,9 @@ public class ListQueryRequest {
                     return List.of();
                 }
                 return config.getFilterValues().stream()
-                        .filter(StringUtils::hasText)
-                        .map(String::trim)
-                        .toList();
+                    .filter(StringUtils::hasText)
+                    .map(String::trim)
+                    .toList();
             }
         }
         return List.of();

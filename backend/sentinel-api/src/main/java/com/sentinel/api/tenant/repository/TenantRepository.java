@@ -1,11 +1,6 @@
 package com.sentinel.api.tenant.repository;
 
 import com.sentinel.api.tenant.entity.Tenant;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.sentinel.api.tenant.entity.TenantStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +11,12 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 public interface TenantRepository
-        extends JpaRepository<Tenant, UUID>, JpaSpecificationExecutor<Tenant> {
+    extends JpaRepository<Tenant, UUID>, JpaSpecificationExecutor<Tenant> {
 
     boolean existsBySlugIgnoreCase(String slug);
 

@@ -12,18 +12,17 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AnalyticsSummaryResponse extends TotalStatsResponse {
 
+    private Long endpointCount;
+    private String entityName;
     public AnalyticsSummaryResponse(TotalStatsResponse totalStatsResponse, Long endpointCount, String entityName) {
         super(
-                totalStatsResponse.getBucket(),
-                totalStatsResponse.getScope(),
-                totalStatsResponse.getEntityId(),
-                totalStatsResponse.getTotalStats()
+            totalStatsResponse.getBucket(),
+            totalStatsResponse.getScope(),
+            totalStatsResponse.getEntityId(),
+            totalStatsResponse.getTotalStats()
         );
         this.endpointCount = endpointCount;
         this.entityName = entityName;
     }
-
-    private Long endpointCount;
-    private String entityName;
 
 }

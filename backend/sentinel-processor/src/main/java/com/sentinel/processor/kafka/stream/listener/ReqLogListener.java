@@ -25,7 +25,8 @@ public class ReqLogListener {
     private final ObjectMapper objectMapper;
     private final CassandraTemplate cassandraTemplate;
 
-    @KafkaListener(topics = KafkaTopics.request_logs, containerFactory = "sentinelKafkaListenerContainerFactory", groupId = KafkaTopics.request_logs + "_group")
+    @KafkaListener(topics = KafkaTopics.request_logs, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+        KafkaTopics.request_logs + "_group")
     public void onReqLogsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
@@ -50,24 +51,24 @@ public class ReqLogListener {
 
     private RequestLogLookup toRequestLogLookup(KafkaMessage.ReqLog reqLogKafkaMessage) {
         return RequestLogLookup.builder()
-                .requestLogId(reqLogKafkaMessage.requestLogId())
-                .occurredAt(reqLogKafkaMessage.occurredAt())
-                .build();
+            .requestLogId(reqLogKafkaMessage.requestLogId())
+            .occurredAt(reqLogKafkaMessage.occurredAt())
+            .build();
     }
 
     private RequestLog toRequestLog(KafkaMessage.ReqLog reqLog) {
         return RequestLog.builder()
-                .id(new RequestLog.PrimaryKeyComposite(reqLog.tenantId(), reqLog.serviceId(), reqLog.occurredAt(), reqLog.requestLogId()))
-                .endpointId(reqLog.endpointId())
-                .requestId(reqLog.requestId())
-                .traceId(reqLog.traceId())
-                .endUserIp(reqLog.endUserIp())
-                .userId(reqLog.userId())
-                .statusCode(reqLog.statusCode())
-                .durationMs(reqLog.durationMs())
-                .requestSizeBytes(reqLog.requestSizeBytes())
-                .responseSizeBytes(reqLog.responseSizeBytes())
-                .build();
+            .id(new RequestLog.PrimaryKeyComposite(reqLog.tenantId(), reqLog.serviceId(), reqLog.occurredAt(), reqLog.requestLogId()))
+            .endpointId(reqLog.endpointId())
+            .requestId(reqLog.requestId())
+            .traceId(reqLog.traceId())
+            .endUserIp(reqLog.endUserIp())
+            .userId(reqLog.userId())
+            .statusCode(reqLog.statusCode())
+            .durationMs(reqLog.durationMs())
+            .requestSizeBytes(reqLog.requestSizeBytes())
+            .responseSizeBytes(reqLog.responseSizeBytes())
+            .build();
     }
 
 }

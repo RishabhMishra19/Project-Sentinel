@@ -3,4 +3,5 @@ package com.sentinel.api.role.dto.request;
 import com.sentinel.api.permission.entity.PermissionType;
 import jakarta.validation.constraints.NotNull;
 
-public record UpdateRoleScopeRequest(@NotNull PermissionType permission) {}
+public record UpdateRoleScopeRequest(@NotNull PermissionType permission) {
+}

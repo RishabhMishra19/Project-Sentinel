@@ -17,6 +17,23 @@ import java.util.UUID;
 @Builder
 public class AnalyticsStatsMetrics {
 
+    private UUID entityId;
+    private Instant bucketStart;
+    private long requestCount = 0;
+    private long errorCount = 0;
+    private double errorRate = 0;
+    private long status2xx = 0;
+    private long status3xx = 0;
+    private long status4xx = 0;
+    private long status5xx = 0;
+    private long latencySumMs = 0;
+    private long latencyMinMs = Integer.MAX_VALUE;
+    private long latencyMaxMs = 0;
+    private long latencyP50Ms = 0;
+    private long latencyP95Ms = 0;
+    private long latencyP99Ms = 0;
+    private long requestBytesTotal = 0;
+    private long responseBytesTotal = 0;
     public AnalyticsStatsMetrics(AnalyticsStatsMetrics metrics) {
         this.entityId = metrics.getEntityId();
         this.bucketStart = metrics.getBucketStart();
@@ -36,24 +53,6 @@ public class AnalyticsStatsMetrics {
         this.requestBytesTotal = metrics.getRequestBytesTotal();
         this.responseBytesTotal = metrics.getResponseBytesTotal();
     }
-
-    private UUID entityId;
-    private Instant bucketStart;
-    private long requestCount = 0;
-    private long errorCount = 0;
-    private double errorRate = 0;
-    private long status2xx = 0;
-    private long status3xx = 0;
-    private long status4xx = 0;
-    private long status5xx = 0;
-    private long latencySumMs = 0;
-    private long latencyMinMs = Integer.MAX_VALUE;
-    private long latencyMaxMs = 0;
-    private long latencyP50Ms = 0;
-    private long latencyP95Ms = 0;
-    private long latencyP99Ms = 0;
-    private long requestBytesTotal = 0;
-    private long responseBytesTotal = 0;
 
     public void accumulate(KafkaMessage.ReqLog reqLog) {
         this.requestCount++;

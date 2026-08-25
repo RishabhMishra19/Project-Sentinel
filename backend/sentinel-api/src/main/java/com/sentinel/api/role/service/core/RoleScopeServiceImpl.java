@@ -8,11 +8,12 @@ import com.sentinel.api.role.entity.RoleScopeStatus;
 import com.sentinel.api.role.entity.RoleScopeType;
 import com.sentinel.api.role.repository.RoleScopeRepository;
 import com.sentinel.api.user.entity.User;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +35,8 @@ public class RoleScopeServiceImpl implements RoleScopeService {
     public RoleScope getByIdForRole(UUID tenantId, UUID roleId, UUID scopeId) {
         roleService.getByIdForTenant(tenantId, roleId);
         return roleScopeRepository
-                .findByIdAndRoleId(scopeId, roleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Role scope not found"));
+            .findByIdAndRoleId(scopeId, roleId)
+            .orElseThrow(() -> new ResourceNotFoundException("Role scope not found"));
     }
 
     @Override
@@ -46,11 +47,11 @@ public class RoleScopeServiceImpl implements RoleScopeService {
 
     @Override
     public RoleScope create(
-            Role role,
-            RoleScopeType scopeType,
-            UUID scopeId,
-            PermissionType permission,
-            User actor) {
+        Role role,
+        RoleScopeType scopeType,
+        UUID scopeId,
+        PermissionType permission,
+        User actor) {
         RoleScope scope = new RoleScope();
         scope.setRole(role);
         scope.setScopeType(scopeType);

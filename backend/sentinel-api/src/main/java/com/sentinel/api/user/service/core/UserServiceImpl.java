@@ -7,14 +7,15 @@ import com.sentinel.api.tenant.entity.Tenant;
 import com.sentinel.api.user.entity.User;
 import com.sentinel.api.user.entity.UserStatus;
 import com.sentinel.api.user.repository.UserRepository;
-import java.time.Instant;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,16 +28,16 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public User getById(UUID id) {
         return userRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            .findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
     @Transactional(readOnly = true)
     public User findActiveByEmailWithAuthorities(String email) {
         User user = userRepository
-                .findByEmailWithRolesAndPermissions(email)
-                .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
+            .findByEmailWithRolesAndPermissions(email)
+            .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
         if (user.getStatus() != UserStatus.ACTIVE) {
             throw new UnauthorizedException("User account is inactive");
         }
@@ -47,8 +48,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public User findByIdWithAuthorities(UUID id) {
         User user = userRepository
-                .findByIdWithRolesAndPermissions(id)
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
+            .findByIdWithRolesAndPermissions(id)
+            .orElseThrow(() -> new UnauthorizedException("User not found"));
         if (user.getStatus() != UserStatus.ACTIVE) {
             throw new UnauthorizedException("User account is inactive");
         }
@@ -64,8 +65,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updatePasswordHash(UUID userId, String newPasswordHash) {
         User user = userRepository
-                .findById(userId)
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
+            .findById(userId)
+            .orElseThrow(() -> new UnauthorizedException("User not found"));
         if (user.getStatus() != UserStatus.ACTIVE) {
             throw new UnauthorizedException("User account is inactive");
         }
@@ -84,8 +85,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public User getByIdForTenant(UUID tenantId, UUID id) {
         return userRepository
-                .findWithRolesByIdAndTenantId(id, tenantId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            .findWithRolesByIdAndTenantId(id, tenantId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
@@ -96,7 +97,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(
-            String email, String displayName, String passwordHash, Tenant tenant, boolean tenantAdmin) {
+        String email, String displayName, String passwordHash, Tenant tenant, boolean tenantAdmin) {
         User user = new User();
         user.setEmail(email);
         user.setDisplayName(displayName);

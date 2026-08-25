@@ -12,10 +12,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,6 +21,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -32,10 +33,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserService userService;
 
+    private static void rejectAccessTokenExpired(HttpServletResponse response) throws IOException {
+        ErrorCode code = ErrorCode.ACCESS_TOKEN_EXPIRED;
+        response.setStatus(code.getStatus().value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter()
+            .write("{\"errorCode\":\""
+                + code.name()
+                + "\",\"error\":\""
+                + code.getReason()
+                + "\",\"message\":\"Invalid or expired access token\"}");
+    }
+
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+        HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
@@ -49,32 +62,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authorities.add(new SimpleGrantedAuthority(PermissionType.ALL.name()));
                 }
                 user.getRoles().stream()
-                        .filter(role -> role.getStatus() == RoleStatus.ACTIVE)
-                        .forEach(role -> {
-                            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-                            role.getRoleScopes().stream()
-                                    .filter(scope -> scope.getStatus() == RoleScopeStatus.ACTIVE)
-                                    .forEach(scope -> {
-                                        authorities.add(new SimpleGrantedAuthority(
-                                                scope.getPermission().name()));
-                                        scopeGrants.add(new ScopeGrant(
-                                                scope.getScopeType(),
-                                                scope.getScopeId(),
-                                                scope.getPermission()));
-                                    });
-                        });
+                    .filter(role -> role.getStatus() == RoleStatus.ACTIVE)
+                    .forEach(role -> {
+                        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+                        role.getRoleScopes().stream()
+                            .filter(scope -> scope.getStatus() == RoleScopeStatus.ACTIVE)
+                            .forEach(scope -> {
+                                authorities.add(new SimpleGrantedAuthority(
+                                    scope.getPermission().name()));
+                                scopeGrants.add(new ScopeGrant(
+                                    scope.getScopeType(),
+                                    scope.getScopeId(),
+                                    scope.getPermission()));
+                            });
+                    });
                 UserPrincipal principal = new UserPrincipal(
-                        user.getId(),
-                        user.getEmail(),
-                        user.getStatus(),
-                        user.isSentinelAdmin(),
-                        user.isTenantAdmin(),
-                        user.getTenant() != null ? user.getTenant().getId() : null,
-                        null,
-                        scopeGrants,
-                        authorities);
+                    user.getId(),
+                    user.getEmail(),
+                    user.getStatus(),
+                    user.isSentinelAdmin(),
+                    user.isTenantAdmin(),
+                    user.getTenant() != null ? user.getTenant().getId() : null,
+                    null,
+                    scopeGrants,
+                    authorities);
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(principal, null, authorities);
+                    new UsernamePasswordAuthenticationToken(principal, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (AccessTokenExpiredException ex) {
                 SecurityContextHolder.clearContext();
@@ -85,17 +98,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
-    }
-
-    private static void rejectAccessTokenExpired(HttpServletResponse response) throws IOException {
-        ErrorCode code = ErrorCode.ACCESS_TOKEN_EXPIRED;
-        response.setStatus(code.getStatus().value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter()
-                .write("{\"errorCode\":\""
-                        + code.name()
-                        + "\",\"error\":\""
-                        + code.getReason()
-                        + "\",\"message\":\"Invalid or expired access token\"}");
     }
 }

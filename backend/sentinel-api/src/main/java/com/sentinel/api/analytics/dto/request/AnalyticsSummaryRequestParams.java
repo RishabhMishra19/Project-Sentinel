@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record AnalyticsSummaryRequestParams(
-        @NotNull AnalyticsScope scope, @NotNull Instant from, @NotNull Instant to, @NotNull UUID entityId
-) {}
+    @NotNull AnalyticsScope scope, @NotNull Instant from, @NotNull Instant to, @NotNull UUID entityId
+) {
+}
 

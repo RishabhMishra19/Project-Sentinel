@@ -28,13 +28,13 @@ public class ProductMapper {
 
     public ProductResponse toResponse(Product product) {
         return new ProductResponse(
-                product.getId().toString(),
-                product.getTenant().getId().toString(),
-                product.getName(),
-                product.getStatus(),
-                userMapper.toBrief(product.getCreatedBy()),
-                userMapper.toBrief(product.getUpdatedBy()),
-                product.getCreatedAt(),
-                product.getUpdatedAt());
+            product.getId().toString(),
+            product.getTenant().getId().toString(),
+            product.getName(),
+            product.getStatus(),
+            userMapper.toBrief(product.getCreatedBy()),
+            userMapper.toBrief(product.getUpdatedBy()),
+            product.getCreatedAt(),
+            product.getUpdatedAt());
     }
 }

@@ -21,7 +21,7 @@ public class IngestCache {
     private final ServiceApiKeyRepository serviceApiKeyRepository;
 
     public <T> boolean store(String key, int ttl, T value) {
-        try{
+        try {
             memcachedClient.set(key, ttl, value);
             return true;
         } catch (Exception e) {
@@ -30,8 +30,8 @@ public class IngestCache {
         }
     }
 
-    public <T> T resolve(String key){
-        try{
+    public <T> T resolve(String key) {
+        try {
             return memcachedClient.get(key);
         } catch (Exception e) {
             log.error("Failed to resolve ingest cache for key {}", key);

@@ -15,11 +15,11 @@ public class MemcachedConfig {
 
     @Bean
     public MemcachedClient memcachedClient(
-            @Value("${sentinel.memcached.host}") String host,
-            @Value("${sentinel.memcached.port}") int port) throws IOException {
+        @Value("${sentinel.memcached.host}") String host,
+        @Value("${sentinel.memcached.port}") int port) throws IOException {
 
         return new XMemcachedClientBuilder(
-                List.of(new InetSocketAddress(host, port))
+            List.of(new InetSocketAddress(host, port))
         ).build();
     }
 }

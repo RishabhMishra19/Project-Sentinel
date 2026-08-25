@@ -1,8 +1,5 @@
 package com.sentinel.api.apikey.service;
 
-import com.sentinel.common.apikey.entity.ServiceApiKey;
-import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;
-import com.sentinel.common.apikey.repository.ServiceApiKeyRepository;
 import com.sentinel.api.apikey.dto.request.CreateServiceApiKeyRequest;
 import com.sentinel.api.apikey.dto.response.ServiceApiKeyCreatedResponse;
 import com.sentinel.api.apikey.dto.response.ServiceApiKeyResponse;
@@ -19,6 +16,16 @@ import com.sentinel.api.service.entity.Service;
 import com.sentinel.api.service.service.core.ServiceService;
 import com.sentinel.api.user.entity.User;
 import com.sentinel.api.user.repository.UserRepository;
+import com.sentinel.common.apikey.entity.ServiceApiKey;
+import com.sentinel.common.apikey.entity.ServiceApiKeyStatus;
+import com.sentinel.common.apikey.repository.ServiceApiKeyRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
@@ -28,12 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.transaction.annotation.Transactional;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -53,13 +54,13 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ServiceApiKeyResponse> list(
-            UUID tenantId, UUID productId, UUID serviceId, ListQueryRequest query) {
+        UUID tenantId, UUID productId, UUID serviceId, ListQueryRequest query) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         requireServiceInProduct(effectiveTenantId, productId, serviceId);
         Pageable effective =
-                query.toPageable(ServiceApiKeySpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
+            query.toPageable(ServiceApiKeySpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
         Specification<ServiceApiKey> spec =
-                ServiceApiKeySpecifications.forService(serviceId, query);
+            ServiceApiKeySpecifications.forService(serviceId, query);
         Page<ServiceApiKey> page = serviceApiKeyRepository.findAll(spec, effective);
         Map<UUID, User> users = loadUsers(page.getContent());
         return PageResponse.from(page.map(key -> toResponse(key, users)));
@@ -68,7 +69,7 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
     @Override
     @Transactional(readOnly = true)
     public ServiceApiKeyResponse getById(
-            UUID tenantId, UUID productId, UUID serviceId, UUID id) {
+        UUID tenantId, UUID productId, UUID serviceId, UUID id) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         requireServiceInProduct(effectiveTenantId, productId, serviceId);
         ServiceApiKey key = requireKey(serviceId, id);
@@ -78,36 +79,36 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
 
     @Override
     public ServiceApiKeyCreatedResponse create(
-            UUID tenantId,
-            UUID productId,
-            UUID serviceId,
-            CreateServiceApiKeyRequest request,
-            UUID actorId) {
+        UUID tenantId,
+        UUID productId,
+        UUID serviceId,
+        CreateServiceApiKeyRequest request,
+        UUID actorId) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         requireServiceInProduct(effectiveTenantId, productId, serviceId);
         if (serviceApiKeyRepository.existsByServiceIdAndStatus(
-                serviceId, ServiceApiKeyStatus.ACTIVE)) {
+            serviceId, ServiceApiKeyStatus.ACTIVE)) {
             throw new ConflictException("An active API key already exists for this service");
         }
         String rawApiKey = generateRawApiKey();
         ServiceApiKey saved = serviceApiKeyRepository.save(
-                serviceApiKeyMapper.toEntity(
-                        new CreateServiceApiKeyRequest(request.name().trim()),
-                        serviceId,
-                        rawApiKey,
-                        actorId));
+            serviceApiKeyMapper.toEntity(
+                new CreateServiceApiKeyRequest(request.name().trim()),
+                serviceId,
+                rawApiKey,
+                actorId));
         ServiceApiKey withIds = requireKey(serviceId, saved.getId());
         Map<UUID, User> users = loadUsers(List.of(withIds));
         return serviceApiKeyMapper.toCreatedResponse(
-                withIds,
-                users.get(withIds.getCreatedById()),
-                users.get(withIds.getUpdatedById()),
-                rawApiKey);
+            withIds,
+            users.get(withIds.getCreatedById()),
+            users.get(withIds.getUpdatedById()),
+            rawApiKey);
     }
 
     @Override
     public void revoke(
-            UUID tenantId, UUID productId, UUID serviceId, UUID id, UUID actorId) {
+        UUID tenantId, UUID productId, UUID serviceId, UUID id, UUID actorId) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         requireServiceInProduct(effectiveTenantId, productId, serviceId);
         ServiceApiKey key = requireKey(serviceId, id);
@@ -123,7 +124,7 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
 
     private ServiceApiKeyResponse toResponse(ServiceApiKey key, Map<UUID, User> users) {
         return serviceApiKeyMapper.toResponse(
-                key, users.get(key.getCreatedById()), users.get(key.getUpdatedById()));
+            key, users.get(key.getCreatedById()), users.get(key.getUpdatedById()));
     }
 
     private Map<UUID, User> loadUsers(List<ServiceApiKey> keys) {
@@ -148,8 +149,8 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
     private Service requireServiceInProduct(UUID tenantId, UUID productId, UUID serviceId) {
         requireProductInTenant(tenantId, productId);
         Service service = serviceService
-                .findById(serviceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
+            .findById(serviceId)
+            .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
         if (!service.getProduct().getId().equals(productId)) {
             throw new ResourceNotFoundException("Service not found");
         }
@@ -158,14 +159,14 @@ public class ServiceApiKeyFacadeImpl implements ServiceApiKeyFacade {
 
     private Product requireProductInTenant(UUID tenantId, UUID productId) {
         return productService
-                .findWithAuditByIdAndTenantId(productId, tenantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+            .findWithAuditByIdAndTenantId(productId, tenantId)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
 
     private ServiceApiKey requireKey(UUID serviceId, UUID id) {
         return serviceApiKeyRepository
-                .findByIdAndServiceId(id, serviceId)
-                .orElseThrow(() -> new ResourceNotFoundException("API key not found"));
+            .findByIdAndServiceId(id, serviceId)
+            .orElseThrow(() -> new ResourceNotFoundException("API key not found"));
     }
 
     private UUID requireTenantId(UUID tenantId) {

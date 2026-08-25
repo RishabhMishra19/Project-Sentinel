@@ -1,9 +1,9 @@
 package com.sentinel.api.auth.controller;
 
-import com.sentinel.api.auth.dto.response.AuthSessionResponse;
 import com.sentinel.api.auth.dto.internal.AuthSessionResult;
 import com.sentinel.api.auth.dto.request.ChangePasswordRequest;
 import com.sentinel.api.auth.dto.request.LoginRequest;
+import com.sentinel.api.auth.dto.response.AuthSessionResponse;
 import com.sentinel.api.auth.dto.response.ProfileResponse;
 import com.sentinel.api.auth.service.AuthFacade;
 import com.sentinel.api.common.response.ApiResponses;
@@ -33,7 +33,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthSessionResponse> login(
-            @Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        @Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         AuthSessionResult result = authFacade.login(request);
         writeRefreshCookie(response, result.refreshTokenRaw());
         return ApiResponses.ok(result.body());
@@ -41,7 +41,7 @@ public class AuthController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthSessionResponse> refreshToken(
-            HttpServletRequest request, HttpServletResponse response) {
+        HttpServletRequest request, HttpServletResponse response) {
         String raw = cookieAuthSupport.readRefreshCookie(request);
         AuthSessionResult result = authFacade.refresh(raw);
         writeRefreshCookie(response, result.refreshTokenRaw());
@@ -63,9 +63,9 @@ public class AuthController {
 
     @PostMapping("/change-password")
     public ResponseEntity<AuthSessionResponse> changePassword(
-            @AuthenticationPrincipal UserPrincipal principal,
-            @Valid @RequestBody ChangePasswordRequest request,
-            HttpServletResponse response) {
+        @AuthenticationPrincipal UserPrincipal principal,
+        @Valid @RequestBody ChangePasswordRequest request,
+        HttpServletResponse response) {
         AuthSessionResult result = authFacade.changePassword(principal.getId(), request);
         writeRefreshCookie(response, result.refreshTokenRaw());
         return ApiResponses.ok(result.body());
@@ -73,6 +73,6 @@ public class AuthController {
 
     private void writeRefreshCookie(HttpServletResponse response, String refreshTokenRaw) {
         cookieAuthSupport.writeRefreshCookie(
-                response, refreshTokenRaw, jwtProperties.getRefreshTokenTtl().toSeconds());
+            response, refreshTokenRaw, jwtProperties.getRefreshTokenTtl().toSeconds());
     }
 }

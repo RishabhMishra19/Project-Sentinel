@@ -11,9 +11,9 @@ public class KafkaTopicConfig {
 
     @Bean
     NewTopic requestEventsTopic(
-            @Value("${sentinel.kafka.request-logs-topic}") String topic,
-            @Value("${sentinel.kafka.request-logs-partitions}") int partitions,
-            @Value("${sentinel.kafka.request-logs-replicas}") short replicas) {
+        @Value("${sentinel.kafka.request-logs-topic}") String topic,
+        @Value("${sentinel.kafka.request-logs-partitions}") int partitions,
+        @Value("${sentinel.kafka.request-logs-replicas}") short replicas) {
         return TopicBuilder.name(topic).partitions(partitions).replicas(replicas).build();
     }
 

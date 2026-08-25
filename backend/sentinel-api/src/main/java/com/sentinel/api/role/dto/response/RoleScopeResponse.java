@@ -5,9 +5,10 @@ import com.sentinel.api.role.entity.RoleScopeStatus;
 import com.sentinel.api.role.entity.RoleScopeType;
 
 public record RoleScopeResponse(
-        String id,
-        RoleScopeType scopeType,
-        String scopeId,
-        String scopeName,
-        PermissionType permission,
-        RoleScopeStatus status) {}
+    String id,
+    RoleScopeType scopeType,
+    String scopeId,
+    String scopeName,
+    PermissionType permission,
+    RoleScopeStatus status) {
+}

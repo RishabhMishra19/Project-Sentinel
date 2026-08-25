@@ -4,6 +4,7 @@ import com.sentinel.api.common.exception.BadRequestException;
 import com.sentinel.api.common.exception.ConflictException;
 import com.sentinel.api.common.exception.ForbiddenException;
 import com.sentinel.api.common.exception.ResourceNotFoundException;
+import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.common.response.PageResponse;
 import com.sentinel.api.role.entity.Role;
 import com.sentinel.api.role.service.core.RoleService;
@@ -16,12 +17,9 @@ import com.sentinel.api.user.dto.response.CreateUserResponse;
 import com.sentinel.api.user.dto.response.UserResponse;
 import com.sentinel.api.user.entity.User;
 import com.sentinel.api.user.entity.UserStatus;
-import com.sentinel.api.common.query.ListQueryRequest;
 import com.sentinel.api.user.mapper.UserMapper;
 import com.sentinel.api.user.repository.UserSpecifications;
 import com.sentinel.api.user.service.core.UserService;
-import java.security.SecureRandom;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +29,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -39,7 +40,7 @@ public class UserFacadeImpl implements UserFacade {
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "createdAt");
     private static final int TEMP_PASSWORD_LENGTH = 16;
     private static final String TEMP_PASSWORD_CHARS =
-            "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
+        "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final UserService userService;
@@ -53,7 +54,7 @@ public class UserFacadeImpl implements UserFacade {
     public PageResponse<UserResponse> list(UUID tenantId, ListQueryRequest query) {
         UUID effectiveTenantId = requireTenantId(tenantId);
         Pageable effective =
-                query.toPageable(UserSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
+            query.toPageable(UserSpecifications.SORTABLE_FIELDS, DEFAULT_SORT);
         Specification<User> spec = UserSpecifications.withFilters(effectiveTenantId, query);
         Page<User> page = userService.findAll(spec, effective);
         return PageResponse.from(page.map(userMapper::toResponse));
@@ -76,11 +77,11 @@ public class UserFacadeImpl implements UserFacade {
         Tenant tenantRef = tenantRepository.getReferenceById(effectiveTenantId);
         String temporaryPassword = generateTemporaryPassword();
         User saved = userService.create(
-                email,
-                displayName,
-                passwordEncoder.encode(temporaryPassword),
-                tenantRef,
-                false);
+            email,
+            displayName,
+            passwordEncoder.encode(temporaryPassword),
+            tenantRef,
+            false);
         User withRoles = userService.getByIdForTenant(effectiveTenantId, saved.getId());
         return userMapper.toCreateResponse(withRoles, temporaryPassword);
     }

@@ -33,27 +33,27 @@ public interface ServiceRepository extends JpaRepository<Service, UUID>, JpaSpec
 
     @Query("SELECT s.id FROM Service s WHERE s.status = :status and s.product.id in :productIds")
     List<UUID> findIdsByProductIdsAndStatus(
-            @Param("productIds") List<UUID> productIds,
-            @Param("status") ServiceStatus status
+        @Param("productIds") List<UUID> productIds,
+        @Param("status") ServiceStatus status
     );
 
     @Query("""
-                SELECT s.id
-                FROM Service s
-                LEFT JOIN Product p on s.product.id = p.id
-                Left JOIN Tenant t on p.tenant.id = t.id
-                WHERE t.id = :tenantId
-                  AND s.status = :status
-            """)
+            SELECT s.id
+            FROM Service s
+            LEFT JOIN Product p on s.product.id = p.id
+            Left JOIN Tenant t on p.tenant.id = t.id
+            WHERE t.id = :tenantId
+              AND s.status = :status
+        """)
     List<UUID> findIdsByTenantIdAndStatus(@Param("tenantId") UUID tenantId, @Param("status") ServiceStatus status);
 
     @Query("""
-                SELECT s.id
-                FROM Service s
-                LEFT JOIN Product p on s.product.id = p.id
-                WHERE p.id = :productId
-                  AND s.status = :status
-            """)
+            SELECT s.id
+            FROM Service s
+            LEFT JOIN Product p on s.product.id = p.id
+            WHERE p.id = :productId
+              AND s.status = :status
+        """)
     List<UUID> findIdsByProductIdAndStatus(@Param("productId") UUID productId, @Param("status") ServiceStatus status);
 
     @Query("SELECT s.id FROM Service s WHERE s.status = :status")

@@ -9,11 +9,12 @@ import java.util.List;
 public record AuthSessionResponse(String accessToken, Instant expiresAt, User user) {
 
     public record User(
-            String id,
-            String email,
-            String name,
-            boolean sentinelAdmin,
-            boolean tenantAdmin,
-            List<RoleSummaryResponse> roles,
-            TenantSummaryResponse tenant) {}
+        String id,
+        String email,
+        String name,
+        boolean sentinelAdmin,
+        boolean tenantAdmin,
+        List<RoleSummaryResponse> roles,
+        TenantSummaryResponse tenant) {
+    }
 }

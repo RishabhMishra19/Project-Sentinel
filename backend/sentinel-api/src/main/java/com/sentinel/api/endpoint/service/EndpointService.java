@@ -8,9 +8,13 @@ import java.util.UUID;
 public interface EndpointService {
 
     Long findCountByTenantId(UUID tenantId);
+
     Long findCountByProductId(UUID productId);
+
     Long findCountByServiceId(UUID serviceId);
+
     EndpointResponse findById(UUID id);
+
     List<EndpointResponse> findByServiceId(UUID serviceId);
 
 }

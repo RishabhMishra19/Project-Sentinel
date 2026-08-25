@@ -5,9 +5,10 @@ import com.sentinel.api.role.mapper.RoleMapper;
 import com.sentinel.api.user.dto.response.CreateUserResponse;
 import com.sentinel.api.user.dto.response.UserResponse;
 import com.sentinel.api.user.entity.User;
-import java.util.Comparator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Comparator;
 
 @Component
 @RequiredArgsConstructor
@@ -21,32 +22,32 @@ public class UserMapper {
 
     public UserResponse toResponse(User user) {
         return new UserResponse(
-                user.getId().toString(),
-                user.getEmail(),
-                user.getDisplayName(),
-                user.getStatus(),
-                user.isTenantAdmin(),
-                user.getRoles().stream()
-                        .sorted(Comparator.comparing(role -> role.getName().toLowerCase()))
-                        .map(roleMapper::toBrief)
-                        .toList(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getLastLoginAt());
+            user.getId().toString(),
+            user.getEmail(),
+            user.getDisplayName(),
+            user.getStatus(),
+            user.isTenantAdmin(),
+            user.getRoles().stream()
+                .sorted(Comparator.comparing(role -> role.getName().toLowerCase()))
+                .map(roleMapper::toBrief)
+                .toList(),
+            user.getCreatedAt(),
+            user.getUpdatedAt(),
+            user.getLastLoginAt());
     }
 
     public CreateUserResponse toCreateResponse(User user, String temporaryPassword) {
         UserResponse base = toResponse(user);
         return new CreateUserResponse(
-                base.id(),
-                base.email(),
-                base.displayName(),
-                base.status(),
-                base.tenantAdmin(),
-                base.roles(),
-                base.createdAt(),
-                base.updatedAt(),
-                base.lastLoginAt(),
-                temporaryPassword);
+            base.id(),
+            base.email(),
+            base.displayName(),
+            base.status(),
+            base.tenantAdmin(),
+            base.roles(),
+            base.createdAt(),
+            base.updatedAt(),
+            base.lastLoginAt(),
+            temporaryPassword);
     }
 }

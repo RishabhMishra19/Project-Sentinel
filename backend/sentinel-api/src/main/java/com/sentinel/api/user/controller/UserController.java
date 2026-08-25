@@ -11,7 +11,6 @@ import com.sentinel.api.user.dto.response.CreateUserResponse;
 import com.sentinel.api.user.dto.response.UserResponse;
 import com.sentinel.api.user.service.UserFacade;
 import jakarta.validation.Valid;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -34,47 +35,47 @@ public class UserController {
     @PreAuthorize("@accessSupport.canReadUsers()")
     @PostMapping("/search")
     public ResponseEntity<PageResponse<UserResponse>> search(
-            @AuthenticationPrincipal UserPrincipal principal, @RequestBody ListQueryRequest query) {
+        @AuthenticationPrincipal UserPrincipal principal, @RequestBody ListQueryRequest query) {
         return ApiResponses.okPage(userFacade.list(principal.getActiveTenantId(), query));
     }
 
     @PreAuthorize("@accessSupport.canReadUsers()")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getById(
-            @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID id) {
+        @AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID id) {
         return ApiResponses.ok(userFacade.getById(principal.getActiveTenantId(), id));
     }
 
     @PreAuthorize("@accessSupport.canWriteUsers()")
     @PostMapping
     public ResponseEntity<CreateUserResponse> create(
-            @Valid @RequestBody CreateUserRequest request,
-            @AuthenticationPrincipal UserPrincipal principal) {
+        @Valid @RequestBody CreateUserRequest request,
+        @AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponses.created(userFacade.create(principal.getActiveTenantId(), request));
     }
 
     @PreAuthorize("@accessSupport.canWriteUsers()")
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(
-            @PathVariable UUID id,
-            @Valid @RequestBody UpdateUserRequest request,
-            @AuthenticationPrincipal UserPrincipal principal) {
+        @PathVariable UUID id,
+        @Valid @RequestBody UpdateUserRequest request,
+        @AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponses.ok(userFacade.update(principal.getActiveTenantId(), id, request));
     }
 
     @PreAuthorize("@accessSupport.canWriteUsers()")
     @PostMapping("/{id}/roles")
     public ResponseEntity<UserResponse> assignRole(
-            @PathVariable UUID id,
-            @Valid @RequestBody AssignRoleRequest request,
-            @AuthenticationPrincipal UserPrincipal principal) {
+        @PathVariable UUID id,
+        @Valid @RequestBody AssignRoleRequest request,
+        @AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponses.ok(userFacade.assignRole(principal.getActiveTenantId(), id, request));
     }
 
     @PreAuthorize("@accessSupport.canWriteUsers()")
     @PostMapping("/{id}/mark-inactive")
     public ResponseEntity<Void> markInactive(
-            @PathVariable UUID id, @AuthenticationPrincipal UserPrincipal principal) {
+        @PathVariable UUID id, @AuthenticationPrincipal UserPrincipal principal) {
         userFacade.markInactive(principal.getActiveTenantId(), id, principal.getId());
         return ApiResponses.noContent();
     }

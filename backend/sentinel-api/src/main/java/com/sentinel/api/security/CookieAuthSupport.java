@@ -16,23 +16,23 @@ public class CookieAuthSupport {
 
     public void writeRefreshCookie(HttpServletResponse response, String rawToken, long maxAgeSeconds) {
         ResponseCookie cookie = ResponseCookie.from(cookieProperties.getRefreshTokenName(), rawToken)
-                .httpOnly(true)
-                .secure(cookieProperties.isSecure())
-                .path(cookieProperties.getPath())
-                .sameSite(cookieProperties.getSameSite())
-                .maxAge(maxAgeSeconds)
-                .build();
+            .httpOnly(true)
+            .secure(cookieProperties.isSecure())
+            .path(cookieProperties.getPath())
+            .sameSite(cookieProperties.getSameSite())
+            .maxAge(maxAgeSeconds)
+            .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     public void clearRefreshCookie(HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from(cookieProperties.getRefreshTokenName(), "")
-                .httpOnly(true)
-                .secure(cookieProperties.isSecure())
-                .path(cookieProperties.getPath())
-                .sameSite(cookieProperties.getSameSite())
-                .maxAge(0)
-                .build();
+            .httpOnly(true)
+            .secure(cookieProperties.isSecure())
+            .path(cookieProperties.getPath())
+            .sameSite(cookieProperties.getSameSite())
+            .maxAge(0)
+            .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 

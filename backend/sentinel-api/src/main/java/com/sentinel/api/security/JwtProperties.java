@@ -1,10 +1,11 @@
 package com.sentinel.api.security;
 
-import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
 
 @Component
 @ConfigurationProperties(prefix = "sentinel.jwt")

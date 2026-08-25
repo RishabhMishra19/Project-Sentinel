@@ -52,11 +52,11 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     public AnalyticsSummaryResponse getSummary(AnalyticsSummaryRequestParams params) {
         AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
         TotalStatsResponse totalStats = analyticsService.findTotalStats(
-                params.entityId(),
-                params.from(),
-                params.to(),
-                params.scope(),
-                bucket
+            params.entityId(),
+            params.from(),
+            params.to(),
+            params.scope(),
+            bucket
         );
         long activeEndpoints = this.countEndPoints(params.entityId(), params.scope());
         Map<UUID, String> idToNameMap = this.getIdToNameMap(List.of(params.entityId()), params.scope());
@@ -67,34 +67,34 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     @Transactional(readOnly = true)
     public AnalyticsTimeSeriesResponse getTimeSeries(AnalyticsTimeSeriesRequestParams params) {
         TimeSeriesStatsResponse timeSeriesStatsResponse = analyticsService.findTimeSeriesStats(
-                params.entityId(),
-                params.from(),
-                params.to(),
-                params.scope(),
-                params.bucket()
+            params.entityId(),
+            params.from(),
+            params.to(),
+            params.scope(),
+            params.bucket()
         );
         long activeEndpoints = this.countEndPoints(params.entityId(), params.scope());
         Map<UUID, String> idToNameMap = this.getIdToNameMap(List.of(params.entityId()), params.scope());
         return new AnalyticsTimeSeriesResponse(
-                timeSeriesStatsResponse,
-                activeEndpoints,
-                idToNameMap.get(params.entityId())
+            timeSeriesStatsResponse,
+            activeEndpoints,
+            idToNameMap.get(params.entityId())
         );
     }
 
     @Override
     @Transactional(readOnly = true)
     public AnalyticsChildrenAggregatedResponse getChildrenAggregated(
-            AnalyticsChildrenAggregatedRequestParams params
+        AnalyticsChildrenAggregatedRequestParams params
     ) {
         AnalyticsScope childScope = this.getChildScope(params.scope());
         List<UUID> entityIds = this.getChildEntityIds(params.scope(), params.entityId());
         AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
         EntityAggregatedStatsResponse entityAggregatedStatsResponse = analyticsService.findEntityAggregatedStats(entityIds,
-                params.from(),
-                params.to(),
-                childScope,
-                bucket
+            params.from(),
+            params.to(),
+            childScope,
+            bucket
         );
         Map<UUID, Long> endpointCountMap = new HashMap<>();
         for (UUID entityId : entityIds) {

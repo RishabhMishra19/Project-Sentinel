@@ -10,7 +10,13 @@ import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -120,8 +126,8 @@ public class KafkaTopologyController {
 
         try (AdminClient adminClient = AdminClient.create(kafkaAdmin.getConfigurationProperties())) {
             List<String> monitoredTopics = Arrays.asList(
-                    "request_logs", "tenant_minute_analytics", "product_minute_analytics",
-                    "service_minute_analytics", "endpoint_minute_analytics"
+                "request_logs", "tenant_minute_analytics", "product_minute_analytics",
+                "service_minute_analytics", "endpoint_minute_analytics"
             );
 
             for (String topic : monitoredTopics) {
@@ -130,7 +136,8 @@ public class KafkaTopologyController {
                     totalMessagesSum += getLogEndOffset(adminClient, new TopicPartition(topic, p));
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         stats.put("totalMessages", totalMessagesSum);
         stats.put("avgLatencyMs", 3.5);
@@ -142,7 +149,7 @@ public class KafkaTopologyController {
         try {
             Map<TopicPartition, OffsetSpec> request = Collections.singletonMap(tp, OffsetSpec.latest());
             Map<TopicPartition, ListOffsetsResult.ListOffsetsResultInfo> result =
-                    adminClient.listOffsets(request).all().get(2, TimeUnit.SECONDS);
+                adminClient.listOffsets(request).all().get(2, TimeUnit.SECONDS);
 
             ListOffsetsResult.ListOffsetsResultInfo info = result.get(tp);
             return info != null ? info.offset() : 0L;
@@ -155,9 +162,9 @@ public class KafkaTopologyController {
     private long getCommittedOffset(AdminClient adminClient, String groupId, TopicPartition tp) {
         try {
             Map<TopicPartition, OffsetAndMetadata> committed =
-                    adminClient.listConsumerGroupOffsets(groupId)
-                            .partitionsToOffsetAndMetadata()
-                            .get(2, TimeUnit.SECONDS);
+                adminClient.listConsumerGroupOffsets(groupId)
+                    .partitionsToOffsetAndMetadata()
+                    .get(2, TimeUnit.SECONDS);
 
             OffsetAndMetadata metadata = committed.get(tp);
             return metadata != null ? metadata.offset() : -1L;

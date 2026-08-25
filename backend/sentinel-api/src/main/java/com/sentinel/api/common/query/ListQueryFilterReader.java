@@ -1,14 +1,18 @@
 package com.sentinel.api.common.query;
 
 import com.sentinel.api.common.exception.BadRequestException;
-import java.util.Locale;
-import java.util.UUID;
 import org.springframework.util.StringUtils;
 
-/** Helpers to read typed values from ListQueryRequest.filterConfigs (e.g. Analytics). */
+import java.util.Locale;
+import java.util.UUID;
+
+/**
+ * Helpers to read typed values from ListQueryRequest.filterConfigs (e.g. Analytics).
+ */
 public final class ListQueryFilterReader {
 
-    private ListQueryFilterReader() {}
+    private ListQueryFilterReader() {
+    }
 
     public static String require(ListQueryRequest query, String fieldName) {
         String value = query != null ? query.firstFilterValue(fieldName) : null;
@@ -19,7 +23,7 @@ public final class ListQueryFilterReader {
     }
 
     public static <E extends Enum<E>> E requireEnum(
-            ListQueryRequest query, String fieldName, Class<E> type) {
+        ListQueryRequest query, String fieldName, Class<E> type) {
         String raw = require(query, fieldName);
         try {
             return Enum.valueOf(type, raw.trim().toUpperCase(Locale.ROOT));
@@ -29,7 +33,7 @@ public final class ListQueryFilterReader {
     }
 
     public static <E extends Enum<E>> E optionalEnum(
-            ListQueryRequest query, String fieldName, Class<E> type, E defaultValue) {
+        ListQueryRequest query, String fieldName, Class<E> type, E defaultValue) {
         String raw = query != null ? query.firstFilterValue(fieldName) : null;
         if (!StringUtils.hasText(raw)) {
             return defaultValue;
