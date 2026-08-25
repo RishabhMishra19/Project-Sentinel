@@ -4,7 +4,13 @@ import com.sentinel.common.cassandra.analytics.utils.AnalyticsBucket;
 import com.sentinel.common.cassandra.analytics.utils.AnalyticsScope;
 import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;
-import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.TestInputTopic;
+import org.apache.kafka.streams.TestOutputTopic;
+import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.TopologyTestDriver;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,14 +25,27 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+    /**
+     * Integration-style tests for the complete Sentinel Kafka Streams analytics pipeline.
+     *
+     * Each test feeds records into one real topology input topic and verifies the
+     * aggregated records emitted by the corresponding real output topic.
+     *
+     * The topology is built from {@link AnalyticsStream#buildTopology(StreamsBuilder)},
+     * so these tests exercise the production topology rather than a test duplicate.
+     *
+     * Windowed tests deliberately place five records across two output windows and
+     * then advance stream time beyond the second window's one-minute grace period.
+     * Expected aggregates are calculated from the same input records and compared
+     * with the actual Kafka Streams output.
+     */
 class AnalyticsStreamTest {
 
     private static final long MINUTE_MS = 60_000L;
     private static final long HOUR_MS = 60 * MINUTE_MS;
     private static final long DAY_MS = 24 * HOUR_MS;
 
-    private static final Instant BASE =
-            Instant.parse("2026-08-25T10:00:00Z");
+    private static final Instant BASE = Instant.parse("2026-08-25T10:00:00Z");
 
     @Autowired
     private AnalyticsStream analyticsStream;
@@ -49,89 +68,42 @@ class AnalyticsStreamTest {
         Topology topology = builder.build();
 
         Properties properties = new Properties();
+        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "sentinel-analytics-test");
+        properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "dummy:9092");
 
-        properties.put(
-                StreamsConfig.APPLICATION_ID_CONFIG,
-                "sentinel-analytics-test"
-        );
-
-        properties.put(
-                StreamsConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "dummy:9092"
-        );
-
-        testDriver = new TopologyTestDriver(
-                topology,
-                properties
-        );
+        testDriver = new TopologyTestDriver(topology, properties);
     }
 
     @AfterEach
     void tearDown() {
-        if (testDriver != null) {
+        if (testDriver != null)
             testDriver.close();
-        }
     }
 
-    // ========================================================================
     // 1. REQUEST LOG -> ENDPOINT MINUTE
-    // ========================================================================
+    // Request logs are aggregated into endpoint-level minute windows.
 
     @Test
     void shouldAggregateRequestLogsIntoEndpointMinute() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
         TestInputTopic<String, KafkaMessage.ReqLog> input =
-                AnalyticsStreamTestUtils.createRequestInputTopic(
-                        testDriver,
-                        analyticsStreamUtils,
-                        KafkaTopics.request_logs
-                );
+            AnalyticsStreamTestUtils.createRequestInputTopic(testDriver, analyticsStreamUtils, KafkaTopics.request_logs);
 
         List<KafkaMessage.ReqLog> requests = List.of(
-                AnalyticsStreamTestUtils.randomReqLog(
-                        data.tenantId(),
-                        data.productId(),
-                        data.serviceId(),
-                        data.endpointId(),
-                        BASE.plusMillis(10_000L)
-                ),
-                AnalyticsStreamTestUtils.randomReqLog(
-                        data.tenantId(),
-                        data.productId(),
-                        data.serviceId(),
-                        data.endpointId(),
-                        BASE.plusMillis(20_000L)
-                ),
-                AnalyticsStreamTestUtils.randomReqLog(
-                        data.tenantId(),
-                        data.productId(),
-                        data.serviceId(),
-                        data.endpointId(),
-                        BASE.plusMillis(40_000L)
-                ),
-                AnalyticsStreamTestUtils.randomReqLog(
-                        data.tenantId(),
-                        data.productId(),
-                        data.serviceId(),
-                        data.endpointId(),
-                        BASE.plusMillis(MINUTE_MS + 10_000L)
-                ),
-                AnalyticsStreamTestUtils.randomReqLog(
-                        data.tenantId(),
-                        data.productId(),
-                        data.serviceId(),
-                        data.endpointId(),
-                        BASE.plusMillis(MINUTE_MS + 30_000L)
-                )
-        );
+            AnalyticsStreamTestUtils.randomReqLog(data.tenantId(), data.productId(), data.serviceId(), data.endpointId(),
+                BASE.plusMillis(10_000L)),
+            AnalyticsStreamTestUtils.randomReqLog(data.tenantId(), data.productId(), data.serviceId(), data.endpointId(),
+                BASE.plusMillis(20_000L)),
+            AnalyticsStreamTestUtils.randomReqLog(data.tenantId(), data.productId(), data.serviceId(), data.endpointId(),
+                BASE.plusMillis(40_000L)),
+            AnalyticsStreamTestUtils.randomReqLog(data.tenantId(), data.productId(), data.serviceId(), data.endpointId(),
+                BASE.plusMillis(MINUTE_MS + 10_000L)),
+            AnalyticsStreamTestUtils.randomReqLog(data.tenantId(), data.productId(), data.serviceId(), data.endpointId(),
+                BASE.plusMillis(MINUTE_MS + 30_000L)));
 
-        AnalyticsStreamTestUtils.pipeRequests(
-                input,
-                requests
-        );
+        AnalyticsStreamTestUtils.pipeRequests(input, requests);
 
         /*
          * First minute:
@@ -144,906 +116,418 @@ class AnalyticsStreamTest {
          *
          * Move stream time beyond grace.
          */
-        Instant closingTimestamp =
-                BASE.plusMillis(3 * MINUTE_MS);
+        Instant closingTimestamp = BASE.plusMillis(3 * MINUTE_MS);
 
-        input.pipeInput(
-                UUID.randomUUID().toString(),
-                AnalyticsStreamTestUtils.randomReqLog(
-                        data.tenantId(),
-                        data.productId(),
-                        data.serviceId(),
-                        UUID.randomUUID(),
-                        closingTimestamp
-                ),
-                closingTimestamp
-        );
+        input.pipeInput(UUID.randomUUID().toString(),
+            AnalyticsStreamTestUtils.randomReqLog(data.tenantId(), data.productId(), data.serviceId(), UUID.randomUUID(), closingTimestamp),
+            closingTimestamp);
 
         TestOutputTopic<String, KafkaMessage.AnalyticsMetrics> output =
-                AnalyticsStreamTestUtils.createAnalyticsOutputTopic(
-                        testDriver,
-                        analyticsStreamUtils,
-                        KafkaTopics.endpoint_minute_analytics
-                );
+            AnalyticsStreamTestUtils.createAnalyticsOutputTopic(testDriver, analyticsStreamUtils, KafkaTopics.endpoint_minute_analytics);
 
-        List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                output.readKeyValuesToList();
+        List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results = output.readKeyValuesToList();
 
-        assertThat(results)
-                .hasSize(2);
+        assertThat(results).hasSize(2);
 
         List<KafkaMessage.ReqLog> firstWindowRequests =
-                requests.stream()
-                        .filter(request ->
-                                request.occurredAt().isBefore(
-                                        BASE.plusMillis(MINUTE_MS)
-                                )
-                        )
-                        .toList();
+            requests.stream().filter(request -> request.occurredAt().isBefore(BASE.plusMillis(MINUTE_MS))).toList();
 
         List<KafkaMessage.ReqLog> secondWindowRequests =
-                requests.stream()
-                        .filter(request ->
-                                !request.occurredAt().isBefore(
-                                        BASE.plusMillis(MINUTE_MS)
-                                )
-                        )
-                        .toList();
+            requests.stream().filter(request -> !request.occurredAt().isBefore(BASE.plusMillis(MINUTE_MS))).toList();
 
         KafkaMessage.AnalyticsMetrics actualFirst =
-                AnalyticsStreamTestUtils.findFirstResultForTimestamp(
-                        results,
-                        BASE,
-                        AnalyticsBucket.MINUTE
-                );
+            AnalyticsStreamTestUtils.findFirstResultForTimestamp(results, BASE, AnalyticsBucket.MINUTE);
 
         KafkaMessage.AnalyticsMetrics actualSecond =
-                AnalyticsStreamTestUtils.findFirstResultForTimestamp(
-                        results,
-                        BASE.plusMillis(MINUTE_MS),
-                        AnalyticsBucket.MINUTE
-                );
+            AnalyticsStreamTestUtils.findFirstResultForTimestamp(results, BASE.plusMillis(MINUTE_MS), AnalyticsBucket.MINUTE);
 
-        List<KafkaMessage.AnalyticsMetrics> expectedFirstMetrics =
-                firstWindowRequests.stream()
-                        .map(request ->
-                                new KafkaMessage.AnalyticsMetrics(
-                                        AnalyticsBucket.MINUTE,
-                                        AnalyticsScope.ENDPOINT,
-                                        request.endpointId()
-                                ).initialize(request)
-                        )
-                        .toList();
+        List<KafkaMessage.AnalyticsMetrics> expectedFirstMetrics = firstWindowRequests.stream().map(
+            request -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.ENDPOINT, request.endpointId()).initialize(
+                request)).toList();
 
-        List<KafkaMessage.AnalyticsMetrics> expectedSecondMetrics =
-                secondWindowRequests.stream()
-                        .map(request ->
-                                new KafkaMessage.AnalyticsMetrics(
-                                        AnalyticsBucket.MINUTE,
-                                        AnalyticsScope.ENDPOINT,
-                                        request.endpointId()
-                                ).initialize(request)
-                        )
-                        .toList();
+        List<KafkaMessage.AnalyticsMetrics> expectedSecondMetrics = secondWindowRequests.stream().map(
+            request -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.ENDPOINT, request.endpointId()).initialize(
+                request)).toList();
 
-        AnalyticsStreamTestUtils.assertAggregation(
-                actualFirst,
-                expectedFirstMetrics,
-                AnalyticsBucket.MINUTE,
-                AnalyticsScope.ENDPOINT,
-                data.endpointId()
-        );
+        AnalyticsStreamTestUtils.assertAggregation(actualFirst, expectedFirstMetrics, AnalyticsBucket.MINUTE, AnalyticsScope.ENDPOINT,
+            data.endpointId());
 
-        AnalyticsStreamTestUtils.assertAggregation(
-                actualSecond,
-                expectedSecondMetrics,
-                AnalyticsBucket.MINUTE,
-                AnalyticsScope.ENDPOINT,
-                data.endpointId()
-        );
+        AnalyticsStreamTestUtils.assertAggregation(actualSecond, expectedSecondMetrics, AnalyticsBucket.MINUTE, AnalyticsScope.ENDPOINT,
+            data.endpointId());
     }
 
-    // ========================================================================
     // 2. ENDPOINT MINUTE -> SERVICE MINUTE
-    // ========================================================================
+    // Endpoint minute records are re-keyed to service and aggregated.
 
     @Test
     void shouldAggregateEndpointMinutesIntoServiceMinute() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.endpoint_minute_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.endpoint_minute_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.endpointKey(data);
+        String key = AnalyticsStreamTestUtils.endpointKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.MINUTE,
-                        AnalyticsBucket.MINUTE,
-                        AnalyticsScope.SERVICE,
-                        data.serviceId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.MINUTE, AnalyticsBucket.MINUTE, AnalyticsScope.SERVICE,
+                data.serviceId(), BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeMinute(
-                input,
-                key,
-                data.endpointId(),
-                AnalyticsScope.ENDPOINT
-        );
+        closeMinute(input, key, data.endpointId(), AnalyticsScope.ENDPOINT);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.service_minute_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.service_minute_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.MINUTE,
-                data.serviceId(),
-                AnalyticsScope.SERVICE
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.MINUTE, data.serviceId(), AnalyticsScope.SERVICE);
     }
 
-    // ========================================================================
     // 3. SERVICE MINUTE -> PRODUCT MINUTE
-    // ========================================================================
+    // Service minute records are re-keyed to product and aggregated.
 
     @Test
     void shouldAggregateServiceMinutesIntoProductMinute() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.service_minute_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.service_minute_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.serviceKey(data);
+        String key = AnalyticsStreamTestUtils.serviceKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.MINUTE,
-                        AnalyticsBucket.MINUTE,
-                        AnalyticsScope.PRODUCT,
-                        data.productId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.MINUTE, AnalyticsBucket.MINUTE, AnalyticsScope.PRODUCT,
+                data.productId(), BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeMinute(
-                input,
-                key,
-                data.serviceId(),
-                AnalyticsScope.SERVICE
-        );
+        closeMinute(input, key, data.serviceId(), AnalyticsScope.SERVICE);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.product_minute_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.product_minute_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.MINUTE,
-                data.productId(),
-                AnalyticsScope.PRODUCT
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.MINUTE, data.productId(), AnalyticsScope.PRODUCT);
     }
 
-    // ========================================================================
     // 4. PRODUCT MINUTE -> TENANT MINUTE
-    // ========================================================================
+    // Product minute records are re-keyed to tenant and aggregated.
 
     @Test
     void shouldAggregateProductMinutesIntoTenantMinute() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.product_minute_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.product_minute_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.productKey(data);
+        String key = AnalyticsStreamTestUtils.productKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.MINUTE,
-                        AnalyticsBucket.MINUTE,
-                        AnalyticsScope.TENANT,
-                        data.tenantId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.MINUTE, AnalyticsBucket.MINUTE, AnalyticsScope.TENANT,
+                data.tenantId(), BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeMinute(
-                input,
-                key,
-                data.productId(),
-                AnalyticsScope.PRODUCT
-        );
+        closeMinute(input, key, data.productId(), AnalyticsScope.PRODUCT);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.tenant_minute_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.tenant_minute_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.MINUTE,
-                data.tenantId(),
-                AnalyticsScope.TENANT
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.MINUTE, data.tenantId(), AnalyticsScope.TENANT);
     }
 
-    // ========================================================================
     // 5. ENDPOINT MINUTE -> ENDPOINT HOUR
-    // ========================================================================
+    // Endpoint minute records are rolled up into endpoint hour windows.
 
     @Test
     void shouldAggregateEndpointMinutesIntoEndpointHour() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.endpoint_minute_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.endpoint_minute_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.endpointKey(data);
+        String key = AnalyticsStreamTestUtils.endpointKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.MINUTE,
-                        AnalyticsBucket.HOUR,
-                        AnalyticsScope.ENDPOINT,
-                        data.endpointId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.MINUTE, AnalyticsBucket.HOUR, AnalyticsScope.ENDPOINT,
+                data.endpointId(), BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeHour(
-                input,
-                key,
-                data.endpointId(),
-                AnalyticsScope.ENDPOINT
-        );
+        closeHour(input, key, data.endpointId(), AnalyticsScope.ENDPOINT);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.endpoint_hour_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.endpoint_hour_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.HOUR,
-                data.endpointId(),
-                AnalyticsScope.ENDPOINT
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.HOUR, data.endpointId(), AnalyticsScope.ENDPOINT);
     }
 
-    // ========================================================================
     // 6. SERVICE MINUTE -> SERVICE HOUR
-    // ========================================================================
+    // Service minute records are rolled up into service hour windows.
 
     @Test
     void shouldAggregateServiceMinutesIntoServiceHour() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.service_minute_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.service_minute_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.serviceKey(data);
+        String key = AnalyticsStreamTestUtils.serviceKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.MINUTE,
-                        AnalyticsBucket.HOUR,
-                        AnalyticsScope.SERVICE,
-                        data.serviceId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.MINUTE, AnalyticsBucket.HOUR, AnalyticsScope.SERVICE,
+                data.serviceId(), BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeHour(
-                input,
-                key,
-                data.serviceId(),
-                AnalyticsScope.SERVICE
-        );
+        closeHour(input, key, data.serviceId(), AnalyticsScope.SERVICE);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.service_hour_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.service_hour_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.HOUR,
-                data.serviceId(),
-                AnalyticsScope.SERVICE
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.HOUR, data.serviceId(), AnalyticsScope.SERVICE);
     }
 
-    // ========================================================================
     // 7. PRODUCT MINUTE -> PRODUCT HOUR
-    // ========================================================================
+    // Product minute records are rolled up into product hour windows.
 
     @Test
     void shouldAggregateProductMinutesIntoProductHour() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.product_minute_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.product_minute_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.productKey(data);
+        String key = AnalyticsStreamTestUtils.productKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.MINUTE,
-                        AnalyticsBucket.HOUR,
-                        AnalyticsScope.PRODUCT,
-                        data.productId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.MINUTE, AnalyticsBucket.HOUR, AnalyticsScope.PRODUCT,
+                data.productId(), BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeHour(
-                input,
-                key,
-                data.productId(),
-                AnalyticsScope.PRODUCT
-        );
+        closeHour(input, key, data.productId(), AnalyticsScope.PRODUCT);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.product_hour_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.product_hour_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.HOUR,
-                data.productId(),
-                AnalyticsScope.PRODUCT
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.HOUR, data.productId(), AnalyticsScope.PRODUCT);
     }
 
-    // ========================================================================
     // 8. TENANT MINUTE -> TENANT HOUR
-    // ========================================================================
+    // Tenant minute records are rolled up into tenant hour windows.
 
     @Test
     void shouldAggregateTenantMinutesIntoTenantHour() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.tenant_minute_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.tenant_minute_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.tenantKey(data);
+        String key = AnalyticsStreamTestUtils.tenantKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.MINUTE,
-                        AnalyticsBucket.HOUR,
-                        AnalyticsScope.TENANT,
-                        data.tenantId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.MINUTE, AnalyticsBucket.HOUR, AnalyticsScope.TENANT, data.tenantId(),
+                BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeHour(
-                input,
-                key,
-                data.tenantId(),
-                AnalyticsScope.TENANT
-        );
+        closeHour(input, key, data.tenantId(), AnalyticsScope.TENANT);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.tenant_hour_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.tenant_hour_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.HOUR,
-                data.tenantId(),
-                AnalyticsScope.TENANT
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.HOUR, data.tenantId(), AnalyticsScope.TENANT);
     }
 
-    // ========================================================================
     // 9. ENDPOINT HOUR -> ENDPOINT DAY
-    // ========================================================================
+    // Endpoint hour records are rolled up into endpoint day windows.
 
     @Test
     void shouldAggregateEndpointHoursIntoEndpointDay() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.endpoint_hour_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.endpoint_hour_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.endpointKey(data);
+        String key = AnalyticsStreamTestUtils.endpointKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.HOUR,
-                        AnalyticsBucket.DAY,
-                        AnalyticsScope.ENDPOINT,
-                        data.endpointId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.HOUR, AnalyticsBucket.DAY, AnalyticsScope.ENDPOINT,
+                data.endpointId(), BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeDay(
-                input,
-                key,
-                data.endpointId(),
-                AnalyticsScope.ENDPOINT
-        );
+        closeDay(input, key, data.endpointId(), AnalyticsScope.ENDPOINT);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.endpoint_day_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.endpoint_day_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.DAY,
-                data.endpointId(),
-                AnalyticsScope.ENDPOINT
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.DAY, data.endpointId(), AnalyticsScope.ENDPOINT);
     }
 
-    // ========================================================================
     // 10. SERVICE HOUR -> SERVICE DAY
-    // ========================================================================
+    // Service hour records are rolled up into service day windows.
 
     @Test
     void shouldAggregateServiceHoursIntoServiceDay() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.service_hour_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.service_hour_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.serviceKey(data);
+        String key = AnalyticsStreamTestUtils.serviceKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.HOUR,
-                        AnalyticsBucket.DAY,
-                        AnalyticsScope.SERVICE,
-                        data.serviceId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.HOUR, AnalyticsBucket.DAY, AnalyticsScope.SERVICE, data.serviceId(),
+                BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeDay(
-                input,
-                key,
-                data.serviceId(),
-                AnalyticsScope.SERVICE
-        );
+        closeDay(input, key, data.serviceId(), AnalyticsScope.SERVICE);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.service_day_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.service_day_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.DAY,
-                data.serviceId(),
-                AnalyticsScope.SERVICE
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.DAY, data.serviceId(), AnalyticsScope.SERVICE);
     }
 
-    // ========================================================================
     // 11. PRODUCT HOUR -> PRODUCT DAY
-    // ========================================================================
+    // Product hour records are rolled up into product day windows.
 
     @Test
     void shouldAggregateProductHoursIntoProductDay() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.product_hour_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.product_hour_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.productKey(data);
+        String key = AnalyticsStreamTestUtils.productKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.HOUR,
-                        AnalyticsBucket.DAY,
-                        AnalyticsScope.PRODUCT,
-                        data.productId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.HOUR, AnalyticsBucket.DAY, AnalyticsScope.PRODUCT, data.productId(),
+                BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeDay(
-                input,
-                key,
-                data.productId(),
-                AnalyticsScope.PRODUCT
-        );
+        closeDay(input, key, data.productId(), AnalyticsScope.PRODUCT);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.product_day_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.product_day_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.DAY,
-                data.productId(),
-                AnalyticsScope.PRODUCT
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.DAY, data.productId(), AnalyticsScope.PRODUCT);
     }
 
-    // ========================================================================
     // 12. TENANT HOUR -> TENANT DAY
-    // ========================================================================
+    // Tenant hour records are rolled up into tenant day windows.
 
     @Test
     void shouldAggregateTenantHoursIntoTenantDay() {
 
-        AnalyticsStreamTestUtils.TestData data =
-                AnalyticsStreamTestUtils.createTestData(BASE);
+        AnalyticsStreamTestUtils.TestData data = AnalyticsStreamTestUtils.createTestData(BASE);
 
-        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input =
-                analyticsInput(
-                        KafkaTopics.tenant_hour_analytics
-                );
+        TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input = analyticsInput(KafkaTopics.tenant_hour_analytics);
 
-        String key =
-                AnalyticsStreamTestUtils.tenantKey(data);
+        String key = AnalyticsStreamTestUtils.tenantKey(data);
 
         List<KafkaMessage.AnalyticsMetrics> metrics =
-                AnalyticsStreamTestUtils.randomFiveMetrics(
-                        AnalyticsBucket.HOUR,
-                        AnalyticsBucket.DAY,
-                        AnalyticsScope.TENANT,
-                        data.tenantId(),
-                        BASE
-                );
+            AnalyticsStreamTestUtils.randomFiveMetrics(AnalyticsBucket.HOUR, AnalyticsBucket.DAY, AnalyticsScope.TENANT, data.tenantId(),
+                BASE);
 
-        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(
-                input,
-                key,
-                metrics
-        );
+        AnalyticsStreamTestUtils.pipeAnalyticsMetrics(input, key, metrics);
 
-        closeDay(
-                input,
-                key,
-                data.tenantId(),
-                AnalyticsScope.TENANT
-        );
+        closeDay(input, key, data.tenantId(), AnalyticsScope.TENANT);
 
         List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results =
-                analyticsOutput(
-                        KafkaTopics.tenant_day_analytics
-                ).readKeyValuesToList();
+            analyticsOutput(KafkaTopics.tenant_day_analytics).readKeyValuesToList();
 
         assertThat(results).hasSize(2);
 
-        assertDownstreamWindowResults(
-                results,
-                metrics,
-                AnalyticsBucket.DAY,
-                data.tenantId(),
-                AnalyticsScope.TENANT
-        );
+        assertDownstreamWindowResults(results, metrics, AnalyticsBucket.DAY, data.tenantId(), AnalyticsScope.TENANT);
     }
 
     // ========================================================================
     // INPUT / OUTPUT HELPERS
     // ========================================================================
 
-    private TestInputTopic<String, KafkaMessage.AnalyticsMetrics>
-    analyticsInput(String topic) {
-
-        return AnalyticsStreamTestUtils.createAnalyticsInputTopic(
-                testDriver,
-                analyticsStreamUtils,
-                topic
-        );
+    private TestInputTopic<String, KafkaMessage.AnalyticsMetrics> analyticsInput(String topic) {
+        return AnalyticsStreamTestUtils.createAnalyticsInputTopic(testDriver, analyticsStreamUtils, topic);
     }
 
-    private TestOutputTopic<String, KafkaMessage.AnalyticsMetrics>
-    analyticsOutput(String topic) {
-
-        return AnalyticsStreamTestUtils.createAnalyticsOutputTopic(
-                testDriver,
-                analyticsStreamUtils,
-                topic
-        );
+    private TestOutputTopic<String, KafkaMessage.AnalyticsMetrics> analyticsOutput(String topic) {
+        return AnalyticsStreamTestUtils.createAnalyticsOutputTopic(testDriver, analyticsStreamUtils, topic);
     }
 
-    // ========================================================================
-    // WINDOW CLOSING
-    // ========================================================================
+    // Advance stream time past the second output window and its one-minute grace period.
 
-    private void closeMinute(
-            TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input,
-            String key,
-            UUID entityId,
-            AnalyticsScope scope
-    ) {
+    private void closeMinute(TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input, String key, UUID entityId, AnalyticsScope scope) {
 
-        Instant timestamp =
-                AnalyticsStreamTestUtils.closeSecondWindow(
-                        AnalyticsBucket.MINUTE,
-                        BASE
-                );
+        Instant timestamp = AnalyticsStreamTestUtils.closeSecondWindow(AnalyticsBucket.MINUTE, BASE);
 
-        input.pipeInput(
-                key,
-                AnalyticsStreamTestUtils.randomAnalyticsMetric(
-                        AnalyticsBucket.MINUTE,
-                        scope,
-                        entityId,
-                        timestamp
-                ),
-                timestamp
-        );
+        input.pipeInput(key, AnalyticsStreamTestUtils.randomAnalyticsMetric(AnalyticsBucket.MINUTE, scope, entityId, timestamp), timestamp);
     }
 
-    private void closeHour(
-            TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input,
-            String key,
-            UUID entityId,
-            AnalyticsScope scope
-    ) {
+    private void closeHour(TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input, String key, UUID entityId, AnalyticsScope scope) {
 
-        Instant timestamp =
-                AnalyticsStreamTestUtils.closeSecondWindow(
-                        AnalyticsBucket.HOUR,
-                        BASE
-                );
+        Instant timestamp = AnalyticsStreamTestUtils.closeSecondWindow(AnalyticsBucket.HOUR, BASE);
 
-        input.pipeInput(
-                key,
-                AnalyticsStreamTestUtils.randomAnalyticsMetric(
-                        AnalyticsBucket.MINUTE,
-                        scope,
-                        entityId,
-                        timestamp
-                ),
-                timestamp
-        );
+        input.pipeInput(key, AnalyticsStreamTestUtils.randomAnalyticsMetric(AnalyticsBucket.MINUTE, scope, entityId, timestamp), timestamp);
     }
 
-    private void closeDay(
-            TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input,
-            String key,
-            UUID entityId,
-            AnalyticsScope scope
-    ) {
+    private void closeDay(TestInputTopic<String, KafkaMessage.AnalyticsMetrics> input, String key, UUID entityId, AnalyticsScope scope) {
 
-        Instant timestamp =
-                AnalyticsStreamTestUtils.closeSecondWindow(
-                        AnalyticsBucket.DAY,
-                        BASE
-                );
+        Instant timestamp = AnalyticsStreamTestUtils.closeSecondWindow(AnalyticsBucket.DAY, BASE);
 
-        input.pipeInput(
-                key,
-                AnalyticsStreamTestUtils.randomAnalyticsMetric(
-                        AnalyticsBucket.HOUR,
-                        scope,
-                        entityId,
-                        timestamp
-                ),
-                timestamp
-        );
+        input.pipeInput(key, AnalyticsStreamTestUtils.randomAnalyticsMetric(AnalyticsBucket.HOUR, scope, entityId, timestamp), timestamp);
     }
 
-    // ========================================================================
-    // DOWNSTREAM ASSERTION
-    // ========================================================================
+    // Split the input by output window, then compare each expected aggregate with the output.
 
-    private void assertDownstreamWindowResults(
-            List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results,
-            List<KafkaMessage.AnalyticsMetrics> inputMetrics,
-            AnalyticsBucket outputBucket,
-            UUID expectedEntityId,
-            AnalyticsScope expectedScope
-    ) {
+    private void assertDownstreamWindowResults(List<KeyValue<String, KafkaMessage.AnalyticsMetrics>> results,
+        List<KafkaMessage.AnalyticsMetrics> inputMetrics, AnalyticsBucket outputBucket, UUID expectedEntityId,
+        AnalyticsScope expectedScope) {
 
-        Instant firstWindow =
-                AnalyticsStreamTestUtils.truncateTimestamp(
-                        inputMetrics.getFirst().getTimestamp(),
-                        outputBucket
-                );
+        Instant firstWindow = AnalyticsStreamTestUtils.truncateTimestamp(inputMetrics.getFirst().getTimestamp(), outputBucket);
 
-        Instant secondWindow =
-                AnalyticsStreamTestUtils.secondWindow(
-                        outputBucket,
-                        firstWindow
-                );
+        Instant secondWindow = AnalyticsStreamTestUtils.secondWindow(outputBucket, firstWindow);
 
-        List<KafkaMessage.AnalyticsMetrics> firstWindowMetrics =
-                inputMetrics.stream()
-                        .filter(metric ->
-                                AnalyticsStreamTestUtils
-                                        .truncateTimestamp(
-                                                metric.getTimestamp(),
-                                                outputBucket
-                                        )
-                                        .equals(firstWindow)
-                        )
-                        .toList();
+        List<KafkaMessage.AnalyticsMetrics> firstWindowMetrics = inputMetrics.stream()
+            .filter(metric -> AnalyticsStreamTestUtils.truncateTimestamp(metric.getTimestamp(), outputBucket).equals(firstWindow)).toList();
 
-        List<KafkaMessage.AnalyticsMetrics> secondWindowMetrics =
-                inputMetrics.stream()
-                        .filter(metric ->
-                                AnalyticsStreamTestUtils
-                                        .truncateTimestamp(
-                                                metric.getTimestamp(),
-                                                outputBucket
-                                        )
-                                        .equals(secondWindow)
-                        )
-                        .toList();
+        List<KafkaMessage.AnalyticsMetrics> secondWindowMetrics = inputMetrics.stream()
+            .filter(metric -> AnalyticsStreamTestUtils.truncateTimestamp(metric.getTimestamp(), outputBucket).equals(secondWindow))
+            .toList();
 
-        assertThat(firstWindowMetrics)
-                .isNotEmpty();
+        assertThat(firstWindowMetrics).isNotEmpty();
 
-        assertThat(secondWindowMetrics)
-                .isNotEmpty();
+        assertThat(secondWindowMetrics).isNotEmpty();
 
         KafkaMessage.AnalyticsMetrics actualFirst =
-                AnalyticsStreamTestUtils.findFirstResultForTimestamp(
-                        results,
-                        firstWindow,
-                        outputBucket
-                );
+            AnalyticsStreamTestUtils.findFirstResultForTimestamp(results, firstWindow, outputBucket);
 
         KafkaMessage.AnalyticsMetrics actualSecond =
-                AnalyticsStreamTestUtils.findFirstResultForTimestamp(
-                        results,
-                        secondWindow,
-                        outputBucket
-                );
+            AnalyticsStreamTestUtils.findFirstResultForTimestamp(results, secondWindow, outputBucket);
 
-        AnalyticsStreamTestUtils.assertAggregation(
-                actualFirst,
-                firstWindowMetrics,
-                outputBucket,
-                expectedScope,
-                expectedEntityId
-        );
+        AnalyticsStreamTestUtils.assertAggregation(actualFirst, firstWindowMetrics, outputBucket, expectedScope, expectedEntityId);
 
-        AnalyticsStreamTestUtils.assertAggregation(
-                actualSecond,
-                secondWindowMetrics,
-                outputBucket,
-                expectedScope,
-                expectedEntityId
-        );
+        AnalyticsStreamTestUtils.assertAggregation(actualSecond, secondWindowMetrics, outputBucket, expectedScope, expectedEntityId);
     }
 }
