@@ -1,6 +1,6 @@
-package com.sentinel.api.service.entity;
+package com.sentinel.common.postgresql.service;
 
-import com.sentinel.api.product.entity.Product;
+import com.sentinel.common.postgresql.product.Product;
 import com.sentinel.common.postgresql.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

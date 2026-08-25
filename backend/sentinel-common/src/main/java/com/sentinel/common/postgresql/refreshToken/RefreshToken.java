@@ -1,4 +1,4 @@
-package com.sentinel.api.auth.entity;
+package com.sentinel.common.postgresql.refreshToken;
 
 import com.sentinel.common.postgresql.user.User;
 import jakarta.persistence.Column;

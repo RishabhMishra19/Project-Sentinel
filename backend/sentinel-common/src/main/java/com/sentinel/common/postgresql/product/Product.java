@@ -1,4 +1,4 @@
-package com.sentinel.api.product.entity;
+package com.sentinel.common.postgresql.product;
 
 import com.sentinel.common.postgresql.tenant.Tenant;
 import com.sentinel.common.postgresql.user.User;

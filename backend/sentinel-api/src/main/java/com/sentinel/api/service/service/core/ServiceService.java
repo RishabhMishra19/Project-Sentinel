@@ -1,6 +1,6 @@
 package com.sentinel.api.service.service.core;
 
-import com.sentinel.api.service.entity.Service;
+import com.sentinel.common.postgresql.service.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

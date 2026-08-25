@@ -1,10 +1,10 @@
 package com.sentinel.api.service.mapper;
 
-import com.sentinel.api.product.entity.Product;
+import com.sentinel.common.postgresql.product.Product;
 import com.sentinel.api.service.dto.request.CreateServiceRequest;
 import com.sentinel.api.service.dto.response.ServiceResponse;
-import com.sentinel.api.service.entity.Service;
-import com.sentinel.api.service.entity.ServiceStatus;
+import com.sentinel.common.postgresql.service.Service;
+import com.sentinel.common.postgresql.service.ServiceStatus;
 import com.sentinel.common.postgresql.user.User;
 import com.sentinel.api.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;

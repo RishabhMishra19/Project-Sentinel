@@ -1,4 +1,4 @@
-package com.sentinel.api.service.entity;
+package com.sentinel.common.postgresql.service;
 
 public enum ServiceStatus {
     ACTIVE,

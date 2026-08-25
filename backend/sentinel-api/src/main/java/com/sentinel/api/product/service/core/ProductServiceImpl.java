@@ -1,6 +1,6 @@
 package com.sentinel.api.product.service.core;
 
-import com.sentinel.api.product.entity.Product;
+import com.sentinel.common.postgresql.product.Product;
 import com.sentinel.api.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

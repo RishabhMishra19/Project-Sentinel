@@ -2,8 +2,8 @@ package com.sentinel.api.product.mapper;
 
 import com.sentinel.api.product.dto.request.CreateProductRequest;
 import com.sentinel.api.product.dto.response.ProductResponse;
-import com.sentinel.api.product.entity.Product;
-import com.sentinel.api.product.entity.ProductStatus;
+import com.sentinel.common.postgresql.product.Product;
+import com.sentinel.common.postgresql.product.ProductStatus;
 import com.sentinel.common.postgresql.tenant.Tenant;
 import com.sentinel.common.postgresql.user.User;
 import com.sentinel.api.user.mapper.UserMapper;
