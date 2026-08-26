@@ -9,6 +9,8 @@ export const PageHeader = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const { loadTests } = useLoadContext();
 
+    console.log({ loadTests });
+
     const runningCount = (loadTests ?? []).filter(
         (v) => v.status === "LOAD_RUNNING",
     ).length;

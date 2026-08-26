@@ -1,10 +1,52 @@
+import { useState } from "react";
 import { statusToColorMap } from "../constants/constants";
-import { useTestDataDelete } from "../hooks/useTestDataDelete";
 import { Button } from "../molecules/Button";
 import { StatusBadge } from "../molecules/StatusBadge";
+import { ApiManager } from "../services/ApiManager";
+import { useLoadContext } from "../hooks/useLoadContext";
+import { LoadRunFormDrawer } from "../drawers/LoadRunFormDrawer";
 
 export const LoadTestDataHeader = ({ name, id, status }) => {
-    const { handleDelete, result } = useTestDataDelete(id);
+    const { setLoadTestData } = useLoadContext();
+    const [isLoading, setIsLoading] = useState(false);
+    const [isRunDrawerOpen, setIsRunDrawerOpen] = useState(false);
+
+    const handleDelete = (e) => {
+        e.preventDefault();
+        if (
+            !window.confirm(
+                "Are you sure you want to delete this test and its related records?",
+            )
+        ) {
+            return;
+        }
+
+        setIsLoading(true);
+        ApiManager.deleteLoadTestById(id)
+            .then(() => {
+                ApiManager.getAllTestData().then(setLoadTestData);
+            })
+            .finally(() => setIsLoading(false));
+    };
+
+    const handleStart = (e) => {
+        e.preventDefault();
+        setIsRunDrawerOpen(true);
+    };
+
+    const handleStop = (e) => {
+        e.preventDefault();
+        if (!window.confirm("Are you sure you want to stop this load test?")) {
+            return;
+        }
+
+        setIsLoading(true);
+        ApiManager.stopLoadTestById(id)
+            .then(() => {
+                ApiManager.getAllTestData().then(setLoadTestData);
+            })
+            .finally(() => setIsLoading(false));
+    };
 
     return (
         <div style={styles.header}>
@@ -23,14 +65,27 @@ export const LoadTestDataHeader = ({ name, id, status }) => {
                     <Button
                         variant="danger"
                         onClick={handleDelete}
-                        disabled={result.isLoading}
+                        disabled={isLoading}
                     >
                         Delete Data
                     </Button>
                 )}
-                {status === "LOAD_IDLE" && <Button>Start</Button>}
-                {status === "LOAD_RUNNING" && <Button>Stop</Button>}
+                {status === "LOAD_IDLE" && (
+                    <Button onClick={handleStart} disabled={isLoading}>
+                        Start
+                    </Button>
+                )}
+                {status === "LOAD_RUNNING" && (
+                    <Button onClick={handleStop} disabled={isLoading}>
+                        Stop
+                    </Button>
+                )}
             </div>
+            <LoadRunFormDrawer
+                open={isRunDrawerOpen}
+                onClose={() => setIsRunDrawerOpen(false)}
+                loadTestRunId={id}
+            />
         </div>
     );
 };

@@ -15,9 +15,12 @@ export const LoadTestDataListPage = () => {
     } = useLoadContext();
 
     useEffect(() => {
+        // const id = setInterval(() => {
         ApiManager.getAllTestData().then((data) => {
             setLoadTestData(data);
         });
+        // }, 1000);
+        // return () => clearInterval(id);
     }, []);
 
     const [search, setSearch] = useState("");
@@ -26,7 +29,7 @@ export const LoadTestDataListPage = () => {
     const filteredloadDataList = useMemo(() => {
         const query = search.trim().toLowerCase();
 
-        return loadTests.filter((item) => {
+        return (loadTests ?? []).filter((item) => {
             const matchesSearch =
                 !query ||
                 item.name?.toLowerCase().includes(query) ||

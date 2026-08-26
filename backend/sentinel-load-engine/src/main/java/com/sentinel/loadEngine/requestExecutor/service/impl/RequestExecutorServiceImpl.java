@@ -34,7 +34,7 @@ public class RequestExecutorServiceImpl implements RequestExecutorService {
     @Transactional
     public LoadTestResponse startLoadTest(UUID loadTestDataId, RunLoadTestRequest request) {
         LoadTestRunLog runLog = loadTestRunService.getLatestRunLogByDataId(loadTestDataId);
-        if (runLog != null) {
+        if (runLog != null && runLog.getCompletedAt() == null) {
             throw new RuntimeException("Load test run log already exists: " + loadTestDataId);
         }
         runLog = loadTestRunService.create(loadTestDataId, request);

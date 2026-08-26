@@ -24,7 +24,7 @@ export const LoadTestDataProvider = ({ children }) => {
         <LoadTestDataContext.Provider
             value={{
                 isLoading: data.isLoading,
-                loadTests: data.loadTests,
+                loadTests: data.loadTests ?? [],
                 selectedLoadTestId: data.selectedLoadTestId,
                 setLoadTestData,
                 getLoadTest,
