@@ -6,6 +6,8 @@ import com.sentinel.ingest.logs.service.EndpointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -34,34 +36,36 @@ public class EndpointServiceImpl implements EndpointService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void bulkInsertEndpoints(List<Endpoint> endpoints) {
         if (endpoints == null || endpoints.isEmpty()) {
             return;
         }
         String sql = """
             INSERT INTO endpoints (
-                id,
                 service_id,
                 method,
                 path_template,
                 first_seen_at,
                 last_seen_at
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT (service_id, method, path_template)
+            DO NOTHING
             """;
         jdbcTemplate.batchUpdate(
             sql, endpoints, endpoints.size(), (ps, endPoint) -> {
-                ps.setObject(1, endPoint.getId());
-                ps.setObject(2, endPoint.getServiceId());
-                ps.setString(3, endPoint.getMethod());
-                ps.setString(4, endPoint.getPathTemplate());
-                ps.setTimestamp(5, Timestamp.from(endPoint.getFirstSeenAt()));
-                ps.setTimestamp(6, Timestamp.from(endPoint.getLastSeenAt()));
+                ps.setObject(1, endPoint.getServiceId());
+                ps.setString(2, endPoint.getMethod());
+                ps.setString(3, endPoint.getPathTemplate());
+                ps.setTimestamp(4, Timestamp.from(endPoint.getFirstSeenAt()));
+                ps.setTimestamp(5, Timestamp.from(endPoint.getLastSeenAt()));
             }
         );
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void bulkUpdateLastSeenToNow(List<UUID> endpointIds) {
         if (endpointIds == null || endpointIds.isEmpty())
             return;

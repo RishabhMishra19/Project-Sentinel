@@ -3,7 +3,7 @@
 -- changeset sentinel:005-create-endpoint
 CREATE TABLE endpoints
 (
-    id            UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     service_id    UUID        NOT NULL,
     method        VARCHAR(16) NOT NULL,
     path_template TEXT        NOT NULL,

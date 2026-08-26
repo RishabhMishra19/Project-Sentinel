@@ -5,5 +5,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class KafkaConstants {
 
-    public static final int CONSUMER_BATCH_SIZE = 1000;
+    public static final int CONSUMER_BATCH_SIZE = 200;
 }
