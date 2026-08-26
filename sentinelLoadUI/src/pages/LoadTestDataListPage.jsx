@@ -15,12 +15,12 @@ export const LoadTestDataListPage = () => {
     } = useLoadContext();
 
     useEffect(() => {
-        // const id = setInterval(() => {
-        ApiManager.getAllTestData().then((data) => {
-            setLoadTestData(data);
-        });
-        // }, 1000);
-        // return () => clearInterval(id);
+        const id = setInterval(() => {
+            ApiManager.getAllTestData().then((data) => {
+                setLoadTestData(data);
+            });
+        }, 1000);
+        return () => clearInterval(id);
     }, []);
 
     const [search, setSearch] = useState("");
