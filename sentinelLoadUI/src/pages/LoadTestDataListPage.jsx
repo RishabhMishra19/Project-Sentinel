@@ -4,12 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { RouteManager } from "../services/RouteManager";
 import LoadTestDataDetailsDrawer from "../drawers/LoadTestDataDetailsDrawer";
 import { GenerateDataDrawer } from "../drawers/GenerateDataDrawer";
+import LoadTestDataDashboardDrawer from "../drawers/LoadTestDataDashboardDrawer";
 
 export const LoadTestDataListPage = () => {
     const navigate = useNavigate();
     const { loadDataList, result } = useTestDataList();
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [selectedLoadData, setSelectedLoadData] = useState(null);
+    const [dashboardSelectedLoadData, setDashboardSelectedLoadData] =
+        useState(null);
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("ALL");
 
@@ -46,6 +49,11 @@ export const LoadTestDataListPage = () => {
                 open={!!selectedLoadData}
                 onClose={() => setSelectedLoadData(null)}
             />
+            <LoadTestDataDashboardDrawer
+                data={dashboardSelectedLoadData}
+                open={!!dashboardSelectedLoadData}
+                onClose={() => setDashboardSelectedLoadData(null)}
+            />
 
             {result.isLoading ? (
                 <span>loading...</span>
@@ -58,11 +66,7 @@ export const LoadTestDataListPage = () => {
                             key={item.id}
                             item={item}
                             onViewDashboard={() =>
-                                navigate(
-                                    RouteManager.getLoadTestDashboardPage(
-                                        item.id,
-                                    ),
-                                )
+                                setDashboardSelectedLoadData(item)
                             }
                             onViewDetails={() => setSelectedLoadData(item)}
                             onStart={alert}
