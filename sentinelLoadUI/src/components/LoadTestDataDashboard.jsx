@@ -10,6 +10,7 @@ export const LoadTestDataDashboard = ({ data }) => {
         createdAt,
         startedAt,
         completedAt,
+        deletedAt,
         config,
         associatedLoadTestData,
     } = data;
@@ -55,6 +56,7 @@ export const LoadTestDataDashboard = ({ data }) => {
                     createdAt={createdAt}
                     startedAt={startedAt}
                     completedAt={completedAt}
+                    deletedAt={deletedAt}
                 />
 
                 <LoadConfiguration config={config} />
@@ -168,7 +170,13 @@ const SummaryCard = ({ label, value, icon }) => {
 /* Run Overview */
 /* -------------------------------------------------- */
 
-const RunOverview = ({ status, createdAt, startedAt, completedAt }) => {
+const RunOverview = ({
+    status,
+    createdAt,
+    startedAt,
+    completedAt,
+    deletedAt,
+}) => {
     return (
         <DashboardCard title="Run Overview">
             <div style={styles.timeline}>
@@ -176,7 +184,9 @@ const RunOverview = ({ status, createdAt, startedAt, completedAt }) => {
 
                 <TimelineItem label="Started" value={startedAt} />
 
-                <TimelineItem label="Completed" value={completedAt} last />
+                <TimelineItem label="Completed" value={completedAt} />
+
+                <TimelineItem label="Deleted" value={deletedAt} last />
             </div>
 
             <div style={styles.runStatus}>

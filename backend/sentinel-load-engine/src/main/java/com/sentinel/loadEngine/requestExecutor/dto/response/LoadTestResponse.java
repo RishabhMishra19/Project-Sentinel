@@ -25,6 +25,7 @@ public class LoadTestResponse {
         this.associatedLoadTestData = loadTestData.getTestData();
         this.status = loadTestData.getStatus();
         this.createdAt = loadTestData.getCreatedAt();
+        this.deletedAt = loadTestData.getDeletedAt();
         if(runLog!=null){
             this.config = runLog.getConfig();
             this.startedAt = runLog.getStartedAt();
@@ -40,5 +41,6 @@ public class LoadTestResponse {
     private LoadTestRunLogConfig config;
     private Instant startedAt;
     private Instant completedAt;
+    private Instant deletedAt;
 
 }

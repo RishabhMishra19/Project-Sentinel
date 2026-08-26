@@ -6,6 +6,7 @@ CREATE TABLE load_test_data (
     name       VARCHAR(255) NOT NULL,
     test_data  JSONB        NOT NULL,
     created_at TIMESTAMP    NOT NULL,
+    deleted_at TIMESTAMP    DEFAULT NULL,
     status     VARCHAR(50)  NOT NULL,
 
     CONSTRAINT load_test_data_pkey PRIMARY KEY (id)
