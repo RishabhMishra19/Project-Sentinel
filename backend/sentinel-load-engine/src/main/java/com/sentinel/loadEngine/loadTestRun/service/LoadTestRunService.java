@@ -15,4 +15,7 @@ public interface LoadTestRunService {
 
     LoadTestRunLog getLatestRunLogByDataId(UUID loadTestDataId);
 
+    void updateNoOfRequests(UUID loadTestRunId, long totalRequests, long totalErrors);
+
+
 }

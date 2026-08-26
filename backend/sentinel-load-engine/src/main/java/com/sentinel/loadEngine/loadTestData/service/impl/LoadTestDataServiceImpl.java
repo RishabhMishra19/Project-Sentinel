@@ -4,6 +4,7 @@ import com.sentinel.common.cassandra.analytics.service.AnalyticsService;
 import com.sentinel.common.cassandra.analytics.utils.AnalyticsBucket;
 import com.sentinel.common.cassandra.analytics.utils.AnalyticsScope;
 import com.sentinel.common.cassandra.requestlog.service.RequestLogCleanupService;
+import com.sentinel.common.crypto.Sha256Hasher;
 import com.sentinel.common.postgresql.apikey.entity.ServiceApiKey;
 import com.sentinel.common.postgresql.apikey.entity.ServiceApiKeyStatus;
 import com.sentinel.common.postgresql.apikey.repository.ServiceApiKeyRepository;
@@ -30,6 +31,7 @@ import com.sentinel.loadEngine.loadTestData.service.LoadTestDataService;
 import com.sentinel.loadEngine.requestExecutor.dto.request.GenerateLoadTestDataRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -79,12 +81,12 @@ public class LoadTestDataServiceImpl implements LoadTestDataService {
             request.endpointsPerService()
         );
 
-        this.generateServiceApiKeys(
+        Map<UUID, String> apiKeysMap = this.generateServiceApiKeys(
             productServices.values().stream().flatMap(List::stream).toList(),
             admin.getId()
         );
 
-        LoadTestDataDTO dataDto = new LoadTestDataDTO(tenants, tenantProducts, productServices, serviceEndpoints);
+        LoadTestDataDTO dataDto = new LoadTestDataDTO(tenants, tenantProducts, productServices, serviceEndpoints, apiKeysMap);
 
         return loadTestDataRepository.save(LoadTestData.builder()
             .name(request.name()).status(LoadTestStatus.LOAD_IDLE).createdAt(Instant.now()).testData(dataDto)
@@ -98,7 +100,7 @@ public class LoadTestDataServiceImpl implements LoadTestDataService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public LoadTestData markRunning(UUID id) {
         LoadTestData loadTestData = this.getById(id);
         if (LoadTestStatus.DATA_DELETED.equals(loadTestData.getStatus())) {
@@ -112,7 +114,7 @@ public class LoadTestDataServiceImpl implements LoadTestDataService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public LoadTestData markIdle(UUID id) {
         LoadTestData loadTestData = this.getById(id);
         if (LoadTestStatus.DATA_DELETED.equals(loadTestData.getStatus())) {
@@ -249,10 +251,12 @@ public class LoadTestDataServiceImpl implements LoadTestDataService {
         return productServices;
     }
 
-    private Map<UUID, List<ServiceApiKey>> generateServiceApiKeys(
+    private Map<UUID, String> generateServiceApiKeys(
         List<Service> services,
         UUID adminId
     ) {
+        Map<UUID, String> apiKeysMap = new HashMap<>();
+
         List<ServiceApiKey> apiKeys = new ArrayList<>(services.size());
 
         for (Service service : services) {
@@ -261,25 +265,20 @@ public class LoadTestDataServiceImpl implements LoadTestDataService {
             apiKey.setServiceId(service.getId());
             apiKey.setName(service.getName() + "-Default-Key");
             // Simulate or hash a mock key string for load generation
-            apiKey.setKeyHash("hash_" + UUID.randomUUID().toString().replace("-", ""));
+            String rawKey = "hash_" + UUID.randomUUID().toString().replace("-", "");
+            apiKey.setKeyHash(Sha256Hasher.hash(rawKey));
             apiKey.setStatus(ServiceApiKeyStatus.ACTIVE); // Ensure this enum exists in your project
             apiKey.setCreatedById(adminId);
             apiKey.setUpdatedById(adminId);
 
+            apiKeysMap.put(service.getId(), rawKey);
             apiKeys.add(apiKey);
         }
 
         // Batch save to the database
         apiKeys = serviceApiKeyRepository.saveAll(apiKeys);
 
-        // Map by serviceId for fast in-memory lookup during the load test loop
-        Map<UUID, List<ServiceApiKey>> serviceApiKeyMap = new HashMap<>();
-        for (ServiceApiKey apiKey : apiKeys) {
-            serviceApiKeyMap.putIfAbsent(apiKey.getServiceId(), new ArrayList<>());
-            serviceApiKeyMap.get(apiKey.getServiceId()).add(apiKey);
-        }
-
-        return serviceApiKeyMap;
+        return apiKeysMap;
     }
 
     private String randomSuffix() {

@@ -20,4 +20,5 @@ public interface RequestExecutorService {
     Boolean deleteLoadTestData(UUID loadTestDataId);
 
     List<LoadTestResponse> getLoadTestList();
+
 }

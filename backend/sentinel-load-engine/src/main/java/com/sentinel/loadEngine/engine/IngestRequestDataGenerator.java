@@ -1,13 +1,10 @@
 package com.sentinel.loadEngine.engine;
 
-import com.sentinel.common.postgresql.apikey.entity.ServiceApiKey;
-import com.sentinel.common.postgresql.apikey.repository.ServiceApiKeyRepository;
 import com.sentinel.loadEngine.engine.dto.IngestRequest;
 import com.sentinel.loadEngine.loadTestData.entity.LoadTestDataDTO;
 import com.sentinel.loadEngine.loadTestRun.entity.LoadTestRunLogConfig;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -15,35 +12,21 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class IngestRequestDataGenerator {
 
-    public IngestRequestDataGenerator(LoadTestRunLogConfig runLogConfig, LoadTestDataDTO loadTestDataDTO,
-        ServiceApiKeyRepository apiKeyRepository) {
+    public IngestRequestDataGenerator(LoadTestRunLogConfig runLogConfig, LoadTestDataDTO loadTestDataDTO) {
         this.runLogConfig = runLogConfig;
         this.loadTestDataDTO = loadTestDataDTO;
-        this.serviceIdToApiKeyMap = new HashMap<>();
-        this.apiKeyRepository = apiKeyRepository;
         this.serviceIdToEndpointListMap = loadTestDataDTO.getServiceIdToEndpointInfoMap();
         this.serviceIds = loadTestDataDTO.getServiceIds();
         this.lastOccurredAt = runLogConfig.getMinRequestOccurredAtTime() != null
             ? runLogConfig.getMinRequestOccurredAtTime()
             : Instant.now();
-        this.init();
     }
 
-    private final ServiceApiKeyRepository apiKeyRepository;
     private final LoadTestRunLogConfig runLogConfig;
     private final LoadTestDataDTO loadTestDataDTO;
-    private final Map<UUID, String> serviceIdToApiKeyMap;
     private final Map<UUID, List<LoadTestDataDTO.EndpointInfo>> serviceIdToEndpointListMap;
     private final List<UUID> serviceIds;
     private Instant lastOccurredAt;
-
-    public void init() {
-        System.out.println("Populating serviceIdToApiKeyMap!");
-        List<ServiceApiKey> apiKeys = apiKeyRepository.findByServiceIdIn(loadTestDataDTO.getServiceIds());
-        for (ServiceApiKey apiKey : apiKeys) {
-            this.serviceIdToApiKeyMap.putIfAbsent(apiKey.getServiceId(), apiKey.getKeyHash());
-        }
-    }
 
     public IngestRequest getRequest() {
         UUID serviceId = this.serviceIds.get(ThreadLocalRandom.current().nextInt(serviceIds.size()));
@@ -55,19 +38,20 @@ public class IngestRequestDataGenerator {
         Instant occurredAt =
             this.getRandomDateBetween(runLogConfig.getMinRequestOccurredAtTime(), runLogConfig.getMaxRequestOccurredAtTime());
         int statusCode = this.getRandomStatusCode(runLogConfig.getFailureRatePercentage());
-        return new IngestRequest(serviceId, serviceIdToApiKeyMap.get(serviceId), List.of(IngestRequest.IngestRequestItem.builder()
-            .method(endpointInfo.method())
-            .path(endpointInfo.path())
-            .occurredAt(occurredAt)
-            .statusCode(statusCode)
-            .durationMs(durationMs)
-            .endUserIp("192.168.1." + ThreadLocalRandom.current().nextInt(255))
-            .requestSizeBytes(requestSize)
-            .responseSizeBytes(responseSize)
-            .requestId(UUID.randomUUID().toString())
-            .traceId(UUID.randomUUID().toString())
-            .userId("user_" + ThreadLocalRandom.current().nextInt(500))
-            .build()));
+        return new IngestRequest(serviceId, this.loadTestDataDTO.getApiKeysMap().get(serviceId),
+            List.of(IngestRequest.IngestRequestItem.builder()
+                .method(endpointInfo.method())
+                .path(endpointInfo.path())
+                .occurredAt(occurredAt)
+                .statusCode(statusCode)
+                .durationMs(durationMs)
+                .endUserIp("192.168.1." + ThreadLocalRandom.current().nextInt(255))
+                .requestSizeBytes(requestSize)
+                .responseSizeBytes(responseSize)
+                .requestId(UUID.randomUUID().toString())
+                .traceId(UUID.randomUUID().toString())
+                .userId("user_" + ThreadLocalRandom.current().nextInt(500))
+                .build()));
     }
 
     private Instant getRandomDateBetween(Instant minDate, Instant maxDate) {

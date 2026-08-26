@@ -8,6 +8,7 @@ import com.sentinel.loadEngine.loadTestRun.service.LoadTestRunService;
 import com.sentinel.loadEngine.requestExecutor.dto.request.RunLoadTestRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -20,7 +21,7 @@ public class LoadTestRunServiceImpl implements LoadTestRunService {
     private final LoadTestRunRepository loadTestRunRepository;
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public LoadTestRunLog create(UUID loadTestDataId, RunLoadTestRequest request) {
         return loadTestRunRepository.save(LoadTestRunLog.builder()
             .loadTestData(new LoadTestData(loadTestDataId))
@@ -35,7 +36,7 @@ public class LoadTestRunServiceImpl implements LoadTestRunService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public LoadTestRunLog markCompleted(UUID id) {
         LoadTestRunLog loadTestRunLog = this.getById(id);
         if (loadTestRunLog.getCompletedAt() != null) {
@@ -48,6 +49,15 @@ public class LoadTestRunServiceImpl implements LoadTestRunService {
     @Override
     public LoadTestRunLog getLatestRunLogByDataId(UUID loadTestDataId) {
         return loadTestRunRepository.findLatestRunLogForDataId(loadTestDataId).orElse(null);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateNoOfRequests(UUID loadTestRunId, long totalRequests, long totalErrors) {
+        LoadTestRunLog runLog =  this.getById(loadTestRunId);
+        runLog.setTotalRequests(totalRequests);
+        runLog.setFailedRequests(totalErrors);
+        loadTestRunRepository.saveAndFlush(runLog);
     }
 
 }

@@ -10,11 +10,15 @@ import com.sentinel.loadEngine.requestExecutor.dto.request.RunLoadTestRequest;
 import com.sentinel.loadEngine.requestExecutor.dto.response.LoadTestResponse;
 import com.sentinel.loadEngine.requestExecutor.service.RequestExecutorService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 
+@Slf4j
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class RequestExecutorServiceImpl implements RequestExecutorService {
@@ -40,8 +44,13 @@ public class RequestExecutorServiceImpl implements RequestExecutorService {
         runLog = loadTestRunService.create(loadTestDataId, request);
         LoadTestData loadTestData = loadTestDataService.markRunning(loadTestDataId);
         LoadTestRunLog finalRunLog = runLog;
-        Thread.ofVirtual().start(() -> {
-            loadExecutor.execute(loadTestData, finalRunLog);
+        CompletableFuture.runAsync(
+            () -> loadExecutor.execute(loadTestData, finalRunLog),
+            Executors.newVirtualThreadPerTaskExecutor()
+        ).whenComplete((result, exception) -> {
+            if(exception!=null) log.error(exception.getMessage(), exception);
+            loadTestRunService.markCompleted(finalRunLog.getId());
+            loadTestDataService.markIdle(loadTestDataId);
         });
         return new LoadTestResponse(loadTestData, runLog);
     }
@@ -82,4 +91,5 @@ public class RequestExecutorServiceImpl implements RequestExecutorService {
         return loadTestDataService.findLoadTestDataWithLatestRuns().stream().map(v -> new LoadTestResponse(v.loadTestData(), v.latestRun()))
             .toList();
     }
+
 }

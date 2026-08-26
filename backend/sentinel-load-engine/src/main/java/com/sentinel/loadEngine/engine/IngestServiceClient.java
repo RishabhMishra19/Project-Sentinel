@@ -30,6 +30,7 @@ public class IngestServiceClient {
 
 
     public IngestResponse sendRequest(IngestRequest ingestRequest) {
+        HttpResponse<String> response = null;
         try {
             String jsonBody = objectMapper.writeValueAsString(ingestRequest);
             HttpRequest request = HttpRequest.newBuilder()
@@ -37,7 +38,7 @@ public class IngestServiceClient {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+           response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return objectMapper.readValue(response.body(), IngestResponse.class);
         } catch (Exception e) {
             throw new RuntimeException(e);

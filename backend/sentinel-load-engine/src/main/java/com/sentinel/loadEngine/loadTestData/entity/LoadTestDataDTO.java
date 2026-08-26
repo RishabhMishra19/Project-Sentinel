@@ -21,7 +21,7 @@ import java.util.UUID;
 public class LoadTestDataDTO {
 
     public LoadTestDataDTO(List<Tenant> tenants, Map<UUID, List<Product>> tenantProducts,
-        Map<UUID, List<Service>> productServices, Map<UUID, List<LoadTestDataDTO.EndpointInfo>> serviceEndpoints) {
+        Map<UUID, List<Service>> productServices, Map<UUID, List<LoadTestDataDTO.EndpointInfo>> serviceEndpoints, Map<UUID, String> apiKeysMap) {
         this.tenants = tenants.stream().map(tenant -> new TenantInfo(
             tenant.getId(),
             tenant.getName(),
@@ -35,9 +35,11 @@ public class LoadTestDataDTO {
                 )).toList()
             )).toList()
         )).toList();
+        this.apiKeysMap = apiKeysMap;
     }
 
     private List<TenantInfo> tenants;
+    private Map<UUID, String> apiKeysMap;
 
     public record EndpointInfo(String method, String path) {
     }
