@@ -2,7 +2,7 @@ import { useCreateTestData } from "../hooks/useCreateTestData";
 import { Form } from "../components/Form";
 import { Input } from "../components/Input";
 
-export default function CreateLoadTestDateForm() {
+export default function GenerateDataForm() {
     const { loadData, handleChange, handleCreate, result } =
         useCreateTestData();
 

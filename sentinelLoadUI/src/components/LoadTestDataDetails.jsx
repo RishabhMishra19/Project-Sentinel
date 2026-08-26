@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-const LoadTestDataViewer = ({ data }) => {
+const LoadTestDataDetails = ({ data }) => {
     const loadTestData = data?.associatedLoadTestData;
 
     const [search, setSearch] = useState("");
@@ -563,4 +563,4 @@ const styles = {
     },
 };
 
-export default LoadTestDataViewer;
+export default LoadTestDataDetails;

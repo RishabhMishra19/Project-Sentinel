@@ -6,7 +6,7 @@ import CreateLoadTestDateForm from "../pages/CreateLoadTestDataForm";
 import Drawer from "./Drawer";
 import { Stat } from "./Stat";
 
-export const LoadEngineHeader = () => {
+export const PageHeader = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const { loadDataList } = useTestDataList();
 
