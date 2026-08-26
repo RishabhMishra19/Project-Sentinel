@@ -4,6 +4,9 @@ import com.sentinel.common.cassandra.analytics.service.AnalyticsService;
 import com.sentinel.common.cassandra.analytics.utils.AnalyticsBucket;
 import com.sentinel.common.cassandra.analytics.utils.AnalyticsScope;
 import com.sentinel.common.cassandra.requestlog.service.RequestLogCleanupService;
+import com.sentinel.common.postgresql.apikey.entity.ServiceApiKey;
+import com.sentinel.common.postgresql.apikey.entity.ServiceApiKeyStatus;
+import com.sentinel.common.postgresql.apikey.repository.ServiceApiKeyRepository;
 import com.sentinel.common.postgresql.endpoint.entity.Endpoint;
 import com.sentinel.common.postgresql.endpoint.repository.EndpointRepository;
 import com.sentinel.common.postgresql.product.entity.Product;
@@ -51,6 +54,7 @@ public class LoadTestDataServiceImpl implements LoadTestDataService {
     private final ProductRepository productRepository;
     private final ServiceRepository serviceRepository;
     private final EndpointRepository endpointRepository;
+    private final ServiceApiKeyRepository serviceApiKeyRepository;
     private final AnalyticsService analyticsService;
     private final RequestLogCleanupService  requestLogCleanupService;
 
@@ -72,6 +76,11 @@ public class LoadTestDataServiceImpl implements LoadTestDataService {
         Map<UUID, List<LoadTestDataDTO.EndpointInfo>> serviceEndpoints = this.generateEndpoints(
             productServices.values().stream().flatMap(List::stream).map(Service::getId).collect(Collectors.toSet()),
             request.endpointsPerService()
+        );
+
+        this.generateServiceApiKeys(
+            productServices.values().stream().flatMap(List::stream).toList(),
+            admin.getId()
         );
 
         LoadTestDataDTO dataDto = new LoadTestDataDTO(tenants, tenantProducts, productServices, serviceEndpoints);
@@ -231,6 +240,39 @@ public class LoadTestDataServiceImpl implements LoadTestDataService {
         }
 
         return productServices;
+    }
+
+    private Map<UUID, List<ServiceApiKey>> generateServiceApiKeys(
+        List<Service> services,
+        UUID adminId
+    ) {
+        List<ServiceApiKey> apiKeys = new ArrayList<>(services.size());
+
+        for (Service service : services) {
+            ServiceApiKey apiKey = new ServiceApiKey();
+
+            apiKey.setServiceId(service.getId());
+            apiKey.setName(service.getName() + "-Default-Key");
+            // Simulate or hash a mock key string for load generation
+            apiKey.setKeyHash("hash_" + UUID.randomUUID().toString().replace("-", ""));
+            apiKey.setStatus(ServiceApiKeyStatus.ACTIVE); // Ensure this enum exists in your project
+            apiKey.setCreatedById(adminId);
+            apiKey.setUpdatedById(adminId);
+
+            apiKeys.add(apiKey);
+        }
+
+        // Batch save to the database
+        apiKeys = serviceApiKeyRepository.saveAll(apiKeys);
+
+        // Map by serviceId for fast in-memory lookup during the load test loop
+        Map<UUID, List<ServiceApiKey>> serviceApiKeyMap = new HashMap<>();
+        for (ServiceApiKey apiKey : apiKeys) {
+            serviceApiKeyMap.putIfAbsent(apiKey.getServiceId(), new ArrayList<>());
+            serviceApiKeyMap.get(apiKey.getServiceId()).add(apiKey);
+        }
+
+        return serviceApiKeyMap;
     }
 
     private String randomSuffix() {

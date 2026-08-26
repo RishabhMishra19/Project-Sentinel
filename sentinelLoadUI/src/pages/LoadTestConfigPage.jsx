@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { startLoadTestById, stopLoadTestById } from "../services/api";
 
 export default function LoadTestConfigPage({
-    loadTestDataId = "bd61fa13-07ee-462e-8839-7136a03699c9",
+    loadTestDataId = "f61a1b53-68c1-4113-ae46-a57864fa8edd",
 }) {
     const now = new Date();
 

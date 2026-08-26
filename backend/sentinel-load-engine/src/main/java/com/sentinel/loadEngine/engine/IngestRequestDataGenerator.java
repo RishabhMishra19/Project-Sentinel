@@ -25,6 +25,7 @@ public class IngestRequestDataGenerator {
         this.apiKeyRepository = apiKeyRepository;
         this.serviceIdToEndpointListMap = loadTestDataDTO.getServiceIdToEndpointInfoMap();
         this.serviceIds = loadTestDataDTO.getServiceIds();
+        this.init();
     }
 
     private final ServiceApiKeyRepository apiKeyRepository;
@@ -35,7 +36,6 @@ public class IngestRequestDataGenerator {
     private final Map<UUID, List<LoadTestDataDTO.EndpointInfo>> serviceIdToEndpointListMap;
     private final List<UUID> serviceIds;
 
-    @PostConstruct
     public void init() {
         System.out.println("Populating serviceIdToApiKeyMap!");
         List<ServiceApiKey> apiKeys = apiKeyRepository.findByServiceIdIn(loadTestDataDTO.getServiceIds());
