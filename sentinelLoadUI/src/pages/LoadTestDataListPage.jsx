@@ -1,18 +1,10 @@
 import { useMemo, useState } from "react";
 import { useTestDataList } from "../hooks/useTestDataList";
-import { useNavigate } from "react-router-dom";
-import { RouteManager } from "../services/RouteManager";
-import LoadTestDataDetailsDrawer from "../drawers/LoadTestDataDetailsDrawer";
-import { GenerateDataDrawer } from "../drawers/GenerateDataDrawer";
 import LoadTestDataDashboardDrawer from "../drawers/LoadTestDataDashboardDrawer";
 
 export const LoadTestDataListPage = () => {
-    const navigate = useNavigate();
     const { loadDataList, result } = useTestDataList();
-    const [createModalOpen, setCreateModalOpen] = useState(false);
     const [selectedLoadData, setSelectedLoadData] = useState(null);
-    const [dashboardSelectedLoadData, setDashboardSelectedLoadData] =
-        useState(null);
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("ALL");
 
@@ -39,20 +31,10 @@ export const LoadTestDataListPage = () => {
                 status={status}
                 setStatus={setStatus}
             />
-
-            <GenerateDataDrawer
-                open={createModalOpen}
-                onClose={() => setCreateModalOpen(false)}
-            />
-            <LoadTestDataDetailsDrawer
+            <LoadTestDataDashboardDrawer
                 data={selectedLoadData}
                 open={!!selectedLoadData}
                 onClose={() => setSelectedLoadData(null)}
-            />
-            <LoadTestDataDashboardDrawer
-                data={dashboardSelectedLoadData}
-                open={!!dashboardSelectedLoadData}
-                onClose={() => setDashboardSelectedLoadData(null)}
             />
 
             {result.isLoading ? (
@@ -65,11 +47,7 @@ export const LoadTestDataListPage = () => {
                         <LoadTestCard
                             key={item.id}
                             item={item}
-                            onViewDashboard={() =>
-                                setDashboardSelectedLoadData(item)
-                            }
-                            onViewDetails={() => setSelectedLoadData(item)}
-                            onStart={alert}
+                            onClick={() => setSelectedLoadData(item)}
                         />
                     ))}
                 </div>
@@ -122,7 +100,7 @@ const Toolbar = ({ search, setSearch, status, setStatus }) => (
 
 /* ---------------- Load Test Card ---------------- */
 
-const LoadTestCard = ({ item, onViewDashboard, onViewDetails, onStart }) => {
+const LoadTestCard = ({ item, onClick }) => {
     const tenantCount = item?.associatedLoadTestData?.tenants?.length || 0;
 
     const productCount = item?.associatedLoadTestData?.productIds?.length || 0;
@@ -141,7 +119,7 @@ const LoadTestCard = ({ item, onViewDashboard, onViewDetails, onStart }) => {
         : 0;
 
     return (
-        <div style={styles.card}>
+        <div style={styles.card} onClick={onClick}>
             <div style={styles.cardMain}>
                 <div style={styles.cardIcon}>⚡</div>
 
@@ -170,9 +148,7 @@ const LoadTestCard = ({ item, onViewDashboard, onViewDetails, onStart }) => {
                 <MiniStat value={endpointCount} label="Endpoints" />
             </div>
 
-            <button onClick={onViewDetails}>view details</button>
-            <button onClick={onViewDashboard}>view dashboard</button>
-            <button onClick={onStart}>start</button>
+            <div style={styles.summaryArrow}>→</div>
         </div>
     );
 };
@@ -408,8 +384,8 @@ const styles = {
     card: {
         position: "relative",
         width: "100%",
-        minHeight: "105px",
-        padding: "18px 52px 18px 18px",
+        minHeight: "80px",
+        padding: "0px 20px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -419,6 +395,7 @@ const styles = {
         borderRadius: "11px",
         background: "#fff",
         textAlign: "left",
+        cursor: "pointer",
     },
 
     cardMain: {
@@ -532,6 +509,13 @@ const styles = {
     emptyText: {
         margin: "6px 0 0",
         fontSize: "13px",
+        color: "#9ca3af",
+    },
+    summaryArrow: {
+        flexShrink: 0,
+        marginLeft: "16px",
+        fontSize: "22px",
+        fontWeight: 400,
         color: "#9ca3af",
     },
 };

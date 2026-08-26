@@ -95,4 +95,12 @@ const styles = {
         fontWeight: 500,
         color: "#374151",
     },
+    runStatus: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginTop: "8px",
+        paddingTop: "15px",
+        borderTop: "1px solid #f0f0f0",
+    },
 };

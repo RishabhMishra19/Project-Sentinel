@@ -9,7 +9,7 @@ export default function LoadTestDataDashboardDrawer({ open, onClose, data }) {
             title={<LoadTestDataHeader name={name} id={id} status={status} />}
             open={open}
             onClose={onClose}
-            width="800px"
+            width="1000px"
         >
             <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <LoadTestDataDashboard data={data} />
