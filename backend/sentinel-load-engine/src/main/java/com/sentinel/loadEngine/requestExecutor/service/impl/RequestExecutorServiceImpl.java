@@ -12,6 +12,7 @@ import com.sentinel.loadEngine.requestExecutor.service.RequestExecutorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @org.springframework.stereotype.Service
@@ -60,7 +61,7 @@ public class RequestExecutorServiceImpl implements RequestExecutorService {
 
     @Override
     public LoadTestResponse getLoadTestByDataId(UUID loadTestDataId) {
-        LoadTestData loadTestData = loadTestDataService.markRunning(loadTestDataId);
+        LoadTestData loadTestData = loadTestDataService.getById(loadTestDataId);
         LoadTestRunLog runLog = loadTestRunService.getLatestRunLogByDataId(loadTestDataId);
         return new LoadTestResponse(loadTestData, runLog);
     }
@@ -74,5 +75,11 @@ public class RequestExecutorServiceImpl implements RequestExecutorService {
         }
         loadTestDataService.deleteDataById(loadTestDataId);
         return true;
+    }
+
+    @Override
+    public List<LoadTestResponse> getLoadTestList() {
+        return loadTestDataService.findLoadTestDataWithLatestRuns().stream().map(v -> new LoadTestResponse(v.loadTestData(), v.latestRun()))
+            .toList();
     }
 }

@@ -4,6 +4,7 @@ import com.sentinel.loadEngine.requestExecutor.dto.request.GenerateLoadTestDataR
 import com.sentinel.loadEngine.requestExecutor.dto.request.RunLoadTestRequest;
 import com.sentinel.loadEngine.requestExecutor.dto.response.LoadTestResponse;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface RequestExecutorService {
@@ -17,4 +18,6 @@ public interface RequestExecutorService {
     LoadTestResponse getLoadTestByDataId(UUID loadTestDataId);
 
     Boolean deleteLoadTestData(UUID loadTestDataId);
+
+    List<LoadTestResponse> getLoadTestList();
 }

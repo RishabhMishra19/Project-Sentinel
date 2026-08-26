@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,6 +25,11 @@ import java.util.UUID;
 public class RequestExecutorController {
 
     private final RequestExecutorService requestExecutorService;
+
+    @GetMapping("/data")
+    ResponseEntity<List<LoadTestResponse>> generate() {
+        return ResponseEntity.ok(requestExecutorService.getLoadTestList());
+    }
 
     @PostMapping("/data")
     ResponseEntity<UUID> generate(@Valid @RequestBody GenerateLoadTestDataRequest request) {

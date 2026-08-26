@@ -49,4 +49,5 @@ public class LoadTestRunServiceImpl implements LoadTestRunService {
     public LoadTestRunLog getLatestRunLogByDataId(UUID loadTestDataId) {
         return loadTestRunRepository.findLatestRunLogForDataId(loadTestDataId).orElse(null);
     }
+
 }

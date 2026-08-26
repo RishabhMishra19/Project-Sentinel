@@ -21,6 +21,7 @@ import com.sentinel.common.postgresql.tenant.repository.TenantRepository;
 import com.sentinel.common.postgresql.user.entity.User;
 import com.sentinel.common.postgresql.user.entity.UserStatus;
 import com.sentinel.common.postgresql.user.repository.UserRepository;
+import com.sentinel.loadEngine.loadTestData.dto.LoadTestDataWithLatestRun;
 import com.sentinel.loadEngine.loadTestData.entity.LoadTestData;
 import com.sentinel.loadEngine.loadTestData.entity.LoadTestDataDTO;
 import com.sentinel.loadEngine.loadTestData.entity.LoadTestStatus;
@@ -56,7 +57,7 @@ public class LoadTestDataServiceImpl implements LoadTestDataService {
     private final EndpointRepository endpointRepository;
     private final ServiceApiKeyRepository serviceApiKeyRepository;
     private final AnalyticsService analyticsService;
-    private final RequestLogCleanupService  requestLogCleanupService;
+    private final RequestLogCleanupService requestLogCleanupService;
 
 
     @Override
@@ -158,6 +159,12 @@ public class LoadTestDataServiceImpl implements LoadTestDataService {
         loadTestData.setStatus(LoadTestStatus.DATA_DELETED);
         loadTestDataRepository.save(loadTestData);
     }
+
+    @Override
+    public List<LoadTestDataWithLatestRun> findLoadTestDataWithLatestRuns() {
+        return loadTestDataRepository.findLoadTestDataListWithLatestRuns();
+    }
+
 
     private User getAdminUser() {
         return userRepository.findByEmailIgnoreCase(adminUsername).filter(User::isSentinelAdmin)

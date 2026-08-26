@@ -21,6 +21,7 @@ public class LoadTestResponse {
 
     public LoadTestResponse(LoadTestData loadTestData, LoadTestRunLog runLog) {
         this.id = loadTestData.getId();
+        this.name = loadTestData.getName();
         this.associatedLoadTestData = loadTestData.getTestData();
         this.status = loadTestData.getStatus();
         this.createdAt = loadTestData.getCreatedAt();
@@ -32,6 +33,7 @@ public class LoadTestResponse {
     }
 
     private UUID id;
+    private String name;
     private LoadTestDataDTO associatedLoadTestData;
     private LoadTestStatus status;
     private Instant createdAt;
