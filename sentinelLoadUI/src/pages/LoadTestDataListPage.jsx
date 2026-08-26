@@ -1,16 +1,15 @@
 import { useMemo, useState } from "react";
 import { useTestDataList } from "../hooks/useTestDataList";
-import CreateLoadTestDateForm from "./CreateLoadTestDataForm";
-import Drawer from "../components/Drawer";
-import LoadTestDataDetailsModal from "./LoadTestDataDetailsModal";
 import { useNavigate } from "react-router-dom";
 import { RouteManager } from "../services/RouteManager";
+import LoadTestDataDetailsDrawer from "../drawers/LoadTestDataDetailsDrawer";
+import { GenerateDataDrawer } from "../drawers/GenerateDataDrawer";
 
 export const LoadTestDataListPage = () => {
     const navigate = useNavigate();
     const { loadDataList, result } = useTestDataList();
     const [createModalOpen, setCreateModalOpen] = useState(false);
-    const [selectedLoadDataId, setSelectedLoadDataId] = useState(null);
+    const [selectedLoadData, setSelectedLoadData] = useState(null);
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("ALL");
 
@@ -38,17 +37,14 @@ export const LoadTestDataListPage = () => {
                 setStatus={setStatus}
             />
 
-            <Drawer
+            <GenerateDataDrawer
                 open={createModalOpen}
                 onClose={() => setCreateModalOpen(false)}
-                title={"Test Data Generation"}
-            >
-                <CreateLoadTestDateForm />
-            </Drawer>
-            <LoadTestDataDetailsModal
-                loadTestDataId={selectedLoadDataId}
-                open={!!selectedLoadDataId}
-                onClose={() => setSelectedLoadDataId(null)}
+            />
+            <LoadTestDataDetailsDrawer
+                data={selectedLoadData}
+                open={!!selectedLoadData}
+                onClose={() => setSelectedLoadData(null)}
             />
 
             {result.isLoading ? (
@@ -68,7 +64,7 @@ export const LoadTestDataListPage = () => {
                                     ),
                                 )
                             }
-                            onViewDetails={() => setSelectedLoadDataId(item.id)}
+                            onViewDetails={() => setSelectedLoadData(item)}
                             onStart={alert}
                         />
                     ))}

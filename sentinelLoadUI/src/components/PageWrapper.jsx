@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { LoadEngineHeader } from "./LoadEngineHeader";
+import { PageHeader } from "./PageHeader";
 
 export const PageWrapper = () => {
     return (
@@ -18,7 +18,7 @@ export const PageWrapper = () => {
                     zIndex: 100,
                 }}
             >
-                <LoadEngineHeader />
+                <PageHeader />
             </div>
             <div style={{ paddingTop: "20px" }}>
                 <Outlet />

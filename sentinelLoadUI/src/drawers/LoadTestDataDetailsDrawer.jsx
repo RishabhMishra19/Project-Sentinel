@@ -1,39 +1,25 @@
-import { useTestRun } from "../hooks/useTestRun";
-import { ErrorMessage } from "../components/ErrorMessage";
-import LoadTestDataViewer from "./LoadDataViewer";
-import Drawer from "../components/Drawer";
-import { Stat } from "../components/Stat";
+import Drawer from "../atoms/Drawer";
+import { Stat } from "../atoms/Stat";
 import { useTestDataDelete } from "../hooks/useTestDataDelete";
+import LoadTestDataDetails from "../components/LoadTestDataDetails";
 
-export default function LoadTestDataDetailsModal({
-    open,
-    onClose,
-    loadTestDataId,
-}) {
-    const { result, loadTestData } = useTestRun({
-        loadTestDataId,
-        disabled: !open,
-    });
-
-    const tenantCount = (loadTestData?.associatedLoadTestData?.tenantIds ?? [])
+export default function LoadTestDataDetailsDrawer({ open, onClose, data }) {
+    const tenantCount = (data?.associatedLoadTestData?.tenantIds ?? []).length;
+    const productCount = (data?.associatedLoadTestData?.productIds ?? [])
         .length;
-    const productCount = (
-        loadTestData?.associatedLoadTestData?.productIds ?? []
-    ).length;
-    const serviceCount = (
-        loadTestData?.associatedLoadTestData?.serviceIds ?? []
-    ).length;
+    const serviceCount = (data?.associatedLoadTestData?.serviceIds ?? [])
+        .length;
     const endpointCount = Object.values(
-        loadTestData?.associatedLoadTestData?.serviceIdToEndpointInfoMap ?? {},
+        data?.associatedLoadTestData?.serviceIdToEndpointInfoMap ?? {},
     ).reduce((total, cur) => total + cur.length, 0);
 
     return (
         <Drawer
             title={
                 <Header
-                    id={loadTestData?.id}
-                    name={loadTestData?.name}
-                    status={loadTestData?.status}
+                    id={data?.id}
+                    name={data?.name}
+                    status={data?.status}
                     closeModal={onClose}
                     tenantCount={tenantCount}
                     productCount={productCount}
@@ -46,15 +32,7 @@ export default function LoadTestDataDetailsModal({
             width="800px"
         >
             <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg">
-                {result.isLoading ? (
-                    "loading"
-                ) : result.errorMessage ? (
-                    <ErrorMessage errorMessage={result.errorMessage} />
-                ) : (
-                    <div>
-                        <LoadTestDataViewer data={loadTestData} />
-                    </div>
-                )}
+                <LoadTestDataDetails data={data} />
             </div>
         </Drawer>
     );

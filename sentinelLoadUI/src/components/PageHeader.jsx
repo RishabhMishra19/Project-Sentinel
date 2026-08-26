@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { RouteManager } from "../services/RouteManager";
 import { useTestDataList } from "../hooks/useTestDataList";
-import CreateLoadTestDateForm from "../pages/CreateLoadTestDataForm";
-import Drawer from "./Drawer";
-import { Stat } from "./Stat";
+import GenerateDataForm from "../components/GenerateDataForm";
+import Drawer from "../atoms/Drawer";
+import { Stat } from "../atoms/Stat";
 
 export const PageHeader = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -78,7 +78,7 @@ export const PageHeader = () => {
                     onClose={() => setCreateModalOpen(false)}
                     title={"Test Data Generation"}
                 >
-                    <CreateLoadTestDateForm />
+                    <GenerateDataForm />
                 </Drawer>
             </div>
         </div>
