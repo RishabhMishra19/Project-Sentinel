@@ -1,6 +1,6 @@
 import { Section } from "../molecules/Section";
 
-export const LoadRunConfig = ({ config }) => {
+export const LoadRunConfig = ({ config, totalRequests, failedRequests }) => {
     if (!config) {
         return (
             <Section title="Load Configuration">
@@ -34,6 +34,16 @@ export const LoadRunConfig = ({ config }) => {
                 <ConfigItem
                     label="Max Latency"
                     value={`${config.maxLatencyMs} ms`}
+                />
+
+                <ConfigItem
+                    label="Total Requests Made"
+                    value={`${totalRequests ?? 0}`}
+                />
+
+                <ConfigItem
+                    label="Total Requests Failed"
+                    value={`${failedRequests ?? 0}`}
                 />
             </div>
         </Section>

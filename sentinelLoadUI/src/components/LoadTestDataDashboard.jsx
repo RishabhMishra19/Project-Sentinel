@@ -12,6 +12,8 @@ export const LoadTestDataDashboard = ({ data }) => {
         deletedAt,
         config,
         associatedLoadTestData,
+        failedRequests,
+        totalRequests,
     } = data ?? {};
 
     const tenants = associatedLoadTestData?.tenants || [];
@@ -48,7 +50,11 @@ export const LoadTestDataDashboard = ({ data }) => {
                     completedAt={completedAt}
                     deletedAt={deletedAt}
                 />
-                <LoadRunConfig config={config} />
+                <LoadRunConfig
+                    config={config}
+                    totalRequests={totalRequests}
+                    failedRequests={failedRequests}
+                />
             </div>
 
             {/* Load Test Entities */}

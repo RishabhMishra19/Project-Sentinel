@@ -30,6 +30,8 @@ public class LoadTestResponse {
             this.config = runLog.getConfig();
             this.startedAt = runLog.getStartedAt();
             this.completedAt = runLog.getCompletedAt();
+            this.totalRequests = runLog.getTotalRequests();
+            this.failedRequests = runLog.getFailedRequests();
         }
     }
 
@@ -42,5 +44,7 @@ public class LoadTestResponse {
     private Instant startedAt;
     private Instant completedAt;
     private Instant deletedAt;
+    private Long totalRequests;
+    private Long failedRequests;
 
 }
