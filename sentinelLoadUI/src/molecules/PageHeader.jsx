@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { RouteManager } from "../services/RouteManager";
 import { useTestDataList } from "../hooks/useTestDataList";
 import GenerateDataForm from "../components/GenerateDataForm";
-import Drawer from "../atoms/Drawer";
-import { Stat } from "../atoms/Stat";
+import Drawer from "../molecules/Drawer";
+import { Stat } from "../molecules/Stat";
 
 export const PageHeader = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);

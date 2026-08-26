@@ -1,6 +1,6 @@
 import { useCreateTestData } from "../hooks/useCreateTestData";
-import { Form } from "../atoms/Form";
-import { Input } from "../atoms/Input";
+import { Form } from "../molecules/Form";
+import { Input } from "../molecules/Input";
 
 export default function GenerateDataForm() {
     const { loadData, handleChange, handleCreate, result } =

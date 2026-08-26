@@ -1,5 +1,5 @@
-import Drawer from "../atoms/Drawer";
-import { Stat } from "../atoms/Stat";
+import Drawer from "../molecules/Drawer";
+import { Stat } from "../molecules/Stat";
 import { useTestDataDelete } from "../hooks/useTestDataDelete";
 import LoadTestDataDetails from "../components/LoadTestDataDetails";
 

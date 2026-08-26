@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LoadTestDataListPage } from "./pages/LoadTestDataListPage";
-import { PageWrapper } from "./components/PageWrapper";
+import { PageWrapper } from "./molecules/PageWrapper";
 
 export default function App() {
     return (

@@ -1,5 +1,5 @@
 import GenerateDataForm from "../components/GenerateDataForm";
-import Drawer from "../atoms/Drawer";
+import Drawer from "../molecules/Drawer";
 
 export const GenerateDataDrawer = ({ open, onClose }) => {
     return (
