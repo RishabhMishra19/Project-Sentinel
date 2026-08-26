@@ -45,7 +45,7 @@ public class RequestExecutorController {
         return ResponseEntity.ok(requestExecutorService.stopLoadTest(loadTestDataId));
     }
 
-    @DeleteMapping("/{loadTestDataId}")
+    @DeleteMapping("/data/{loadTestDataId}")
     ResponseEntity<Boolean> deleteData(@PathVariable UUID loadTestDataId) {
         return ResponseEntity.ok(requestExecutorService.deleteLoadTestData(loadTestDataId));
     }

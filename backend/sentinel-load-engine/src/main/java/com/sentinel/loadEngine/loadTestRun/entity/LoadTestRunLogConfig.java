@@ -22,6 +22,8 @@ public class LoadTestRunLogConfig {
         this.minLatencyMs = request.minLatencyMs();
         this.maxLatencyMs = request.maxLatencyMs();
         this.failureRatePercentage = request.failureRatePercentage();
+        this.minRequestOccurredAtTime = request.minRequestOccurredAtTime();
+        this.maxRequestOccurredAtTime = request.maxRequestOccurredAtTime();
     }
 
     int targetRps;

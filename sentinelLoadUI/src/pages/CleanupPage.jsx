@@ -1,14 +1,9 @@
 import React, { useState } from "react";
-import {
-    getLoadTestById,
-    getRelatedEntities,
-    deleteLoadTestOrData,
-} from "../services/api";
+import { getLoadTestById, deleteLoadTestOrData } from "../services/api";
 
 export default function CleanupPage() {
     const [loadTestId, setLoadTestId] = useState("");
     const [loadTest, setLoadTest] = useState(null);
-    const [entities, setEntities] = useState(null);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
@@ -18,16 +13,13 @@ export default function CleanupPage() {
         setLoading(true);
         setMessage("");
         try {
-            const [testData, entityData] = await Promise.all([
-                getLoadTestById(loadTestId).catch(() => null),
-                getRelatedEntities(loadTestId).catch(() => null),
-            ]);
+            const testData = await getLoadTestById(loadTestId).catch(
+                () => null,
+            );
             setLoadTest(testData);
-            setEntities(entityData);
         } catch (err) {
             setMessage(`Error: ${err.message}`);
             setLoadTest(null);
-            setEntities(null);
         } finally {
             setLoading(false);
         }
@@ -46,7 +38,6 @@ export default function CleanupPage() {
             if (success) {
                 setMessage("Successfully deleted test and related entities.");
                 setLoadTest(null);
-                setEntities(null);
                 setLoadTestId("");
             } else {
                 setMessage("Deletion failed on the backend.");
@@ -57,36 +48,6 @@ export default function CleanupPage() {
             setLoading(false);
         }
     };
-
-    // Helper to safely render lists of IdName objects
-    const renderIdNameList = (title, items) => {
-        if (!items || items.length === 0) return null;
-        return (
-            <div style={{ marginBottom: "15px" }}>
-                <h4 style={{ margin: "10px 0 5px 0", color: "#333" }}>
-                    {title} ({items.length})
-                </h4>
-                <ol
-                    style={{
-                        paddingLeft: "20px",
-                        lineHeight: "1.5",
-                        margin: 0,
-                    }}
-                >
-                    {items.map((item, idx) => (
-                        <li
-                            key={item.id || idx}
-                            style={{ marginBottom: "4px", color: "#2c3e50" }}
-                        >
-                            <span>{item.name}</span>
-                        </li>
-                    ))}
-                </ol>
-            </div>
-        );
-    };
-
-    const analytics = entities?.analyticsCount;
 
     return (
         <div
@@ -157,7 +118,7 @@ export default function CleanupPage() {
                 </p>
             )}
 
-            {(loadTest || entities) && (
+            {loadTest && (
                 <div
                     style={{
                         padding: "20px",
@@ -188,18 +149,13 @@ export default function CleanupPage() {
                         }}
                     >
                         <p style={{ margin: "4px 0" }}>
-                            <strong>Load Test Name:</strong>{" "}
-                            {loadTest?.name || loadTest?.loadTestName || "N/A"}
+                            <strong>Load Test Name:</strong> {loadTest.name}
                         </p>
                         <p style={{ margin: "4px 0" }}>
-                            <strong>Test Data ID:</strong>{" "}
-                            {loadTest?.testDataId ||
-                                entities?.loadTestId ||
-                                loadTestId}
+                            <strong>Test Data ID:</strong> {loadTest.id}
                         </p>
                         <p style={{ margin: "4px 0" }}>
-                            <strong>Status:</strong>{" "}
-                            {loadTest?.status || loadTest?.testStatus || "N/A"}
+                            <strong>Status:</strong> {loadTest.status}
                         </p>
                     </div>
 
@@ -212,110 +168,7 @@ export default function CleanupPage() {
                             textAlign: "left",
                         }}
                     >
-                        {renderIdNameList("Tenants", entities?.tenants)}
-                        {renderIdNameList("Products", entities?.products)}
-                        {renderIdNameList("Services", entities?.services)}
-                        {renderIdNameList("Endpoints", entities?.endpoints)}
-
-                        {!entities?.tenants?.length &&
-                            !entities?.products?.length &&
-                            !entities?.services?.length &&
-                            !entities?.endpoints?.length && (
-                                <p
-                                    style={{
-                                        color: "#666",
-                                        fontStyle: "italic",
-                                    }}
-                                >
-                                    No related entities found for this load test
-                                    ID.
-                                </p>
-                            )}
-                    </div>
-
-                    {/* Log Count and Detailed Analytics Count Breakdown */}
-                    <div
-                        style={{
-                            marginTop: "20px",
-                            borderTop: "1px solid #ddd",
-                            paddingTop: "15px",
-                            textAlign: "left",
-                        }}
-                    >
-                        <div
-                            style={{
-                                display: "flex",
-                                gap: "15px",
-                                marginBottom: "15px",
-                            }}
-                        >
-                            <div
-                                style={{
-                                    flex: 1,
-                                    background: "#fff",
-                                    padding: "10px",
-                                    border: "1px solid #ccc",
-                                    borderRadius: "4px",
-                                    textAlign: "center",
-                                }}
-                            >
-                                <strong>Request Log Count:</strong>{" "}
-                                {entities?.requestLogCount ?? 0}
-                            </div>
-                        </div>
-
-                        {analytics && (
-                            <div
-                                style={{
-                                    background: "#fff",
-                                    padding: "12px",
-                                    border: "1px solid #ccc",
-                                    borderRadius: "4px",
-                                }}
-                            >
-                                <strong
-                                    style={{
-                                        display: "block",
-                                        marginBottom: "8px",
-                                    }}
-                                >
-                                    Analytics Counts Summary:
-                                </strong>
-                                <div
-                                    style={{
-                                        display: "grid",
-                                        gridTemplateColumns: "1fr 1fr 1fr",
-                                        gap: "8px",
-                                        fontSize: "13px",
-                                    }}
-                                >
-                                    <div>
-                                        Tenant (D/H/M):{" "}
-                                        {analytics.tenantDayAnalyticsCount} /{" "}
-                                        {analytics.tenantHourAnalyticsCount} /{" "}
-                                        {analytics.tenantMinuteAnalyticsCount}
-                                    </div>
-                                    <div>
-                                        Product (D/H/M):{" "}
-                                        {analytics.productDayAnalyticsCount} /{" "}
-                                        {analytics.productHourAnalyticsCount} /{" "}
-                                        {analytics.productMinuteAnalyticsCount}
-                                    </div>
-                                    <div>
-                                        Service (D/H/M):{" "}
-                                        {analytics.serviceDayAnalyticsCount} /{" "}
-                                        {analytics.serviceHourAnalyticsCount} /{" "}
-                                        {analytics.serviceMinuteAnalyticsCount}
-                                    </div>
-                                    <div style={{ gridColumn: "span 3" }}>
-                                        Endpoint (D/H/M):{" "}
-                                        {analytics.endpointDayAnalyticsCount} /{" "}
-                                        {analytics.endpointHourAnalyticsCount} /{" "}
-                                        {analytics.endpointMinuteAnalyticsCount}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        {JSON.stringify(loadTest.associatedLoadTestData)}
                     </div>
 
                     <button

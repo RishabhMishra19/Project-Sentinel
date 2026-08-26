@@ -2,13 +2,8 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import TestDataPage from "./pages/TestDataPage";
 import CleanupPage from "./pages/CleanupPage";
+import LoadTestConfigPage from "./pages/LoadTestConfigPage";
 
-// Placeholder pages for next steps
-const LoadTestConfigPage = () => (
-    <div style={{ padding: "20px" }}>
-        <h2>Load Test Config (Coming Next)</h2>
-    </div>
-);
 const LiveDashboardPage = () => (
     <div style={{ padding: "20px" }}>
         <h2>Live Dashboard (Coming Next)</h2>
