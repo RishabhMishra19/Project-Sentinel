@@ -1,17 +1,32 @@
-import { useMemo, useState } from "react";
-import { useTestDataList } from "../hooks/useTestDataList";
+import { useEffect, useMemo, useState } from "react";
 import LoadTestDataDashboardDrawer from "../drawers/LoadTestDataDashboardDrawer";
+import { StatusBadge } from "../molecules/StatusBadge";
+import { statusToColorMap } from "../constants/constants";
+import { useLoadContext } from "../hooks/useLoadContext";
+import { ApiManager } from "../services/ApiManager";
 
 export const LoadTestDataListPage = () => {
-    const { loadDataList, result } = useTestDataList();
-    const [selectedLoadData, setSelectedLoadData] = useState(null);
+    const {
+        setLoadTestData,
+        loadTests,
+        isLoading,
+        setSelectedLoadTestId,
+        selectedLoadTestId,
+    } = useLoadContext();
+
+    useEffect(() => {
+        ApiManager.getAllTestData().then((data) => {
+            setLoadTestData(data);
+        });
+    }, []);
+
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("ALL");
 
     const filteredloadDataList = useMemo(() => {
         const query = search.trim().toLowerCase();
 
-        return loadDataList.filter((item) => {
+        return loadTests.filter((item) => {
             const matchesSearch =
                 !query ||
                 item.name?.toLowerCase().includes(query) ||
@@ -21,7 +36,7 @@ export const LoadTestDataListPage = () => {
 
             return matchesSearch && matchesStatus;
         });
-    }, [loadDataList, search, status]);
+    }, [loadTests, search, status]);
 
     return (
         <div style={styles.container}>
@@ -32,12 +47,12 @@ export const LoadTestDataListPage = () => {
                 setStatus={setStatus}
             />
             <LoadTestDataDashboardDrawer
-                data={selectedLoadData}
-                open={!!selectedLoadData}
-                onClose={() => setSelectedLoadData(null)}
+                loadTestDataId={selectedLoadTestId}
+                open={!!selectedLoadTestId}
+                onClose={() => setSelectedLoadTestId(null)}
             />
 
-            {result.isLoading ? (
+            {isLoading ? (
                 <span>loading...</span>
             ) : filteredloadDataList.length === 0 ? (
                 <EmptyState search={search} />
@@ -47,7 +62,7 @@ export const LoadTestDataListPage = () => {
                         <LoadTestCard
                             key={item.id}
                             item={item}
-                            onClick={() => setSelectedLoadData(item)}
+                            onClick={() => setSelectedLoadTestId(item.id)}
                         />
                     ))}
                 </div>
@@ -127,7 +142,10 @@ const LoadTestCard = ({ item, onClick }) => {
                     <div style={styles.cardTitleRow}>
                         <h3 style={styles.cardTitle}>{item.name}</h3>
 
-                        <StatusBadge status={item?.status} />
+                        <StatusBadge
+                            status={item.status}
+                            color={statusToColorMap[item.status]}
+                        />
                     </div>
 
                     <div style={styles.cardId}>{item.id}</div>
@@ -162,58 +180,6 @@ const MiniStat = ({ value, label }) => (
         <span style={styles.miniStatLabel}>{label}</span>
     </div>
 );
-
-/* ---------------- Status ---------------- */
-
-const StatusBadge = ({ status }) => {
-    if (!status) {
-        return (
-            <span
-                style={{
-                    ...styles.statusBadge,
-                    background: "#f3f4f6",
-                    color: "#6b7280",
-                }}
-            >
-                NOT RUN
-            </span>
-        );
-    }
-
-    const statusStyles = {
-        RUNNING: {
-            background: "#dbeafe",
-            color: "#1d4ed8",
-        },
-
-        COMPLETED: {
-            background: "#dcfce7",
-            color: "#166534",
-        },
-
-        FAILED: {
-            background: "#fee2e2",
-            color: "#b91c1c",
-        },
-    };
-
-    const colors = statusStyles[status] || {
-        background: "#f3f4f6",
-        color: "#6b7280",
-    };
-
-    return (
-        <span
-            style={{
-                ...styles.statusBadge,
-                background: colors.background,
-                color: colors.color,
-            }}
-        >
-            {status}
-        </span>
-    );
-};
 
 /* ---------------- Empty State ---------------- */
 

@@ -1,7 +1,11 @@
 import { statusToColorMap } from "../constants/constants";
+import { useTestDataDelete } from "../hooks/useTestDataDelete";
+import { Button } from "../molecules/Button";
 import { StatusBadge } from "../molecules/StatusBadge";
 
 export const LoadTestDataHeader = ({ name, id, status }) => {
+    const { handleDelete, result } = useTestDataDelete(id);
+
     return (
         <div style={styles.header}>
             <div style={styles.headerInfo}>
@@ -15,7 +19,17 @@ export const LoadTestDataHeader = ({ name, id, status }) => {
                 <div style={styles.id}>{id}</div>
             </div>
             <div style={styles.headerActions}>
-                <button style={styles.secondaryButton}>Run Again</button>
+                {status !== "DATA_DELETED" && (
+                    <Button
+                        variant="danger"
+                        onClick={handleDelete}
+                        disabled={result.isLoading}
+                    >
+                        Delete Data
+                    </Button>
+                )}
+                {status === "LOAD_IDLE" && <Button>Start</Button>}
+                {status === "LOAD_RUNNING" && <Button>Stop</Button>}
             </div>
         </div>
     );
@@ -59,6 +73,8 @@ const styles = {
 
     headerActions: {
         flexShrink: 0,
+        display: "flex",
+        gap: "10px",
     },
 
     secondaryButton: {

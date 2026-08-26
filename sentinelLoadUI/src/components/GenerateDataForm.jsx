@@ -2,9 +2,10 @@ import { useCreateTestData } from "../hooks/useCreateTestData";
 import { Form } from "../molecules/Form";
 import { Input } from "../molecules/Input";
 
-export default function GenerateDataForm() {
-    const { loadData, handleChange, handleCreate, result } =
-        useCreateTestData();
+export default function GenerateDataForm({ onClose }) {
+    const { loadData, handleChange, handleCreate, result } = useCreateTestData({
+        onSuccess: onClose,
+    });
 
     return (
         <Form

@@ -1,24 +1,23 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { RouteManager } from "../services/RouteManager";
-import { useTestDataList } from "../hooks/useTestDataList";
-import GenerateDataForm from "../components/GenerateDataForm";
-import Drawer from "../molecules/Drawer";
-import { Stat } from "../molecules/Stat";
+import { SummaryCard } from "./SummaryBadge";
+import { GenerateDataDrawer } from "../drawers/GenerateDataDrawer";
+import { useLoadContext } from "../hooks/useLoadContext";
 
 export const PageHeader = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
-    const { loadDataList } = useTestDataList();
+    const { loadTests } = useLoadContext();
 
-    const runningCount = (loadDataList ?? []).filter(
+    const runningCount = (loadTests ?? []).filter(
         (v) => v.status === "LOAD_RUNNING",
     ).length;
 
-    const idleCount = (loadDataList ?? []).filter(
+    const idleCount = (loadTests ?? []).filter(
         (v) => v.status === "LOAD_IDLE",
     ).length;
 
-    const deletedCount = (loadDataList ?? []).filter(
+    const deletedCount = (loadTests ?? []).filter(
         (v) => v.status === "DATA_DELETED",
     ).length;
 
@@ -60,10 +59,22 @@ export const PageHeader = () => {
             </div>
             <div style={styles.headerRight}>
                 <div style={styles.stats}>
-                    <Stat value={(loadDataList ?? []).length} label="Total" />
-                    <Stat value={runningCount} label="Running" />
-                    <Stat value={idleCount} label="Idle" />
-                    <Stat value={deletedCount} label="Deleted" />
+                    <SummaryCard
+                        label="Total"
+                        value={(loadTests ?? []).length}
+                        icon="Σ"
+                    />
+                    <SummaryCard
+                        label="Running"
+                        value={runningCount}
+                        icon="▶"
+                    />
+                    <SummaryCard label="Idle" value={idleCount} icon="⏸" />
+                    <SummaryCard
+                        label="Deleted"
+                        value={deletedCount}
+                        icon="×"
+                    />
                 </div>
 
                 <button
@@ -73,13 +84,10 @@ export const PageHeader = () => {
                 >
                     + New Load Test
                 </button>
-                <Drawer
+                <GenerateDataDrawer
                     open={createModalOpen}
                     onClose={() => setCreateModalOpen(false)}
-                    title={"Test Data Generation"}
-                >
-                    <GenerateDataForm />
-                </Drawer>
+                />
             </div>
         </div>
     );

@@ -4,7 +4,7 @@ import Drawer from "../molecules/Drawer";
 export const GenerateDataDrawer = ({ open, onClose }) => {
     return (
         <Drawer open={open} onClose={onClose} title={"Generate Data"}>
-            <GenerateDataForm />
+            <GenerateDataForm onClose={onClose} />
         </Drawer>
     );
 };

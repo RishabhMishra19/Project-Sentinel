@@ -1,10 +1,9 @@
-import { useNavigate } from "react-router-dom";
 import { ApiManager } from "../services/ApiManager";
 import { useState } from "react";
-import { RouteManager } from "../services/RouteManager";
+import { useLoadContext } from "./useLoadContext";
 
-export const useCreateTestData = () => {
-  const navigate = useNavigate();
+export const useCreateTestData = ({ onSuccess }) => {
+  const { setSelectedLoadTestId, setLoadTestData } = useLoadContext();
 
   const [result, setResult] = useState({
     isLoading: false,
@@ -28,11 +27,13 @@ export const useCreateTestData = () => {
     e.preventDefault();
     setResult(pval => ({ ...pval, isLoading: true }))
     ApiManager.generateTestData(loadData)
-      .then(result => {
-        setResult(pval => ({ ...pval, isLoading: false, errorMessage: '' }));
-        navigate(RouteManager.getLoadTestDetailsPage(result.data));
+      .then(id => {
+        ApiManager.getAllTestData().then(setLoadTestData).finally(() => {
+          setSelectedLoadTestId(id)
+          onSuccess()
+        })
       })
-      .catch(error => setResult(pval => ({ ...pval, isLoading: false, errorMessage: error.message })));
+      .finally(() => setResult(pval => ({ ...pval, isLoading: false })))
   }
 
   return {

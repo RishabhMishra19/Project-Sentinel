@@ -13,10 +13,14 @@ export const RunOverview = ({
     return (
         <Section title="Run Overview">
             <div style={styles.timeline}>
-                <TimelineItem label="Created" value={createdAt} />
-                <TimelineItem label="Started" value={startedAt} />
-                <TimelineItem label="Completed" value={completedAt} />
-                <TimelineItem label="Deleted" value={deletedAt} last />
+                <TimelineItem label="Created At" value={createdAt} />
+                {startedAt && (
+                    <TimelineItem label="Started At" value={startedAt} />
+                )}
+                {completedAt && (
+                    <TimelineItem label="Completed At" value={completedAt} />
+                )}
+                <TimelineItem label="Deleted At" value={deletedAt} last />
             </div>
             <div style={styles.runStatus}>
                 <span style={styles.detailLabel}>Current Status</span>

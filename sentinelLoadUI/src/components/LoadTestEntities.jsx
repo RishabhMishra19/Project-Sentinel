@@ -1,3 +1,4 @@
+import { Collapsible } from "../molecules/Collapsible";
 import { Section } from "../molecules/Section";
 
 export const LoadTestEntities = ({ tenants }) => {
@@ -18,23 +19,25 @@ export const LoadTestEntities = ({ tenants }) => {
 
 const Tenant = ({ tenant }) => {
     return (
-        <div style={styles.tenant}>
-            <div style={styles.tenantHeader}>
-                <div>
-                    <div style={styles.tenantLabel}>TENANT</div>
+        <Collapsible
+            title={
+                <div style={styles.tenantHeader}>
+                    <div>
+                        <div style={styles.tenantLabel}>TENANT</div>
 
-                    <div style={styles.tenantName}>{tenant.tenantName}</div>
+                        <div style={styles.tenantName}>{tenant.tenantName}</div>
+                    </div>
+
+                    <div style={styles.tenantId}>{tenant.tenantId}</div>
                 </div>
-
-                <div style={styles.tenantId}>{tenant.tenantId}</div>
-            </div>
-
+            }
+        >
             <div style={styles.productList}>
                 {(tenant.products || []).map((product) => (
                     <Product key={product.productId} product={product} />
                 ))}
             </div>
-        </div>
+        </Collapsible>
     );
 };
 
@@ -51,27 +54,31 @@ const Product = ({ product }) => {
     );
 
     return (
-        <div style={styles.product}>
-            <div style={styles.productHeader}>
-                <div>
-                    <div style={styles.productLabel}>PRODUCT</div>
+        <Collapsible
+            title={
+                <div style={styles.productHeader}>
+                    <div>
+                        <div style={styles.productLabel}>PRODUCT</div>
 
-                    <div style={styles.productName}>{product.productName}</div>
+                        <div style={styles.productName}>
+                            {product.productName}
+                        </div>
+                    </div>
+
+                    <div style={styles.productStats}>
+                        <span>{serviceCount} services</span>
+
+                        <span>{endpointCount} endpoints</span>
+                    </div>
                 </div>
-
-                <div style={styles.productStats}>
-                    <span>{serviceCount} services</span>
-
-                    <span>{endpointCount} endpoints</span>
-                </div>
-            </div>
-
+            }
+        >
             <div style={styles.serviceList}>
                 {(product.services || []).map((service) => (
                     <Service key={service.serviceId} service={service} />
                 ))}
             </div>
-        </div>
+        </Collapsible>
     );
 };
 
@@ -82,8 +89,10 @@ const Product = ({ product }) => {
 const Service = ({ service }) => {
     return (
         <div style={styles.service}>
-            <div style={styles.serviceName}>{service.serviceName}</div>
-
+            <div>
+                <div style={styles.serviceLabel}>SERVICE</div>
+                <div style={styles.serviceName}>{service.serviceName}</div>
+            </div>
             <div style={styles.serviceEndpointCount}>
                 {service.endpoints?.length || 0}
                 {" endpoints"}
@@ -96,7 +105,7 @@ const styles = {
     tenantList: {
         display: "flex",
         flexDirection: "column",
-        gap: "12px",
+        gap: "8px",
     },
 
     tenant: {
@@ -111,7 +120,6 @@ const styles = {
         justifyContent: "space-between",
         gap: "15px",
         padding: "14px 16px",
-        background: "#fafafa",
     },
 
     tenantLabel: {
@@ -135,7 +143,10 @@ const styles = {
     },
 
     productList: {
-        padding: "10px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
+        marginTop: "10px",
     },
 
     product: {
@@ -172,10 +183,10 @@ const styles = {
     },
 
     serviceList: {
-        marginTop: "9px",
         display: "flex",
         flexDirection: "column",
-        gap: "5px",
+        gap: "8px",
+        marginTop: "10px",
     },
 
     service: {
@@ -194,6 +205,12 @@ const styles = {
 
     serviceEndpointCount: {
         fontSize: "10px",
+        color: "#9ca3af",
+    },
+    serviceLabel: {
+        fontSize: "9px",
+        fontWeight: 700,
+        letterSpacing: "0.5px",
         color: "#9ca3af",
     },
 };

@@ -1,7 +1,9 @@
 import { ApiManager } from "../services/ApiManager";
 import { useState } from "react";
+import { useLoadContext } from "./useLoadContext";
 
-export const useTestDataDelete = (loadTestDataId, onSuccess) => {
+export const useTestDataDelete = (loadTestDataId) => {
+  const { setLoadTestData } = useLoadContext();
   const [result, setResult] = useState({
     isLoading: false,
     errorMessage: ''
@@ -21,9 +23,9 @@ export const useTestDataDelete = (loadTestDataId, onSuccess) => {
     ApiManager.deleteLoadTestById(loadTestDataId)
       .then(() => {
         setResult(pval => ({ ...pval, isLoading: false, errorMessage: '' }));
-        onSuccess();
+        ApiManager.getAllTestData().then(setLoadTestData)
       })
-      .catch(error => setResult(pval => ({ ...pval, isLoading: false, errorMessage: error.message })));
+      .finally(() => setResult(pval => ({ ...pval, isLoading: false })))
   }
 
   return {
