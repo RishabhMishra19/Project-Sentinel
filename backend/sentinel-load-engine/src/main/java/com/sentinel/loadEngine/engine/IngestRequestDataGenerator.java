@@ -20,13 +20,23 @@ public class IngestRequestDataGenerator {
         this.lastOccurredAt = runLogConfig.getMinRequestOccurredAtTime() != null
             ? runLogConfig.getMinRequestOccurredAtTime()
             : Instant.now();
+
+        this.minOccurredAtEpochMilli = this.lastOccurredAt.toEpochMilli();
+        this.maxOccurredAtEpochMilli = runLogConfig.getMaxRequestOccurredAtTime().toEpochMilli();
+        this.totalRequests = (long) runLogConfig.getDurationSeconds() * runLogConfig.getTargetRps();
+        this.timeRangeMs = maxOccurredAtEpochMilli - minOccurredAtEpochMilli;
     }
 
     private final LoadTestRunLogConfig runLogConfig;
     private final LoadTestDataDTO loadTestDataDTO;
     private final Map<UUID, List<LoadTestDataDTO.EndpointInfo>> serviceIdToEndpointListMap;
     private final List<UUID> serviceIds;
+    private final long minOccurredAtEpochMilli;
+    private final long maxOccurredAtEpochMilli;
+    private final long totalRequests;
+    private final long timeRangeMs;
     private Instant lastOccurredAt;
+    private long generatedRequests;
 
     public IngestRequest getRequest() {
         UUID serviceId = this.serviceIds.get(ThreadLocalRandom.current().nextInt(serviceIds.size()));
@@ -57,21 +67,27 @@ public class IngestRequestDataGenerator {
         return minLong + ThreadLocalRandom.current().nextInt(maxLong - minLong);
     }
 
-    public Instant getNextOccurredAt() {
-        long maxEpochMilli = runLogConfig.getMaxRequestOccurredAtTime().toEpochMilli();
-
-        // Advance the timestamp forward by a small random step (e.g., 1 to 50 milliseconds)
-        // Adjust the step bounds depending on how dense your RPS is
-        long randomIncrement = ThreadLocalRandom.current().nextLong(1, 50);
-
-        long nextEpochMilli = lastOccurredAt.toEpochMilli() + randomIncrement;
-
-        // If we exceed the max boundary, loop back or clamp it to maxEpochMilli
-        if (nextEpochMilli > maxEpochMilli) {
-            nextEpochMilli = maxEpochMilli;
+    public synchronized Instant getNextOccurredAt() {
+        if (totalRequests <= 1 || timeRangeMs <= 0) {
+            lastOccurredAt = Instant.ofEpochMilli(
+                Math.min(lastOccurredAt.toEpochMilli() + 1, maxOccurredAtEpochMilli)
+            );
+            return lastOccurredAt;
         }
 
-        // Update tracking reference
+        long requestNumber = generatedRequests++;
+
+        long nextEpochMilli = minOccurredAtEpochMilli
+            + (requestNumber * timeRangeMs / (totalRequests - 1));
+
+        if (nextEpochMilli <= lastOccurredAt.toEpochMilli()) {
+            nextEpochMilli = lastOccurredAt.toEpochMilli() + 1;
+        }
+
+        if (nextEpochMilli > maxOccurredAtEpochMilli) {
+            nextEpochMilli = maxOccurredAtEpochMilli;
+        }
+
         lastOccurredAt = Instant.ofEpochMilli(nextEpochMilli);
 
         return lastOccurredAt;
