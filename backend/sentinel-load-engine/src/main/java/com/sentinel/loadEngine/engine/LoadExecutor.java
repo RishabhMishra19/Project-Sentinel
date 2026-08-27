@@ -3,9 +3,9 @@ package com.sentinel.loadEngine.engine;
 import com.sentinel.loadEngine.loadTestData.entity.LoadTestData;
 import com.sentinel.loadEngine.loadTestRun.entity.LoadTestRunLog;
 import com.sentinel.loadEngine.loadTestRun.service.LoadTestRunService;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.distribution.HistogramSnapshot;
-import io.micrometer.core.instrument.distribution.ValueAtPercentile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,21 +25,35 @@ import java.util.concurrent.atomic.AtomicLong;
 @RequiredArgsConstructor
 public class LoadExecutor {
 
-    public record LoadExecutionResult(
-        long totalRequests,
-        long totalErrors
-    ) {
+    public record LoadExecutionResult(long totalRequests, long totalErrors) {
     }
 
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private final AtomicBoolean isCanceled = new AtomicBoolean(false);
+
+    /**
+     * Successfully completed requests.
+     */
     private final AtomicLong totalRequests = new AtomicLong(0);
+
+    /**
+     * Requests that failed.
+     */
     private final AtomicLong totalErrors = new AtomicLong(0);
+
+    /**
+     * Tasks submitted to the executor.
+     */
     private final AtomicLong totalSubmitted = new AtomicLong(0);
+
+    /**
+     * Requests currently executing.
+     */
     private final AtomicLong activeRequests = new AtomicLong(0);
 
     private final IngestServiceClient ingestServiceClient;
     private final LoadTestRunService loadTestRunService;
+    private final MeterRegistry meterRegistry;
 
     public void cancelRun() {
         isCanceled.set(true);
@@ -50,9 +64,11 @@ public class LoadExecutor {
             throw new RuntimeException("The load test run is already running");
         }
 
-        isCanceled.set(false);
-        totalRequests.set(0);
-        totalErrors.set(0);
+        Timer ingestTimer =
+            Timer.builder("sentinel.ingest.http").description("HTTP latency for ingest requests").tag("runId", runLog.getId().toString())
+                .publishPercentiles(0.5, 0.95, 0.99).publishPercentileHistogram().register(meterRegistry);
+
+        resetCounters();
 
         IngestRequestDataGenerator generator = new IngestRequestDataGenerator(runLog.getConfig(), loadTestData.getTestData());
 
@@ -66,126 +82,189 @@ public class LoadExecutor {
 
             Instant endTime = Instant.now().plus(Duration.ofSeconds(durationSeconds));
 
+            /*
+             * ---------------------------------------------------------
+             * Load generation phase
+             * ---------------------------------------------------------
+             */
             while (Instant.now().isBefore(endTime) && !Thread.currentThread().isInterrupted() && !isCanceled.get()) {
-
 
                 long tickStart = System.currentTimeMillis();
 
+                /*
+                 * Submit targetRps requests for this one-second window.
+                 */
                 for (int i = 0; i < targetRps; i++) {
+
                     totalSubmitted.incrementAndGet();
-                    executorService.submit(() -> executeRequest(generator, concurrencyLimiter));
+
+                    executorService.submit(() -> executeRequest(generator, concurrencyLimiter, ingestTimer));
                 }
 
+                /*
+                 * Maintain approximately targetRps.
+                 */
                 long elapsed = System.currentTimeMillis() - tickStart;
+
                 long sleepTime = 1000 - elapsed;
 
                 if (sleepTime > 0) {
                     Thread.sleep(sleepTime);
                 }
-                // Live progress update
-                loadTestRunService.updateNoOfRequests(runLog.getId(), totalRequests.get(), totalErrors.get());
-                long submitted = totalSubmitted.get();
-                long started = totalRequests.get();
-                long errors = totalErrors.get();
 
-                long submitted = totalSubmitted.get();
-                long completed = totalCompleted.get();
-                long errors = totalErrors.get();
-                long active = activeRequests.get();
-
-                long pending = submitted - completed - errors - active;
-
-                log.info(
-                    "submitted={}, started={}, errors={}, waiting={}, waiting for permit={}",
-                    submitted,
-                    started,
-                    errors,
-                    submitted - started,
-                    concurrencyLimiter.getQueueLength()
-                );
+                /*
+                 * Live progress update.
+                 */
+                logProgress(runLog);
             }
 
             log.info("Load generation finished");
 
-            while (concurrencyLimiter.getQueueLength() > 0) {
+            /*
+             * ---------------------------------------------------------
+             * Drain phase
+             * ---------------------------------------------------------
+             *
+             * No more tasks will be submitted.
+             *
+             * shutdown() tells the executor to finish all already
+             * submitted tasks but reject new tasks.
+             */
+            executorService.shutdown();
 
-                log.info(
-                    "Draining: started={}, errors={}, waiting={}",
-                    totalRequests.get(),
-                    totalErrors.get(),
-                    concurrencyLimiter.getQueueLength()
-                );
+            log.info("Waiting for submitted requests to complete: submitted={}", totalSubmitted.get());
 
-                Thread.sleep(1000);
+            /*
+             * Wait one second at a time so we can continue printing
+             * live drain statistics.
+             */
+            while (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
+
+                logProgress(runLog);
             }
 
-            log.info(
-                "completed total requests: {}, total errors: {}",
-                totalRequests.get(),
-                totalErrors.get()
-            );
+            /*
+             * Print the final state as well.
+             */
+            logProgress(runLog);
 
-            this.logIngestLatency();
+            log.info("Load test completed: totalRequests={}, totalErrors={}", totalRequests.get(), totalErrors.get());
+
+            logIngestLatency(ingestTimer);
 
         } catch (InterruptedException e) {
+
             Thread.currentThread().interrupt();
 
+            log.warn("Load test execution interrupted");
+
         } finally {
-            loadTestRunService.updateNoOfRequests(
-                runLog.getId(),
-                totalRequests.get(),
-                totalErrors.get()
-            );
+
+            /*
+             * Persist the latest state.
+             */
+            loadTestRunService.updateNoOfRequests(runLog.getId(), totalRequests.get(), totalErrors.get());
+
             isRunning.set(false);
             isCanceled.set(false);
         }
-        return new LoadExecutionResult(
-            totalRequests.get(),
-            totalErrors.get()
-        );
+
+        return new LoadExecutionResult(totalRequests.get(), totalErrors.get());
     }
 
-    private void executeRequest(IngestRequestDataGenerator generator, Semaphore concurrencyLimiter) {
+    private void executeRequest(IngestRequestDataGenerator generator, Semaphore concurrencyLimiter, Timer ingestTimer) {
         boolean acquired = false;
 
         try {
+            /*
+             * Wait until a concurrency slot becomes available.
+             */
             concurrencyLimiter.acquire();
             acquired = true;
+
+            /*
+             * This request is now actually executing.
+             */
             activeRequests.incrementAndGet();
 
+            /*
+             * Execute the HTTP request.
+             */
+            ingestTimer.record(() -> ingestServiceClient.sendRequest(generator.getRequest()));
+
+            /*
+             * Only count it as completed after sendRequest()
+             * successfully returns.
+             */
             totalRequests.incrementAndGet();
 
-            ingestServiceClient.sendRequest(generator.getRequest());
+        } catch (InterruptedException e) {
+
+            Thread.currentThread().interrupt();
+
+            totalErrors.incrementAndGet();
 
         } catch (Exception e) {
+
             totalErrors.incrementAndGet();
+
             log.error("Error executing ingest request", e);
 
         } finally {
+
+            /*
+             * The request is no longer active.
+             */
             if (acquired) {
+                activeRequests.decrementAndGet();
                 concurrencyLimiter.release();
             }
         }
     }
 
-    private void logIngestLatency() {
-        HistogramSnapshot snapshot = ingestServiceClient.getIngestTimer().takeSnapshot();
+    private void logProgress(LoadTestRunLog runLog) {
+        long submitted = totalSubmitted.get();
+        long completed = totalRequests.get();
+        long errors = totalErrors.get();
+        long active = activeRequests.get();
 
-        log.info(
-            "Ingest latency: count={}, p50={}ms, p95={}ms, p99={}ms, max={}ms",
-            snapshot.count(),
-            percentile(snapshot, 0.50),
-            percentile(snapshot, 0.95),
-            percentile(snapshot, 0.99),
-            snapshot.max(TimeUnit.MILLISECONDS)
-        );
+        /*
+         * Everything that has been submitted but is neither:
+         *
+         *   completed
+         *   failed
+         *   currently active
+         *
+         * is waiting for a concurrency permit.
+         */
+        long pending = Math.max(0, submitted - completed - errors - active);
+
+        /*
+         * Live DB update.
+         */
+        loadTestRunService.updateNoOfRequests(runLog.getId(), completed, errors);
+
+        log.info("submitted={}, active={}, completed={}, errors={}, pending={}", submitted, active, completed, errors, pending);
+    }
+
+    private void logIngestLatency(Timer ingestTimer) {
+        HistogramSnapshot snapshot = ingestTimer.takeSnapshot();
+
+        log.info("Ingest latency: count={}, p50={}ms, p95={}ms, p99={}ms, max={}ms", snapshot.count(), percentile(snapshot, 0.50),
+            percentile(snapshot, 0.95), percentile(snapshot, 0.99), snapshot.max(TimeUnit.MILLISECONDS));
     }
 
     private double percentile(HistogramSnapshot snapshot, double target) {
-        return Arrays.stream(snapshot.percentileValues())
-            .filter(value -> value.percentile() == target)
-            .mapToDouble(value -> value.value(TimeUnit.MILLISECONDS))
-            .findFirst()
-            .orElse(Double.NaN);
+        return Arrays.stream(snapshot.percentileValues()).filter(value -> value.percentile() == target)
+            .mapToDouble(value -> value.value(TimeUnit.MILLISECONDS)).findFirst().orElse(Double.NaN);
+    }
+
+    private void resetCounters() {
+        isCanceled.set(false);
+
+        totalRequests.set(0);
+        totalErrors.set(0);
+        totalSubmitted.set(0);
+        activeRequests.set(0);
     }
 }
