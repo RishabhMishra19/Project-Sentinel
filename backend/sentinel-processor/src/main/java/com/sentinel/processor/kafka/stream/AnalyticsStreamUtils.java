@@ -28,6 +28,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
@@ -153,45 +154,50 @@ public class AnalyticsStreamUtils {
         );
 
         stream
-            .peek((key, value) -> metrics.inputRecords.incrementAndGet())
+            .peek((key, value) -> {
+                metrics.inputRecords.incrementAndGet();
+                if (value != null && value.getTimestamp() != null) {
+                    metrics.latestEventTime.accumulateAndGet(
+                        value.getTimestamp().toEpochMilli(),
+                        Math::max
+                    );
+
+                }
+            })
             .groupByKey(Grouped.with(Serdes.String(), analyticsMetricSerde))
             .windowedBy(bucketToWindowMap.get(bucket))
             .aggregate(
                 () -> new KafkaMessage.AnalyticsMetrics(bucket, scope, null),
-                (key, value, aggregatedVal) -> aggregatedVal.aggregate(value),
+                (key, value, aggregatedVal) -> {
+                    metrics.aggregateRecords.incrementAndGet();
+                    return aggregatedVal.aggregate(value);
+                },
                 Materialized.<String, KafkaMessage.AnalyticsMetrics, WindowStore<Bytes, byte[]>>as(outputTopic + "_aggregated_state_store")
                     .withKeySerde(Serdes.String())
                     .withValueSerde(this.analyticsMetricSerde))
             .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"))
             .toStream()
-            .peek((key, value) -> metrics.outputRecords.incrementAndGet())
+            .peek((key, value) -> {
+                metrics.outputRecords.getAndIncrement();
+                metrics.lastWindowStartTime = key.window().startTime();
+                metrics.lastWindowEndTime = key.window().endTime();
+            })
             .map((windowedKey, val) -> KeyValue.pair(windowedKey.key(), val))
             .to(outputTopic, Produced.with(Serdes.String(), analyticsMetricSerde));
     }
 
-    @Scheduled(fixedRate = 1000)
+//    @Scheduled(fixedRate = 1000)
     public void logStreamMetrics() {
         streamMetrics.forEach((name, metrics) -> {
-            long input = metrics.inputRecords.get();
-            long output = metrics.outputRecords.get();
-
-            long previousInput = metrics.lastInput.getAndSet(input);
-            long previousOutput = metrics.lastOutput.getAndSet(output);
-
-            long inputRate = input - previousInput;
-            long outputRate = output - previousOutput;
-
-            if (inputRate == 0 && outputRate == 0) {
-                return;
-            }
-
             log.info(
-                "Analytics stream [{}]: input={} records/s, output={} records/s, totalInput={}, totalOutput={}",
+                "Analytics stream [{}]: window=[{} - {}], streamTime={}, totalInput={}, totalOutput={}, totalAggregatedRecords={}",
                 name,
-                inputRate,
-                outputRate,
-                input,
-                output
+                metrics.lastWindowStartTime==null ? null : metrics.lastWindowStartTime.toString(),
+                metrics.lastWindowEndTime==null ? null : metrics.lastWindowEndTime.toString(),
+                metrics.latestEventTime.get(),
+                metrics.inputRecords.get(),
+                metrics.outputRecords.get(),
+                metrics.aggregateRecords.get()
             );
         });
     }
@@ -199,8 +205,10 @@ public class AnalyticsStreamUtils {
     private static class StreamMetrics {
         private final AtomicLong inputRecords = new AtomicLong();
         private final AtomicLong outputRecords = new AtomicLong();
-        private final AtomicLong lastInput = new AtomicLong();
-        private final AtomicLong lastOutput = new AtomicLong();
+        private final AtomicLong aggregateRecords = new AtomicLong();
+        private Instant  lastWindowStartTime = null;
+        private Instant  lastWindowEndTime = null;
+        private final AtomicLong latestEventTime = new AtomicLong(-1);
     }
 
 }

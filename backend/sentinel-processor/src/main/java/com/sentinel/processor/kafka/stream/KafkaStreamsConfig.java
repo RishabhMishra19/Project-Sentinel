@@ -9,17 +9,21 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.errors.DefaultProductionExceptionHandler;
 import org.apache.kafka.streams.errors.LogAndFailExceptionHandler;
 import org.apache.kafka.streams.errors.LogAndFailProcessingExceptionHandler;
+import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
+import org.springframework.kafka.config.StreamsBuilderFactoryBeanConfigurer;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.kafka.streams.kstream.EmitStrategy.log;
+
 @Configuration
-//@EnableKafkaStreams
+@EnableKafkaStreams
 @RequiredArgsConstructor
 public class KafkaStreamsConfig {
 
@@ -47,5 +51,19 @@ public class KafkaStreamsConfig {
         // This explicitly enables support for Instant, LocalDateTime, LocalDate, etc.
         mapper.registerModule(new JavaTimeModule());
         return mapper;
+    }
+
+    @Bean
+    public StreamsBuilderFactoryBeanConfigurer streamsBuilderFactoryBeanConfigurer() {
+        return factoryBean -> factoryBean.setStreamsUncaughtExceptionHandler(
+            exception -> {
+                log.error(
+                    "KAFKA STREAMS UNCAUGHT EXCEPTION - thread will be affected",
+                    exception
+                );
+
+                return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.SHUTDOWN_CLIENT;
+            }
+        );
     }
 }
