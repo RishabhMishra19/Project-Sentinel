@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS analytics_endpoint_stats_hour (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS analytics_endpoint_stats_day (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS analytics_product_stats_minute (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS analytics_product_stats_hour (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,
@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS analytics_product_stats_day (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,
@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS analytics_service_stats_minute (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,
@@ -253,7 +253,7 @@ CREATE TABLE IF NOT EXISTS analytics_service_stats_hour (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,
@@ -285,7 +285,7 @@ CREATE TABLE IF NOT EXISTS analytics_service_stats_day (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,
@@ -321,7 +321,7 @@ CREATE TABLE IF NOT EXISTS analytics_tenant_stats_minute (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,
@@ -353,7 +353,7 @@ CREATE TABLE IF NOT EXISTS analytics_tenant_stats_hour (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,
@@ -385,7 +385,7 @@ CREATE TABLE IF NOT EXISTS analytics_tenant_stats_day (
     latency_max_ms bigint,
     latency_p50_ms bigint,
     latency_p95_ms bigint,
-    latency_p99_ms int,
+    latency_p99_ms bigint,
 
     request_bytes_total bigint,
     response_bytes_total bigint,

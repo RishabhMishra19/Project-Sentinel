@@ -1,5 +1,6 @@
 package com.sentinel.processor.kafka.stream.listener;
 
+import com.sentinel.common.cassandra.CassandraBatchInsertUtil;
 import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
 import com.sentinel.common.cassandra.requestlog.entity.RequestLogLookup;
 import com.sentinel.common.kafka.KafkaMessage;
@@ -8,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.cassandra.core.CassandraBatchOperations;
-import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -23,7 +22,7 @@ public class ReqLogListener {
 
     private static final Logger log = LoggerFactory.getLogger(ReqLogListener.class);
     private final ObjectMapper objectMapper;
-    private final CassandraTemplate cassandraTemplate;
+    private final CassandraBatchInsertUtil cassandraBatchInsertUtil;
 
     @KafkaListener(topics = KafkaTopics.request_logs, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
         KafkaTopics.request_logs + "_group")
@@ -39,10 +38,8 @@ public class ReqLogListener {
             requestLogLookups.add(this.toRequestLogLookup(reqLog));
         }
         try {
-            CassandraBatchOperations batchOperations = cassandraTemplate.batchOps();
-            requestLogs.forEach(batchOperations::insert);
-            requestLogLookups.forEach(batchOperations::insert);
-            batchOperations.execute();
+            cassandraBatchInsertUtil.insert(requestLogs);
+            cassandraBatchInsertUtil.insert(requestLogLookups);
         } catch (Exception e) {
             log.error("Failed processing Kafka batch", e);
             throw e;

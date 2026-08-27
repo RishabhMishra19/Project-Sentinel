@@ -25,7 +25,6 @@ public class IngestServiceClient {
 
     private final HttpClient httpClient = HttpClient.newBuilder()
         .connectTimeout(Duration.ofSeconds(5))
-        .executor(Executors.newVirtualThreadPerTaskExecutor())
         .build();
 
 

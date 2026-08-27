@@ -35,8 +35,7 @@ public class IngestRequestDataGenerator {
         int durationMs = this.getRandomIntBetween(runLogConfig.getMinLatencyMs(), runLogConfig.getMaxLatencyMs());
         int requestSize = this.getRandomIntBetween(10000, 20000);
         int responseSize = this.getRandomIntBetween(10000, 50000);
-        Instant occurredAt =
-            this.getRandomDateBetween(runLogConfig.getMinRequestOccurredAtTime(), runLogConfig.getMaxRequestOccurredAtTime());
+        Instant occurredAt = this.getNextOccurredAt();
         int statusCode = this.getRandomStatusCode(runLogConfig.getFailureRatePercentage());
         return new IngestRequest(serviceId, this.loadTestDataDTO.getApiKeysMap().get(serviceId),
             List.of(IngestRequest.IngestRequestItem.builder()
@@ -52,12 +51,6 @@ public class IngestRequestDataGenerator {
                 .traceId(UUID.randomUUID().toString())
                 .userId("user_" + ThreadLocalRandom.current().nextInt(500))
                 .build()));
-    }
-
-    private Instant getRandomDateBetween(Instant minDate, Instant maxDate) {
-        long minDateEpochMilli = minDate.toEpochMilli();
-        long maxDateEpochMilli = maxDate.toEpochMilli();
-        return Instant.ofEpochMilli(minDateEpochMilli + ThreadLocalRandom.current().nextLong(maxDateEpochMilli - minDateEpochMilli));
     }
 
     private int getRandomIntBetween(int minLong, int maxLong) {

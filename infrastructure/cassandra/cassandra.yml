@@ -1,78 +1,68 @@
 services:
-  cassandra:
-    image: cassandra:5.0
+    cassandra:
+        image: cassandra:5.0
 
-    ports:
-      # CQL native protocol
-      # Host:Container
-      - "9042:9042"
+        ports:
+            - "9042:9042"
 
-    environment:
-      # Name of the Cassandra cluster.
-      CASSANDRA_CLUSTER_NAME: sentinel-cluster
+        environment:
+            CASSANDRA_CLUSTER_NAME: sentinel-cluster
 
-      # Single-node development cluster.
-      CASSANDRA_DC: datacenter1
-      CASSANDRA_RACK: rack1
+            CASSANDRA_DC: datacenter1
+            CASSANDRA_RACK: rack1
 
-      # Disable Cassandra's legacy snitch behavior for a
-      # simple local development setup.
-      CASSANDRA_ENDPOINT_SNITCH: SimpleSnitch
+            CASSANDRA_ENDPOINT_SNITCH: SimpleSnitch
 
-      # Enable username/password authentication
-      CASSANDRA_AUTHENTICATOR: PasswordAuthenticator
+            CASSANDRA_AUTHENTICATOR: PasswordAuthenticator
 
-    volumes:
-      # Persist Cassandra data.
-      - cassandra-data:/var/lib/cassandra
+            # Keep Cassandra's JVM memory reasonable for local development.
+            MAX_HEAP_SIZE: 2G
+            HEAP_NEWSIZE: 512M
 
-    healthcheck:
-      # Check whether Cassandra is accepting CQL connections.
-      test:
-        [
-          "CMD-SHELL",
-          "cqlsh -e 'SELECT now() FROM system.local;' 127.0.0.1 9042",
-        ]
+        volumes:
+            - cassandra-data:/var/lib/cassandra
 
-      interval: 10s
-      timeout: 10s
-      retries: 20
-      start_period: 60s
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "cqlsh -e 'SELECT now() FROM system.local;' 127.0.0.1 9042",
+                ]
+            interval: 10s
+            timeout: 10s
+            retries: 20
+            start_period: 60s
 
-  # ============================================================
-  # Cassandra schema initialization
-  # ============================================================
-  cassandra-init:
-    image: cassandra:5.0
+    cassandra-init:
+        image: cassandra:5.0
 
-    depends_on:
-      cassandra:
-        condition: service_healthy
+        depends_on:
+            cassandra:
+                condition: service_healthy
 
-    volumes:
-      # Mount our CQL initialization scripts.
-      - ./init:/init:ro
+        volumes:
+            - ./init:/init:ro
 
-    entrypoint: ["/bin/bash", "-c"]
+        entrypoint: ["/bin/bash", "-c"]
 
-    command:
-      - |
-        echo "Waiting for Cassandra..."
-        until cqlsh cassandra 9042 -e "SELECT now() FROM system.local;" > /dev/null 2>&1; do
-          sleep 5
-        done
+        command:
+            - |
+                echo "Waiting for Cassandra..."
+                until cqlsh cassandra 9042 -e "SELECT now() FROM system.local;" > /dev/null 2>&1; do
+                  sleep 5
+                done
 
-        echo "Cassandra is ready."
-        echo "Running initialization scripts..."
+                echo "Cassandra is ready."
+                echo "Running initialization scripts..."
 
-        for file in /init/*.cql; do
-          echo "Executing $$file..."
-          cqlsh cassandra 9042 -f "$$file"
-        done
+                for file in /init/*.cql; do
+                  echo "Executing $$file..."
+                  cqlsh cassandra 9042 -f "$$file"
+                done
 
-        echo "Cassandra initialization completed."
+                echo "Cassandra initialization completed."
 
-    restart: "no"
+        restart: "no"
 
 volumes:
-  cassandra-data:
+    cassandra-data:

@@ -67,10 +67,4 @@ public class KafkaTopics {
      * Daily aggregated endpoint metrics derived from hourly statistics. Used for daily endpoint analytics and Cassandra persistence.
      */
     public static final String endpoint_day_analytics = "endpoint_day_analytics";
-
-    /**
-     * Endpoint-level HTTP status code metrics. Contains aggregated counts for 2xx, 3xx, 4xx, and 5xx responses for each endpoint, used for
-     * endpoint health and status analytics.
-     */
-    public static final String endpoint_status_metrics = "endpoint_status_metrics";
 }
