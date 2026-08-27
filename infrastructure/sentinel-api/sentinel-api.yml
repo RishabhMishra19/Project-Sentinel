@@ -1,60 +1,60 @@
 services:
-  sentinel-api:
-    build:
-      # Build context is the Sentinel project root.
-      # This allows the Dockerfile to access backend/.
-      context: ../..
+    sentinel-api:
+        build:
+            # Build context is the Sentinel project root.
+            # This allows the Dockerfile to access backend/.
+            context: ../..
 
-      # Dockerfile lives under infrastructure/.
-      dockerfile: infrastructure/sentinel-api/Dockerfile
+            # Dockerfile lives under infrastructure/.
+            dockerfile: infrastructure/sentinel-api/Dockerfile
 
-    expose:
-      - "8080"
+        expose:
+            - "8080"
 
-    environment:
-      # --------------------------------------------------------
-      # PostgreSQL
-      # --------------------------------------------------------
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sentinel
-      SPRING_DATASOURCE_USERNAME: sentinel
-      SPRING_DATASOURCE_PASSWORD: sentinel
+        environment:
+            # --------------------------------------------------------
+            # PostgreSQL
+            # --------------------------------------------------------
+            SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sentinel
+            SPRING_DATASOURCE_USERNAME: sentinel
+            SPRING_DATASOURCE_PASSWORD: sentinel
 
-      # --------------------------------------------------------
-      # Cassandra
-      # --------------------------------------------------------
-      SPRING_CASSANDRA_CONTACT_POINTS: cassandra
-      SPRING_CASSANDRA_PORT: 9042
-      SPRING_CASSANDRA_LOCAL_DATACENTER: datacenter1
+            # --------------------------------------------------------
+            # Cassandra
+            # --------------------------------------------------------
+            SPRING_CASSANDRA_CONTACT_POINTS: cassandra
+            SPRING_CASSANDRA_PORT: 9042
+            SPRING_CASSANDRA_LOCAL_DATACENTER: datacenter1
 
-      # Redis
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
+            # Redis
+            SPRING_DATA_REDIS_HOST: redis
+            SPRING_DATA_REDIS_PORT: 6379
 
-      # Kafka cluster
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092,kafka-3:9092
+            # Kafka cluster
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
-    depends_on:
-      # Processor should wait until PostgreSQL is healthy.
-      postgres:
-        condition: service_healthy
+        depends_on:
+            # Processor should wait until PostgreSQL is healthy.
+            postgres:
+                condition: service_healthy
 
-      # Processor should wait until redis is healthy.
-      redis:
-        condition: service_healthy
+            # Processor should wait until redis is healthy.
+            redis:
+                condition: service_healthy
 
-      # Processor should wait until Cassandra is healthy.
-      cassandra:
-        condition: service_healthy
+            # Processor should wait until Cassandra is healthy.
+            cassandra:
+                condition: service_healthy
 
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -sf http://localhost:8080/actuator/health || exit 1",
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 30
-      start_period: 40s
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "curl -sf http://localhost:8080/actuator/health || exit 1",
+                ]
+            interval: 5s
+            timeout: 5s
+            retries: 30
+            start_period: 40s
 
-    restart: unless-stopped
+        restart: unless-stopped

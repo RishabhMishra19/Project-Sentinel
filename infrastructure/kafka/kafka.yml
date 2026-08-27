@@ -1,0 +1,67 @@
+services:
+    kafka:
+        build:
+            context: .
+            dockerfile: Dockerfile
+
+        container_name: kafka
+
+        ports:
+            # Host:Container
+            # Applications running on the host can use localhost:9092
+            - "9092:9092"
+
+        environment:
+            # Unique ID of this Kafka broker/controller
+            KAFKA_NODE_ID: 1
+
+            # This node acts as both:
+            # - Kafka broker
+            # - KRaft controller
+            #
+            # No ZooKeeper.
+            KAFKA_PROCESS_ROLES: broker,controller
+
+            # All three nodes form the KRaft controller quorum.
+            #
+            # Format:
+            # node-id@hostname:controller-port
+            KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+            # Listener used by KRaft controllers.
+            KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+            # 9092 -> Kafka broker/client traffic
+            # 9093 -> KRaft controller traffic
+            KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+
+            # Address advertised to other containers.
+            KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+
+            # Map listener names to security protocols.
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+
+            # Broker-to-broker communication.
+            KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+            # ------------------------------------------------------
+            # Internal Kafka topics
+            # ------------------------------------------------------
+
+            # Consumer offsets are replicated across all 3 brokers.
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+            # Transaction state is replicated across all 3 brokers.
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+            # At least 2 replicas must remain in-sync.
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+            # We will explicitly create topics while learning.
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+        volumes:
+            # Persist Kafka data for this broker.
+            - kafka-data:/var/lib/kafka/data
+
+volumes:
+    kafka-data:

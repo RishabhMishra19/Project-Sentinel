@@ -102,72 +102,72 @@ public class AnalyticsListener {
     public void onEndpointMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
         this.storeInCassandra(records, AnalyticsEndpointStatsMinute::new, endpointMinuteMetrics);
     }
-
-    @KafkaListener(topics = KafkaTopics.endpoint_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.endpoint_hour_analytics + "_group")
-    public void onEndpointHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsEndpointStatsHour::new, endpointHourMetrics);
-    }
-
-    @KafkaListener(topics = KafkaTopics.endpoint_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.endpoint_day_analytics + "_group")
-    public void onEndpointDayAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsEndpointStatsDay::new, endpointDayMetrics);
-    }
-
-    @KafkaListener(topics = KafkaTopics.service_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.service_minute_analytics + "_group")
-    public void onServiceMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsServiceStatsMinute::new, serviceMinuteMetrics);
-    }
-
-    @KafkaListener(topics = KafkaTopics.service_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.service_hour_analytics + "_group")
-    public void onServiceHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsServiceStatsHour::new, serviceHourMetrics);
-    }
-
-    @KafkaListener(topics = KafkaTopics.service_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.service_day_analytics + "_group")
-    public void onServiceDayAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsServiceStatsDay::new, serviceDayMetrics);
-    }
-
-    @KafkaListener(topics = KafkaTopics.product_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.product_minute_analytics + "_group")
-    public void onProductMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsProductStatsMinute::new, productMinuteMetrics);
-    }
-
-    @KafkaListener(topics = KafkaTopics.product_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.product_hour_analytics + "_group")
-    public void onProductHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsProductStatsHour::new, productHourMetrics);
-    }
-
-    @KafkaListener(topics = KafkaTopics.product_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.product_day_analytics + "_group")
-    public void onProductDayAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsProductStatsDay::new, productDayMetrics);
-    }
-
-    @KafkaListener(topics = KafkaTopics.tenant_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.tenant_minute_analytics + "_group")
-    public void onTenantMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsTenantStatsMinute::new, tenantMinuteMetrics);
-    }
-
-    @KafkaListener(topics = KafkaTopics.tenant_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.tenant_hour_analytics + "_group")
-    public void onTenantHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsTenantStatsHour::new, tenantHourMetrics);
-    }
-
-    @KafkaListener(topics = KafkaTopics.tenant_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
-        KafkaTopics.tenant_day_analytics + "_group")
-    public void onTenantDayAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
-        this.storeInCassandra(records, AnalyticsTenantStatsDay::new, tenantDayMetrics);
-    }
+//
+//    @KafkaListener(topics = KafkaTopics.endpoint_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.endpoint_hour_analytics + "_group")
+//    public void onEndpointHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsEndpointStatsHour::new, endpointHourMetrics);
+//    }
+//
+//    @KafkaListener(topics = KafkaTopics.endpoint_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.endpoint_day_analytics + "_group")
+//    public void onEndpointDayAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsEndpointStatsDay::new, endpointDayMetrics);
+//    }
+//
+//    @KafkaListener(topics = KafkaTopics.service_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.service_minute_analytics + "_group")
+//    public void onServiceMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsServiceStatsMinute::new, serviceMinuteMetrics);
+//    }
+//
+//    @KafkaListener(topics = KafkaTopics.service_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.service_hour_analytics + "_group")
+//    public void onServiceHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsServiceStatsHour::new, serviceHourMetrics);
+//    }
+//
+//    @KafkaListener(topics = KafkaTopics.service_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.service_day_analytics + "_group")
+//    public void onServiceDayAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsServiceStatsDay::new, serviceDayMetrics);
+//    }
+//
+//    @KafkaListener(topics = KafkaTopics.product_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.product_minute_analytics + "_group")
+//    public void onProductMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsProductStatsMinute::new, productMinuteMetrics);
+//    }
+//
+//    @KafkaListener(topics = KafkaTopics.product_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.product_hour_analytics + "_group")
+//    public void onProductHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsProductStatsHour::new, productHourMetrics);
+//    }
+//
+//    @KafkaListener(topics = KafkaTopics.product_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.product_day_analytics + "_group")
+//    public void onProductDayAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsProductStatsDay::new, productDayMetrics);
+//    }
+//
+//    @KafkaListener(topics = KafkaTopics.tenant_minute_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.tenant_minute_analytics + "_group")
+//    public void onTenantMinuteAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsTenantStatsMinute::new, tenantMinuteMetrics);
+//    }
+//
+//    @KafkaListener(topics = KafkaTopics.tenant_hour_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.tenant_hour_analytics + "_group")
+//    public void onTenantHourAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsTenantStatsHour::new, tenantHourMetrics);
+//    }
+//
+//    @KafkaListener(topics = KafkaTopics.tenant_day_analytics, containerFactory = "sentinelKafkaListenerContainerFactory", groupId =
+//        KafkaTopics.tenant_day_analytics + "_group")
+//    public void onTenantDayAnalyticsBatch(List<ConsumerRecord<String, String>> records) {
+//        this.storeInCassandra(records, AnalyticsTenantStatsDay::new, tenantDayMetrics);
+//    }
 
     private <T> void storeInCassandra(
         List<ConsumerRecord<String, String>> records,

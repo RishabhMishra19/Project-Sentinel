@@ -7,8 +7,7 @@ services:
         environment:
             DYNAMIC_CONFIG_ENABLED: "true"
             KAFKA_CLUSTERS_0_NAME: local
-            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:29092,kafka-2:29092,kafka-3:29092
+            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+            SERVER_SERVLET_CONTEXT_PATH: /kafka
         depends_on:
-            - kafka-1
-            - kafka-2
-            - kafka-3
+            - kafka

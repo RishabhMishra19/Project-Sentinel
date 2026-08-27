@@ -1,53 +1,47 @@
 services:
-  sentinel-processor:
-    build:
-      # Build context is the Sentinel project root.
-      context: ../..
+    sentinel-processor:
+        build:
+            # Build context is the Sentinel project root.
+            context: ../..
 
-      # Dockerfile for the processor.
-      dockerfile: infrastructure/sentinel-processor/Dockerfile
+            # Dockerfile for the processor.
+            dockerfile: infrastructure/sentinel-processor/Dockerfile
 
-    expose:
-      - "8082"
+        expose:
+            - "8082"
 
-    environment:
-      # --------------------------------------------------------
-      # Cassandra
-      # --------------------------------------------------------
-      SPRING_CASSANDRA_CONTACT_POINTS: cassandra
-      SPRING_CASSANDRA_PORT: 9042
-      SPRING_CASSANDRA_LOCAL_DATACENTER: datacenter1
+        environment:
+            # --------------------------------------------------------
+            # Cassandra
+            # --------------------------------------------------------
+            SPRING_CASSANDRA_CONTACT_POINTS: cassandra
+            SPRING_CASSANDRA_PORT: 9042
+            SPRING_CASSANDRA_LOCAL_DATACENTER: datacenter1
 
-      # --------------------------------------------------------
-      # Kafka
-      # --------------------------------------------------------
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092,kafka-3:9092
+            # --------------------------------------------------------
+            # Kafka
+            # --------------------------------------------------------
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
-    depends_on:
-      # Processor should wait until Cassandra is healthy.
-      cassandra:
-        condition: service_healthy
+        depends_on:
+            # Processor should wait until Cassandra is healthy.
+            cassandra:
+                condition: service_healthy
 
-      # Kafka brokers need to be started before the processor.
-      kafka-1:
-        condition: service_started
+            # Kafka brokers need to be started before the processor.
+            kafka:
+                condition: service_started
 
-      kafka-2:
-        condition: service_started
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "curl -sf http://localhost:8082/actuator/health || exit 1",
+                ]
 
-      kafka-3:
-        condition: service_started
+            interval: 10s
+            timeout: 5s
+            retries: 12
+            start_period: 40s
 
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -sf http://localhost:8082/actuator/health || exit 1",
-        ]
-
-      interval: 10s
-      timeout: 5s
-      retries: 12
-      start_period: 40s
-
-    restart: unless-stopped
+        restart: unless-stopped

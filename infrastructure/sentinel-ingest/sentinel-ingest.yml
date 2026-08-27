@@ -1,57 +1,51 @@
 services:
-  sentinel-api:
-    build:
-      # Build context is the Sentinel project root.
-      # This allows the Dockerfile to access backend/.
-      context: ../..
+    sentinel-api:
+        build:
+            # Build context is the Sentinel project root.
+            # This allows the Dockerfile to access backend/.
+            context: ../..
 
-      # Dockerfile lives under infrastructure/.
-      dockerfile: infrastructure/sentinel-ingest/Dockerfile
+            # Dockerfile lives under infrastructure/.
+            dockerfile: infrastructure/sentinel-ingest/Dockerfile
 
-    expose:
-      - "8081"
+        expose:
+            - "8081"
 
-    environment:
-      # PostgreSQL
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sentinel
-      SPRING_DATASOURCE_USERNAME: sentinel
-      SPRING_DATASOURCE_PASSWORD: sentinel
+        environment:
+            # PostgreSQL
+            SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sentinel
+            SPRING_DATASOURCE_USERNAME: sentinel
+            SPRING_DATASOURCE_PASSWORD: sentinel
 
-      # Memcached
-      MEMCACHED_HOST: memcached
-      MEMCACHED_PORT: 11211
+            # Memcached
+            MEMCACHED_HOST: memcached
+            MEMCACHED_PORT: 11211
 
-      # Kafka cluster
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092,kafka-3:9092
+            # Kafka cluster
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
-    depends_on:
-      # Processor should wait until PostgreSQL is healthy.
-      postgres:
-        condition: service_healthy
+        depends_on:
+            # Processor should wait until PostgreSQL is healthy.
+            postgres:
+                condition: service_healthy
 
-      # Processor should wait until memcached is healthy.
-      memcached:
-        condition: service_healthy
+            # Processor should wait until memcached is healthy.
+            memcached:
+                condition: service_healthy
 
-      # Kafka brokers need to be started before the processor.
-      kafka-1:
-        condition: service_started
+            # Kafka brokers need to be started before the processor.
+            kafka:
+                condition: service_started
 
-      kafka-2:
-        condition: service_started
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "curl -sf http://localhost:8081/actuator/health || exit 1",
+                ]
+            interval: 5s
+            timeout: 5s
+            retries: 30
+            start_period: 40s
 
-      kafka-3:
-        condition: service_started
-
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -sf http://localhost:8081/actuator/health || exit 1",
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 30
-      start_period: 40s
-
-    restart: unless-stopped
+        restart: unless-stopped

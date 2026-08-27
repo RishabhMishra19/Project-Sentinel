@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@EnableKafkaStreams
+//@EnableKafkaStreams
 @RequiredArgsConstructor
 public class KafkaStreamsConfig {
 

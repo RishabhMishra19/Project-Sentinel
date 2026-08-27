@@ -1,19 +1,17 @@
 include:
-  # Infrastructure
-  - ./infrastructure/kafka/kafka-1.yml
-  - ./infrastructure/kafka/kafka-2.yml
-  - ./infrastructure/kafka/kafka-3.yml
-  - ./infrastructure/kafka/kafka-ui.yml
-  - ./infrastructure/redis/redis.yml
-  - ./infrastructure/memcached/memcached.yml
-  - ./infrastructure/postgres/postgres.yml
-  - ./infrastructure/cassandra/cassandra.yml
+    # Infrastructure
+    - ./infrastructure/kafka/kafka.yml
+    - ./infrastructure/kafka/kafka-ui.yml
+    - ./infrastructure/redis/redis.yml
+    - ./infrastructure/memcached/memcached.yml
+    - ./infrastructure/postgres/postgres.yml
+    - ./infrastructure/cassandra/cassandra.yml
 
-  # Applications
-  # - ./infrastructure/sentinel-api/sentinel-api.yml
-  # - ./infrastructure/sentinel-ingest/sentinel-ingest.yml
-  # - ./infrastructure/sentinel-processor/sentinel-processor.yml
-  # - ./infrastructure/sentinel-web/sentinel-web.yml
+    # Applications
+    # - ./infrastructure/sentinel-api/sentinel-api.yml
+    # - ./infrastructure/sentinel-ingest/sentinel-ingest.yml
+    # - ./infrastructure/sentinel-processor/sentinel-processor.yml
+    # - ./infrastructure/sentinel-web/sentinel-web.yml
 
-  # Reverse Proxy
-  # - ./infrastructure/nginx/nginx.yml
+    # Reverse Proxy
+    # - ./infrastructure/nginx/nginx.yml
