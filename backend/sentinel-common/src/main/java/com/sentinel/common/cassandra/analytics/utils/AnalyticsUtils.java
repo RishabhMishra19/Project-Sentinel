@@ -4,7 +4,6 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.sentinel.common.cassandra.analytics.dto.AnalyticsStatsMetrics;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 public class AnalyticsUtils {
@@ -153,18 +152,6 @@ public class AnalyticsUtils {
 
     public static Instant getInstant(Row row, String column) {
         return row.get(column, Instant.class);
-    }
-
-    public static AnalyticsBucket getAnalyticsBucket(Instant from, Instant to) {
-        if (from.truncatedTo(ChronoUnit.DAYS)
-            .isBefore(to.truncatedTo(ChronoUnit.DAYS))) {
-            return AnalyticsBucket.DAY;
-        }
-        if (from.truncatedTo(ChronoUnit.HOURS)
-            .isBefore(to.truncatedTo(ChronoUnit.HOURS))) {
-            return AnalyticsBucket.HOUR;
-        }
-        return AnalyticsBucket.MINUTE;
     }
 
 }

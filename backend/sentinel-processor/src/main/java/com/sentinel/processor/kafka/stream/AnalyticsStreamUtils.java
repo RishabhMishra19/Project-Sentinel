@@ -24,12 +24,15 @@ import org.apache.kafka.streams.processor.TimestampExtractor;
 import org.apache.kafka.streams.state.WindowStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 @RequiredArgsConstructor
@@ -38,6 +41,7 @@ public class AnalyticsStreamUtils {
     private static final String SENTINEL_LOGS_PREFIX = "SENTINEL_LOGS_PREFIX: ";
     private static final String KEY_SEPARATOR = "|";
     private static final String KEY_SEPARATOR_REGEX = "\\|";
+
     private final Logger log = LoggerFactory.getLogger(AnalyticsStreamUtils.class);
     private final ObjectMapper objectMapper;
 
@@ -46,6 +50,7 @@ public class AnalyticsStreamUtils {
         Map.entry(AnalyticsBucket.HOUR, TimeWindows.ofSizeAndGrace(Duration.ofHours(1), Duration.ofMinutes(1))),
         Map.entry(AnalyticsBucket.DAY, TimeWindows.ofSizeAndGrace(Duration.ofDays(1), Duration.ofMinutes(1)))
     );
+
     private final TimestampExtractor reqLogTimestampExtractor = (record, previousTimeStamp) -> {
         KafkaMessage.ReqLog log = (KafkaMessage.ReqLog) record.value();
         if (log != null && log.occurredAt() != null) {
@@ -56,6 +61,7 @@ public class AnalyticsStreamUtils {
         }
         return record.timestamp();
     };
+
     private final TimestampExtractor analyticsTimestampExtractor = (record, previousTimeStamp) -> {
         KafkaMessage.AnalyticsMetrics metrics = (KafkaMessage.AnalyticsMetrics) record.value();
         if (metrics != null && metrics.getTimestamp() != null) {
@@ -66,8 +72,11 @@ public class AnalyticsStreamUtils {
         }
         return record.timestamp();
     };
+
     public Serde<KafkaMessage.ReqLog> requestLogSerde = customSerde(KafkaMessage.ReqLog.class);
     public Serde<KafkaMessage.AnalyticsMetrics> analyticsMetricSerde = customSerde(KafkaMessage.AnalyticsMetrics.class);
+
+    private final ConcurrentHashMap<String, StreamMetrics> streamMetrics = new ConcurrentHashMap<>();
 
     private <T> Serde<T> customSerde(Class<T> clazz) {
         Serializer<T> serializer = (topic, data) -> {
@@ -79,6 +88,7 @@ public class AnalyticsStreamUtils {
                 throw new RuntimeException(e);
             }
         };
+
         Deserializer<T> deserializer = (topic, data) -> {
             if (data == null || data.length == 0)
                 return null;
@@ -95,6 +105,7 @@ public class AnalyticsStreamUtils {
                 throw new RuntimeException(e);
             }
         };
+
         return Serdes.serdeFrom(serializer, deserializer);
     }
 
@@ -102,15 +113,14 @@ public class AnalyticsStreamUtils {
         return streamsBuilder.stream(
             KafkaTopics.request_logs,
             Consumed.with(Serdes.String(), requestLogSerde).withTimestampExtractor(reqLogTimestampExtractor)
-        ).peek((key, val) -> log.info("{}INPUT: topic={}, timestamp={}, entityId={}, key={}, , val={}, ", SENTINEL_LOGS_PREFIX,
-            KafkaTopics.request_logs, val.occurredAt(), val.endpointId(), key, val));
+        );
     }
 
     public KStream<String, KafkaMessage.AnalyticsMetrics> getAnalyticsInputStream(StreamsBuilder streamsBuilder, String inputTopic) {
-        return streamsBuilder.stream(inputTopic,
-                Consumed.with(Serdes.String(), analyticsMetricSerde).withTimestampExtractor(analyticsTimestampExtractor))
-            .peek((key, val) -> log.info("{}INPUT: topic={}, timestamp={}, entityId={}, key={}, val={}", SENTINEL_LOGS_PREFIX, inputTopic,
-                val.getTimestamp(), val.getEntityId(), key, val));
+        return streamsBuilder.stream(
+            inputTopic,
+            Consumed.with(Serdes.String(), analyticsMetricSerde).withTimestampExtractor(analyticsTimestampExtractor)
+        );
     }
 
     public String getCompositeKey(KafkaMessage.ReqLog reqLog) {
@@ -135,10 +145,15 @@ public class AnalyticsStreamUtils {
         AnalyticsScope scope,
         String outputTopic
     ) {
+        String metricKey = bucket + "-" + scope;
+
+        StreamMetrics metrics = streamMetrics.computeIfAbsent(
+            metricKey,
+            key -> new StreamMetrics()
+        );
+
         stream
-            .peek(
-                (key, value) -> log.info("{}Repartitioned: , timestamp={}, entityId={}, scope={}, bucket={}, key={}", SENTINEL_LOGS_PREFIX,
-                    value.getTimestamp(), value.getEntityId(), value.getScope(), value.getBucket(), key))
+            .peek((key, value) -> metrics.inputRecords.incrementAndGet())
             .groupByKey(Grouped.with(Serdes.String(), analyticsMetricSerde))
             .windowedBy(bucketToWindowMap.get(bucket))
             .aggregate(
@@ -149,11 +164,43 @@ public class AnalyticsStreamUtils {
                     .withValueSerde(this.analyticsMetricSerde))
             .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"))
             .toStream()
-            .peek((key, value) -> log.info("{}Output: topic={}, timestamp={}, entityId={}, key={}, value={}", SENTINEL_LOGS_PREFIX,
-                outputTopic, value.getTimestamp(), value.getEntityId(), key, value))
+            .peek((key, value) -> metrics.outputRecords.incrementAndGet())
             .map((windowedKey, val) -> KeyValue.pair(windowedKey.key(), val))
             .to(outputTopic, Produced.with(Serdes.String(), analyticsMetricSerde));
+    }
 
+    @Scheduled(fixedRate = 1000)
+    public void logStreamMetrics() {
+        streamMetrics.forEach((name, metrics) -> {
+            long input = metrics.inputRecords.get();
+            long output = metrics.outputRecords.get();
+
+            long previousInput = metrics.lastInput.getAndSet(input);
+            long previousOutput = metrics.lastOutput.getAndSet(output);
+
+            long inputRate = input - previousInput;
+            long outputRate = output - previousOutput;
+
+            if (inputRate == 0 && outputRate == 0) {
+                return;
+            }
+
+            log.info(
+                "Analytics stream [{}]: input={} records/s, output={} records/s, totalInput={}, totalOutput={}",
+                name,
+                inputRate,
+                outputRate,
+                input,
+                output
+            );
+        });
+    }
+
+    private static class StreamMetrics {
+        private final AtomicLong inputRecords = new AtomicLong();
+        private final AtomicLong outputRecords = new AtomicLong();
+        private final AtomicLong lastInput = new AtomicLong();
+        private final AtomicLong lastOutput = new AtomicLong();
     }
 
 }

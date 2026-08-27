@@ -50,13 +50,12 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     @Override
     @Transactional(readOnly = true)
     public AnalyticsSummaryResponse getSummary(AnalyticsSummaryRequestParams params) {
-        AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
         TotalStatsResponse totalStats = analyticsService.findTotalStats(
             params.entityId(),
             params.from(),
             params.to(),
             params.scope(),
-            bucket
+            AnalyticsBucket.MINUTE
         );
         long activeEndpoints = this.countEndPoints(params.entityId(), params.scope());
         Map<UUID, String> idToNameMap = this.getIdToNameMap(List.of(params.entityId()), params.scope());
@@ -89,12 +88,11 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     ) {
         AnalyticsScope childScope = this.getChildScope(params.scope());
         List<UUID> entityIds = this.getChildEntityIds(params.scope(), params.entityId());
-        AnalyticsBucket bucket = AnalyticsUtils.getAnalyticsBucket(params.from(), params.to());
         EntityAggregatedStatsResponse entityAggregatedStatsResponse = analyticsService.findEntityAggregatedStats(entityIds,
             params.from(),
             params.to(),
             childScope,
-            bucket
+            AnalyticsBucket.MINUTE
         );
         Map<UUID, Long> endpointCountMap = new HashMap<>();
         for (UUID entityId : entityIds) {
