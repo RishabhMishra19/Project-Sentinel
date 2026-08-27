@@ -1,17 +1,13 @@
 package com.sentinel.ingest.logs.service;
 
-import com.sentinel.common.postgresql.endpoint.entity.Endpoint;
+import com.sentinel.ingest.logs.dto.EndpointKey;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public interface EndpointService {
 
-    Map<String, Map<String, UUID>> findPathTemplateMappingForService(UUID serviceId);
-
-    void bulkInsertEndpoints(List<Endpoint> endpoints);
-
-    void bulkUpdateLastSeenToNow(List<UUID> endpointIds);
+    Map<EndpointKey, UUID> upsertEndpointsAndReturnIdMapping(Set<EndpointKey> endpointKeys);
 
 }
