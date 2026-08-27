@@ -44,13 +44,24 @@ public class RequestExecutorServiceImpl implements RequestExecutorService {
         runLog = loadTestRunService.create(loadTestDataId, request);
         LoadTestData loadTestData = loadTestDataService.markRunning(loadTestDataId);
         LoadTestRunLog finalRunLog = runLog;
-        CompletableFuture.runAsync(
+        CompletableFuture.supplyAsync(
             () -> loadExecutor.execute(loadTestData, finalRunLog),
             Executors.newVirtualThreadPerTaskExecutor()
         ).whenComplete((result, exception) -> {
-            if(exception!=null) log.error(exception.getMessage(), exception);
+            if (exception != null) {
+                log.error(exception.getMessage(), exception);
+                return;
+            }
+
+            loadTestRunService.updateNoOfRequests(
+                finalRunLog.getId(),
+                result.totalRequests(),
+                result.totalErrors()
+            );
+
             loadTestRunService.markCompleted(finalRunLog.getId());
             loadTestDataService.markIdle(loadTestDataId);
+            log.info("Load test run completed with result: {}", result);
         });
         return new LoadTestResponse(loadTestData, runLog);
     }
