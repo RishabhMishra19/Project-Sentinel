@@ -6,13 +6,10 @@ import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.UUID;
 
 @Slf4j
 @Configuration
@@ -33,10 +30,8 @@ public class AnalyticsStream {
         //1. reqLog to endpointMinuteAnalytics stream
         KStream<String, KafkaMessage.AnalyticsMetrics> rawEndpointAnalyticsStream = analyticsStreamUtils
             .getReqLogInputStream(builder)
-            .map((key, val) -> KeyValue.pair(
-                analyticsStreamUtils.getCompositeKey(val),
-                new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.ENDPOINT, val.endpointId()).initialize(val)
-            ));
+            .mapValues((key, val) -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.ENDPOINT,
+                val.endpointId()).initialize(val));
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             rawEndpointAnalyticsStream,
             AnalyticsBucket.MINUTE,
@@ -48,12 +43,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> serviceMinuteStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.endpoint_minute_analytics
-        ).map((key, val) -> {
-            String newCompositeKey = analyticsStreamUtils.removeLastIdFromCompositeKey(key);
-            UUID newEntityId = analyticsStreamUtils.extractUUIDAtLastFromCompositeKey(newCompositeKey);
-            return KeyValue.pair(newCompositeKey,
-                new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.SERVICE, newEntityId).initialize(val));
-        });
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             serviceMinuteStream,
             AnalyticsBucket.MINUTE,
@@ -65,12 +55,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> productMinuteStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.service_minute_analytics
-        ).map((key, val) -> {
-            String newCompositeKey = analyticsStreamUtils.removeLastIdFromCompositeKey(key);
-            UUID newEntityId = analyticsStreamUtils.extractUUIDAtLastFromCompositeKey(newCompositeKey);
-            return KeyValue.pair(newCompositeKey,
-                new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.PRODUCT, newEntityId).initialize(val));
-        });
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             productMinuteStream,
             AnalyticsBucket.MINUTE,
@@ -82,12 +67,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> tenantMinuteStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.product_minute_analytics
-        ).map((key, val) -> {
-            String newCompositeKey = analyticsStreamUtils.removeLastIdFromCompositeKey(key);
-            UUID newEntityId = analyticsStreamUtils.extractUUIDAtLastFromCompositeKey(newCompositeKey);
-            return KeyValue.pair(newCompositeKey,
-                new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.MINUTE, AnalyticsScope.TENANT, newEntityId).initialize(val));
-        });
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             tenantMinuteStream,
             AnalyticsBucket.MINUTE,
@@ -102,8 +82,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> endpointHourStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.endpoint_minute_analytics
-        ).mapValues(
-            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.ENDPOINT, val.getEntityId()).initialize(val));
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             endpointHourStream,
             AnalyticsBucket.HOUR,
@@ -115,8 +94,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> serviceHourStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.service_minute_analytics
-        ).mapValues(
-            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.SERVICE, val.getEntityId()).initialize(val));
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             serviceHourStream,
             AnalyticsBucket.HOUR,
@@ -128,8 +106,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> productHourStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.product_minute_analytics
-        ).mapValues(
-            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.PRODUCT, val.getEntityId()).initialize(val));
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             productHourStream,
             AnalyticsBucket.HOUR,
@@ -141,8 +118,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> tenantHourStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.tenant_minute_analytics
-        ).mapValues(
-            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.HOUR, AnalyticsScope.TENANT, val.getEntityId()).initialize(val));
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             tenantHourStream,
             AnalyticsBucket.HOUR,
@@ -157,8 +133,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> endpointDayStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.endpoint_hour_analytics
-        ).mapValues(
-            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.ENDPOINT, val.getEntityId()).initialize(val));
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             endpointDayStream,
             AnalyticsBucket.DAY,
@@ -170,9 +145,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> serviceDayStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.service_hour_analytics
-        ).mapValues(
-            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.SERVICE, val.getEntityId()).initialize(val));
-        ;
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             serviceDayStream,
             AnalyticsBucket.DAY,
@@ -184,9 +157,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> productDayStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.product_hour_analytics
-        ).mapValues(
-            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.PRODUCT, val.getEntityId()).initialize(val));
-        ;
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             productDayStream,
             AnalyticsBucket.DAY,
@@ -198,9 +169,7 @@ public class AnalyticsStream {
         KStream<String, KafkaMessage.AnalyticsMetrics> tenantDayStream = analyticsStreamUtils.getAnalyticsInputStream(
             builder,
             KafkaTopics.tenant_hour_analytics
-        ).mapValues(
-            val -> new KafkaMessage.AnalyticsMetrics(AnalyticsBucket.DAY, AnalyticsScope.TENANT, val.getEntityId()).initialize(val));
-        ;
+        );
         analyticsStreamUtils.groupByKeyAndSendTimeWindowedAggregationToTopic(
             tenantDayStream,
             AnalyticsBucket.DAY,

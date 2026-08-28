@@ -1,6 +1,7 @@
 services:
     cassandra:
         image: cassandra:5.0
+        container_name: cassandra
 
         ports:
             - "9042:9042"
@@ -32,37 +33,6 @@ services:
             timeout: 10s
             retries: 20
             start_period: 60s
-
-    cassandra-init:
-        image: cassandra:5.0
-
-        depends_on:
-            cassandra:
-                condition: service_healthy
-
-        volumes:
-            - ./init:/init:ro
-
-        entrypoint: ["/bin/bash", "-c"]
-
-        command:
-            - |
-                echo "Waiting for Cassandra..."
-                until cqlsh cassandra 9042 -e "SELECT now() FROM system.local;" > /dev/null 2>&1; do
-                  sleep 5
-                done
-
-                echo "Cassandra is ready."
-                echo "Running initialization scripts..."
-
-                for file in /init/*.cql; do
-                  echo "Executing $$file..."
-                  cqlsh cassandra 9042 -f "$$file"
-                done
-
-                echo "Cassandra initialization completed."
-
-        restart: "no"
 
 volumes:
     cassandra-data:

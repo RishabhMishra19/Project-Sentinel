@@ -11,7 +11,6 @@ import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.Serializer;
 import org.apache.kafka.common.utils.Bytes;
-import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Grouped;
@@ -24,24 +23,14 @@ import org.apache.kafka.streams.processor.TimestampExtractor;
 import org.apache.kafka.streams.state.WindowStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 @RequiredArgsConstructor
 public class AnalyticsStreamUtils {
-
-    private static final String SENTINEL_LOGS_PREFIX = "SENTINEL_LOGS_PREFIX: ";
-    private static final String KEY_SEPARATOR = "|";
-    private static final String KEY_SEPARATOR_REGEX = "\\|";
 
     private final Logger log = LoggerFactory.getLogger(AnalyticsStreamUtils.class);
     private final ObjectMapper objectMapper;
@@ -76,8 +65,6 @@ public class AnalyticsStreamUtils {
 
     public Serde<KafkaMessage.ReqLog> requestLogSerde = customSerde(KafkaMessage.ReqLog.class);
     public Serde<KafkaMessage.AnalyticsMetrics> analyticsMetricSerde = customSerde(KafkaMessage.AnalyticsMetrics.class);
-
-    private final ConcurrentHashMap<String, StreamMetrics> streamMetrics = new ConcurrentHashMap<>();
 
     private <T> Serde<T> customSerde(Class<T> clazz) {
         Serializer<T> serializer = (topic, data) -> {
@@ -124,91 +111,35 @@ public class AnalyticsStreamUtils {
         );
     }
 
-    public String getCompositeKey(KafkaMessage.ReqLog reqLog) {
-        return reqLog.tenantId().toString() + KEY_SEPARATOR + reqLog.productId().toString() + KEY_SEPARATOR + reqLog.serviceId()
-            .toString() + KEY_SEPARATOR + reqLog.endpointId()
-            .toString();
-    }
-
-    public String removeLastIdFromCompositeKey(String compositeKey) {
-        String[] keys = compositeKey.split(KEY_SEPARATOR_REGEX);
-        return String.join(KEY_SEPARATOR, Arrays.stream(keys).toList().subList(0, keys.length - 1));
-    }
-
-    public UUID extractUUIDAtLastFromCompositeKey(String compositeKey) {
-        String[] keys = compositeKey.split(KEY_SEPARATOR_REGEX);
-        return UUID.fromString(keys[keys.length - 1]);
-    }
-
     public void groupByKeyAndSendTimeWindowedAggregationToTopic(
         KStream<String, KafkaMessage.AnalyticsMetrics> stream,
         AnalyticsBucket bucket,
         AnalyticsScope scope,
         String outputTopic
     ) {
-        String metricKey = bucket + "-" + scope;
-
-        StreamMetrics metrics = streamMetrics.computeIfAbsent(
-            metricKey,
-            key -> new StreamMetrics()
-        );
-
         stream
-            .peek((key, value) -> {
-                metrics.inputRecords.incrementAndGet();
-                if (value != null && value.getTimestamp() != null) {
-                    metrics.latestEventTime.accumulateAndGet(
-                        value.getTimestamp().toEpochMilli(),
-                        Math::max
-                    );
-
-                }
+            .mapValues((key, val) -> {
+                val.setEntityId(KafkaMessage.extractUUIDAtLastFromCompositeKey(key));
+                val.setScope(scope);
+                val.setBucket(bucket);
+                return val;
             })
+            .peek((key, value) -> log.info("Input Stream : bucket: {}, scope: {}, entityId: {}, key: {}", bucket, scope, value.getEntityId(), key))
             .groupByKey(Grouped.with(Serdes.String(), analyticsMetricSerde))
             .windowedBy(bucketToWindowMap.get(bucket))
-            .aggregate(
-                () -> new KafkaMessage.AnalyticsMetrics(bucket, scope, null),
-                (key, value, aggregatedVal) -> {
-                    metrics.aggregateRecords.incrementAndGet();
-                    return aggregatedVal.aggregate(value);
+            .reduce((curAggregate, val) -> {
+                    log.info("Aggregating : bucket: {}, scope: {}, entity1Id: {}, entity2Id: {}", bucket, scope, curAggregate.getEntityId(), val.getEntityId());
+                    curAggregate.aggregate(val);
+                    return curAggregate;
                 },
-                Materialized.<String, KafkaMessage.AnalyticsMetrics, WindowStore<Bytes, byte[]>>as(outputTopic + "_aggregated_state_store")
+                Materialized.<String, KafkaMessage.AnalyticsMetrics, WindowStore<Bytes, byte[]>>as(outputTopic + "_reduced_state_store")
                     .withKeySerde(Serdes.String())
                     .withValueSerde(this.analyticsMetricSerde))
             .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"))
             .toStream()
-            .peek((key, value) -> {
-                metrics.outputRecords.getAndIncrement();
-                metrics.lastWindowStartTime = key.window().startTime();
-                metrics.lastWindowEndTime = key.window().endTime();
-            })
-            .map((windowedKey, val) -> KeyValue.pair(windowedKey.key(), val))
+            .peek((key, value) -> log.info("Aggregated Stream : bucket: {}, scope: {}, entityId: {}, windowTime: {}, key: {}", bucket, scope, value.getEntityId(), key.window().startTime(), key))
+            .selectKey((windowedKey, val) -> KafkaMessage.removeLastIdFromCompositeKey(windowedKey.key()))
             .to(outputTopic, Produced.with(Serdes.String(), analyticsMetricSerde));
-    }
-
-//    @Scheduled(fixedRate = 1000)
-    public void logStreamMetrics() {
-        streamMetrics.forEach((name, metrics) -> {
-            log.info(
-                "Analytics stream [{}]: window=[{} - {}], streamTime={}, totalInput={}, totalOutput={}, totalAggregatedRecords={}",
-                name,
-                metrics.lastWindowStartTime==null ? null : metrics.lastWindowStartTime.toString(),
-                metrics.lastWindowEndTime==null ? null : metrics.lastWindowEndTime.toString(),
-                metrics.latestEventTime.get(),
-                metrics.inputRecords.get(),
-                metrics.outputRecords.get(),
-                metrics.aggregateRecords.get()
-            );
-        });
-    }
-
-    private static class StreamMetrics {
-        private final AtomicLong inputRecords = new AtomicLong();
-        private final AtomicLong outputRecords = new AtomicLong();
-        private final AtomicLong aggregateRecords = new AtomicLong();
-        private Instant  lastWindowStartTime = null;
-        private Instant  lastWindowEndTime = null;
-        private final AtomicLong latestEventTime = new AtomicLong(-1);
     }
 
 }

@@ -160,7 +160,7 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
                                 KafkaTopics.request_logs,
                                 null,
                                 System.currentTimeMillis(),
-                                reqLog.requestId(),
+                                KafkaMessage.getCompositeKey(reqLog),
                                 reqLog
                             )
                         ).get();

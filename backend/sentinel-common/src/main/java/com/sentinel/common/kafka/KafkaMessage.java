@@ -1,6 +1,5 @@
 package com.sentinel.common.kafka;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -22,17 +21,19 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 
 public class KafkaMessage {
 
-    private static final Map<AnalyticsBucket, ChronoUnit> bucketToChronoUnitMap = Map.ofEntries(
-        Map.entry(AnalyticsBucket.MINUTE, ChronoUnit.MINUTES),
-        Map.entry(AnalyticsBucket.HOUR, ChronoUnit.HOURS),
-        Map.entry(AnalyticsBucket.DAY, ChronoUnit.DAYS)
-    );
+    private static final String KEY_SEPARATOR = "|";
+    private static final String KEY_SEPARATOR_REGEX = "\\|";
+
+    private static final Map<AnalyticsBucket, ChronoUnit> bucketToChronoUnitMap =
+        Map.ofEntries(Map.entry(AnalyticsBucket.MINUTE, ChronoUnit.MINUTES), Map.entry(AnalyticsBucket.HOUR, ChronoUnit.HOURS),
+            Map.entry(AnalyticsBucket.DAY, ChronoUnit.DAYS));
 
     // Serializes the histogram into a compressed, Base64-encoded string
     public static class JacksonHdrSerializer extends JsonSerializer<Histogram> {
@@ -88,6 +89,7 @@ public class KafkaMessage {
         @JsonSerialize(using = JacksonHdrSerializer.class)
         @JsonDeserialize(using = JacksonHdrDeserializer.class)
         private Histogram latencyHistogram;
+
         public AnalyticsMetrics(AnalyticsBucket bucket, AnalyticsScope scope, UUID entityId) {
             this.bucket = bucket;
             this.scope = scope;
@@ -163,27 +165,24 @@ public class KafkaMessage {
     }
 
     @Builder
-    public static record ReqLog(
-        UUID requestLogId,
-        UUID tenantId,
-        UUID productId,
-        UUID serviceId,
-        UUID endpointId,
-        String path,
-        Instant occurredAt,
-        Integer statusCode,
-        Integer durationMs,
-        String endUserIp,
-        String requestId,
-        String traceId,
-        String userId,
-        Integer requestSizeBytes,
-        Integer responseSizeBytes
-    ) {
-        @JsonIgnore
-        public String getKey() {
-            return tenantId.toString() + "|" + productId.toString() + "|" + serviceId.toString() + "|" + endpointId.toString();
-        }
+    public static record ReqLog(UUID requestLogId, UUID tenantId, UUID productId, UUID serviceId, UUID endpointId, String path,
+                                Instant occurredAt, Integer statusCode, Integer durationMs, String endUserIp, String requestId,
+                                String traceId, String userId, Integer requestSizeBytes, Integer responseSizeBytes) {
+    }
+
+    public static String getCompositeKey(KafkaMessage.ReqLog reqLog) {
+        return reqLog.tenantId().toString() + KEY_SEPARATOR + reqLog.productId().toString() + KEY_SEPARATOR +
+            reqLog.serviceId().toString() + KEY_SEPARATOR + reqLog.endpointId().toString();
+    }
+
+    public static String removeLastIdFromCompositeKey(String compositeKey) {
+        String[] keys = compositeKey.split(KEY_SEPARATOR_REGEX);
+        return String.join(KEY_SEPARATOR, Arrays.stream(keys).toList().subList(0, keys.length - 1));
+    }
+
+    public static UUID extractUUIDAtLastFromCompositeKey(String compositeKey) {
+        String[] keys = compositeKey.split(KEY_SEPARATOR_REGEX);
+        return UUID.fromString(keys[keys.length - 1]);
     }
 
 }
