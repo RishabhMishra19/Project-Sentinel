@@ -2,31 +2,25 @@ package com.sentinel.common.cassandra;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 @Slf4j
 public class CassandraInsertMetrics {
 
-    public CassandraInsertMetrics() {
-        this.totalRequest = 0L;
-        this.totalSuccess = 0L;
-        this.totalFailure = 0L;
-        this.latency = 0L;
-    }
-
-    private Long totalRequest;
-    private Long totalSuccess;
-    private Long totalFailure;
-    private Long latency;
+    private final AtomicLong totalRequest = new AtomicLong();
+    private final AtomicLong totalSuccess = new AtomicLong();
+    private final AtomicLong latency = new AtomicLong();
 
     public void record(long total, long success, long latency) {
-        this.totalRequest += total;
-        this.totalSuccess += success;
-        this.totalFailure += (total - success);
-        this.latency += latency;
+        this.totalRequest.addAndGet(total);
+        this.totalSuccess.addAndGet(success);
+        this.latency.addAndGet(latency);
         log.info(this.toString());
     }
 
     public String toString() {
-        return String.format("Cassandra Write: total=%s, success=%s, failure=%s, latency=%.2f ms", this.totalRequest, this.totalSuccess,
-            this.totalFailure, (double)this.latency/this.totalRequest);
+        return String.format("Cassandra Write: total=%s, success=%s, failure=%s, latency=%.2f ms", this.totalRequest.get(),
+            this.totalSuccess.get(),
+            this.totalRequest.get() - this.totalSuccess.get(), (double) this.latency.get() / this.totalRequest.get());
     }
 }
