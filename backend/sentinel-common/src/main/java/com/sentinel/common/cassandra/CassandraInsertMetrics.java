@@ -7,9 +7,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class CassandraInsertMetrics {
 
-    private final AtomicLong totalRequest = new AtomicLong();
-    private final AtomicLong totalSuccess = new AtomicLong();
-    private final AtomicLong latency = new AtomicLong();
+    private final AtomicLong totalRequest = new AtomicLong(0L);
+    private final AtomicLong totalSuccess = new AtomicLong(0L);
+    private final AtomicLong latency = new AtomicLong(0L);
 
     public void record(long total, long success, long latency) {
         this.totalRequest.addAndGet(total);

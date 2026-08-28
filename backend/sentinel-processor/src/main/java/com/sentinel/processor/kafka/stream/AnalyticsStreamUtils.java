@@ -34,6 +34,7 @@ public class AnalyticsStreamUtils {
 
     private final Logger log = LoggerFactory.getLogger(AnalyticsStreamUtils.class);
     private final ObjectMapper objectMapper;
+    private final StreamsMetrics streamsMetrics = new StreamsMetrics();
 
     private final Map<AnalyticsBucket, TimeWindows> bucketToWindowMap = Map.ofEntries(
         Map.entry(AnalyticsBucket.MINUTE, TimeWindows.ofSizeAndGrace(Duration.ofMinutes(1), Duration.ofMinutes(1))),
@@ -122,6 +123,7 @@ public class AnalyticsStreamUtils {
                 val.setEntityId(KafkaMessage.extractUUIDAtLastFromCompositeKey(key));
                 val.setScope(scope);
                 val.setBucket(bucket);
+                streamsMetrics.recordIncoming(outputTopic);
                 return val;
             })
             .groupByKey(Grouped.with(Serdes.String(), analyticsMetricSerde))
@@ -135,7 +137,10 @@ public class AnalyticsStreamUtils {
                     .withValueSerde(this.analyticsMetricSerde))
             .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"))
             .toStream()
-            .selectKey((windowedKey, val) -> KafkaMessage.removeLastIdFromCompositeKey(windowedKey.key()))
+            .selectKey((windowedKey, val) -> {
+                streamsMetrics.recordOutgoing(outputTopic);
+                return KafkaMessage.removeLastIdFromCompositeKey(windowedKey.key());
+            })
             .to(outputTopic, Produced.with(Serdes.String(), analyticsMetricSerde));
     }
 
