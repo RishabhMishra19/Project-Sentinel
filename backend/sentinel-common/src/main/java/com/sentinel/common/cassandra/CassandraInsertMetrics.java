@@ -22,10 +22,11 @@ public class CassandraInsertMetrics {
         this.totalSuccess += success;
         this.totalFailure += (total - success);
         this.latency += latency;
+        log.info(this.toString());
     }
 
     public String toString() {
-        return String.format("Cassandra Write: total=%s, success=%s, failure=%s, latency=%s", this.totalRequest, this.totalSuccess,
+        return String.format("Cassandra Write: total=%s, success=%s, failure=%s, latency=%.2f ms", this.totalRequest, this.totalSuccess,
             this.totalFailure, (double)this.latency/this.totalRequest);
     }
 }
