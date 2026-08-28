@@ -11,6 +11,7 @@ import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.Serializer;
 import org.apache.kafka.common.utils.Bytes;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Grouped;
@@ -137,9 +138,10 @@ public class AnalyticsStreamUtils {
                     .withValueSerde(this.analyticsMetricSerde))
             .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"))
             .toStream()
-            .selectKey((windowedKey, val) -> {
-                streamsMetrics.recordOutgoing(outputTopic);
-                return KafkaMessage.removeLastIdFromCompositeKey(windowedKey.key());
+            .map((windowedKey, val) -> {
+                val.setTimestamp(windowedKey.window().startTime());
+                streamsMetrics.recordOutgoing(outputTopic, windowedKey.window().startTime(), val.getEntityId());
+                return KeyValue.pair(KafkaMessage.removeLastIdFromCompositeKey(windowedKey.key()), val);
             })
             .to(outputTopic, Produced.with(Serdes.String(), analyticsMetricSerde));
     }

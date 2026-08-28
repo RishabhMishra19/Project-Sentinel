@@ -20,20 +20,14 @@ import org.HdrHistogram.Histogram;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Map;
 import java.util.UUID;
 
 public class KafkaMessage {
 
     private static final String KEY_SEPARATOR = "|";
     private static final String KEY_SEPARATOR_REGEX = "\\|";
-
-    private static final Map<AnalyticsBucket, ChronoUnit> bucketToChronoUnitMap =
-        Map.ofEntries(Map.entry(AnalyticsBucket.MINUTE, ChronoUnit.MINUTES), Map.entry(AnalyticsBucket.HOUR, ChronoUnit.HOURS),
-            Map.entry(AnalyticsBucket.DAY, ChronoUnit.DAYS));
 
     // Serializes the histogram into a compressed, Base64-encoded string
     public static class JacksonHdrSerializer extends JsonSerializer<Histogram> {
@@ -127,26 +121,9 @@ public class KafkaMessage {
             return this;
         }
 
-        public AnalyticsMetrics initialize(AnalyticsMetrics metrics) {
-            this.timestamp = metrics.getTimestamp();
-            this.requestCount = metrics.getRequestCount();
-            this.errorCount = metrics.getErrorCount();
-            this.status2xx = metrics.getStatus2xx();
-            this.status3xx = metrics.getStatus3xx();
-            this.status4xx = metrics.getStatus4xx();
-            this.status5xx = metrics.getStatus5xx();
-            this.latencySumMs = metrics.getLatencySumMs();
-            this.latencyMinMs = metrics.getLatencyMinMs();
-            this.latencyMaxMs = metrics.getLatencyMaxMs();
-            this.requestBytesTotal = metrics.getRequestBytesTotal();
-            this.responseBytesTotal = metrics.getResponseBytesTotal();
-            this.latencyHistogram = metrics.getLatencyHistogram();
-            return this;
-        }
 
         public AnalyticsMetrics aggregate(AnalyticsMetrics metric) {
             this.entityId = metric.entityId;
-            this.timestamp = metric.timestamp == null ? null : metric.timestamp.truncatedTo(bucketToChronoUnitMap.get(bucket));
             this.requestCount += metric.requestCount;
             this.errorCount += metric.errorCount;
             this.status2xx += metric.status2xx;
