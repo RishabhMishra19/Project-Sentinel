@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.cassandra.core.AsyncCassandraTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -17,15 +18,13 @@ public class CassandraBatchInsertUtil {
 
     private final AsyncCassandraTemplate asyncCassandraTemplate;
     private final Semaphore writeLimiter = new Semaphore(MAX_CONCURRENT_WRITES);
-
-    public <T> void insert(List<T> entities) {
-        insertAsync(entities).join();
-    }
+    private final CassandraInsertMetrics cassandraInsertMetrics = new CassandraInsertMetrics();
 
     public <T> CompletableFuture<Void> insertAsync(List<T> entities) {
         if (entities == null || entities.isEmpty()) {
             return CompletableFuture.completedFuture(null);
         }
+        Instant startedAt = Instant.now();
         List<CompletableFuture<T>> futures = new ArrayList<>(entities.size());
         for (T entity : entities) {
             try {
@@ -40,10 +39,19 @@ public class CassandraBatchInsertUtil {
                 );
             }
         }
-
         return CompletableFuture.allOf(
             futures.toArray(new CompletableFuture[0])
-        );
+        ).thenApply(ignored -> {
+            writeLimiter.release();
+            long total = futures.size();
+            long successful = futures.stream()
+                .filter(CompletableFuture::isDone)
+                .filter(f -> !f.isCompletedExceptionally())
+                .count();
+            long latency = Instant.now().toEpochMilli() - startedAt.toEpochMilli();
+            cassandraInsertMetrics.record(total, successful, latency);
+            return null;
+        });
     }
 
 }
