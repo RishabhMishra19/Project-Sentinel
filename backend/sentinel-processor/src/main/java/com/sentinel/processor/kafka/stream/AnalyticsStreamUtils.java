@@ -124,11 +124,9 @@ public class AnalyticsStreamUtils {
                 val.setBucket(bucket);
                 return val;
             })
-            .peek((key, value) -> log.info("Input Stream : bucket: {}, scope: {}, entityId: {}, key: {}", bucket, scope, value.getEntityId(), key))
             .groupByKey(Grouped.with(Serdes.String(), analyticsMetricSerde))
             .windowedBy(bucketToWindowMap.get(bucket))
             .reduce((curAggregate, val) -> {
-                    log.info("Aggregating : bucket: {}, scope: {}, entity1Id: {}, entity2Id: {}", bucket, scope, curAggregate.getEntityId(), val.getEntityId());
                     curAggregate.aggregate(val);
                     return curAggregate;
                 },
@@ -137,7 +135,6 @@ public class AnalyticsStreamUtils {
                     .withValueSerde(this.analyticsMetricSerde))
             .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"))
             .toStream()
-            .peek((key, value) -> log.info("Aggregated Stream : bucket: {}, scope: {}, entityId: {}, windowTime: {}, key: {}", bucket, scope, value.getEntityId(), key.window().startTime(), key))
             .selectKey((windowedKey, val) -> KafkaMessage.removeLastIdFromCompositeKey(windowedKey.key()))
             .to(outputTopic, Produced.with(Serdes.String(), analyticsMetricSerde));
     }
