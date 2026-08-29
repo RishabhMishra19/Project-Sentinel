@@ -1,63 +1,27 @@
 package com.sentinel.common.kafka;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sentinel.common.cassandra.analytics.utils.AnalyticsBucket;
 import com.sentinel.common.cassandra.analytics.utils.AnalyticsScope;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import org.HdrHistogram.Histogram;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
 public class KafkaMessage {
 
-    private static final String KEY_SEPARATOR = "|";
-    private static final String KEY_SEPARATOR_REGEX = "\\|";
-
-    // Serializes the histogram into a compressed, Base64-encoded string
-    public static class JacksonHdrSerializer extends JsonSerializer<Histogram> {
-        @Override
-        public void serialize(Histogram value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-            if (value == null) {
-                gen.writeNull();
-                return;
-            }
-            ByteBuffer buffer = ByteBuffer.allocate(value.getEstimatedFootprintInBytes());
-            int size = value.encodeIntoCompressedByteBuffer(buffer);
-            byte[] bytes = new byte[size];
-            System.arraycopy(buffer.array(), 0, bytes, 0, size);
-
-            gen.writeString(Base64.getEncoder().encodeToString(bytes));
-        }
-    }
-
-    // Deserializes the Base64 string back into a Histogram object
-    public static class JacksonHdrDeserializer extends JsonDeserializer<Histogram> {
-        @SneakyThrows
-        @Override
-        public Histogram deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            String base64Str = p.getValueAsString();
-            if (base64Str == null)
-                return null;
-
-            byte[] bytes = Base64.getDecoder().decode(base64Str);
-            return Histogram.decodeFromCompressedByteBuffer(ByteBuffer.wrap(bytes), 0);
-        }
+    @Builder
+    public static record ReqLog(UUID requestLogId, UUID tenantId, UUID productId, UUID serviceId, UUID endpointId, String path,
+                                Instant occurredAt, Integer statusCode, Integer durationMs, String endUserIp, String requestId,
+                                String traceId, String userId, Integer requestSizeBytes, Integer responseSizeBytes) {
     }
 
     @Getter
@@ -80,8 +44,6 @@ public class KafkaMessage {
         private long latencyMaxMs;
         private long requestBytesTotal;
         private long responseBytesTotal;
-        @JsonSerialize(using = JacksonHdrSerializer.class)
-        @JsonDeserialize(using = JacksonHdrDeserializer.class)
         private Histogram latencyHistogram;
 
         public AnalyticsMetrics(AnalyticsBucket bucket, AnalyticsScope scope, UUID entityId) {
@@ -141,25 +103,71 @@ public class KafkaMessage {
 
     }
 
+
     @Builder
-    public static record ReqLog(UUID requestLogId, UUID tenantId, UUID productId, UUID serviceId, UUID endpointId, String path,
-                                Instant occurredAt, Integer statusCode, Integer durationMs, String endUserIp, String requestId,
-                                String traceId, String userId, Integer requestSizeBytes, Integer responseSizeBytes) {
-    }
+    @Setter
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AnalyticsKey {
+        UUID tenantId;
+        UUID productId;
+        UUID serviceId;
+        UUID endpointId;
 
-    public static String getCompositeKey(KafkaMessage.ReqLog reqLog) {
-        return reqLog.tenantId().toString() + KEY_SEPARATOR + reqLog.productId().toString() + KEY_SEPARATOR +
-            reqLog.serviceId().toString() + KEY_SEPARATOR + reqLog.endpointId().toString();
-    }
+        public UUID getEntityId(AnalyticsScope forScope) {
+            return switch (forScope) {
+                case TENANT -> tenantId;
+                case PRODUCT -> productId;
+                case SERVICE -> serviceId;
+                case ENDPOINT -> endpointId;
+            };
+        }
 
-    public static String removeLastIdFromCompositeKey(String compositeKey) {
-        String[] keys = compositeKey.split(KEY_SEPARATOR_REGEX);
-        return String.join(KEY_SEPARATOR, Arrays.stream(keys).toList().subList(0, keys.length - 1));
-    }
+        public AnalyticsKey removeIdForScope(AnalyticsScope forScope) {
+            switch (forScope) {
+                case TENANT -> this.tenantId = null;
+                case PRODUCT -> this.productId = null;
+                case SERVICE -> this.serviceId = null;
+                case ENDPOINT -> this.endpointId = null;
+            }
+            ;
+            return this;
+        }
 
-    public static UUID extractUUIDAtLastFromCompositeKey(String compositeKey) {
-        String[] keys = compositeKey.split(KEY_SEPARATOR_REGEX);
-        return UUID.fromString(keys[keys.length - 1]);
+        public String getBase64Str(ObjectMapper objectMapper) {
+            try {
+                byte[] jsonBytes = objectMapper.writeValueAsBytes(this);
+                return Base64.getUrlEncoder()
+                    .withoutPadding()
+                    .encodeToString(jsonBytes);
+
+            } catch (JsonProcessingException e) {
+                throw new IllegalStateException(
+                    "Failed to serialize AnalyticsKey",
+                    e
+                );
+            }
+        }
+
+        public static AnalyticsKey fromKey(String encodedKey, ObjectMapper objectMapper) {
+            if (encodedKey == null || encodedKey.isBlank()) {
+                return null;
+            }
+
+            try {
+                byte[] jsonBytes = Base64.getUrlDecoder()
+                    .decode(encodedKey);
+
+                return objectMapper.readValue(jsonBytes, AnalyticsKey.class);
+
+            } catch (IllegalArgumentException | IOException e) {
+                throw new IllegalArgumentException(
+                    "Invalid AnalyticsKey: " + encodedKey,
+                    e
+                );
+            }
+        }
     }
 
 }

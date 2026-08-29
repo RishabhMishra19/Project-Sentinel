@@ -41,7 +41,7 @@ public class StreamsMetrics {
 
     public void recordOutgoing(String kafkaTopic, Instant windowStartTime, UUID entityId) {
         bucketToWindowsMap.get(kafkaTopic).totalOutgoingEvents.addAndGet(1L);
-        log.info(this.getLog(kafkaTopic, windowStartTime, entityId));
+//        log.info(this.getLog(kafkaTopic, windowStartTime, entityId));
     }
 
     public String getLog(String kafkaTopic, Instant windowStartTime, UUID entityId) {

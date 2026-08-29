@@ -13,6 +13,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 @RequiredArgsConstructor
@@ -23,10 +24,7 @@ public class ReqLogListener {
     private final CassandraBatchInsertUtil cassandraBatchInsertUtil;
 
 
-    @KafkaListener(
-        topics = KafkaTopics.request_logs, containerFactory = "sentinelKafkaListenerContainerFactory",
-        groupId = KafkaTopics.request_logs + "_group"
-    )
+    @KafkaListener(topics = KafkaTopics.request_logs, groupId = KafkaTopics.request_logs + "_group")
     public void onReqLogsBatch(List<ConsumerRecord<String, String>> records) {
         if (records == null || records.isEmpty()) {
             return;
@@ -41,8 +39,11 @@ public class ReqLogListener {
                 requestLogs.add(this.toRequestLog(reqLog));
                 requestLogLookups.add(this.toRequestLogLookup(reqLog));
             }
-            cassandraBatchInsertUtil.insertAsync(requestLogs);
-            cassandraBatchInsertUtil.insertAsync(requestLogLookups);
+            // 1. Fire off both async execution flows in parallel
+            CompletableFuture<Void> logsFuture = cassandraBatchInsertUtil.insertAsync(requestLogs);
+            CompletableFuture<Void> lookupsFuture = cassandraBatchInsertUtil.insertAsync(requestLogLookups);
+            // 2. Explicitly join them together and block the Kafka consumer thread until BOTH are finished
+            CompletableFuture.allOf(logsFuture, lookupsFuture).join();
         } catch (Exception e) {
             log.error("Failed processing Kafka batch", e);
             throw e;
@@ -50,25 +51,16 @@ public class ReqLogListener {
     }
 
     private RequestLogLookup toRequestLogLookup(KafkaMessage.ReqLog reqLogKafkaMessage) {
-        return RequestLogLookup.builder()
-            .requestLogId(reqLogKafkaMessage.requestLogId())
-            .occurredAt(reqLogKafkaMessage.occurredAt())
+        return RequestLogLookup.builder().requestLogId(reqLogKafkaMessage.requestLogId()).occurredAt(reqLogKafkaMessage.occurredAt())
             .build();
     }
 
     private RequestLog toRequestLog(KafkaMessage.ReqLog reqLog) {
         return RequestLog.builder()
             .id(new RequestLog.PrimaryKeyComposite(reqLog.tenantId(), reqLog.serviceId(), reqLog.occurredAt(), reqLog.requestLogId()))
-            .endpointId(reqLog.endpointId())
-            .requestId(reqLog.requestId())
-            .traceId(reqLog.traceId())
-            .endUserIp(reqLog.endUserIp())
-            .userId(reqLog.userId())
-            .statusCode(reqLog.statusCode())
-            .durationMs(reqLog.durationMs())
-            .requestSizeBytes(reqLog.requestSizeBytes())
-            .responseSizeBytes(reqLog.responseSizeBytes())
-            .build();
+            .endpointId(reqLog.endpointId()).requestId(reqLog.requestId()).traceId(reqLog.traceId()).endUserIp(reqLog.endUserIp())
+            .userId(reqLog.userId()).statusCode(reqLog.statusCode()).durationMs(reqLog.durationMs())
+            .requestSizeBytes(reqLog.requestSizeBytes()).responseSizeBytes(reqLog.responseSizeBytes()).build();
     }
 
 }

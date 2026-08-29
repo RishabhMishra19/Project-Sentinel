@@ -1,5 +1,6 @@
 package com.sentinel.ingest.logs.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sentinel.common.crypto.Sha256Hasher;
 import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;
@@ -42,10 +43,11 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
 
     private final ServiceApiKeyRepository serviceApiKeyRepository;
     private final PathTemplateDeriver pathTemplateDeriver;
-    private final KafkaTemplate<String, KafkaMessage.ReqLog> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final IngestCache ingestCache;
     private final ServiceIdentityResolverRepository serviceIdentityResolverRepository;
     private final EndpointService endpointService;
+    private final ObjectMapper objectMapper;
 
     /* Timers for individual ingestion stages. */
     private final Timer resolveServiceIdentityTimer;
@@ -90,11 +92,12 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
     public IngestRequestLogServiceImpl(
         ServiceApiKeyRepository serviceApiKeyRepository,
         PathTemplateDeriver pathTemplateDeriver,
-        KafkaTemplate<String, KafkaMessage.ReqLog> kafkaTemplate,
+        KafkaTemplate<String, String> kafkaTemplate,
         IngestCache ingestCache,
         ServiceIdentityResolverRepository serviceIdentityResolverRepository,
         EndpointService endpointService,
-        MeterRegistry meterRegistry
+        MeterRegistry meterRegistry,
+        ObjectMapper objectMapper
     ) {
         this.serviceApiKeyRepository = serviceApiKeyRepository;
         this.pathTemplateDeriver = pathTemplateDeriver;
@@ -112,6 +115,7 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
         this.endpointFindMappingTimer = buildTimer(meterRegistry, "sentinel.ingest.endpoint-find-mapping");
         this.endpointBulkUpdateTimer = buildTimer(meterRegistry, "sentinel.ingest.endpoint-bulk-update");
         this.kafkaSendTimer = buildTimer(meterRegistry, "sentinel.ingest.kafka-send");
+        this.objectMapper = objectMapper;
     }
 
     private Timer buildTimer(MeterRegistry meterRegistry, String name) {
@@ -155,13 +159,15 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
             kafkaSendTimer.record(() -> {
                 try {
                     for (KafkaMessage.ReqLog reqLog : reqLogs) {
+                        KafkaMessage.AnalyticsKey analyticsKey =
+                            new KafkaMessage.AnalyticsKey(reqLog.tenantId(), reqLog.productId(), reqLog.serviceId(), reqLog.endpointId());
                         kafkaTemplate.send(
                             new ProducerRecord<>(
                                 KafkaTopics.request_logs,
                                 null,
                                 System.currentTimeMillis(),
-                                KafkaMessage.getCompositeKey(reqLog),
-                                reqLog
+                                analyticsKey.getBase64Str(objectMapper),
+                                objectMapper.writeValueAsString(reqLog)
                             )
                         ).get();
                     }
@@ -249,8 +255,8 @@ public class IngestRequestLogServiceImpl implements IngestRequestLogService {
     }
 
     /**
-     * Logs throughput and average stage latency approximately once every second.
-     * Only one request thread is allowed to perform the logging.
+     * Logs throughput and average stage latency approximately once every second. Only one request thread is allowed to perform the
+     * logging.
      */
     private void logThroughputIfNeeded() {
         long now = System.nanoTime();

@@ -16,10 +16,12 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.Suppressed;
 import org.apache.kafka.streams.kstream.TimeWindows;
+import org.apache.kafka.streams.kstream.Windowed;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 import org.apache.kafka.streams.state.WindowStore;
 import org.slf4j.Logger;
@@ -38,9 +40,9 @@ public class AnalyticsStreamUtils {
     private final StreamsMetrics streamsMetrics = new StreamsMetrics();
 
     private final Map<AnalyticsBucket, TimeWindows> bucketToWindowMap = Map.ofEntries(
-        Map.entry(AnalyticsBucket.MINUTE, TimeWindows.ofSizeAndGrace(Duration.ofMinutes(1), Duration.ofMinutes(1))),
-        Map.entry(AnalyticsBucket.HOUR, TimeWindows.ofSizeAndGrace(Duration.ofHours(1), Duration.ofMinutes(1))),
-        Map.entry(AnalyticsBucket.DAY, TimeWindows.ofSizeAndGrace(Duration.ofDays(1), Duration.ofMinutes(1)))
+        Map.entry(AnalyticsBucket.MINUTE, TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(1))),
+        Map.entry(AnalyticsBucket.HOUR, TimeWindows.ofSizeWithNoGrace(Duration.ofHours(1))),
+        Map.entry(AnalyticsBucket.DAY, TimeWindows.ofSizeWithNoGrace(Duration.ofDays(1)))
     );
 
     private final TimestampExtractor reqLogTimestampExtractor = (record, previousTimeStamp) -> {
@@ -117,31 +119,40 @@ public class AnalyticsStreamUtils {
         KStream<String, KafkaMessage.AnalyticsMetrics> stream,
         AnalyticsBucket bucket,
         AnalyticsScope scope,
-        String outputTopic
+        String outputTopic,
+        Boolean withChangedScope
     ) {
-        stream
+        KTable<Windowed<String>, KafkaMessage.AnalyticsMetrics> kTable = stream
             .mapValues((key, val) -> {
-                val.setEntityId(KafkaMessage.extractUUIDAtLastFromCompositeKey(key));
-                val.setScope(scope);
+                if (withChangedScope) {
+                    val.setScope(scope);
+                    val.setEntityId(KafkaMessage.AnalyticsKey.fromKey(key, objectMapper).getEntityId(scope));
+                }
+
                 val.setBucket(bucket);
                 streamsMetrics.recordIncoming(outputTopic);
                 return val;
             })
             .groupByKey(Grouped.with(Serdes.String(), analyticsMetricSerde))
             .windowedBy(bucketToWindowMap.get(bucket))
-            .reduce((curAggregate, val) -> {
-                    curAggregate.aggregate(val);
-                    return curAggregate;
-                },
+            .reduce(KafkaMessage.AnalyticsMetrics::aggregate,
                 Materialized.<String, KafkaMessage.AnalyticsMetrics, WindowStore<Bytes, byte[]>>as(outputTopic + "_reduced_state_store")
                     .withKeySerde(Serdes.String())
-                    .withValueSerde(this.analyticsMetricSerde))
-            .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"))
+                    .withValueSerde(this.analyticsMetricSerde));
+
+        if (!withChangedScope) {
+            kTable =
+                kTable.suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"));
+        }
+
+        kTable
             .toStream()
             .map((windowedKey, val) -> {
                 val.setTimestamp(windowedKey.window().startTime());
                 streamsMetrics.recordOutgoing(outputTopic, windowedKey.window().startTime(), val.getEntityId());
-                return KeyValue.pair(KafkaMessage.removeLastIdFromCompositeKey(windowedKey.key()), val);
+                String newKey = KafkaMessage.AnalyticsKey.fromKey(windowedKey.key(), objectMapper)
+                    .removeIdForScope(scope).getBase64Str(objectMapper);
+                return KeyValue.pair(newKey, val);
             })
             .to(outputTopic, Produced.with(Serdes.String(), analyticsMetricSerde));
     }

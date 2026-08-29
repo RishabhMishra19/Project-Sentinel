@@ -7,6 +7,7 @@ import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfigur
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
+import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(
@@ -20,6 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCassandraRepositories(basePackages = {"com.sentinel.processor.repository", "com.sentinel.common"})
 @ConfigurationPropertiesScan(basePackages = {"com.sentinel.processor", "com.sentinel.common"})
 @EnableScheduling
+@EnableKafkaStreams
 public class ProcessorApplication {
 
     public static void main(String[] args) {

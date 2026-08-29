@@ -36,7 +36,8 @@ public class AnalyticsStream {
             rawEndpointAnalyticsStream,
             AnalyticsBucket.MINUTE,
             AnalyticsScope.ENDPOINT,
-            KafkaTopics.endpoint_minute_analytics
+            KafkaTopics.endpoint_minute_analytics,
+            false
         );
 
         //2. endpointMinuteAnalytics to serviceMinuteAnalytics stream
@@ -48,7 +49,8 @@ public class AnalyticsStream {
             serviceMinuteStream,
             AnalyticsBucket.MINUTE,
             AnalyticsScope.SERVICE,
-            KafkaTopics.service_minute_analytics
+            KafkaTopics.service_minute_analytics,
+            true
         );
 
         //3. serviceMinuteAnalytics to productMinuteAnalytics stream
@@ -60,7 +62,8 @@ public class AnalyticsStream {
             productMinuteStream,
             AnalyticsBucket.MINUTE,
             AnalyticsScope.PRODUCT,
-            KafkaTopics.product_minute_analytics
+            KafkaTopics.product_minute_analytics,
+            true
         );
 
         //4. productMinuteAnalytics to tenantMinuteAnalytics stream
@@ -72,7 +75,8 @@ public class AnalyticsStream {
             tenantMinuteStream,
             AnalyticsBucket.MINUTE,
             AnalyticsScope.TENANT,
-            KafkaTopics.tenant_minute_analytics
+            KafkaTopics.tenant_minute_analytics,
+            true
         );
 
         //---------------------------------------------------------------------------------------
@@ -87,7 +91,8 @@ public class AnalyticsStream {
             endpointHourStream,
             AnalyticsBucket.HOUR,
             AnalyticsScope.ENDPOINT,
-            KafkaTopics.endpoint_hour_analytics
+            KafkaTopics.endpoint_hour_analytics,
+            false
         );
 
         //6. serviceMinuteAnalytics  to serviceHourAnalytics
@@ -99,7 +104,8 @@ public class AnalyticsStream {
             serviceHourStream,
             AnalyticsBucket.HOUR,
             AnalyticsScope.SERVICE,
-            KafkaTopics.service_hour_analytics
+            KafkaTopics.service_hour_analytics,
+            false
         );
 
         //7. productMinuteAnalytics  to productHourAnalytics
@@ -111,7 +117,8 @@ public class AnalyticsStream {
             productHourStream,
             AnalyticsBucket.HOUR,
             AnalyticsScope.PRODUCT,
-            KafkaTopics.product_hour_analytics
+            KafkaTopics.product_hour_analytics,
+            false
         );
 
         //8. tenantMinuteAnalytics  to tenantHourAnalytics
@@ -123,7 +130,8 @@ public class AnalyticsStream {
             tenantHourStream,
             AnalyticsBucket.HOUR,
             AnalyticsScope.TENANT,
-            KafkaTopics.tenant_hour_analytics
+            KafkaTopics.tenant_hour_analytics,
+            false
         );
 
         //---------------------------------------------------------------------------------------
@@ -138,7 +146,8 @@ public class AnalyticsStream {
             endpointDayStream,
             AnalyticsBucket.DAY,
             AnalyticsScope.ENDPOINT,
-            KafkaTopics.endpoint_day_analytics
+            KafkaTopics.endpoint_day_analytics,
+            false
         );
 
         //10. serviceHourAnalytics  to serviceDayAnalytics
@@ -150,7 +159,8 @@ public class AnalyticsStream {
             serviceDayStream,
             AnalyticsBucket.DAY,
             AnalyticsScope.SERVICE,
-            KafkaTopics.service_day_analytics
+            KafkaTopics.service_day_analytics,
+            false
         );
 
         //11. productHourAnalytics  to productDayAnalytics
@@ -162,7 +172,8 @@ public class AnalyticsStream {
             productDayStream,
             AnalyticsBucket.DAY,
             AnalyticsScope.PRODUCT,
-            KafkaTopics.product_day_analytics
+            KafkaTopics.product_day_analytics,
+            false
         );
 
         //12. tenantHourAnalytics  to tenantDayAnalytics
@@ -174,7 +185,8 @@ public class AnalyticsStream {
             tenantDayStream,
             AnalyticsBucket.DAY,
             AnalyticsScope.TENANT,
-            KafkaTopics.tenant_day_analytics
+            KafkaTopics.tenant_day_analytics,
+            false
         );
 
         return rawEndpointAnalyticsStream;
