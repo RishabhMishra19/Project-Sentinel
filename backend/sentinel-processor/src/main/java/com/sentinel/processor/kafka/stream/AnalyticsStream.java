@@ -37,7 +37,7 @@ public class AnalyticsStream {
             AnalyticsBucket.MINUTE,
             AnalyticsScope.ENDPOINT,
             KafkaTopics.endpoint_minute_analytics,
-            false
+            AnalyticsStreamUtils.GroupByType.BUCKET
         );
 
         //2. endpointMinuteAnalytics to serviceMinuteAnalytics stream
@@ -50,7 +50,7 @@ public class AnalyticsStream {
             AnalyticsBucket.MINUTE,
             AnalyticsScope.SERVICE,
             KafkaTopics.service_minute_analytics,
-            true
+            AnalyticsStreamUtils.GroupByType.SCOPE
         );
 
         //3. serviceMinuteAnalytics to productMinuteAnalytics stream
@@ -63,7 +63,7 @@ public class AnalyticsStream {
             AnalyticsBucket.MINUTE,
             AnalyticsScope.PRODUCT,
             KafkaTopics.product_minute_analytics,
-            true
+            AnalyticsStreamUtils.GroupByType.SCOPE
         );
 
         //4. productMinuteAnalytics to tenantMinuteAnalytics stream
@@ -76,7 +76,7 @@ public class AnalyticsStream {
             AnalyticsBucket.MINUTE,
             AnalyticsScope.TENANT,
             KafkaTopics.tenant_minute_analytics,
-            true
+            AnalyticsStreamUtils.GroupByType.SCOPE
         );
 
         //---------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ public class AnalyticsStream {
             AnalyticsBucket.HOUR,
             AnalyticsScope.ENDPOINT,
             KafkaTopics.endpoint_hour_analytics,
-            false
+            AnalyticsStreamUtils.GroupByType.BUCKET
         );
 
         //6. serviceMinuteAnalytics  to serviceHourAnalytics
@@ -105,7 +105,7 @@ public class AnalyticsStream {
             AnalyticsBucket.HOUR,
             AnalyticsScope.SERVICE,
             KafkaTopics.service_hour_analytics,
-            false
+            AnalyticsStreamUtils.GroupByType.BUCKET
         );
 
         //7. productMinuteAnalytics  to productHourAnalytics
@@ -118,7 +118,7 @@ public class AnalyticsStream {
             AnalyticsBucket.HOUR,
             AnalyticsScope.PRODUCT,
             KafkaTopics.product_hour_analytics,
-            false
+            AnalyticsStreamUtils.GroupByType.BUCKET
         );
 
         //8. tenantMinuteAnalytics  to tenantHourAnalytics
@@ -131,7 +131,7 @@ public class AnalyticsStream {
             AnalyticsBucket.HOUR,
             AnalyticsScope.TENANT,
             KafkaTopics.tenant_hour_analytics,
-            false
+            AnalyticsStreamUtils.GroupByType.BUCKET
         );
 
         //---------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ public class AnalyticsStream {
             AnalyticsBucket.DAY,
             AnalyticsScope.ENDPOINT,
             KafkaTopics.endpoint_day_analytics,
-            false
+            AnalyticsStreamUtils.GroupByType.BUCKET
         );
 
         //10. serviceHourAnalytics  to serviceDayAnalytics
@@ -160,7 +160,7 @@ public class AnalyticsStream {
             AnalyticsBucket.DAY,
             AnalyticsScope.SERVICE,
             KafkaTopics.service_day_analytics,
-            false
+            AnalyticsStreamUtils.GroupByType.BUCKET
         );
 
         //11. productHourAnalytics  to productDayAnalytics
@@ -173,7 +173,7 @@ public class AnalyticsStream {
             AnalyticsBucket.DAY,
             AnalyticsScope.PRODUCT,
             KafkaTopics.product_day_analytics,
-            false
+            AnalyticsStreamUtils.GroupByType.BUCKET
         );
 
         //12. tenantHourAnalytics  to tenantDayAnalytics
@@ -186,7 +186,7 @@ public class AnalyticsStream {
             AnalyticsBucket.DAY,
             AnalyticsScope.TENANT,
             KafkaTopics.tenant_day_analytics,
-            false
+            AnalyticsStreamUtils.GroupByType.BUCKET
         );
 
         return rawEndpointAnalyticsStream;

@@ -15,7 +15,6 @@ public class CassandraInsertMetrics {
         this.totalRequest.addAndGet(total);
         this.totalSuccess.addAndGet(success);
         this.latency.addAndGet(latency);
-        log.info(this.toString());
     }
 
     public String toString() {

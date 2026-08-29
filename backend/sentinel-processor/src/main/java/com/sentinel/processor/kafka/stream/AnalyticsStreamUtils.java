@@ -35,6 +35,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AnalyticsStreamUtils {
 
+    public static enum GroupByType {
+        BUCKET,
+        SCOPE
+    }
+
     private final Logger log = LoggerFactory.getLogger(AnalyticsStreamUtils.class);
     private final ObjectMapper objectMapper;
     private final StreamsMetrics streamsMetrics = new StreamsMetrics();
@@ -120,15 +125,14 @@ public class AnalyticsStreamUtils {
         AnalyticsBucket bucket,
         AnalyticsScope scope,
         String outputTopic,
-        Boolean withChangedScope
+        GroupByType withChangedScope
     ) {
         KTable<Windowed<String>, KafkaMessage.AnalyticsMetrics> kTable = stream
             .mapValues((key, val) -> {
-                if (withChangedScope) {
+                if (GroupByType.SCOPE.equals(withChangedScope)) {
                     val.setScope(scope);
                     val.setEntityId(KafkaMessage.AnalyticsKey.fromKey(key, objectMapper).getEntityId(scope));
                 }
-
                 val.setBucket(bucket);
                 streamsMetrics.recordIncoming(outputTopic);
                 return val;
@@ -140,7 +144,7 @@ public class AnalyticsStreamUtils {
                     .withKeySerde(Serdes.String())
                     .withValueSerde(this.analyticsMetricSerde));
 
-        if (!withChangedScope) {
+        if (GroupByType.BUCKET.equals(withChangedScope)) {
             kTable =
                 kTable.suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"));
         }
