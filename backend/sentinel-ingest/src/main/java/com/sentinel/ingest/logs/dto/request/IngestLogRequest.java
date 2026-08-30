@@ -19,7 +19,7 @@ import java.util.UUID;
 
 public record IngestLogRequest(@NotNull UUID serviceId, @NotEmpty String apiKey,
                                @NotEmpty @Size(max = 500) List<@Valid RequestLogRequest> requests) {
-    public List<KafkaMessage.ReqLog> toReqLogKafkaMessage(ServiceIdentityResolverRepository.ServiceIdentity serviceIdentity) {
+    public List<KafkaMessage.ReqLog> toReqLogKafkaMessages(ServiceIdentityResolverRepository.ServiceIdentity serviceIdentity) {
         return this.requests.stream().map(log ->
             KafkaMessage.ReqLog
                 .builder()

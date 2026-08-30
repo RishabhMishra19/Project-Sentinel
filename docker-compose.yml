@@ -7,6 +7,9 @@ include:
     - ./infrastructure/postgres/postgres.yml
     - ./infrastructure/cassandra/cassandra.yml
 
+    #Monitoring
+    - ./infrastructure/prometheus/prometheus-compose.yml
+
     # Applications
     # - ./infrastructure/sentinel-api/sentinel-api.yml
     # - ./infrastructure/sentinel-ingest/sentinel-ingest.yml

@@ -1,7 +1,6 @@
 package com.sentinel.loadEngine.engine;
 
 import com.sentinel.loadEngine.engine.dto.IngestRequest;
-import com.sentinel.loadEngine.engine.dto.IngestResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,7 @@ public class IngestServiceClient {
         .build();
 
 
-    public IngestResponse sendRequest(IngestRequest ingestRequest) {
+    public void sendRequest(IngestRequest ingestRequest) {
         HttpResponse<String> response = null;
         try {
             String jsonBody = objectMapper.writeValueAsString(ingestRequest);
@@ -38,7 +37,6 @@ public class IngestServiceClient {
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return objectMapper.readValue(response.body(), IngestResponse.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

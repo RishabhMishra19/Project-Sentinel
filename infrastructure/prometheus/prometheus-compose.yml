@@ -1,0 +1,15 @@
+services:
+    prometheus:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: prometheus
+        ports:
+            - "9090:9090"
+        volumes:
+            - prometheus_data:/prometheus
+        depends_on:
+            - kafka
+
+volumes:
+    prometheus_data:
