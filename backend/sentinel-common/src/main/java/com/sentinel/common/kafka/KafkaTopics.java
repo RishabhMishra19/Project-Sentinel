@@ -1,5 +1,7 @@
 package com.sentinel.common.kafka;
 
+import java.util.List;
+
 public class KafkaTopics {
 
     /**
@@ -67,4 +69,10 @@ public class KafkaTopics {
      * Daily aggregated endpoint metrics derived from hourly statistics. Used for daily endpoint analytics and Cassandra persistence.
      */
     public static final String endpoint_day_analytics = "endpoint_day_analytics";
+
+    public static List<String> getAllTopics() {
+        return List.of(request_logs, tenant_minute_analytics, product_minute_analytics, service_minute_analytics, endpoint_minute_analytics,
+            tenant_hour_analytics, product_hour_analytics, service_hour_analytics, endpoint_hour_analytics, tenant_day_analytics,
+            product_day_analytics, service_day_analytics, endpoint_day_analytics);
+    }
 }

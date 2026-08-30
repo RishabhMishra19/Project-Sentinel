@@ -1,10 +1,12 @@
 package com.sentinel.processor.kafka.stream.listener;
 
 import com.sentinel.common.cassandra.CassandraBatchInsertUtil;
+import com.sentinel.common.cassandra.CassandraTables;
 import com.sentinel.common.cassandra.requestlog.entity.RequestLog;
 import com.sentinel.common.cassandra.requestlog.entity.RequestLogLookup;
 import com.sentinel.common.kafka.KafkaMessage;
 import com.sentinel.common.kafka.KafkaTopics;
+import com.sentinel.processor.monitor.ListenerMetrics;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -22,6 +24,7 @@ public class ReqLogListener {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ReqLogListener.class);
     private final ObjectMapper objectMapper;
     private final CassandraBatchInsertUtil cassandraBatchInsertUtil;
+    private final ListenerMetrics listenerMetrics;
 
 
     @KafkaListener(topics = KafkaTopics.request_logs, groupId = KafkaTopics.request_logs + "_group")
@@ -30,24 +33,30 @@ public class ReqLogListener {
             return;
         }
 
-        List<RequestLog> requestLogs = new ArrayList<>(records.size());
-        List<RequestLogLookup> requestLogLookups = new ArrayList<>(records.size());
-
-        try {
+        listenerMetrics.recordProcessing(KafkaTopics.request_logs, records.size(), () -> {
+            List<RequestLog> requestLogs = new ArrayList<>(records.size());
+            List<RequestLogLookup> requestLogLookups = new ArrayList<>(records.size());
             for (ConsumerRecord<String, String> record : records) {
                 KafkaMessage.ReqLog reqLog = objectMapper.readValue(record.value(), KafkaMessage.ReqLog.class);
                 requestLogs.add(this.toRequestLog(reqLog));
                 requestLogLookups.add(this.toRequestLogLookup(reqLog));
             }
             // 1. Fire off both async execution flows in parallel
-            CompletableFuture<Void> logsFuture = cassandraBatchInsertUtil.insertAsync(requestLogs);
-            CompletableFuture<Void> lookupsFuture = cassandraBatchInsertUtil.insertAsync(requestLogLookups);
+            CompletableFuture<CassandraBatchInsertUtil.BatchInsertResult> logsFuture = cassandraBatchInsertUtil.insertAsync(requestLogs);
+            CompletableFuture<CassandraBatchInsertUtil.BatchInsertResult> lookupsFuture =
+                cassandraBatchInsertUtil.insertAsync(requestLogLookups);
+
             // 2. Explicitly join them together and block the Kafka consumer thread until BOTH are finished
             CompletableFuture.allOf(logsFuture, lookupsFuture).join();
-        } catch (Exception e) {
-            log.error("Failed processing Kafka batch", e);
-            throw e;
-        }
+
+            CassandraBatchInsertUtil.BatchInsertResult logsResult = logsFuture.join();
+            CassandraBatchInsertUtil.BatchInsertResult lookupsResult = lookupsFuture.join();
+
+            listenerMetrics.recordCassandra(CassandraTables.request_logs, logsResult);
+            listenerMetrics.recordCassandra(CassandraTables.request_logs_lookup_by_id, lookupsResult);
+
+        });
+
     }
 
     private RequestLogLookup toRequestLogLookup(KafkaMessage.ReqLog reqLogKafkaMessage) {
