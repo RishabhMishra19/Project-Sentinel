@@ -18,6 +18,7 @@ import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
+import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.Suppressed;
 import org.apache.kafka.streams.kstream.TimeWindows;
@@ -36,19 +37,16 @@ import java.util.Map;
 public class AnalyticsStreamUtils {
 
     public static enum GroupByType {
-        BUCKET,
-        SCOPE
+        BUCKET, SCOPE
     }
 
     private final Logger log = LoggerFactory.getLogger(AnalyticsStreamUtils.class);
     private final ObjectMapper objectMapper;
-    private final StreamsMetrics streamsMetrics = new StreamsMetrics();
 
-    private final Map<AnalyticsBucket, TimeWindows> bucketToWindowMap = Map.ofEntries(
-        Map.entry(AnalyticsBucket.MINUTE, TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(1))),
-        Map.entry(AnalyticsBucket.HOUR, TimeWindows.ofSizeWithNoGrace(Duration.ofHours(1))),
-        Map.entry(AnalyticsBucket.DAY, TimeWindows.ofSizeWithNoGrace(Duration.ofDays(1)))
-    );
+    private final Map<AnalyticsBucket, TimeWindows> bucketToWindowMap =
+        Map.ofEntries(Map.entry(AnalyticsBucket.MINUTE, TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(1))),
+            Map.entry(AnalyticsBucket.HOUR, TimeWindows.ofSizeWithNoGrace(Duration.ofHours(1))),
+            Map.entry(AnalyticsBucket.DAY, TimeWindows.ofSizeWithNoGrace(Duration.ofDays(1))));
 
     private final TimestampExtractor reqLogTimestampExtractor = (record, previousTimeStamp) -> {
         KafkaMessage.ReqLog log = (KafkaMessage.ReqLog) record.value();
@@ -92,13 +90,8 @@ public class AnalyticsStreamUtils {
             try {
                 return objectMapper.readerFor(clazz).readValue(data);
             } catch (Exception e) {
-                log.error(
-                    "Kafka deserialization failed. topic={}, bytes={}, payload={}",
-                    topic,
-                    data.length,
-                    new String(data, java.nio.charset.StandardCharsets.UTF_8),
-                    e
-                );
+                log.error("Kafka deserialization failed. topic={}, bytes={}, payload={}", topic, data.length,
+                    new String(data, java.nio.charset.StandardCharsets.UTF_8), e);
                 throw new RuntimeException(e);
             }
         };
@@ -107,58 +100,44 @@ public class AnalyticsStreamUtils {
     }
 
     public KStream<String, KafkaMessage.ReqLog> getReqLogInputStream(StreamsBuilder streamsBuilder) {
-        return streamsBuilder.stream(
-            KafkaTopics.request_logs,
+        return streamsBuilder.stream(KafkaTopics.request_logs,
             Consumed.with(Serdes.String(), requestLogSerde).withTimestampExtractor(reqLogTimestampExtractor)
-        );
+                .withName(KafkaTopics.request_logs + "_source"));
     }
 
     public KStream<String, KafkaMessage.AnalyticsMetrics> getAnalyticsInputStream(StreamsBuilder streamsBuilder, String inputTopic) {
-        return streamsBuilder.stream(
-            inputTopic,
+        return streamsBuilder.stream(inputTopic,
             Consumed.with(Serdes.String(), analyticsMetricSerde).withTimestampExtractor(analyticsTimestampExtractor)
+                .withName(inputTopic + "_source")
+
         );
     }
 
-    public void groupByKeyAndSendTimeWindowedAggregationToTopic(
-        KStream<String, KafkaMessage.AnalyticsMetrics> stream,
-        AnalyticsBucket bucket,
-        AnalyticsScope scope,
-        String outputTopic,
-        GroupByType withChangedScope
-    ) {
-        KTable<Windowed<String>, KafkaMessage.AnalyticsMetrics> kTable = stream
-            .mapValues((key, val) -> {
+    public void groupByKeyAndSendTimeWindowedAggregationToTopic(KStream<String, KafkaMessage.AnalyticsMetrics> stream,
+        AnalyticsBucket bucket, AnalyticsScope scope, String outputTopic, GroupByType withChangedScope) {
+        KTable<Windowed<String>, KafkaMessage.AnalyticsMetrics> kTable = stream.mapValues((key, val) -> {
                 if (GroupByType.SCOPE.equals(withChangedScope)) {
                     val.setScope(scope);
                     val.setEntityId(KafkaMessage.AnalyticsKey.fromKey(key, objectMapper).getEntityId(scope));
                 }
                 val.setBucket(bucket);
-                streamsMetrics.recordIncoming(outputTopic);
                 return val;
-            })
-            .groupByKey(Grouped.with(Serdes.String(), analyticsMetricSerde))
-            .windowedBy(bucketToWindowMap.get(bucket))
-            .reduce(KafkaMessage.AnalyticsMetrics::aggregate,
+            }).groupByKey(Grouped.with(Serdes.String(), analyticsMetricSerde)).windowedBy(bucketToWindowMap.get(bucket))
+            .reduce(KafkaMessage.AnalyticsMetrics::aggregate, Named.as(outputTopic + "_aggregate"),
                 Materialized.<String, KafkaMessage.AnalyticsMetrics, WindowStore<Bytes, byte[]>>as(outputTopic + "_reduced_state_store")
-                    .withKeySerde(Serdes.String())
-                    .withValueSerde(this.analyticsMetricSerde));
+                    .withKeySerde(Serdes.String()).withValueSerde(this.analyticsMetricSerde));
 
         if (GroupByType.BUCKET.equals(withChangedScope)) {
             kTable =
                 kTable.suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()).withName(outputTopic + "_suppression"));
         }
 
-        kTable
-            .toStream()
-            .map((windowedKey, val) -> {
-                val.setTimestamp(windowedKey.window().startTime());
-                streamsMetrics.recordOutgoing(outputTopic, windowedKey.window().startTime(), val.getEntityId());
-                String newKey = KafkaMessage.AnalyticsKey.fromKey(windowedKey.key(), objectMapper)
-                    .removeIdForScope(scope).getBase64Str(objectMapper);
-                return KeyValue.pair(newKey, val);
-            })
-            .to(outputTopic, Produced.with(Serdes.String(), analyticsMetricSerde));
+        kTable.toStream().map((windowedKey, val) -> {
+            val.setTimestamp(windowedKey.window().startTime());
+            String newKey =
+                KafkaMessage.AnalyticsKey.fromKey(windowedKey.key(), objectMapper).removeIdForScope(scope).getBase64Str(objectMapper);
+            return KeyValue.pair(newKey, val);
+        }).to(outputTopic, Produced.with(Serdes.String(), analyticsMetricSerde).withName(outputTopic + "_sink"));
     }
 
 }
