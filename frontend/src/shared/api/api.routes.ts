@@ -77,6 +77,6 @@ export const MONITOR = {
     GET_INGEST_KAFKA_METRICS: "/admin/monitor/ingest/kafka",
     GET_PROCESSOR_CASSANDRA_METRICS: "/admin/monitor/processor/cassandra",
     GET_PROCESSOR_LISTENER_METRICS: "/admin/monitor/processor/listener",
-    GET_PROCESSOR_STREAMS_METRICS: "/admin/monitor/processor/kafka-streams",
+    GET_PROCESSOR_STREAMS_METRICS: "/admin/monitor/processor/kafkaStreams",
     GET_MESSAGES_IN: "/admin/monitor/kafka/messages-in",
 };

@@ -3,14 +3,13 @@ import { MonitorApi } from "../api/MonitorApi";
 import type { MetricRequest } from "../dto/monitor.request";
 import { extractTime } from "../../../shared/utils/dateUtils";
 import { DashboardChart } from "../components/DashboardChart";
-import { TOPICS } from "../constants/topics";
 import { useState } from "react";
 import { STREAMS } from "../constants/streams";
 
 export const ProcessorStreamsMetricsChart = (params: MetricRequest) => {
-    const [stream, setStream] = useState(TOPICS[0]);
+    const [stream, setStream] = useState(STREAMS[0]);
     const { isLoading, data } = useQuery({
-        queryKey: ["processor-listener-metrics", params],
+        queryKey: ["processor-streams-metrics", params],
         queryFn: () => MonitorApi.getProcessorStreamsMetrics({ ...params, stream }),
         refetchInterval: 1000,
     });
@@ -55,7 +54,7 @@ export const ProcessorStreamsMetricsChart = (params: MetricRequest) => {
                 value: stream,
                 onChange: (val) => !!val && setStream(val),
             }}
-            title="Processor Listener Metrics"
+            title="Processor Streams Metrics"
             data={modifiedData}
             lines={[
                 { dataKey: "polled", name: "Polled", color: "#025b13" },

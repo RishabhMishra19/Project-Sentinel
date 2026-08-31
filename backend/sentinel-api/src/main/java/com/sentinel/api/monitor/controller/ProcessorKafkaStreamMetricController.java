@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Instant;
 
 @RestController
-@RequestMapping("/api/admin/monitor/processor/kafka-streams")
+@RequestMapping("/api/admin/monitor/processor/kafkaStreams")
 @RequiredArgsConstructor
 public class ProcessorKafkaStreamMetricController {
 
