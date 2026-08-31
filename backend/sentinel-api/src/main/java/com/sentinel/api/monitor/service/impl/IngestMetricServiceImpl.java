@@ -138,7 +138,7 @@ public class IngestMetricServiceImpl implements IngestMetricService {
         if (seconds <= 0) {
             throw new IllegalArgumentException("'from' must be before 'to'");
         }
-        int maxPoints = 1000;
+        int maxPoints = 500;
         return Math.max(1, (int) Math.ceil((double) seconds / maxPoints));
     }
 }

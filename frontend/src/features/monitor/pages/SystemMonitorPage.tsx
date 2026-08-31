@@ -1,4 +1,5 @@
 import { getDateTimeRange } from "../../../shared/utils/dateUtils";
+import { IngestAppMetricsChart } from "../charts/IngestAppMetricsChart";
 import { IngestKafkaMetricsChart } from "../charts/IngestKafkaMetricsChart";
 import { ProcessorCassandraMetricsChart } from "../charts/ProcessorCassandraMetricsChart";
 import { ProcessorListenerMetricsChart } from "../charts/ProcessorListenerMetricsChart";
@@ -16,7 +17,7 @@ export default function ProcessorDashboard() {
                     <ProcessorCassandraMetricsChart {...getDateTimeRange(5000)} />
                     <ProcessorStreamsMetricsChart {...getDateTimeRange(5000)} />
                 </div>
-
+                <IngestAppMetricsChart {...getDateTimeRange(5000)} />
                 <div className="mt-2 flex items-center gap-1.5 text-[8px] text-slate-600">
                     <span className="text-blue-400">ⓘ</span>
                     All rates are calculated using Prometheus rate() over a 1-minute window. Times

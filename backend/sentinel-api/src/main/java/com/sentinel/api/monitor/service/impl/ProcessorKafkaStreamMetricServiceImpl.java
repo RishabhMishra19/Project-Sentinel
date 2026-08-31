@@ -20,29 +20,32 @@ public class ProcessorKafkaStreamMetricServiceImpl implements ProcessorKafkaStre
     private static final String APPLICATION = "sentinel-processor";
 
     private static final Map<String, KafkaStreamDefinition> STREAMS = Map.ofEntries(Map.entry("endpoint_minute",
-        new KafkaStreamDefinition("endpoint_minute", "endpoint_minute_analytics_source", "endpoint_minute_analytics",
+        new KafkaStreamDefinition("endpoint_minute", "request_logs_source", "request_logs",
             "endpoint_minute_analytics_sink", "endpoint_minute_analytics")), Map.entry("service_minute",
-        new KafkaStreamDefinition("service_minute", "service_minute_analytics_source", "service_minute_analytics",
+        new KafkaStreamDefinition("service_minute", "endpoint_minute_analytics_source", "endpoint_minute_analytics",
             "service_minute_analytics_sink", "service_minute_analytics")), Map.entry("product_minute",
-        new KafkaStreamDefinition("product_minute", "product_minute_analytics_source", "product_minute_analytics",
+        new KafkaStreamDefinition("product_minute", "service_minute_analytics_source", "service_minute_analytics",
             "product_minute_analytics_sink", "product_minute_analytics")), Map.entry("tenant_minute",
-        new KafkaStreamDefinition("tenant_minute", "tenant_minute_analytics_source", "tenant_minute_analytics",
+        new KafkaStreamDefinition("tenant_minute", "product_minute_analytics_source", "product_minute_analytics",
             "tenant_minute_analytics_sink", "tenant_minute_analytics")), Map.entry("endpoint_hour",
-        new KafkaStreamDefinition("endpoint_hour", "endpoint_hour_analytics_source", "endpoint_hour_analytics",
+        new KafkaStreamDefinition("endpoint_hour", "endpoint_minute_analytics_source", "endpoint_minute_analytics",
             "endpoint_hour_analytics_sink", "endpoint_hour_analytics")), Map.entry("service_hour",
-        new KafkaStreamDefinition("service_hour", "service_hour_analytics_source", "service_hour_analytics", "service_hour_analytics_sink",
+        new KafkaStreamDefinition("service_hour", "service_minute_analytics_source", "service_minute_analytics",
+            "service_hour_analytics_sink",
             "service_hour_analytics")), Map.entry("product_hour",
-        new KafkaStreamDefinition("product_hour", "product_hour_analytics_source", "product_hour_analytics", "product_hour_analytics_sink",
+        new KafkaStreamDefinition("product_hour", "product_minute_analytics_source", "product_minute_analytics",
+            "product_hour_analytics_sink",
             "product_hour_analytics")), Map.entry("tenant_hour",
-        new KafkaStreamDefinition("tenant_hour", "tenant_hour_analytics_source", "tenant_hour_analytics", "tenant_hour_analytics_sink",
+        new KafkaStreamDefinition("tenant_hour", "tenant_minute_analytics_source", "tenant_minute_analytics", "tenant_hour_analytics_sink",
             "tenant_hour_analytics")), Map.entry("endpoint_day",
-        new KafkaStreamDefinition("endpoint_day", "endpoint_day_analytics_source", "endpoint_day_analytics", "endpoint_day_analytics_sink",
+        new KafkaStreamDefinition("endpoint_day", "endpoint_hour_analytics_source", "endpoint_hour_analytics",
+            "endpoint_day_analytics_sink",
             "endpoint_day_analytics")), Map.entry("service_day",
-        new KafkaStreamDefinition("service_day", "service_day_analytics_source", "service_day_analytics", "service_day_analytics_sink",
+        new KafkaStreamDefinition("service_day", "service_hour_analytics_source", "service_hour_analytics", "service_day_analytics_sink",
             "service_day_analytics")), Map.entry("product_day",
-        new KafkaStreamDefinition("product_day", "product_day_analytics_source", "product_day_analytics", "product_day_analytics_sink",
+        new KafkaStreamDefinition("product_day", "product_hour_analytics_source", "product_hour_analytics", "product_day_analytics_sink",
             "product_day_analytics")), Map.entry("tenant_day",
-        new KafkaStreamDefinition("tenant_day", "tenant_day_analytics_source", "tenant_day_analytics", "tenant_day_analytics_sink",
+        new KafkaStreamDefinition("tenant_day", "tenant_hour_analytics_source", "tenant_hour_analytics", "tenant_day_analytics_sink",
             "tenant_day_analytics")));
 
     private final PrometheusServiceClient prometheusServiceClient;
@@ -117,7 +120,7 @@ public class ProcessorKafkaStreamMetricServiceImpl implements ProcessorKafkaStre
         if (seconds <= 0) {
             throw new IllegalArgumentException("'from' must be before 'to'");
         }
-        int maxPoints = 1000;
+        int maxPoints = 500;
         return Math.max(1, (int) Math.ceil((double) seconds / maxPoints));
     }
 }
