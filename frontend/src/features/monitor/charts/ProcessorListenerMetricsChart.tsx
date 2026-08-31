@@ -5,13 +5,14 @@ import { extractTime } from "../../../shared/utils/dateUtils";
 import { DashboardChart } from "../components/DashboardChart";
 import { TOPICS } from "../constants/topics";
 import { useState } from "react";
+import { POLLING_INTERVAL } from "../constants/common";
 
 export const ProcessorListenerMetricsChart = (params: MetricRequest) => {
     const [topic, setTopic] = useState(TOPICS[0]);
     const { isLoading, data } = useQuery({
         queryKey: ["processor-listener-metrics", params],
         queryFn: () => MonitorApi.getProcessorListenerMetrics({ ...params, topic: topic }),
-        refetchInterval: 1000,
+        refetchInterval: POLLING_INTERVAL,
     });
 
     const polledMap = (data?.polled?.data ?? []).reduce(

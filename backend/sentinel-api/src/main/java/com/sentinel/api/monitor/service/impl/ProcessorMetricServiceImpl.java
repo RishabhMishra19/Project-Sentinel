@@ -41,7 +41,7 @@ public class ProcessorMetricServiceImpl implements ProcessorMetricService {
             rate(
                 sentinel_processor_records_polled_total{
                     topic="%s"
-                }[1m]
+                }[30s]
             )
             """.formatted(topic);
         return toNamedSeries(prometheusServiceClient.queryRange(query, from, to, stepSeconds), "polled");
@@ -52,7 +52,7 @@ public class ProcessorMetricServiceImpl implements ProcessorMetricService {
             rate(
                 sentinel_processor_records_failed_total{
                     topic="%s"
-                }[1m]
+                }[30s]
             )
             """.formatted(topic);
         return toNamedSeries(prometheusServiceClient.queryRange(query, from, to, stepSeconds), "failures");
@@ -79,7 +79,7 @@ public class ProcessorMetricServiceImpl implements ProcessorMetricService {
             rate(
                 sentinel_processor_cassandra_writes_total{
                     table="%s"
-                }[1m]
+                }[30s]
             )
             """.formatted(table);
         return toNamedSeries(prometheusServiceClient.queryRange(query, from, to, stepSeconds), "writes");
@@ -90,7 +90,7 @@ public class ProcessorMetricServiceImpl implements ProcessorMetricService {
             rate(
                 sentinel_processor_cassandra_write_failures_total{
                     table="%s"
-                }[1m]
+                }[30s]
             )
             """.formatted(table);
         return toNamedSeries(prometheusServiceClient.queryRange(query, from, to, stepSeconds), "failures");

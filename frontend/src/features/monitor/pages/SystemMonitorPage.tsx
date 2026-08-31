@@ -1,4 +1,4 @@
-import { getDateRange } from "../../../shared/utils/dateUtils";
+import { getDateTimeRange } from "../../../shared/utils/dateUtils";
 import { IngestKafkaMetricsChart } from "../charts/IngestKafkaMetricsChart";
 import { ProcessorCassandraMetricsChart } from "../charts/ProcessorCassandraMetricsChart";
 import { ProcessorListenerMetricsChart } from "../charts/ProcessorListenerMetricsChart";
@@ -11,10 +11,10 @@ export default function ProcessorDashboard() {
                 {/* <DashboardHeader autoRefresh={autoRefresh} setAutoRefresh={setAutoRefresh} /> */}
 
                 <div className="flex flex-wrap w-full justify-between">
-                    <IngestKafkaMetricsChart {...getDateRange(10)} />
-                    <ProcessorListenerMetricsChart {...getDateRange(10)} />
-                    <ProcessorCassandraMetricsChart {...getDateRange(10)} />
-                    <ProcessorStreamsMetricsChart {...getDateRange(10)} />
+                    <IngestKafkaMetricsChart {...getDateTimeRange(5000)} />
+                    <ProcessorListenerMetricsChart {...getDateTimeRange(5000)} />
+                    <ProcessorCassandraMetricsChart {...getDateTimeRange(5000)} />
+                    <ProcessorStreamsMetricsChart {...getDateTimeRange(5000)} />
                 </div>
 
                 <div className="mt-2 flex items-center gap-1.5 text-[8px] text-slate-600">

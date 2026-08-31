@@ -80,6 +80,13 @@ export const getDateRange = (days: number) => {
     return { from: daysBeforeNow.toISOString(), to: now.toISOString() };
 };
 
+export const getDateTimeRange = (seconds: number) => {
+    const now = new Date();
+    const daysBeforeNow = new Date(now.getTime() - seconds * 1000);
+
+    return { from: daysBeforeNow.toISOString(), to: now.toISOString() };
+};
+
 export const extractTime = (timestamp: Date) => {
     return new Date(timestamp).toLocaleTimeString([], {
         hour: "2-digit",

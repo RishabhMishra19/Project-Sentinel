@@ -4,13 +4,14 @@ import type { MetricRequest } from "../dto/monitor.request";
 import { extractTime } from "../../../shared/utils/dateUtils";
 import { useState } from "react";
 import { DashboardChart } from "../components/DashboardChart";
+import { POLLING_INTERVAL } from "../constants/common";
 
 export const IngestKafkaMetricsChart = (params: MetricRequest) => {
     const [ingestTopic, setIngestTopic] = useState("request_logs");
     const { isLoading, data } = useQuery({
         queryKey: ["ingest-kafka-metrics", params],
         queryFn: () => MonitorApi.getIngestKafkaMetrics({ ...params, topic: ingestTopic }),
-        refetchInterval: 1000,
+        refetchInterval: POLLING_INTERVAL,
     });
 
     const requestsMap = (data?.kafkaPublished?.data ?? []).reduce(

@@ -5,13 +5,14 @@ import { extractTime } from "../../../shared/utils/dateUtils";
 import { DashboardChart } from "../components/DashboardChart";
 import { useState } from "react";
 import { STREAMS } from "../constants/streams";
+import { POLLING_INTERVAL } from "../constants/common";
 
 export const ProcessorStreamsMetricsChart = (params: MetricRequest) => {
     const [stream, setStream] = useState(STREAMS[0]);
     const { isLoading, data } = useQuery({
         queryKey: ["processor-streams-metrics", params],
         queryFn: () => MonitorApi.getProcessorStreamsMetrics({ ...params, stream }),
-        refetchInterval: 1000,
+        refetchInterval: POLLING_INTERVAL,
     });
 
     const consumedMap = (data?.consumedPerSecond?.data ?? []).reduce(

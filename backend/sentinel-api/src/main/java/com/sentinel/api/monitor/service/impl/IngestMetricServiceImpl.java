@@ -38,7 +38,7 @@ public class IngestMetricServiceImpl implements IngestMetricService {
     private MetricSeries getKafkaPublished(Instant from, Instant to) {
         String query = """
             rate(
-                sentinel_ingest_kafka_published_total[1m]
+                sentinel_ingest_kafka_published_total[30s]
             )
             """;
         List<MetricSeries> series = prometheusServiceClient.queryRange(query, from, to, calculateStepSeconds(from, to));
@@ -51,7 +51,7 @@ public class IngestMetricServiceImpl implements IngestMetricService {
     private MetricSeries getKafkaPublishFailures(Instant from, Instant to) {
         String query = """
             rate(
-                sentinel_ingest_kafka_publish_failures_total[1m]
+                sentinel_ingest_kafka_publish_failures_total[30s]
             )
             """;
         List<MetricSeries> series = prometheusServiceClient.queryRange(query, from, to, calculateStepSeconds(from, to));
@@ -67,7 +67,7 @@ public class IngestMetricServiceImpl implements IngestMetricService {
                 0.95,
                 sum by (le) (
                     rate(
-                        sentinel_ingest_kafka_publish_duration_seconds_bucket[1m]
+                        sentinel_ingest_kafka_publish_duration_seconds_bucket[30s]
                     )
                 )
             )
@@ -85,7 +85,7 @@ public class IngestMetricServiceImpl implements IngestMetricService {
                 http_server_requests_seconds_count{
                     method="POST",
                     uri="%s"
-                }[1m]
+                }[30s]
             )
             """.formatted(INGEST_URI);
         List<MetricSeries> series = prometheusServiceClient.queryRange(query, from, to, calculateStepSeconds(from, to));
@@ -102,7 +102,7 @@ public class IngestMetricServiceImpl implements IngestMetricService {
                     method="POST",
                     uri="%s",
                     status=~"4..|5.."
-                }[1m]
+                }[30s]
             )
             """.formatted(INGEST_URI);
         List<MetricSeries> series = prometheusServiceClient.queryRange(query, from, to, calculateStepSeconds(from, to));
@@ -121,7 +121,7 @@ public class IngestMetricServiceImpl implements IngestMetricService {
                         http_server_requests_seconds_bucket{
                             method="POST",
                             uri="%s"
-                        }[1m]
+                        }[30s]
                     )
                 )
             )

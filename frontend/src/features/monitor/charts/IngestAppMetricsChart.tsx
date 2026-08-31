@@ -3,12 +3,13 @@ import { MonitorApi } from "../api/MonitorApi";
 import type { MetricRequest } from "../dto/monitor.request";
 import { extractTime } from "../../../shared/utils/dateUtils";
 import { DashboardChart } from "../components/DashboardChart";
+import { POLLING_INTERVAL } from "../constants/common";
 
 export const IngestAppMetricsChart = (params: MetricRequest) => {
     const { isLoading, data } = useQuery({
         queryKey: ["ingest-app-metrics", params],
         queryFn: () => MonitorApi.getIngestAppMetrics(params),
-        refetchInterval: 1000,
+        refetchInterval: POLLING_INTERVAL,
     });
 
     const requestsMap = (data?.requests?.data ?? []).reduce(

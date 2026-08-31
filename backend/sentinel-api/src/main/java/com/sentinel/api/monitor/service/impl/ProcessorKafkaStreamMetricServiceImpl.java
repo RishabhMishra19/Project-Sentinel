@@ -68,7 +68,7 @@ public class ProcessorKafkaStreamMetricServiceImpl implements ProcessorKafkaStre
                     application="%s",
                     processor_node_id="%s",
                     topic="%s"
-                }[1m]
+                }[30s]
             )
             """.formatted(APPLICATION, definition.sourceNode(), definition.sourceTopic());
         return toNamedSeries(prometheusServiceClient.queryRange(query, from, to, stepSeconds), "consumedPerSecond");
@@ -81,7 +81,7 @@ public class ProcessorKafkaStreamMetricServiceImpl implements ProcessorKafkaStre
                     application="%s",
                     processor_node_id="%s",
                     topic="%s"
-                }[1m]
+                }[30s]
             )
             """.formatted(APPLICATION, definition.sinkNode(), definition.sinkTopic());
         return toNamedSeries(prometheusServiceClient.queryRange(query, from, to, stepSeconds), "producedPerSecond");

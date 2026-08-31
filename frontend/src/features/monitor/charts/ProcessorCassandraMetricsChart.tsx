@@ -5,6 +5,7 @@ import { extractTime } from "../../../shared/utils/dateUtils";
 import { DashboardChart } from "../components/DashboardChart";
 import { useState } from "react";
 import { CASSANDRA_TABLES } from "../constants/cassandraTables";
+import { POLLING_INTERVAL } from "../constants/common";
 
 export const ProcessorCassandraMetricsChart = (params: MetricRequest) => {
     const [ingestTable, setIngestTable] = useState(CASSANDRA_TABLES[0]);
@@ -12,7 +13,7 @@ export const ProcessorCassandraMetricsChart = (params: MetricRequest) => {
     const { isLoading, data } = useQuery({
         queryKey: ["processor-cassandra-metrics", params, ingestTable],
         queryFn: () => MonitorApi.getProcessorCassandraMetrics({ ...params, table: ingestTable }),
-        refetchInterval: 1000,
+        refetchInterval: POLLING_INTERVAL,
     });
 
     const writesMap = (data?.writes?.data ?? []).reduce(

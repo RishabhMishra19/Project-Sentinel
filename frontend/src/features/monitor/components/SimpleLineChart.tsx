@@ -115,6 +115,7 @@ export const SimpleLineChart = <T extends LineChartPoint>({
                                 fontSize: "10px",
                             }}
                             content={ChartTooltip}
+                            shared={false}
                         />
                     )}
                     {lines.map((line) => (
