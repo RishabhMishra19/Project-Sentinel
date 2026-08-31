@@ -1,0 +1,16 @@
+export const CASSANDRA_TABLES = [
+    "request_logs",
+    "request_logs_lookup_by_id",
+    "analytics_tenant_stats_minute",
+    "analytics_product_stats_minute",
+    "analytics_service_stats_minute",
+    "analytics_endpoint_stats_minute",
+    "analytics_tenant_stats_hour",
+    "analytics_product_stats_hour",
+    "analytics_service_stats_hour",
+    "analytics_endpoint_stats_hour",
+    "analytics_tenant_stats_day",
+    "analytics_product_stats_day",
+    "analytics_service_stats_day",
+    "analytics_endpoint_stats_day",
+];

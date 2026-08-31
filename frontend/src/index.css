@@ -3,157 +3,157 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-background: #fafbfc;
-  --color-surface: #ffffff;
-  --color-chrome: #eef1f4;
-  --color-foreground: #111827;
-  --color-muted: #6b7280;
-  --color-border: #e5e7eb;
-  --color-accent: #3b6ef5;
-  --color-accent-foreground: #ffffff;
-  --color-accent-soft: #e8effe;
-  --color-primary: #111827;
-  --color-primary-foreground: #ffffff;
-  --color-warning: #d97706;
-  --color-danger: #dc2626;
-  --color-ring: #3b6ef5;
+    --color-background: #fafbfc;
+    --color-surface: #ffffff;
+    --color-chrome: #eef1f4;
+    --color-foreground: #111827;
+    --color-muted: #6b7280;
+    --color-border: #e5e7eb;
+    --color-accent: #3b6ef5;
+    --color-accent-foreground: #ffffff;
+    --color-accent-soft: #e8effe;
+    --color-primary: #111827;
+    --color-primary-foreground: #ffffff;
+    --color-warning: #d97706;
+    --color-danger: #dc2626;
+    --color-ring: #3b6ef5;
 
-  /* Floating sidebar — solid blue in light theme */
-  --color-sidebar: #3b6ef5;
-  --color-sidebar-foreground: #ffffff;
-  --color-sidebar-muted: #ffffff;
-  --color-sidebar-tray: rgb(0 0 0 / 0.14);
-  --color-sidebar-item: rgb(255 255 255 / 0.12);
-  --color-sidebar-item-active: #ffffff;
-  --color-sidebar-item-active-foreground: #3b6ef5;
+    /* Floating sidebar — solid blue in light theme */
+    --color-sidebar: #3b6ef5;
+    --color-sidebar-foreground: #ffffff;
+    --color-sidebar-muted: #ffffff;
+    --color-sidebar-tray: rgb(0 0 0 / 0.14);
+    --color-sidebar-item: rgb(255 255 255 / 0.12);
+    --color-sidebar-item-active: #ffffff;
+    --color-sidebar-item-active-foreground: #3b6ef5;
 
-  /* Auth marketing panel — stays dark, shifts slightly with theme */
-  --color-brand-panel: #0c0f14;
-  --color-brand-panel-foreground: #f8fafc;
-  --color-brand-panel-muted: #94a3b8;
-  --color-brand-panel-border: #334155;
+    /* Auth marketing panel — stays dark, shifts slightly with theme */
+    --color-brand-panel: #0c0f14;
+    --color-brand-panel-foreground: #f8fafc;
+    --color-brand-panel-muted: #94a3b8;
+    --color-brand-panel-border: #334155;
 }
 
 .dark {
-  --color-background: #12171f;
-  --color-surface: #2a3545;
-  --color-chrome: #0a0e14;
-  --color-foreground: #e5e7eb;
-  --color-muted: #9ca3af;
-  --color-border: #3a4658;
-  --color-accent: #60a5fa;
-  --color-accent-foreground: #0c0f14;
-  --color-accent-soft: color-mix(in srgb, #60a5fa 16%, #2a3545);
-  --color-primary: #e5e7eb;
-  --color-primary-foreground: #0c0f14;
-  --color-warning: #fbbf24;
-  --color-danger: #f87171;
-  --color-ring: #60a5fa;
+    --color-background: #12171f;
+    --color-surface: #2a3545;
+    --color-chrome: #0a0e14;
+    --color-foreground: #e5e7eb;
+    --color-muted: #9ca3af;
+    --color-border: #3a4658;
+    --color-accent: #60a5fa;
+    --color-accent-foreground: #0c0f14;
+    --color-accent-soft: color-mix(in srgb, #60a5fa 16%, #2a3545);
+    --color-primary: #e5e7eb;
+    --color-primary-foreground: #0c0f14;
+    --color-warning: #fbbf24;
+    --color-danger: #f87171;
+    --color-ring: #60a5fa;
 
-  /* Floating sidebar — sinks below elevated surface */
-  --color-sidebar: #0f1620;
-  --color-sidebar-foreground: #f1f5f9;
-  --color-sidebar-muted: #8b9cb3;
-  --color-sidebar-tray: rgb(255 255 255 / 0.05);
-  --color-sidebar-item: rgb(255 255 255 / 0.07);
-  --color-sidebar-item-active: #60a5fa;
-  --color-sidebar-item-active-foreground: #0c0f14;
+    /* Floating sidebar — sinks below elevated surface */
+    --color-sidebar: #0f1620;
+    --color-sidebar-foreground: #f1f5f9;
+    --color-sidebar-muted: #8b9cb3;
+    --color-sidebar-tray: rgb(255 255 255 / 0.05);
+    --color-sidebar-item: rgb(255 255 255 / 0.07);
+    --color-sidebar-item-active: #60a5fa;
+    --color-sidebar-item-active-foreground: #0c0f14;
 
-  --color-brand-panel: #0a1628;
-  --color-brand-panel-foreground: #f1f5f9;
-  --color-brand-panel-muted: #8ba3c1;
-  --color-brand-panel-border: #1e3a5f;
+    --color-brand-panel: #0a1628;
+    --color-brand-panel-foreground: #f1f5f9;
+    --color-brand-panel-muted: #8ba3c1;
+    --color-brand-panel-border: #1e3a5f;
 }
 
 @layer base {
-  html,
-  body {
-    @apply bg-background text-foreground;
-  }
+    html,
+    body {
+        @apply bg-background text-foreground;
+    }
 
-  a[href],
-  button:not(:disabled),
-  [type="button"]:not(:disabled),
-  [type="submit"]:not(:disabled),
-  [type="reset"]:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
+    a[href],
+    button:not(:disabled),
+    [type="button"]:not(:disabled),
+    [type="submit"]:not(:disabled),
+    [type="reset"]:not(:disabled),
+    [role="button"]:not(:disabled) {
+        cursor: pointer;
+    }
 
-  button:disabled,
-  [type="button"]:disabled,
-  [type="submit"]:disabled,
-  [type="reset"]:disabled,
-  [role="button"][aria-disabled="true"] {
-    cursor: not-allowed;
-  }
+    button:disabled,
+    [type="button"]:disabled,
+    [type="submit"]:disabled,
+    [type="reset"]:disabled,
+    [role="button"][aria-disabled="true"] {
+        cursor: not-allowed;
+    }
 }
 
 /* Sonner toast color scheme — driven by semantic tokens */
 [data-sonner-toaster] {
-  --normal-bg: var(--color-surface);
-  --normal-border: var(--color-border);
-  --normal-text: var(--color-foreground);
+    --normal-bg: var(--color-surface);
+    --normal-border: var(--color-border);
+    --normal-text: var(--color-foreground);
 
-  --success-bg: color-mix(in srgb, #059669 12%, var(--color-surface));
-  --success-border: color-mix(in srgb, #059669 35%, var(--color-border));
-  --success-text: #059669;
+    --success-bg: color-mix(in srgb, #059669 12%, var(--color-surface));
+    --success-border: color-mix(in srgb, #059669 35%, var(--color-border));
+    --success-text: #059669;
 
-  --error-bg: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface));
-  --error-border: color-mix(in srgb, var(--color-danger) 35%, var(--color-border));
-  --error-text: var(--color-danger);
+    --error-bg: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface));
+    --error-border: color-mix(in srgb, var(--color-danger) 35%, var(--color-border));
+    --error-text: var(--color-danger);
 
-  --warning-bg: color-mix(in srgb, var(--color-warning) 12%, var(--color-surface));
-  --warning-border: color-mix(in srgb, var(--color-warning) 35%, var(--color-border));
-  --warning-text: var(--color-warning);
+    --warning-bg: color-mix(in srgb, var(--color-warning) 12%, var(--color-surface));
+    --warning-border: color-mix(in srgb, var(--color-warning) 35%, var(--color-border));
+    --warning-text: var(--color-warning);
 
-  --info-bg: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
-  --info-border: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
-  --info-text: var(--color-accent);
+    --info-bg: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+    --info-border: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+    --info-text: var(--color-accent);
 }
 
 .dark [data-sonner-toaster] {
-  --success-text: #34d399;
+    --success-text: #34d399;
 }
 
 [data-sonner-toast].sentinel-toast-loading {
-  background: var(--color-background) !important;
-  border-color: var(--color-border) !important;
-  color: var(--color-muted) !important;
+    background: var(--color-background) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-muted) !important;
 }
 
 [data-sonner-toast] [data-button][data-action].sentinel-toast-action {
-  background: var(--color-primary);
-  color: var(--color-primary-foreground);
+    background: var(--color-primary);
+    color: var(--color-primary-foreground);
 }
 
 [data-sonner-toast] [data-button][data-cancel].sentinel-toast-cancel {
-  background: var(--color-border);
-  color: var(--color-foreground);
+    background: var(--color-border);
+    color: var(--color-foreground);
 }
 
 @keyframes bootstrap-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes tenant-text-sparkle {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 1;
-  }
+    0%,
+    100% {
+        opacity: 0.55;
+    }
+    50% {
+        opacity: 1;
+    }
 }
 
 .tenant-text-sparkle {
-  color: var(--color-warning);
-  animation: tenant-text-sparkle 1.6s ease-in-out infinite;
+    color: var(--color-warning);
+    animation: tenant-text-sparkle 1.6s ease-in-out infinite;
 }
